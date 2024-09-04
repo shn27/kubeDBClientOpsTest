@@ -3,10 +3,9 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"os"
-
 	"github.com/olekukonko/tablewriter"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"os"
 )
 
 type DiagnosticResult struct {
@@ -20,7 +19,7 @@ type DiagnosticOutput struct {
 	Data    []byte
 }
 
-const maxLinesPerOutput = 10
+const maxLinesPerOutput = 1
 
 func main() {
 	// Example data
@@ -31,16 +30,6 @@ func main() {
 			Outputs: []DiagnosticOutput{
 				{Message: "Output 1", Data: []byte("Data 1")},
 				{Message: "Output 2", Data: []byte("Data 2")},
-				{Message: "Output 3", Data: []byte("Data 3")},
-				{Message: "Output 4", Data: []byte("Data 4")},
-				{Message: "Output 5", Data: []byte("Data 5")},
-				{Message: "Output 6", Data: []byte("Data 6")},
-				{Message: "Output 7", Data: []byte("Data 7")},
-				{Message: "Output 8", Data: []byte("Data 8")},
-				{Message: "Output 9", Data: []byte("Data 9")},
-				{Message: "Output 10", Data: []byte("Data 10")},
-				{Message: "Output 11", Data: []byte("Data 11")},
-				{Message: "Output 12", Data: []byte("Data 12")},
 			},
 		},
 	}
@@ -84,11 +73,16 @@ func main() {
 	// Render the main table to the buffer
 	table.Render()
 
-	// Save the buffer content to a file
-	err := os.WriteFile("output.md", buf.Bytes(), 0644)
+	// Convert buffer to string
+	tableOutput := buf.String()
+
+	// Print the string variable containing the table
+	fmt.Println(tableOutput)
+
+	err := os.WriteFile("README.md", []byte(tableOutput), 0644)
 	if err != nil {
-		fmt.Println("Error writing to file:", err)
+		fmt.Println("Error writing to README.md:", err)
 	} else {
-		fmt.Println("Table output saved to output.md")
+		fmt.Println("Table output saved to README.md")
 	}
 }
