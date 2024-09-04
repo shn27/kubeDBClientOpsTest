@@ -3,9 +3,11 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"os"
+	"text/template"
+
 	"github.com/olekukonko/tablewriter"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"os"
 )
 
 type DiagnosticResult struct {
@@ -76,13 +78,47 @@ func main() {
 	// Convert buffer to string
 	tableOutput := buf.String()
 
-	// Print the string variable containing the table
-	fmt.Println(tableOutput)
+	// HTML template for the table
+	const htmlTemplate = `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Diagnostic Results</title>
+    <style>
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid black; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>Diagnostic Results</h1>
+    <pre>{{ . }}</pre>
+</body>
+</html>
+`
 
-	err := os.WriteFile("README.md", []byte(tableOutput), 0644)
+	// Create a new template and parse the HTML string into it
+	tmpl, err := template.New("html").Parse(htmlTemplate)
 	if err != nil {
-		fmt.Println("Error writing to README.md:", err)
+		fmt.Println("Error creating template:", err)
+		return
+	}
+
+	// Create a buffer to capture the final HTML output
+	var htmlBuf bytes.Buffer
+
+	// Execute the template with the table output
+	err = tmpl.Execute(&htmlBuf, tableOutput)
+	if err != nil {
+		fmt.Println("Error executing template:", err)
+		return
+	}
+
+	// Save the HTML content to a file
+	err = os.WriteFile("output.html", htmlBuf.Bytes(), 0644)
+	if err != nil {
+		fmt.Println("Error writing to output.html:", err)
 	} else {
-		fmt.Println("Table output saved to README.md")
+		fmt.Println("Table output saved to output.html")
 	}
 }
