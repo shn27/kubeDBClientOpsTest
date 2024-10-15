@@ -1,4 +1,4 @@
-package main
+package work
 
 import (
 	"context"
@@ -52,7 +52,7 @@ func GetK8sClient() (kubernetes.Interface, error) {
 	return k8sClient, nil
 }
 
-func getResource(resourceName string) {
+func GetResource(resourceName string) {
 	kubeconfig := filepath.Join(homedir.HomeDir(), ".kube", "config")
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {

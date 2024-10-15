@@ -1,4 +1,4 @@
-package main
+package work
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func isRunbookCRExit() {
+func IsRunbookCRExit() {
 	myClient, err := getKBClient()
 	if err != nil {
 	}

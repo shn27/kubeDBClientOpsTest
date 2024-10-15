@@ -1,4 +1,4 @@
-package main
+package work
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 )
 
-func getPreferredResourceVersion(ref kmapi.TypedObjectReference) (string, error) {
+func GetPreferredResourceVersion(ref kmapi.TypedObjectReference) (string, error) {
 	cfg, err := config.GetConfig()
 	if err != nil {
 		return "", err
