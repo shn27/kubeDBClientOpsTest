@@ -21,12 +21,16 @@ import (
 func getKBClient() (client.Client, error) {
 	config, err := ctrl.GetConfig()
 	if err != nil {
-		return nil, err
+		config, err = rest.InClusterConfig()
+		if err != nil {
+			return nil, err
+		}
 	}
 	cl, err := client.New(config, client.Options{
 		Scheme: runtime.NewScheme(),
 	})
 	if err != nil {
+
 		return nil, err
 	}
 	return cl, nil

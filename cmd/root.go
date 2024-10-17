@@ -50,12 +50,21 @@ var resource = &cobra.Command{
 	},
 }
 
+var mongodb = &cobra.Command{
+	Use:   "mongodb",
+	Short: "Greet the user",
+	Long:  `This subcommand greets the user with a custom message.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		work.GetDBClient()
+	},
+}
+
 var RootCmd = &cobra.Command{
 	Use:   "app",
 	Short: "This is a simple CLI application",
 	Long:  `A simple CLI application built with Cobra in Go.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Hello from Cobra CLI!")
+		work.GetDBClient()
 	},
 }
 
@@ -64,4 +73,5 @@ func init() {
 	RootCmd.AddCommand(runbook)
 	RootCmd.AddCommand(version)
 	RootCmd.AddCommand(resource)
+	RootCmd.AddCommand(mongodb)
 }
