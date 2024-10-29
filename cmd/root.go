@@ -24,6 +24,14 @@ var markdown1 = &cobra.Command{
 		work.GetMarkdown()
 	},
 }
+var tableWriter = &cobra.Command{
+	Use:   "table",
+	Short: "Greet the user",
+	Long:  `This subcommand greets the user with a custom message.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		work.Table()
+	},
+}
 
 var version = &cobra.Command{
 	Use:   "version",
@@ -59,6 +67,15 @@ var mongodb = &cobra.Command{
 	},
 }
 
+var mongodbServerStatus = &cobra.Command{
+	Use:   "mongodbServerStatus",
+	Short: "Greet the user",
+	Long:  `This subcommand greets the user with a custom message.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		work.GetDBClient()
+	},
+}
+
 var RootCmd = &cobra.Command{
 	Use:   "app",
 	Short: "This is a simple CLI application",
@@ -74,4 +91,6 @@ func init() {
 	RootCmd.AddCommand(version)
 	RootCmd.AddCommand(resource)
 	RootCmd.AddCommand(mongodb)
+	RootCmd.AddCommand(mongodbServerStatus)
+	RootCmd.AddCommand(tableWriter)
 }
