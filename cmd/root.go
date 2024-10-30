@@ -58,12 +58,12 @@ var resource = &cobra.Command{
 	},
 }
 
-var mongodb = &cobra.Command{
-	Use:   "mongodb",
+var currentop = &cobra.Command{
+	Use:   "currentop",
 	Short: "Greet the user",
 	Long:  `This subcommand greets the user with a custom message.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		work.GetDBClient()
+		work.DbCurrentOp()
 	},
 }
 
@@ -72,7 +72,7 @@ var mongodbServerStatus = &cobra.Command{
 	Short: "Greet the user",
 	Long:  `This subcommand greets the user with a custom message.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		work.GetDBClient()
+		work.Network()
 	},
 }
 
@@ -81,7 +81,7 @@ var RootCmd = &cobra.Command{
 	Short: "This is a simple CLI application",
 	Long:  `A simple CLI application built with Cobra in Go.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		work.GetDBClient()
+		work.CallAllMongoMethod()
 	},
 }
 
@@ -90,7 +90,7 @@ func init() {
 	RootCmd.AddCommand(runbook)
 	RootCmd.AddCommand(version)
 	RootCmd.AddCommand(resource)
-	RootCmd.AddCommand(mongodb)
+	RootCmd.AddCommand(currentop)
 	RootCmd.AddCommand(mongodbServerStatus)
 	RootCmd.AddCommand(tableWriter)
 }
