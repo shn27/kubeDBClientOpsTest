@@ -22,14 +22,18 @@ tag:
 push: tag
 	docker push $(REGISTRY_URL)/$(IMAGE_NAME):$(IMAGE_TAG)
 
+
+# Push the Docker image to kind
+.PHONY: push-to-kind
+push-to-kind: build
+	kind load docker-image $(IMAGE_NAME):$(IMAGE_TAG) --name $(KIND_CLUSTER_NAME)
+
+
 # Deploy Docker image to Kind cluster
 .PHONY: deploy
-deploy: build
-deploy:tag
-deploy:push
+deploy:push-to-kind
 	# Apply the Kubernetes deployment and service YAML
 	kubectl apply -f $(K8S_DEPLOYMENT_FILE) -n $(NAMESPACE)
-
 
 
 # Clean up the environment (optional)

@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
         - name: my-app-container
-          image: shn27/my-app-image:latest # Replace this with your actual image name and tag
-          imagePullPolicy: Always
+          image: my-app-image:latest # Replace this with your actual image name and tag
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080 # Change this based on your app's port
 ---

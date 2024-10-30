@@ -3,7 +3,6 @@ package work
 import (
 	"context"
 	"fmt"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -49,94 +48,27 @@ mongodb
 monitoring
 */
 
-func GetDBClient() {
-	for {
-		time.Sleep(30 * time.Second)
-		kbClient, err := getKBClient()
-		if err != nil {
-			fmt.Println("failed to get k8s client", err)
-			continue
-		}
-
-		//db, err := getK8sObject(kbClient)
-		//
-		//if err != nil {
-		//	fmt.Println("failed to get mongo object: %w", err)
-		//}
-		//
-		//if db.Spec.AuthSecret == nil {
-		//	fmt.Printf("auth secret is missing for %s/%s\n", db.Namespace, db.Name)
-		//}
-
-		db := &api.MongoDB{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "mongodb",
-				Namespace: "monitoring",
-			},
-			//Spec: api.MongoDBSpec{
-			//	AuthSecret: &api.SecretReference{
-			//		LocalObjectReference: core.LocalObjectReference{
-			//			Name: "mongodb-auth",
-			//		},
-			//	},
-			//},
-		}
-
-		kubeDBClient, err := mongodb.NewKubeDBClientBuilder(kbClient, db).
-			GetMongoClient()
-		if err != nil {
-			fmt.Println("failed to get kube db client: %w", err)
-			continue
-		}
-
-		fmt.Println("database client created")
-
-		// Run db.currentOp() using RunCommand
-		var result bson.M
-		err = kubeDBClient.Database("admin").RunCommand(context.TODO(), bson.D{
-			{Key: "currentOp", Value: 1},
-		}).Decode(&result)
-
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		// Check for operations in progress
-		inProg, ok := result["inprog"].(bson.A)
-		if !ok {
-			fmt.Println("No operations in progress.")
-			continue
-		}
-
-		// Iterate through each operation
-		for _, op := range inProg {
-			// Each operation is a map of string keys to interface{} values
-			opDetails, ok := op.(bson.M)
-			if !ok {
-				continue
-			}
-
-			// Check if the operation has been running for more than 20 seconds
-			if secsRunning, _ := opDetails["secs_running"].(int32); secsRunning >= 20 {
-				logSlowQuery(opDetails)
-			} else {
-				fmt.Println("Slow Query ok ", secsRunning)
-			}
-
-		}
+func GetDBClient() (*mongodb.Client, error) {
+	kbClient, err := getKBClient()
+	if err != nil {
+		fmt.Println("failed to get k8s client", err)
+		return nil, err
 	}
-}
-
-func logSlowQuery(opDetails bson.M) {
-	fmt.Printf("Slow Query Detected:\n")
-	fmt.Printf("  Operation ID: %v\n", opDetails["opid"])
-	fmt.Printf("  Connection ID: %v\n", opDetails["connectionId"])
-	fmt.Printf("  Namespace: %v\n", opDetails["ns"])
-	fmt.Printf("  Command: %v\n", opDetails["command"])
-	fmt.Printf("  Running Time: %v seconds\n", opDetails["secs_running"])
-	fmt.Printf("  Current Operation Time: %v\n", opDetails["currentOpTime"])
-	fmt.Printf("  Client: %v\n", opDetails["client"])
-	fmt.Println()
+	db := &api.MongoDB{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "mongodb",
+			Namespace: "monitoring",
+		},
+	}
+	kubeDBClient, err := mongodb.NewKubeDBClientBuilder(kbClient, db).
+		WithPod("mongodb-0").
+		WithCred("root:lK!U7bOqp1SdlUOQ").
+		GetMongoClient()
+	if err != nil {
+		fmt.Println("failed to get kube db client: %w", err)
+		return nil, err
+	}
+	return kubeDBClient, nil
 }
 
 func GetDBClientLocalHost() {
