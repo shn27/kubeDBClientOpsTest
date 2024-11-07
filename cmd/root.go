@@ -76,12 +76,21 @@ var mongodbServerStatus = &cobra.Command{
 	},
 }
 
+var mongoBDMetricsCursorOpen = &cobra.Command{
+	Use:   "cursor",
+	Short: "Greet the user",
+	Long:  `This subcommand greets the user with a custom message.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		work.Network()
+	},
+}
+
 var RootCmd = &cobra.Command{
 	Use:   "app",
 	Short: "This is a simple CLI application",
 	Long:  `A simple CLI application built with Cobra in Go.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		work.CallAllMongoMethod()
+		work.Ans()
 	},
 }
 
@@ -93,4 +102,5 @@ func init() {
 	RootCmd.AddCommand(currentop)
 	RootCmd.AddCommand(mongodbServerStatus)
 	RootCmd.AddCommand(tableWriter)
+	RootCmd.AddCommand(mongoBDMetricsCursorOpen)
 }
