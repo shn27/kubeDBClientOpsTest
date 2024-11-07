@@ -13,7 +13,7 @@ func renderSubTable(outputs []DiagnosticOutput) string {
 	var subBuf bytes.Buffer
 	subtable := tablewriter.NewWriter(&subBuf)
 	subtable.SetHeader([]string{"Message", "Data"})
-	subtable.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
+	subtable.SetBorders(tablewriter.Border{Left: false, Top: false, Right: false, Bottom: false})
 
 	// Add each DiagnosticOutput entry as a row in the subtable
 	for _, output := range outputs {
