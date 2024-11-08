@@ -462,4 +462,5 @@ func Ans() {
 	}
 	tmp := postgresClient.Stats()
 	klog.Info(tmp)
+	time.Sleep(60 * time.Minute)
 }
