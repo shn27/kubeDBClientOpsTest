@@ -3,15 +3,16 @@ package work
 import (
 	"context"
 	"fmt"
+	"log"
+	"time"
+
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	api "kubedb.dev/apimachinery/apis/kubedb/v1"
 	"kubedb.dev/db-client-go/mongodb"
-	"log"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"time"
 )
 
 func getK8sObject(ctrlClient client.Client) (*api.MongoDB, error) {
