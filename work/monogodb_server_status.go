@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"kubedb.dev/db-client-go/mongodb"
 	"log"
 	"strings"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"k8s.io/klog/v2"
+	"kubedb.dev/db-client-go/mongodb"
 )
 
 func OpLatencies() {
@@ -453,17 +455,11 @@ func getServerStatus(ctx context.Context, client *mongodb.Client) (bson.M, error
 
 func Ans() {
 	fmt.Println("=================")
-	mongodbClient, err := GetDBClient()
+	postgresClient, err := GetPostgresClient()
 	if err != nil {
-		fmt.Printf("get db client error: %s\n", err.Error())
+		fmt.Printf("get db client error: %v\n", err)
 		return
 	}
-	var data bytes.Buffer
-	for {
-		err := analyzeActiveConnectionsByIP(mongodbClient, &data)
-		if err != nil {
-			log.Printf("Error fetching server status: %v", err)
-		}
-		time.Sleep(time.Second * 5)
-	}
+	tmp := postgresClient.Stats()
+	klog.Info(tmp)
 }
