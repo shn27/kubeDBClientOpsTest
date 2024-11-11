@@ -1,4 +1,4 @@
-package work
+package work_postgres
 
 import (
 	"encoding/json"
@@ -23,3 +23,17 @@ func TestPostgresServerStatus() {
 
 	klog.Info(string(prettyData))
 }
+
+/*
+{
+     "MaxOpenConnections": 0,
+     "OpenConnections": 1,
+     "InUse": 0,
+     "Idle": 1,
+     "WaitCount": 0,
+     "WaitDuration": 0,
+     "MaxIdleClosed": 0,
+     "MaxIdleTimeClosed": 0,
+     "MaxLifetimeClosed": 0
+  }
+*/
