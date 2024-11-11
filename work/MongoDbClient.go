@@ -21,6 +21,7 @@ import (
 func GetK8sObject(
 	gvk schema.GroupVersionKind,
 	ref kmapi.ObjectReference,
+	kbClient client.Client,
 ) (*unstructured.Unstructured, error) {
 	obj := &unstructured.Unstructured{}
 
@@ -30,7 +31,7 @@ func GetK8sObject(
 		Version: gvk.Version,
 	})
 
-	if err := r.ctrlClient.Get(context.TODO(), client.ObjectKey{
+	if err := kbClient.Get(context.TODO(), client.ObjectKey{
 		Name:      ref.Name,
 		Namespace: ref.Namespace,
 	}, obj); err != nil {

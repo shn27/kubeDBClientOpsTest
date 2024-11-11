@@ -462,5 +462,6 @@ func Ans() {
 	}
 	tmp := postgresClient.Stats()
 	klog.Info(tmp)
+	klog.Info("=======NEW LOG=======")
 	time.Sleep(60 * time.Minute)
 }
