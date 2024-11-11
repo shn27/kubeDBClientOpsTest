@@ -3,14 +3,15 @@ package work
 import (
 	"bytes"
 	"fmt"
+	"html/template"
+	"os"
+	"time"
+
 	"github.com/gomarkdown/markdown"
 	"github.com/gomarkdown/markdown/html"
 	"github.com/gomarkdown/markdown/parser"
 	"github.com/olekukonko/tablewriter"
-	"html/template"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"os"
-	"time"
 )
 
 type DiagnosticResult struct {

@@ -320,7 +320,7 @@ func checkConnectionMetrics(client *mongodb.Client, data *bytes.Buffer) error {
 func analyzeActiveConnectionsByIP(client *mongodb.Client, data *bytes.Buffer) error {
 	// Running the "currentOp" command
 	var result bson.M
-	err := client.Database("admin").RunCommand(context.TODO(), bson.D{{"currentOp", 1}}).Decode(&result)
+	err := client.Database("admin").RunCommand(context.TODO(), bson.D{{Key: "currentOp", Value: 1}}).Decode(&result)
 	if err != nil {
 		log.Fatal(err)
 	}
