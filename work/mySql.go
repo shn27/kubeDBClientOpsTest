@@ -48,6 +48,5 @@ func getMysqlClient() (*mysql.Client, error) {
 		fmt.Println("failed to get kube db client: %w", err)
 		return nil, err
 	}
-	fmt.Println("===================worked bro=================")
 	return kubeDBClient, nil
 }
