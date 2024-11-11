@@ -9,7 +9,7 @@ import (
 	"kubedb.dev/db-client-go/mysql"
 )
 
-func PrimaryServiceDNS(db *api.MySQL) string {
+func primaryServiceDNSMySql(db *api.MySQL) string {
 	return fmt.Sprintf("%v.%v.svc", db.ServiceName(), db.Namespace)
 }
 
@@ -42,7 +42,7 @@ func getMysqlClient() (*mysql.Client, error) {
 	}
 	kubeDBClient, err := mysql.NewKubeDBClientBuilder(kbClient, db).
 		WithPod("mysql-0").
-		WithURL(PrimaryServiceDNS(db)).
+		WithURL(primaryServiceDNSMySql(db)).
 		GetMySQLClient()
 	if err != nil {
 		fmt.Println("failed to get kube db client: %w", err)
