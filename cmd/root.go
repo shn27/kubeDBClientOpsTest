@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	utils "github.com/shn27/Test/utils"
 	"github.com/shn27/Test/work"
 	"github.com/spf13/cobra"
 	kmapi "kmodules.xyz/client-go/api/v1"
@@ -55,7 +56,7 @@ var resource = &cobra.Command{
 	Short: "Greet the user",
 	Long:  `This subcommand greets the user with a custom message.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		work.GetResource("mongodb-down")
+		utils.GetResource("mongodb-down")
 	},
 }
 
