@@ -3,29 +3,37 @@ package work
 import (
 	"context"
 	"fmt"
+	"log"
+	"time"
+
 	"go.mongodb.org/mongo-driver/mongo"
+	kmapi "kmodules.xyz/client-go/api/v1"
+
 	"go.mongodb.org/mongo-driver/mongo/options"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	api "kubedb.dev/apimachinery/apis/kubedb/v1"
 	"kubedb.dev/db-client-go/mongodb"
-	"log"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"time"
 )
 
-func getK8sObject(ctrlClient client.Client) (*api.MongoDB, error) {
-	obj := &api.MongoDB{}
+func GetK8sObject(
+	gvk schema.GroupVersionKind,
+	ref kmapi.ObjectReference,
+	kbClient client.Client,
+) (*unstructured.Unstructured, error) {
+	obj := &unstructured.Unstructured{}
 
 	obj.SetGroupVersionKind(schema.GroupVersionKind{
-		Group:   "kubedb.com",
-		Kind:    "MongoDB",
-		Version: "v1",
+		Group:   gvk.Group,
+		Kind:    gvk.Kind,
+		Version: gvk.Version,
 	})
 
-	if err := ctrlClient.Get(context.TODO(), client.ObjectKey{
-		Name:      "mongodb",
-		Namespace: "monitoring",
+	if err := kbClient.Get(context.TODO(), client.ObjectKey{
+		Name:      ref.Name,
+		Namespace: ref.Namespace,
 	}, obj); err != nil {
 		return nil, err
 	}

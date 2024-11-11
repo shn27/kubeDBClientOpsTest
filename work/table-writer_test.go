@@ -2,18 +2,19 @@ package work
 
 import (
 	"fmt"
-	"github.com/olekukonko/tablewriter"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/olekukonko/tablewriter"
 )
 
 func Test_table_writer(t *testing.T) {
 	data := [][]string{
-		[]string{"1/1/2014", "Domain name", "1234", "$10.98"},
-		[]string{"1/1/2014", "January Hosting", "1234", "$54.95"},
-		[]string{"1/4/2014", "February Hosting", "3456", "$51.00"},
-		[]string{"1/4/2014", "February Extra Bandwidth", "4567", "$30.00"},
+		{"1/1/2014", "Domain name", "1234", "$10.98"},
+		{"1/1/2014", "January Hosting", "1234", "$54.95"},
+		{"1/4/2014", "February Hosting", "3456", "$51.00"},
+		{"1/4/2014", "February Extra Bandwidth", "4567", "$30.00"},
 	}
 
 	table := tablewriter.NewWriter(os.Stdout)

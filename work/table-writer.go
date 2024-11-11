@@ -2,10 +2,11 @@ package work
 
 import (
 	"bytes"
-	"github.com/olekukonko/tablewriter"
 	"html/template"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"os"
+
+	"github.com/olekukonko/tablewriter"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // Render the subtable for the Output column
