@@ -2,10 +2,16 @@ package work
 
 import (
 	"fmt"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	kmapi "kmodules.xyz/client-go/api/v1"
 	api "kubedb.dev/apimachinery/apis/kubedb/v1"
 	"kubedb.dev/db-client-go/mysql"
 )
+
+func PrimaryServiceDNS(db *api.MySQL) string {
+	return fmt.Sprintf("%v.%v.svc", db.ServiceName(), db.Namespace)
+}
 
 func getMysqlClient() (*mysql.Client, error) {
 	kbClient, err := getKBClient()
@@ -13,15 +19,30 @@ func getMysqlClient() (*mysql.Client, error) {
 		fmt.Println("failed to get k8s client", err)
 		return nil, err
 	}
-	db := &api.MySQL{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "mysql",
-			Namespace: "monitoring",
-		},
+	ref := kmapi.ObjectReference{
+		Name:      "mysql",
+		Namespace: "monitoring",
+	}
+	gvk := schema.GroupVersionKind{
+		Version: "v1alpha2",
+		Group:   "kubedb.com",
+		Kind:    "MySQL",
+	}
+
+	obj, err := GetK8sObject(gvk, ref, kbClient)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get k8s object : %v", err)
+	}
+
+	db := &api.MySQL{}
+	err = runtime.DefaultUnstructuredConverter.
+		FromUnstructured(obj.UnstructuredContent(), db)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert unstructured object to a concrete type: %w", err)
 	}
 	kubeDBClient, err := mysql.NewKubeDBClientBuilder(kbClient, db).
 		WithPod("mysql-0").
-		//WithCred("root:lK!U7bOqp1SdlUOQ").
+		WithURL(PrimaryServiceDNS(db)).
 		GetMySQLClient()
 	if err != nil {
 		fmt.Println("failed to get kube db client: %w", err)
