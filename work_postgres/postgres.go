@@ -1,4 +1,4 @@
-package work
+package work_postgres
 
 import (
 	"context"
@@ -10,8 +10,6 @@ import (
 	utils "github.com/shn27/Test/utils"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-
-	// Import PostgreSQL driver
 
 	kmapi "kmodules.xyz/client-go/api/v1"
 
