@@ -2,7 +2,6 @@ package work
 
 import (
 	"fmt"
-
 	"k8s.io/client-go/discovery"
 	kmapi "kmodules.xyz/client-go/api/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
