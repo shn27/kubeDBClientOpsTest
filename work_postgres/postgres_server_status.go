@@ -1,4 +1,4 @@
-package work
+package work_postgres
 
 import (
 	"encoding/json"
