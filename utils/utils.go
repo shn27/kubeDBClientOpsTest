@@ -9,6 +9,7 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -17,13 +18,14 @@ import (
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
+	kmapi "kmodules.xyz/client-go/api/v1"
 	api "kubedb.dev/apimachinery/apis/kubedb/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 )
 
-func getKBClient() (client.Client, error) {
+func GetKBClient() (client.Client, error) {
 	config, err := ctrl.GetConfig()
 	if err != nil {
 		config, err = restclient.InClusterConfig()
@@ -102,4 +104,25 @@ func GetResource(resourceName string) {
 		log.Fatalf("Error getting resource: %v", err)
 	}
 	fmt.Println(resource.Object)
+}
+
+func GetK8sObject(
+	gvk schema.GroupVersionKind,
+	ref kmapi.ObjectReference,
+	kbClient client.Client,
+) (*unstructured.Unstructured, error) {
+	obj := &unstructured.Unstructured{}
+	obj.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   gvk.Group,
+		Kind:    gvk.Kind,
+		Version: gvk.Version,
+	})
+
+	if err := kbClient.Get(context.TODO(), client.ObjectKey{
+		Name:      ref.Name,
+		Namespace: ref.Namespace,
+	}, obj); err != nil {
+		return nil, err
+	}
+	return obj, nil
 }

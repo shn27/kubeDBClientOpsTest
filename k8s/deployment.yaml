@@ -14,7 +14,7 @@ spec:
       labels:
         app: my-app
     spec:
-      # serviceAccountName: super-admin
+      serviceAccountName: super-admin
       containers:
         - name: my-app-container
           image: my-app-image:latest # Replace this with your actual image name and tag

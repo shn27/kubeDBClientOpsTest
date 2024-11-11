@@ -15,7 +15,7 @@ import (
 )
 
 func OpLatencies() {
-	kubeDBClient, err := GetDBClient()
+	kubeDBClient, err := GetMongoDBClient()
 	if err != nil {
 		fmt.Printf("get db client error: %s\n", err.Error())
 		return
@@ -44,7 +44,7 @@ func OpLatencies() {
 }
 
 func Network() {
-	kubeDBClient, err := GetDBClient()
+	kubeDBClient, err := GetMongoDBClient()
 	if err != nil {
 		fmt.Printf("get db client error: %s\n", err.Error())
 		return
@@ -73,7 +73,7 @@ func Network() {
 }
 
 func Connections() {
-	kubeDBClient, err := GetDBClient()
+	kubeDBClient, err := GetMongoDBClient()
 	if err != nil {
 		fmt.Printf("get db client error: %s\n", err.Error())
 		return
@@ -102,7 +102,7 @@ func Connections() {
 }
 
 func wiredTiger() {
-	kubeDBClient, err := GetDBClient()
+	kubeDBClient, err := GetMongoDBClient()
 	if err != nil {
 		fmt.Printf("get db client error: %s\n", err.Error())
 		return
@@ -131,7 +131,7 @@ func wiredTiger() {
 }
 
 func metrics_network() {
-	kubeDBClient, err := GetDBClient()
+	kubeDBClient, err := GetMongoDBClient()
 	if err != nil {
 		fmt.Printf("get db client error: %s\n", err.Error())
 		return
@@ -164,7 +164,7 @@ func metrics_network() {
 }
 
 func Metrics_cursor() {
-	kubeDBClient, err := GetDBClient()
+	kubeDBClient, err := GetMongoDBClient()
 	if err != nil {
 		fmt.Printf("get db client error: %s\n", err.Error())
 		return
@@ -197,7 +197,7 @@ func Metrics_cursor() {
 }
 
 func DbCurrentOp() {
-	kubeDBClient, err := GetDBClient()
+	kubeDBClient, err := GetMongoDBClient()
 	if err != nil {
 		fmt.Printf("get db client error: %s\n", err.Error())
 		return
@@ -455,13 +455,11 @@ func getServerStatus(ctx context.Context, client *mongodb.Client) (bson.M, error
 
 func Ans() {
 	fmt.Println("=================")
-	postgresClient, err := GetPostgresClient()
+	mongodbClient, err := GetMongoDBClient()
 	if err != nil {
 		fmt.Printf("get db client error: %v\n", err)
 		return
 	}
-	tmp := postgresClient.Stats()
-	klog.Info(tmp)
+	_ = mongodbClient
 	klog.Info("=======NEW LOG=======")
-	time.Sleep(60 * time.Minute)
 }
