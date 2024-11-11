@@ -7,6 +7,7 @@ import (
 	_ "database/sql"
 
 	_ "github.com/lib/pq"
+	utils "github.com/shn27/Test/utils"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
@@ -23,7 +24,7 @@ func PrimaryServiceDNS(db *dbapi.Postgres) string {
 }
 
 func GetPostgresClient() (*postgres.Client, error) {
-	kbClient, err := getKBClient()
+	kbClient, err := utils.GetKBClient()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get k8s client: %w", err)
 	}
@@ -37,7 +38,7 @@ func GetPostgresClient() (*postgres.Client, error) {
 		Kind:    "Postgres",
 	}
 
-	obj, err := GetK8sObject(gvk, ref, kbClient)
+	obj, err := utils.GetK8sObject(gvk, ref, kbClient)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get k8s object : %v", err)
 	}
