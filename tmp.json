@@ -1,0 +1,12 @@
+{
+        "labels": {
+                "alertname": "PostgresqlSplitBrain",
+                "app": "postgres",
+                "app_namespace": "demo",
+                "k8s_group": "kubedb.com",
+                "k8s_kind": "Postgres",
+                "k8s_resource": "postgreses",
+                "prometheus": "demo/prometheus-kube-prometheus-prometheus",
+                "severity": "critical"
+        }
+}
