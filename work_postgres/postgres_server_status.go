@@ -24,6 +24,22 @@ func TestPostgresServerStatus() {
 	klog.Info(string(prettyData))
 }
 
+func TestClientFuncs() {
+	pgClient, err := GetPostgresClient()
+	if err != nil {
+		klog.Error(err, "failed to get postgres client")
+		return
+	}
+
+	err = pgClient.DB.Ping()
+	if err != nil {
+		klog.Error(err, "failed to ping postgres")
+		return
+	}
+	klog.Info("Pinged postgres\n")
+	klog.Infof("pgClient.DB.Stats().InUse : %d", pgClient.DB.Stats().InUse)
+}
+
 /*
 {
      "MaxOpenConnections": 0,
