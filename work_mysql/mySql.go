@@ -2,6 +2,7 @@ package work
 
 import (
 	"fmt"
+	"github.com/shn27/Test/utils"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	kmapi "kmodules.xyz/client-go/api/v1"
@@ -14,7 +15,7 @@ func primaryServiceDNSMySql(db *api.MySQL) string {
 }
 
 func getMysqlClient() (*mysql.Client, error) {
-	kbClient, err := getKBClient()
+	kbClient, err := utils.GetKBClient()
 	if err != nil {
 		fmt.Println("failed to get k8s client", err)
 		return nil, err
@@ -29,7 +30,7 @@ func getMysqlClient() (*mysql.Client, error) {
 		Kind:    "MySQL",
 	}
 
-	obj, err := GetK8sObject(gvk, ref, kbClient)
+	obj, err := utils.GetK8sObject(gvk, ref, kbClient)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get k8s object : %v", err)
 	}
