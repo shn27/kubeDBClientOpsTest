@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	utils "github.com/shn27/Test/utils"
-	"github.com/shn27/Test/work"
+	"github.com/shn27/Test/work_mongodb"
 	"github.com/shn27/Test/work_postgres"
 	"github.com/spf13/cobra"
 	kmapi "kmodules.xyz/client-go/api/v1"
@@ -93,7 +93,7 @@ var RootCmd = &cobra.Command{
 	Short: "This is a simple CLI application",
 	Long:  `A simple CLI application built with Cobra in Go.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		work.Ans()
+		work.GetDBClientLocalHost()
 	},
 }
 

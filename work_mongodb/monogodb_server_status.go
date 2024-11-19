@@ -10,7 +10,6 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"k8s.io/klog/v2"
 	"kubedb.dev/db-client-go/mongodb"
 )
 
@@ -197,7 +196,7 @@ func Metrics_cursor() {
 }
 
 func DbCurrentOp() {
-	kubeDBClient, err := GetMongoDBClient()
+	kubeDBClient, err := GetMongoDBClientUsingAppRef()
 	if err != nil {
 		fmt.Printf("get db client error: %s\n", err.Error())
 		return
@@ -451,15 +450,4 @@ func getServerStatus(ctx context.Context, client *mongodb.Client) (bson.M, error
 	var result bson.M
 	err := client.Database("admin").RunCommand(ctx, bson.D{{Key: "serverStatus", Value: 1}}).Decode(&result)
 	return result, err
-}
-
-func Ans() {
-	fmt.Println("=================")
-	mongodbClient, err := GetMongoDBClient()
-	if err != nil {
-		fmt.Printf("get db client error: %v\n", err)
-		return
-	}
-	_ = mongodbClient
-	klog.Info("=======NEW LOG=======")
 }
