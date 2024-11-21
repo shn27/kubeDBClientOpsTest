@@ -120,5 +120,20 @@ func TestGetMaxAllowedMemory() {
 		return
 	}
 
+	sharedBuffersStr, err := GetSharedBuffers(pgClient)
+	if err != nil {
+		klog.Error(err, "failed to get shared buffers")
+		return
+	}
+
+	sharedBuffers, err := gohumanize.ParseBytes(sharedBuffersStr)
+	if err != nil {
+		klog.Error(err, "failed to parse shared buffers")
+		return
+	}
 	klog.Infof("Total memory: %s\n", gohumanize.IBytes(uint64(totalMemory)))
+	klog.Infof("Shared buffers: %s\n", gohumanize.IBytes(uint64(sharedBuffers)))
+
+	percentage := float64(sharedBuffers) / float64(totalMemory)
+	klog.Infof("Shared buffers percentage: %.2f%%\n", percentage*float64(100))
 }

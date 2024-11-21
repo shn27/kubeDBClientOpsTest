@@ -10,7 +10,6 @@ import (
 	utils "github.com/shn27/Test/utils"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/klog/v2"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	kmapi "kmodules.xyz/client-go/api/v1"
@@ -70,19 +69,24 @@ func GetTotalMemory(postgresClient *postgres.Client, db *dbapi.Postgres) (int64,
 	if db == nil {
 		return 0, fmt.Errorf("db is nil")
 	}
-	var sharedBuffers string
-	if err := postgresClient.DB.QueryRow("SHOW shared_buffers").Scan(&sharedBuffers); err != nil {
-		return 0, fmt.Errorf("failed to get shared buffers: %w", err)
-	}
 
 	totalMemory := int64(0)
 	for _, v := range db.Spec.PodTemplate.Spec.Containers {
-		klog.Infof("Container: %s\n", v.Name)
-		for key, qv := range v.Resources.Requests {
-			klog.Infof("Request[%s] = %v\n", key, qv)
+		if v.Name != "postgres" {
+			continue
+		}
+		if qv, exists := v.Resources.Requests["memory"]; exists {
 			totalMemory += int64(qv.Value())
 		}
 	}
 
 	return totalMemory, nil
+}
+
+func GetSharedBuffers(postgresClient *postgres.Client) (string, error) {
+	var sharedBuffers string
+	if err := postgresClient.DB.QueryRow("SHOW shared_buffers").Scan(&sharedBuffers); err != nil {
+		return "", fmt.Errorf("failed to get shared buffers: %w", err)
+	}
+	return sharedBuffers, nil
 }
