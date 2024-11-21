@@ -36,20 +36,31 @@ func TestClientFuncs() {
 		klog.Error(err, "failed to ping postgres")
 		return
 	}
+
 	klog.Info("Pinged postgres\n")
 	klog.Infof("pgClient.DB.Stats().InUse : %d", pgClient.DB.Stats().InUse)
 }
 
-/*
-{
-     "MaxOpenConnections": 0,
-     "OpenConnections": 1,
-     "InUse": 0,
-     "Idle": 1,
-     "WaitCount": 0,
-     "WaitDuration": 0,
-     "MaxIdleClosed": 0,
-     "MaxIdleTimeClosed": 0,
-     "MaxLifetimeClosed": 0
-  }
-*/
+func TestSharedBuffers() {
+	pgClient, err := GetPostgresClient()
+	if err != nil {
+		klog.Error(err, "failed to get postgres client")
+		return
+	}
+
+	var sharedBuffers string
+	if err = pgClient.DB.QueryRow("SHOW shared_buffers").Scan(&sharedBuffers); err != nil {
+		klog.Error(err, "failed to get shared buffers")
+		return
+	}
+
+	klog.Infof("Shared buffers: %s\n", sharedBuffers)
+}
+
+func TestGetMaxAllowedMemory() {
+	pgClient, err := GetPostgresClient()
+	if err != nil {
+		klog.Error(err, "failed to get postgres client")
+		return
+	}
+}
