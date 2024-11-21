@@ -12,10 +12,19 @@ var PgCmdTest2 = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		klog.Info("Testing 'TestPostgresServerStatus()':\n")
 		TestPostgresServerStatus()
+		klog.Info("\n========================\n")
+
 		klog.Info("Testing 'TestClientFuncs()':\n")
 		TestClientFuncs()
+		klog.Info("\n========================\n")
+
 		klog.Info("Testing 'TestSharedBuffers()':\n")
 		TestSharedBuffers()
+		klog.Info("\n========================\n")
+
+		klog.Info("Testing 'TestGetMaxAllowedMemory()':\n")
+		TestGetMaxAllowedMemory()
+		klog.Info("\n========================\n")
 	},
 }
 

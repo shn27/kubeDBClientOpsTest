@@ -3,11 +3,25 @@ package work_postgres
 import (
 	"encoding/json"
 
+	gohumanize "github.com/dustin/go-humanize"
+	utils "github.com/shn27/Test/utils"
 	"k8s.io/klog/v2"
 )
 
 func TestPostgresServerStatus() {
-	pgClient, err := GetPostgresClient()
+	kubeClient, err := utils.GetKBClient()
+	if err != nil {
+		klog.Error(err, "failed to get kube client")
+		return
+	}
+
+	db, err := GetPostgresDB(kubeClient)
+	if err != nil {
+		klog.Error(err, "failed to get postgres db")
+		return
+	}
+
+	pgClient, err := GetPostgresClient(kubeClient, db)
 	if err != nil {
 		klog.Error(err, "failed to get postgres client")
 		return
@@ -25,7 +39,19 @@ func TestPostgresServerStatus() {
 }
 
 func TestClientFuncs() {
-	pgClient, err := GetPostgresClient()
+	kubeClient, err := utils.GetKBClient()
+	if err != nil {
+		klog.Error(err, "failed to get kube client")
+		return
+	}
+
+	db, err := GetPostgresDB(kubeClient)
+	if err != nil {
+		klog.Error(err, "failed to get postgres db")
+		return
+	}
+
+	pgClient, err := GetPostgresClient(kubeClient, db)
 	if err != nil {
 		klog.Error(err, "failed to get postgres client")
 		return
@@ -42,7 +68,19 @@ func TestClientFuncs() {
 }
 
 func TestSharedBuffers() {
-	pgClient, err := GetPostgresClient()
+	kubeClient, err := utils.GetKBClient()
+	if err != nil {
+		klog.Error(err, "failed to get kube client")
+		return
+	}
+
+	db, err := GetPostgresDB(kubeClient)
+	if err != nil {
+		klog.Error(err, "failed to get postgres db")
+		return
+	}
+
+	pgClient, err := GetPostgresClient(kubeClient, db)
 	if err != nil {
 		klog.Error(err, "failed to get postgres client")
 		return
@@ -58,9 +96,29 @@ func TestSharedBuffers() {
 }
 
 func TestGetMaxAllowedMemory() {
-	pgClient, err := GetPostgresClient()
+	kubeClient, err := utils.GetKBClient()
+	if err != nil {
+		klog.Error(err, "failed to get kube client")
+		return
+	}
+
+	db, err := GetPostgresDB(kubeClient)
+	if err != nil {
+		klog.Error(err, "failed to get postgres db")
+		return
+	}
+
+	pgClient, err := GetPostgresClient(kubeClient, db)
 	if err != nil {
 		klog.Error(err, "failed to get postgres client")
 		return
 	}
+
+	totalMemory, err := GetTotalMemory(pgClient, db)
+	if err != nil {
+		klog.Error(err, "failed to get total memory")
+		return
+	}
+
+	klog.Infof("Total memory: %s\n", gohumanize.IBytes(uint64(totalMemory)))
 }
