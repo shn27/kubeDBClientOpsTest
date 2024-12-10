@@ -50,6 +50,7 @@ func GetMongoDBClient() (*mongodb.Client, error) {
 		fmt.Println("failed to get kube db client: %w", err)
 		return nil, err
 	}
+
 	return kubeDBClient, nil
 }
 

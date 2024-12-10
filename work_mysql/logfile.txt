@@ -1,0 +1,61 @@
+# Query_time: 0.000156  Lock_time: 0.000001 Rows_sent: 1  Rows_examined: 3\n
+SET timestamp=1732170172;\n
+SELECT count(MEMBER_ID)  as online FROM performance_schema.replication_group_members WHERE MEMBER_STATE = 'ONLINE';\n
+
+# Time: 2024-11-21T06:22:59.453089Z\n
+# User@Host: root[root] @  [10.42.0.118]  Id:   314\n
+# Query_time: 0.000219  Lock_time: 0.000002 Rows_sent: 3  Rows_examined: 3\n
+SET timestamp=1732170179;\n
+SELECT MEMBER_HOST FROM performance_schema.replication_group_members WHERE MEMBER_STATE=\"ONLINE\";\n
+
+# Time: 2024-11-21T06:23:02.449568Z\n
+# User@Host: root[root] @  [10.42.0.95]  Id:   316\n
+# Query_time: 0.009302  Lock_time: 0.000000 Rows_sent: 0  Rows_examined: 0\nSET timestamp=1732170182;\n
+create database if not exists kubedb_system;\n
+
+# Time: 2024-11-21T06:23:02.452498Z\n# User@Host: root[root] @  [10.42.0.95]  Id:   316\n
+# Query_time: 0.002878  Lock_time: 0.000002 Rows_sent: 0  Rows_examined: 0\n
+SET timestamp=1732170182;\n
+create table if not exists kubedb_system.kubedb_write_check (health_key varchar(50) NOT NULL, health_value varchar(50) NOT NULL, PRIMARY KEY (health_key));\n
+
+# Time: 2024-11-21T06:23:02.453954Z\n
+# User@Host: root[root] @  [10.42.0.95]  Id:   316\n
+# Query_time: 0.001385  Lock_time: 0.000001 Rows_sent: 0  Rows_examined: 0\n
+SET timestamp=1732170182;\n
+REPLACE INTO kubedb_system.kubedb_write_check SET health_key = 'write_check', health_value = 'ok';\n
+
+# Time: 2024-11-21T06:23:02.454235Z\n
+# User@Host: root[root] @  [10.42.0.95]  Id:   316\n
+# Query_time: 0.000205  Lock_time: 0.000001 Rows_sent: 1  Rows_examined: 3\n
+SET timestamp=1732170182;\n
+SELECT count(MEMBER_ID)  as online FROM performance_schema.replication_group_members WHERE MEMBER_STATE = 'ONLINE';\n
+
+# Time: 2024-11-21T06:23:09.457752Z\n
+# User@Host: root[root] @  [10.42.0.118]  Id:   317\n
+# Query_time: 0.000226  Lock_time: 0.000002 Rows_sent: 3  Rows_examined: 3\n
+SET timestamp=1732170189;\n
+SELECT MEMBER_HOST FROM performance_schema.replication_group_members WHERE MEMBER_STATE=\"ONLINE\";\n
+
+# Time: 2024-11-21T06:23:09.458946Z\n
+# User@Host: root[root] @  [10.42.0.118]  Id:   318\n
+# Query_time: 0.000122  Lock_time: 0.000000 Rows_sent: 3  Rows_examined: 3\n
+SET timestamp=1732170189;\n
+SELECT MEMBER_HOST FROM performance_schema.replication_group_members WHERE MEMBER_STATE=\"ONLINE\" and MEMBER_ROLE=\"PRIMARY\";\n
+
+# Time: 2024-11-21T06:23:12.442633Zv
+# User@Host: root[root] @  [10.42.0.95]  Id:   319\n
+# Query_time: 0.002992  Lock_time: 0.000000 Rows_sent: 0  Rows_examined: 0\n
+SET timestamp=1732170192;\n
+create database if not exists kubedb_system;\n
+
+# Time: 2024-11-21T06:23:12.445265Z\n
+# User@Host: root[root] @  [10.42.0.95]  Id:   319\n
+# Query_time: 0.002542  Lock_time: 0.000002 Rows_sent: 0  Rows_examined: 0\n
+SET timestamp=1732170192;\n
+create table if not exists kubedb_system.kubedb_write_check (health_key varchar(50) NOT NULL, health_value varchar(50) NOT NULL, PRIMARY KEY (health_key));\n
+
+# Time: 2024-11-21T06:23:12.446195Z\n
+# User@Host: root[root] @  [10.42.0.95]  Id:   319\n
+# Query_time: 0.000839  Lock_time: 0.000000 Rows_sent: 0  Rows_examined: 0\n
+SET timestamp=1732170192;\n
+REPLACE INTO kubedb_system.kubedb_write_check SET health_key = 'write_check', health_value = 'ok';\n

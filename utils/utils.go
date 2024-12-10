@@ -25,6 +25,32 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 )
 
+func GetInClusterConfig() (*restclient.Config, error) {
+	config, err := ctrl.GetConfig()
+	if err != nil {
+		config, err = restclient.InClusterConfig()
+		if err != nil {
+			return nil, err
+		}
+	}
+	return config, nil
+}
+
+func GetPod(namespace string, name string) (*corev1.Pod, error) {
+	config, err := GetInClusterConfig()
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		fmt.Printf("error getting kubernetes config: %v\n", err)
+		os.Exit(1)
+	}
+	pod, err := clientset.CoreV1().Pods(namespace).Get(context.Background(), name, metav1.GetOptions{})
+	if err != nil {
+		err = fmt.Errorf("error getting pods: %v\n", err)
+		return nil, err
+	}
+	return pod, nil
+}
+
 func GetKBClient() (client.Client, error) {
 	config, err := ctrl.GetConfig()
 	if err != nil {
@@ -37,6 +63,11 @@ func GetKBClient() (client.Client, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	//pods, err := r.kubeClient.CoreV1().Pods(namespace).List(context.TODO(), listOptions)
+
+	//pods, err := cl
+
 	return cl, nil
 }
 
