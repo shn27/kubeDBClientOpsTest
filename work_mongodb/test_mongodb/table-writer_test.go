@@ -1,4 +1,4 @@
-package work
+package test_mongodb
 
 import (
 	"fmt"

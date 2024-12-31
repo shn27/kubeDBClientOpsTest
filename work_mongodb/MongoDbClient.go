@@ -43,12 +43,12 @@ func GetMongoDBClient() (*mongodb.Client, error) {
 	db := &api.MongoDB{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "mongodb",
-			Namespace: "monitoring",
+			Namespace: "demo",
 		},
 	}
 	kubeDBClient, err := mongodb.NewKubeDBClientBuilder(kbClient, db).
 		WithPod("mongodb-0").
-		WithCred("root:lK!U7bOqp1SdlUOQ").
+		WithCred("root:fmhKWEuWuZwD64hQ").
 		GetMongoClient()
 	if err != nil {
 		fmt.Println("failed to get kube db client: %w", err)
@@ -63,7 +63,7 @@ func GetMongoDBClientUsingAppRef() (*mongodb.Client, error) {
 	}
 	ref := kmapi.ObjectReference{
 		Name:      "mongodb",
-		Namespace: "monitoring",
+		Namespace: "demo",
 	}
 	gvk := schema.GroupVersionKind{
 		Version: "v1",
@@ -86,7 +86,7 @@ func GetMongoDBClientUsingAppRef() (*mongodb.Client, error) {
 	kubeDBClient, err := mongodb.NewKubeDBClientBuilder(kbClient, db).
 		GetMongoClient()
 	if err != nil {
-		return nil, fmt.Errorf("failed to build kubedb postgres client : %v", err)
+		return nil, fmt.Errorf("failed to build kubedb mongodb client : %v", err)
 	}
 	return kubeDBClient, nil
 }
@@ -150,4 +150,32 @@ func GetDBClientLocalHost() {
 	if err != nil {
 		log.Fatalf("Failed to get replication status: %v", err)
 	}
+}
+
+func IsPrimary() (bool, error) {
+	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://root:x4Zl2gyLTUh_nbyt@127.0.0.1:27018/?directConnection=true")) // not base64
+	if err != nil {
+		log.Fatal(err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Minute)
+	defer cancel()
+
+	err = client.Connect(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer client.Disconnect(ctx)
+	err = client.Ping(context.TODO(), nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("pinged")
+	result := make(map[string]interface{})
+	err = client.Database("admin").RunCommand(context.Background(), map[string]string{"ismaster": "1"}).Decode(&result)
+	if err != nil {
+		return false, err
+	}
+
+	isMaster, ok := result["ismaster"].(bool)
+	return isMaster && ok, nil
 }
