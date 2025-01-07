@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/shn27/Test/work_mysql"
+	"time"
 
 	utils "github.com/shn27/Test/utils"
 	"github.com/shn27/Test/work"
@@ -93,7 +95,15 @@ var RootCmd = &cobra.Command{
 	Short: "This is a simple CLI application",
 	Long:  `A simple CLI application built with Cobra in Go.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		work.Ans()
+		for {
+			time.Sleep(10 * time.Second)
+			_, err := work_mysql.GetMysqlClient()
+			if err != nil {
+				fmt.Println("====================================", err)
+				return
+			}
+			fmt.Println("==============================WORKED=====================")
+		}
 	},
 }
 

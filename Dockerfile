@@ -24,7 +24,7 @@ WORKDIR /root/
 COPY --from=builder /app/my-app .
 
 # Expose port 8080 (adjust according to your application)
-EXPOSE 8080
+EXPOSE 9000
 
 # Run the Go binary
-CMD ["./my-app", "pgCmdTest"]
+CMD ["./my-app"]

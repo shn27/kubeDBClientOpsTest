@@ -20,6 +20,7 @@ require (
 	kubedb.dev/apimachinery v0.48.1
 	kubedb.dev/db-client-go v0.3.0
 	sigs.k8s.io/controller-runtime v0.19.0
+	xorm.io/xorm v1.3.6
 )
 
 require (
@@ -114,5 +115,4 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.1 // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect
 	xorm.io/builder v0.3.11-0.20220531020008-1bd24a7dc978 // indirect
-	xorm.io/xorm v1.3.6 // indirect
 )

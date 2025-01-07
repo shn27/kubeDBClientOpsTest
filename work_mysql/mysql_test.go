@@ -1,4 +1,4 @@
-package work
+package work_mysql
 
 import (
 	"fmt"
@@ -300,4 +300,16 @@ SET    biz = '91848182522'`,
 		},
 	}
 	assert.EqualValues(t, expect, got)
+}
+
+func TestMySQLQuery(t *testing.T) {
+	mysqlClient, err := GetMysqlClient()
+	if err != nil {
+		t.Error(err)
+	}
+	res, err := mysqlClient.Query("SHOW VARIABLES LIKE 'slow_query_log_file';")
+	if err != nil {
+		t.Error(err)
+	}
+	fmt.Println(res)
 }
