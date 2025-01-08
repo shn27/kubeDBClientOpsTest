@@ -27,4 +27,4 @@ COPY --from=builder /app/my-app .
 EXPOSE 9000
 
 # Run the Go binary
-CMD ["./my-app"]
+CMD ["./my-app", "mysql"]

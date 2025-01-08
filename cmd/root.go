@@ -2,11 +2,9 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/shn27/Test/work_mysql"
-	"time"
-
 	utils "github.com/shn27/Test/utils"
 	"github.com/shn27/Test/work"
+	"github.com/shn27/Test/work_mysql"
 	"github.com/shn27/Test/work_postgres"
 	"github.com/spf13/cobra"
 	kmapi "kmodules.xyz/client-go/api/v1"
@@ -95,15 +93,7 @@ var RootCmd = &cobra.Command{
 	Short: "This is a simple CLI application",
 	Long:  `A simple CLI application built with Cobra in Go.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		for {
-			time.Sleep(10 * time.Second)
-			_, err := work_mysql.GetMysqlClient()
-			if err != nil {
-				fmt.Println("====================================", err)
-				return
-			}
-			fmt.Println("==============================WORKED=====================")
-		}
+		fmt.Println("Hello World")
 	},
 }
 
@@ -117,4 +107,5 @@ func init() {
 	RootCmd.AddCommand(tableWriter)
 	RootCmd.AddCommand(mongoBDMetricsCursorOpen)
 	RootCmd.AddCommand(work_postgres.PgCmdTest)
+	RootCmd.AddCommand(work_mysql.MySqlCmdTest)
 }

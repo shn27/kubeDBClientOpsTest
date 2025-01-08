@@ -31,9 +31,10 @@ push-to-kind: build
 
 # Deploy Docker image to Kind cluster
 .PHONY: deploy
-deploy:push-to-kind
-	# Apply the Kubernetes deployment and service YAML
+deploy:
 	kubectl apply -f $(K8S_DEPLOYMENT_FILE) -n $(NAMESPACE)
+	# Apply the Kubernetes deployment and service YAML
+	#kubectl apply -f $(K8S_DEPLOYMENT_FILE) -n $(NAMESPACE)
 
 
 # Clean up the environment (optional)

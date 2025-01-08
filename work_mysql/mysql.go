@@ -47,13 +47,10 @@ func GetMysqlClient() (*mysql.Client, error) {
 		return nil, fmt.Errorf("failed to convert unstructured object to a concrete type: %w", err)
 	}
 
-	fmt.Printf("===========mysql DB: %#v\n", db.Spec)
-
 	mysqlClient, err := mysql.NewKubeDBClientBuilder(kbClient, db).
-		WithPod("mysql-0").
-		//WithContext(ctx).
+		//WithPod("mysql-0").
 		WithURL(primaryServiceDNSMySql(db)).
-		GetMySQLXormClient()
+		GetMySQLClient()
 	if err != nil {
 		fmt.Println("failed to get kube db client: %w", err)
 		return nil, err
@@ -64,7 +61,7 @@ func GetMysqlClient() (*mysql.Client, error) {
 		return nil, err
 	}
 
-	return nil, nil
+	return mysqlClient, nil
 }
 
 func getMySqlClientUsingCred() (*xorm.Engine, error) {
