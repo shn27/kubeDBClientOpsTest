@@ -15,11 +15,28 @@ import (
 	"xorm.io/xorm"
 )
 
-func primaryServiceDNSMySql(db *api.MySQL) string {
-	return fmt.Sprintf("%v.%v.svc", db.ServiceName(), db.Namespace)
+func mysqlQueryTest(client *mysql.XormClient) error {
+	result, err := client.Query("SHOW VARIABLES LIKE 'slow_query_log_file';")
+	if err != nil {
+		return err
+	}
+	fmt.Println("=========================slow_query_log_file=========================")
+
+	for _, row := range result {
+		for _, col := range row {
+			fmt.Println(string(col))
+		}
+	}
+
+	return nil
 }
 
-func GetMysqlClient() (*mysql.Client, error) {
+func primaryServiceDNSMySql(db *api.MySQL) string {
+	return "localhost" //kc port-forward -n demo svc/mysql 3306
+	//return fmt.Sprintf("%v.%v.svc", db.ServiceName(), db.Namespace)
+}
+
+func GetMysqlClient() (*mysql.XormClient, error) {
 	kbClient, err := utils.GetKBClient()
 	if err != nil {
 		fmt.Println("failed to get k8s client", err)
@@ -50,7 +67,7 @@ func GetMysqlClient() (*mysql.Client, error) {
 	mysqlClient, err := mysql.NewKubeDBClientBuilder(kbClient, db).
 		//WithPod("mysql-0").
 		WithURL(primaryServiceDNSMySql(db)).
-		GetMySQLClient()
+		GetMySQLXormClient()
 	if err != nil {
 		fmt.Println("failed to get kube db client: %w", err)
 		return nil, err
@@ -75,6 +92,7 @@ func getMySqlClientUsingCred() (*xorm.Engine, error) {
 		return nil, err
 	}
 	engine.SetDefaultContext(context.Background())
+
 	return engine, nil
 }
 

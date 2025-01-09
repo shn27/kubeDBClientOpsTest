@@ -10,7 +10,7 @@ NAMESPACE=default
 # Build the Docker image
 .PHONY: build
 build:
-	docker build -t $(IMAGE_NAME):$(IMAGE_TAG) -f $(DOCKERFILE_PATH) .
+	docker build -t $(REGISTRY_URL)/$(IMAGE_NAME):$(IMAGE_TAG) -f $(DOCKERFILE_PATH) .
 
 # Tag the Docker image for the registry
 .PHONY: tag
@@ -19,14 +19,14 @@ tag:
 
 # Push the Docker image to the registry
 .PHONY: push
-push: tag
+push:
 	docker push $(REGISTRY_URL)/$(IMAGE_NAME):$(IMAGE_TAG)
 
 
 # Push the Docker image to kind
 .PHONY: push-to-kind
 push-to-kind: build
-	kind load docker-image $(IMAGE_NAME):$(IMAGE_TAG) --name $(KIND_CLUSTER_NAME)
+	kind load docker-image $(REGISTRY_URL)/$(IMAGE_NAME):$(IMAGE_TAG) --name $(KIND_CLUSTER_NAME)
 
 
 # Deploy Docker image to Kind cluster
