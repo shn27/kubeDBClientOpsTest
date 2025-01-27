@@ -1,9 +1,12 @@
 package main
 
 import (
-	"github.com/shn27/Test/cmd"
+	"github.com/shn27/Test/work_mysql"
 )
 
 func main() {
-	cmd.RootCmd.Execute()
+	err := work_mysql.MySqlCmdTest.Execute()
+	if err != nil {
+		return
+	}
 }

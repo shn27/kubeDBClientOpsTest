@@ -15,12 +15,23 @@ import (
 	"xorm.io/xorm"
 )
 
+var (
+	slowQueryLogPathQuery      = "SHOW VARIABLES LIKE 'slow_query_log_file';"
+	innoDBLogBufferSizeQuery   = "SHOW VARIABLES LIKE 'innodb_log_buffer_size';"
+	innoDBLogFileSizeQuery     = "SHOW VARIABLES LIKE 'innodb_log_file_size';"
+	innoDBLogWaitsQuery        = "SHOW STATUS LIKE 'Innodb_log_waits';"
+	innoDBLogWritesQuery       = "SHOW STATUS LIKE 'Innodb_log_writes';"
+	Innodb_os_log_fsyncsQuery  = "SHOW STATUS LIKE 'Innodb_os_log_fsyncs';"
+	QueriesCausedInnoDBLogWait = "SELECT EVENT_ID, EVENT_NAME, SQL_TEXT, TIMER_WAIT FROM performance_schema.events_statements_history_long WHERE EVENT_NAME LIKE 'wait/io/file/innodb%';"
+	tailLines                  = "50"
+)
+
 func mysqlQueryTest(client *mysql.XormClient) error {
-	result, err := client.Query("SHOW VARIABLES LIKE 'slow_query_log_file';")
+	result, err := client.Query(innoDBLogBufferSizeQuery)
 	if err != nil {
 		return err
 	}
-	fmt.Println("=========================slow_query_log_file=========================")
+	fmt.Println("=========================innoDBLogBufferSizeQuery=========================")
 
 	for _, row := range result {
 		for _, col := range row {
@@ -65,8 +76,9 @@ func GetMysqlClient() (*mysql.XormClient, error) {
 	}
 
 	mysqlClient, err := mysql.NewKubeDBClientBuilder(kbClient, db).
-		//WithPod("mysql-0").
 		WithURL(primaryServiceDNSMySql(db)).
+		//WithContext(context.Background()).
+		//WithPod("mysql-0").
 		GetMySQLXormClient()
 	if err != nil {
 		fmt.Println("failed to get kube db client: %w", err)

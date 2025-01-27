@@ -307,9 +307,37 @@ func TestMySQLQuery(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	res, err := mysqlClient.Query("SHOW VARIABLES LIKE 'slow_query_log_file';")
+	res, err := mysqlClient.Query(innoDBLogBufferSizeQuery)
 	if err != nil {
 		t.Error(err)
 	}
-	fmt.Println(res)
+	if err != nil {
+		return
+	} else if len(res) != 1 {
+		t.Error("Query result length is wrong")
+		return
+	} else if res != nil {
+		var innoDBLogBufferSizeQueryRes string
+		for _, row := range res {
+			for _, col := range row {
+				innoDBLogBufferSizeQueryRes = string(col)
+			}
+		}
+		fmt.Println(innoDBLogBufferSizeQueryRes)
+	}
+
+}
+
+func TestMySQLQueryWithTable(t *testing.T) {
+	client, err := GetMysqlClient()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	err = mysqlQueryTest(client)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("==============mysql test success================")
 }
