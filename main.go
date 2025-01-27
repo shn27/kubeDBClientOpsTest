@@ -1,9 +1,11 @@
 package main
 
 import (
-	"github.com/shn27/Test/cmd"
+	"fmt"
+	"github.com/shn27/Test/work_ElasticSearch"
 )
 
 func main() {
-	cmd.RootCmd.Execute()
+	fmt.Println("Hello World")
+	work_ElasticSearch.ElasticSearch.Execute()
 }

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/shn27/Test/work_ElasticSearch"
 
 	utils "github.com/shn27/Test/utils"
 	"github.com/shn27/Test/work"
@@ -107,4 +108,5 @@ func init() {
 	RootCmd.AddCommand(tableWriter)
 	RootCmd.AddCommand(mongoBDMetricsCursorOpen)
 	RootCmd.AddCommand(work_postgres.PgCmdTest)
+	RootCmd.AddCommand(work_ElasticSearch.ElasticSearch)
 }
