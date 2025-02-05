@@ -15,42 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // NodeInfoXpackSecuritySsl type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/info/types.ts#L241-L243
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/info/types.ts#L257-L259
 type NodeInfoXpackSecuritySsl struct {
 	Ssl map[string]string `json:"ssl"`
 }
 
-// NodeInfoXpackSecuritySslBuilder holds NodeInfoXpackSecuritySsl struct and provides a builder API.
-type NodeInfoXpackSecuritySslBuilder struct {
-	v *NodeInfoXpackSecuritySsl
-}
-
-// NewNodeInfoXpackSecuritySsl provides a builder for the NodeInfoXpackSecuritySsl struct.
-func NewNodeInfoXpackSecuritySslBuilder() *NodeInfoXpackSecuritySslBuilder {
-	r := NodeInfoXpackSecuritySslBuilder{
-		&NodeInfoXpackSecuritySsl{
-			Ssl: make(map[string]string, 0),
-		},
+// NewNodeInfoXpackSecuritySsl returns a NodeInfoXpackSecuritySsl.
+func NewNodeInfoXpackSecuritySsl() *NodeInfoXpackSecuritySsl {
+	r := &NodeInfoXpackSecuritySsl{
+		Ssl: make(map[string]string, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the NodeInfoXpackSecuritySsl struct
-func (rb *NodeInfoXpackSecuritySslBuilder) Build() NodeInfoXpackSecuritySsl {
-	return *rb.v
-}
-
-func (rb *NodeInfoXpackSecuritySslBuilder) Ssl(value map[string]string) *NodeInfoXpackSecuritySslBuilder {
-	rb.v.Ssl = value
-	return rb
+	return r
 }

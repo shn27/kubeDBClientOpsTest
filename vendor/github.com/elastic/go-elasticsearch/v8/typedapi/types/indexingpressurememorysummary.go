@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // IndexingPressureMemorySummary type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/stats/types.ts#L302-L311
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/stats/types.ts#L580-L589
 type IndexingPressureMemorySummary struct {
 	AllInBytes                            int64  `json:"all_in_bytes"`
 	CombinedCoordinatingAndPrimaryInBytes int64  `json:"combined_coordinating_and_primary_in_bytes"`
@@ -36,61 +43,149 @@ type IndexingPressureMemorySummary struct {
 	ReplicaRejections                     *int64 `json:"replica_rejections,omitempty"`
 }
 
-// IndexingPressureMemorySummaryBuilder holds IndexingPressureMemorySummary struct and provides a builder API.
-type IndexingPressureMemorySummaryBuilder struct {
-	v *IndexingPressureMemorySummary
-}
+func (s *IndexingPressureMemorySummary) UnmarshalJSON(data []byte) error {
 
-// NewIndexingPressureMemorySummary provides a builder for the IndexingPressureMemorySummary struct.
-func NewIndexingPressureMemorySummaryBuilder() *IndexingPressureMemorySummaryBuilder {
-	r := IndexingPressureMemorySummaryBuilder{
-		&IndexingPressureMemorySummary{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "all_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "AllInBytes", err)
+				}
+				s.AllInBytes = value
+			case float64:
+				f := int64(v)
+				s.AllInBytes = f
+			}
+
+		case "combined_coordinating_and_primary_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CombinedCoordinatingAndPrimaryInBytes", err)
+				}
+				s.CombinedCoordinatingAndPrimaryInBytes = value
+			case float64:
+				f := int64(v)
+				s.CombinedCoordinatingAndPrimaryInBytes = f
+			}
+
+		case "coordinating_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CoordinatingInBytes", err)
+				}
+				s.CoordinatingInBytes = value
+			case float64:
+				f := int64(v)
+				s.CoordinatingInBytes = f
+			}
+
+		case "coordinating_rejections":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CoordinatingRejections", err)
+				}
+				s.CoordinatingRejections = &value
+			case float64:
+				f := int64(v)
+				s.CoordinatingRejections = &f
+			}
+
+		case "primary_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PrimaryInBytes", err)
+				}
+				s.PrimaryInBytes = value
+			case float64:
+				f := int64(v)
+				s.PrimaryInBytes = f
+			}
+
+		case "primary_rejections":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PrimaryRejections", err)
+				}
+				s.PrimaryRejections = &value
+			case float64:
+				f := int64(v)
+				s.PrimaryRejections = &f
+			}
+
+		case "replica_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ReplicaInBytes", err)
+				}
+				s.ReplicaInBytes = value
+			case float64:
+				f := int64(v)
+				s.ReplicaInBytes = f
+			}
+
+		case "replica_rejections":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ReplicaRejections", err)
+				}
+				s.ReplicaRejections = &value
+			case float64:
+				f := int64(v)
+				s.ReplicaRejections = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the IndexingPressureMemorySummary struct
-func (rb *IndexingPressureMemorySummaryBuilder) Build() IndexingPressureMemorySummary {
-	return *rb.v
-}
+// NewIndexingPressureMemorySummary returns a IndexingPressureMemorySummary.
+func NewIndexingPressureMemorySummary() *IndexingPressureMemorySummary {
+	r := &IndexingPressureMemorySummary{}
 
-func (rb *IndexingPressureMemorySummaryBuilder) AllInBytes(allinbytes int64) *IndexingPressureMemorySummaryBuilder {
-	rb.v.AllInBytes = allinbytes
-	return rb
-}
-
-func (rb *IndexingPressureMemorySummaryBuilder) CombinedCoordinatingAndPrimaryInBytes(combinedcoordinatingandprimaryinbytes int64) *IndexingPressureMemorySummaryBuilder {
-	rb.v.CombinedCoordinatingAndPrimaryInBytes = combinedcoordinatingandprimaryinbytes
-	return rb
-}
-
-func (rb *IndexingPressureMemorySummaryBuilder) CoordinatingInBytes(coordinatinginbytes int64) *IndexingPressureMemorySummaryBuilder {
-	rb.v.CoordinatingInBytes = coordinatinginbytes
-	return rb
-}
-
-func (rb *IndexingPressureMemorySummaryBuilder) CoordinatingRejections(coordinatingrejections int64) *IndexingPressureMemorySummaryBuilder {
-	rb.v.CoordinatingRejections = &coordinatingrejections
-	return rb
-}
-
-func (rb *IndexingPressureMemorySummaryBuilder) PrimaryInBytes(primaryinbytes int64) *IndexingPressureMemorySummaryBuilder {
-	rb.v.PrimaryInBytes = primaryinbytes
-	return rb
-}
-
-func (rb *IndexingPressureMemorySummaryBuilder) PrimaryRejections(primaryrejections int64) *IndexingPressureMemorySummaryBuilder {
-	rb.v.PrimaryRejections = &primaryrejections
-	return rb
-}
-
-func (rb *IndexingPressureMemorySummaryBuilder) ReplicaInBytes(replicainbytes int64) *IndexingPressureMemorySummaryBuilder {
-	rb.v.ReplicaInBytes = replicainbytes
-	return rb
-}
-
-func (rb *IndexingPressureMemorySummaryBuilder) ReplicaRejections(replicarejections int64) *IndexingPressureMemorySummaryBuilder {
-	rb.v.ReplicaRejections = &replicarejections
-	return rb
+	return r
 }

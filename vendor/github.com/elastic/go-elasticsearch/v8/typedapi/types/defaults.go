@@ -15,48 +15,22 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // Defaults type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/info/types.ts#L24-L27
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/info/types.ts#L24-L27
 type Defaults struct {
 	AnomalyDetectors AnomalyDetectors `json:"anomaly_detectors"`
 	Datafeeds        Datafeeds        `json:"datafeeds"`
 }
 
-// DefaultsBuilder holds Defaults struct and provides a builder API.
-type DefaultsBuilder struct {
-	v *Defaults
-}
+// NewDefaults returns a Defaults.
+func NewDefaults() *Defaults {
+	r := &Defaults{}
 
-// NewDefaults provides a builder for the Defaults struct.
-func NewDefaultsBuilder() *DefaultsBuilder {
-	r := DefaultsBuilder{
-		&Defaults{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the Defaults struct
-func (rb *DefaultsBuilder) Build() Defaults {
-	return *rb.v
-}
-
-func (rb *DefaultsBuilder) AnomalyDetectors(anomalydetectors *AnomalyDetectorsBuilder) *DefaultsBuilder {
-	v := anomalydetectors.Build()
-	rb.v.AnomalyDetectors = v
-	return rb
-}
-
-func (rb *DefaultsBuilder) Datafeeds(datafeeds *DatafeedsBuilder) *DefaultsBuilder {
-	v := datafeeds.Build()
-	rb.v.Datafeeds = v
-	return rb
+	return r
 }

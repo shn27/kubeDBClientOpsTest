@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 //
-// Code generated from specification version 8.4.0: DO NOT EDIT
+// Code generated from specification version 8.17.0: DO NOT EDIT
 
 package esapi
 
@@ -32,6 +32,11 @@ func newSecurityHasPrivilegesUserProfileFunc(t Transport) SecurityHasPrivilegesU
 		for _, f := range o {
 			f(&r)
 		}
+
+		if transport, ok := t.(Instrumented); ok {
+			r.instrument = transport.InstrumentationEnabled()
+		}
+
 		return r.Do(r.ctx, t)
 	}
 }
@@ -39,8 +44,6 @@ func newSecurityHasPrivilegesUserProfileFunc(t Transport) SecurityHasPrivilegesU
 // ----- API Definition -------------------------------------------------------
 
 // SecurityHasPrivilegesUserProfile - Determines whether the users associated with the specified profile IDs have all the requested privileges.
-//
-// This API is experimental.
 //
 // See full documentation at https://www.elastic.co/guide/en/elasticsearch/reference/current/security-api-has-privileges-user-profile.html.
 type SecurityHasPrivilegesUserProfile func(body io.Reader, o ...func(*SecurityHasPrivilegesUserProfileRequest)) (*Response, error)
@@ -57,15 +60,26 @@ type SecurityHasPrivilegesUserProfileRequest struct {
 	Header http.Header
 
 	ctx context.Context
+
+	instrument Instrumentation
 }
 
 // Do executes the request and returns response or error.
-func (r SecurityHasPrivilegesUserProfileRequest) Do(ctx context.Context, transport Transport) (*Response, error) {
+func (r SecurityHasPrivilegesUserProfileRequest) Do(providedCtx context.Context, transport Transport) (*Response, error) {
 	var (
 		method string
 		path   strings.Builder
 		params map[string]string
+		ctx    context.Context
 	)
+
+	if instrument, ok := r.instrument.(Instrumentation); ok {
+		ctx = instrument.Start(providedCtx, "security.has_privileges_user_profile")
+		defer instrument.Close(ctx)
+	}
+	if ctx == nil {
+		ctx = providedCtx
+	}
 
 	method = "POST"
 
@@ -93,6 +107,9 @@ func (r SecurityHasPrivilegesUserProfileRequest) Do(ctx context.Context, transpo
 
 	req, err := newRequest(method, path.String(), r.Body)
 	if err != nil {
+		if instrument, ok := r.instrument.(Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
 		return nil, err
 	}
 
@@ -102,10 +119,6 @@ func (r SecurityHasPrivilegesUserProfileRequest) Do(ctx context.Context, transpo
 			q.Set(k, v)
 		}
 		req.URL.RawQuery = q.Encode()
-	}
-
-	if r.Body != nil {
-		req.Header[headerContentType] = headerContentTypeJSON
 	}
 
 	if len(r.Header) > 0 {
@@ -120,12 +133,28 @@ func (r SecurityHasPrivilegesUserProfileRequest) Do(ctx context.Context, transpo
 		}
 	}
 
+	if r.Body != nil && req.Header.Get(headerContentType) == "" {
+		req.Header[headerContentType] = headerContentTypeJSON
+	}
+
 	if ctx != nil {
 		req = req.WithContext(ctx)
 	}
 
+	if instrument, ok := r.instrument.(Instrumentation); ok {
+		instrument.BeforeRequest(req, "security.has_privileges_user_profile")
+		if reader := instrument.RecordRequestBody(ctx, "security.has_privileges_user_profile", r.Body); reader != nil {
+			req.Body = reader
+		}
+	}
 	res, err := transport.Perform(req)
+	if instrument, ok := r.instrument.(Instrumentation); ok {
+		instrument.AfterRequest(req, "elasticsearch", "security.has_privileges_user_profile")
+	}
 	if err != nil {
+		if instrument, ok := r.instrument.(Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
 		return nil, err
 	}
 

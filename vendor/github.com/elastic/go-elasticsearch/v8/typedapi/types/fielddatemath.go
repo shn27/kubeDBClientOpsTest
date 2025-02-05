@@ -15,42 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // FieldDateMath holds the union for the following types:
 //
-//	DateMath
-//	float64
+//	string
+//	Float64
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/bucket.ts#L137-L144
-type FieldDateMath interface{}
-
-// FieldDateMathBuilder holds FieldDateMath struct and provides a builder API.
-type FieldDateMathBuilder struct {
-	v FieldDateMath
-}
-
-// NewFieldDateMath provides a builder for the FieldDateMath struct.
-func NewFieldDateMathBuilder() *FieldDateMathBuilder {
-	return &FieldDateMathBuilder{}
-}
-
-// Build finalize the chain and returns the FieldDateMath struct
-func (u *FieldDateMathBuilder) Build() FieldDateMath {
-	return u.v
-}
-
-func (u *FieldDateMathBuilder) DateMath(datemath DateMath) *FieldDateMathBuilder {
-	u.v = &datemath
-	return u
-}
-
-func (u *FieldDateMathBuilder) Float64(float64 float64) *FieldDateMathBuilder {
-	u.v = &float64
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/bucket.ts#L309-L316
+type FieldDateMath any

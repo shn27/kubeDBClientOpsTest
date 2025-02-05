@@ -15,49 +15,41 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"encoding/json"
+)
+
 // CustomNormalizer type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/normalizers.ts#L30-L34
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/normalizers.ts#L30-L34
 type CustomNormalizer struct {
 	CharFilter []string `json:"char_filter,omitempty"`
 	Filter     []string `json:"filter,omitempty"`
 	Type       string   `json:"type,omitempty"`
 }
 
-// CustomNormalizerBuilder holds CustomNormalizer struct and provides a builder API.
-type CustomNormalizerBuilder struct {
-	v *CustomNormalizer
-}
-
-// NewCustomNormalizer provides a builder for the CustomNormalizer struct.
-func NewCustomNormalizerBuilder() *CustomNormalizerBuilder {
-	r := CustomNormalizerBuilder{
-		&CustomNormalizer{},
+// MarshalJSON override marshalling to include literal value
+func (s CustomNormalizer) MarshalJSON() ([]byte, error) {
+	type innerCustomNormalizer CustomNormalizer
+	tmp := innerCustomNormalizer{
+		CharFilter: s.CharFilter,
+		Filter:     s.Filter,
+		Type:       s.Type,
 	}
 
-	r.v.Type = "custom"
+	tmp.Type = "custom"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the CustomNormalizer struct
-func (rb *CustomNormalizerBuilder) Build() CustomNormalizer {
-	return *rb.v
-}
+// NewCustomNormalizer returns a CustomNormalizer.
+func NewCustomNormalizer() *CustomNormalizer {
+	r := &CustomNormalizer{}
 
-func (rb *CustomNormalizerBuilder) CharFilter(char_filter ...string) *CustomNormalizerBuilder {
-	rb.v.CharFilter = char_filter
-	return rb
-}
-
-func (rb *CustomNormalizerBuilder) Filter(filter ...string) *CustomNormalizerBuilder {
-	rb.v.Filter = filter
-	return rb
+	return r
 }

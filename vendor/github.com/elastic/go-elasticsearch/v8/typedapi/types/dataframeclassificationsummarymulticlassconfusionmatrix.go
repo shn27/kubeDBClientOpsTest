@@ -15,50 +15,72 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DataframeClassificationSummaryMulticlassConfusionMatrix type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/evaluate_data_frame/types.ts#L79-L82
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/evaluate_data_frame/types.ts#L120-L123
 type DataframeClassificationSummaryMulticlassConfusionMatrix struct {
 	ConfusionMatrix       []ConfusionMatrixItem `json:"confusion_matrix"`
 	OtherActualClassCount int                   `json:"other_actual_class_count"`
 }
 
-// DataframeClassificationSummaryMulticlassConfusionMatrixBuilder holds DataframeClassificationSummaryMulticlassConfusionMatrix struct and provides a builder API.
-type DataframeClassificationSummaryMulticlassConfusionMatrixBuilder struct {
-	v *DataframeClassificationSummaryMulticlassConfusionMatrix
-}
+func (s *DataframeClassificationSummaryMulticlassConfusionMatrix) UnmarshalJSON(data []byte) error {
 
-// NewDataframeClassificationSummaryMulticlassConfusionMatrix provides a builder for the DataframeClassificationSummaryMulticlassConfusionMatrix struct.
-func NewDataframeClassificationSummaryMulticlassConfusionMatrixBuilder() *DataframeClassificationSummaryMulticlassConfusionMatrixBuilder {
-	r := DataframeClassificationSummaryMulticlassConfusionMatrixBuilder{
-		&DataframeClassificationSummaryMulticlassConfusionMatrix{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "confusion_matrix":
+			if err := dec.Decode(&s.ConfusionMatrix); err != nil {
+				return fmt.Errorf("%s | %w", "ConfusionMatrix", err)
+			}
+
+		case "other_actual_class_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "OtherActualClassCount", err)
+				}
+				s.OtherActualClassCount = value
+			case float64:
+				f := int(v)
+				s.OtherActualClassCount = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DataframeClassificationSummaryMulticlassConfusionMatrix struct
-func (rb *DataframeClassificationSummaryMulticlassConfusionMatrixBuilder) Build() DataframeClassificationSummaryMulticlassConfusionMatrix {
-	return *rb.v
-}
+// NewDataframeClassificationSummaryMulticlassConfusionMatrix returns a DataframeClassificationSummaryMulticlassConfusionMatrix.
+func NewDataframeClassificationSummaryMulticlassConfusionMatrix() *DataframeClassificationSummaryMulticlassConfusionMatrix {
+	r := &DataframeClassificationSummaryMulticlassConfusionMatrix{}
 
-func (rb *DataframeClassificationSummaryMulticlassConfusionMatrixBuilder) ConfusionMatrix(confusion_matrix []ConfusionMatrixItemBuilder) *DataframeClassificationSummaryMulticlassConfusionMatrixBuilder {
-	tmp := make([]ConfusionMatrixItem, len(confusion_matrix))
-	for _, value := range confusion_matrix {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.ConfusionMatrix = tmp
-	return rb
-}
-
-func (rb *DataframeClassificationSummaryMulticlassConfusionMatrixBuilder) OtherActualClassCount(otheractualclasscount int) *DataframeClassificationSummaryMulticlassConfusionMatrixBuilder {
-	rb.v.OtherActualClassCount = otheractualclasscount
-	return rb
+	return r
 }

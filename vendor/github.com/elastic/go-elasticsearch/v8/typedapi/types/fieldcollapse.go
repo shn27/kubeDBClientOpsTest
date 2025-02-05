@@ -15,59 +15,99 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // FieldCollapse type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/FieldCollapse.ts#L24-L29
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/FieldCollapse.ts#L24-L41
 type FieldCollapse struct {
-	Collapse                   *FieldCollapse `json:"collapse,omitempty"`
-	Field                      Field          `json:"field"`
-	InnerHits                  []InnerHits    `json:"inner_hits,omitempty"`
-	MaxConcurrentGroupSearches *int           `json:"max_concurrent_group_searches,omitempty"`
+	Collapse *FieldCollapse `json:"collapse,omitempty"`
+	// Field The field to collapse the result set on
+	Field string `json:"field"`
+	// InnerHits The number of inner hits and their sort order
+	InnerHits []InnerHits `json:"inner_hits,omitempty"`
+	// MaxConcurrentGroupSearches The number of concurrent requests allowed to retrieve the inner_hits per
+	// group
+	MaxConcurrentGroupSearches *int `json:"max_concurrent_group_searches,omitempty"`
 }
 
-// FieldCollapseBuilder holds FieldCollapse struct and provides a builder API.
-type FieldCollapseBuilder struct {
-	v *FieldCollapse
-}
+func (s *FieldCollapse) UnmarshalJSON(data []byte) error {
 
-// NewFieldCollapse provides a builder for the FieldCollapse struct.
-func NewFieldCollapseBuilder() *FieldCollapseBuilder {
-	r := FieldCollapseBuilder{
-		&FieldCollapse{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "collapse":
+			if err := dec.Decode(&s.Collapse); err != nil {
+				return fmt.Errorf("%s | %w", "Collapse", err)
+			}
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "inner_hits":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := NewInnerHits()
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "InnerHits", err)
+				}
+
+				s.InnerHits = append(s.InnerHits, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.InnerHits); err != nil {
+					return fmt.Errorf("%s | %w", "InnerHits", err)
+				}
+			}
+
+		case "max_concurrent_group_searches":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxConcurrentGroupSearches", err)
+				}
+				s.MaxConcurrentGroupSearches = &value
+			case float64:
+				f := int(v)
+				s.MaxConcurrentGroupSearches = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the FieldCollapse struct
-func (rb *FieldCollapseBuilder) Build() FieldCollapse {
-	return *rb.v
-}
+// NewFieldCollapse returns a FieldCollapse.
+func NewFieldCollapse() *FieldCollapse {
+	r := &FieldCollapse{}
 
-func (rb *FieldCollapseBuilder) Collapse(collapse *FieldCollapseBuilder) *FieldCollapseBuilder {
-	v := collapse.Build()
-	rb.v.Collapse = &v
-	return rb
-}
-
-func (rb *FieldCollapseBuilder) Field(field Field) *FieldCollapseBuilder {
-	rb.v.Field = field
-	return rb
-}
-
-func (rb *FieldCollapseBuilder) InnerHits(arg []InnerHits) *FieldCollapseBuilder {
-	rb.v.InnerHits = arg
-	return rb
-}
-
-func (rb *FieldCollapseBuilder) MaxConcurrentGroupSearches(maxconcurrentgroupsearches int) *FieldCollapseBuilder {
-	rb.v.MaxConcurrentGroupSearches = &maxconcurrentgroupsearches
-	return rb
+	return r
 }

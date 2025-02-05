@@ -15,77 +15,93 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // ComponentTemplateSummary type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/_types/ComponentTemplate.ts#L38-L45
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/_types/ComponentTemplate.ts#L39-L51
 type ComponentTemplateSummary struct {
-	Aliases  map[string]AliasDefinition  `json:"aliases,omitempty"`
-	Mappings *TypeMapping                `json:"mappings,omitempty"`
-	Meta_    *Metadata                   `json:"_meta,omitempty"`
-	Settings map[IndexName]IndexSettings `json:"settings"`
-	Version  *VersionNumber              `json:"version,omitempty"`
+	Aliases   map[string]AliasDefinition       `json:"aliases,omitempty"`
+	Lifecycle *DataStreamLifecycleWithRollover `json:"lifecycle,omitempty"`
+	Mappings  *TypeMapping                     `json:"mappings,omitempty"`
+	Meta_     Metadata                         `json:"_meta,omitempty"`
+	Settings  map[string]IndexSettings         `json:"settings,omitempty"`
+	Version   *int64                           `json:"version,omitempty"`
 }
 
-// ComponentTemplateSummaryBuilder holds ComponentTemplateSummary struct and provides a builder API.
-type ComponentTemplateSummaryBuilder struct {
-	v *ComponentTemplateSummary
+func (s *ComponentTemplateSummary) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "aliases":
+			if s.Aliases == nil {
+				s.Aliases = make(map[string]AliasDefinition, 0)
+			}
+			if err := dec.Decode(&s.Aliases); err != nil {
+				return fmt.Errorf("%s | %w", "Aliases", err)
+			}
+
+		case "lifecycle":
+			if err := dec.Decode(&s.Lifecycle); err != nil {
+				return fmt.Errorf("%s | %w", "Lifecycle", err)
+			}
+
+		case "mappings":
+			if err := dec.Decode(&s.Mappings); err != nil {
+				return fmt.Errorf("%s | %w", "Mappings", err)
+			}
+
+		case "_meta":
+			if err := dec.Decode(&s.Meta_); err != nil {
+				return fmt.Errorf("%s | %w", "Meta_", err)
+			}
+
+		case "settings":
+			if s.Settings == nil {
+				s.Settings = make(map[string]IndexSettings, 0)
+			}
+			if err := dec.Decode(&s.Settings); err != nil {
+				return fmt.Errorf("%s | %w", "Settings", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewComponentTemplateSummary provides a builder for the ComponentTemplateSummary struct.
-func NewComponentTemplateSummaryBuilder() *ComponentTemplateSummaryBuilder {
-	r := ComponentTemplateSummaryBuilder{
-		&ComponentTemplateSummary{
-			Aliases:  make(map[string]AliasDefinition, 0),
-			Settings: make(map[IndexName]IndexSettings, 0),
-		},
+// NewComponentTemplateSummary returns a ComponentTemplateSummary.
+func NewComponentTemplateSummary() *ComponentTemplateSummary {
+	r := &ComponentTemplateSummary{
+		Aliases:  make(map[string]AliasDefinition, 0),
+		Settings: make(map[string]IndexSettings, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the ComponentTemplateSummary struct
-func (rb *ComponentTemplateSummaryBuilder) Build() ComponentTemplateSummary {
-	return *rb.v
-}
-
-func (rb *ComponentTemplateSummaryBuilder) Aliases(values map[string]*AliasDefinitionBuilder) *ComponentTemplateSummaryBuilder {
-	tmp := make(map[string]AliasDefinition, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Aliases = tmp
-	return rb
-}
-
-func (rb *ComponentTemplateSummaryBuilder) Mappings(mappings *TypeMappingBuilder) *ComponentTemplateSummaryBuilder {
-	v := mappings.Build()
-	rb.v.Mappings = &v
-	return rb
-}
-
-func (rb *ComponentTemplateSummaryBuilder) Meta_(meta_ *MetadataBuilder) *ComponentTemplateSummaryBuilder {
-	v := meta_.Build()
-	rb.v.Meta_ = &v
-	return rb
-}
-
-func (rb *ComponentTemplateSummaryBuilder) Settings(values map[IndexName]*IndexSettingsBuilder) *ComponentTemplateSummaryBuilder {
-	tmp := make(map[IndexName]IndexSettings, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Settings = tmp
-	return rb
-}
-
-func (rb *ComponentTemplateSummaryBuilder) Version(version VersionNumber) *ComponentTemplateSummaryBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

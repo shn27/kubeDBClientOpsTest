@@ -15,42 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // BucketsVoid holds the union for the following types:
 //
-//	map[string]Void
-//	[]Void
+//	map[string]any
+//	[]any
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L303-L312
-type BucketsVoid interface{}
-
-// BucketsVoidBuilder holds BucketsVoid struct and provides a builder API.
-type BucketsVoidBuilder struct {
-	v BucketsVoid
-}
-
-// NewBucketsVoid provides a builder for the BucketsVoid struct.
-func NewBucketsVoidBuilder() *BucketsVoidBuilder {
-	return &BucketsVoidBuilder{}
-}
-
-// Build finalize the chain and returns the BucketsVoid struct
-func (u *BucketsVoidBuilder) Build() BucketsVoid {
-	return u.v
-}
-
-func (u *BucketsVoidBuilder) Map(value map[string]Void) *BucketsVoidBuilder {
-	u.v = value
-	return u
-}
-
-func (u *BucketsVoidBuilder) Voids(voids ...Void) *BucketsVoidBuilder {
-	u.v = voids
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L346-L355
+type BucketsVoid any

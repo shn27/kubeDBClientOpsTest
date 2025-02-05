@@ -15,40 +15,68 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // HdrMethod type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/metric.ts#L119-L121
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/metric.ts#L225-L230
 type HdrMethod struct {
+	// NumberOfSignificantValueDigits Specifies the resolution of values for the histogram in number of significant
+	// digits.
 	NumberOfSignificantValueDigits *int `json:"number_of_significant_value_digits,omitempty"`
 }
 
-// HdrMethodBuilder holds HdrMethod struct and provides a builder API.
-type HdrMethodBuilder struct {
-	v *HdrMethod
-}
+func (s *HdrMethod) UnmarshalJSON(data []byte) error {
 
-// NewHdrMethod provides a builder for the HdrMethod struct.
-func NewHdrMethodBuilder() *HdrMethodBuilder {
-	r := HdrMethodBuilder{
-		&HdrMethod{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "number_of_significant_value_digits":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NumberOfSignificantValueDigits", err)
+				}
+				s.NumberOfSignificantValueDigits = &value
+			case float64:
+				f := int(v)
+				s.NumberOfSignificantValueDigits = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the HdrMethod struct
-func (rb *HdrMethodBuilder) Build() HdrMethod {
-	return *rb.v
-}
+// NewHdrMethod returns a HdrMethod.
+func NewHdrMethod() *HdrMethod {
+	r := &HdrMethod{}
 
-func (rb *HdrMethodBuilder) NumberOfSignificantValueDigits(numberofsignificantvaluedigits int) *HdrMethodBuilder {
-	rb.v.NumberOfSignificantValueDigits = &numberofsignificantvaluedigits
-	return rb
+	return r
 }

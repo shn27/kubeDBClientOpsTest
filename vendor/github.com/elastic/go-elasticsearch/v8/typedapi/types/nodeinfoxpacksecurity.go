@@ -15,61 +15,80 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // NodeInfoXpackSecurity type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/info/types.ts#L234-L239
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/info/types.ts#L246-L251
 type NodeInfoXpackSecurity struct {
 	Authc     *NodeInfoXpackSecurityAuthc `json:"authc,omitempty"`
 	Enabled   string                      `json:"enabled"`
-	Http      NodeInfoXpackSecuritySsl    `json:"http"`
+	Http      *NodeInfoXpackSecuritySsl   `json:"http,omitempty"`
 	Transport *NodeInfoXpackSecuritySsl   `json:"transport,omitempty"`
 }
 
-// NodeInfoXpackSecurityBuilder holds NodeInfoXpackSecurity struct and provides a builder API.
-type NodeInfoXpackSecurityBuilder struct {
-	v *NodeInfoXpackSecurity
-}
+func (s *NodeInfoXpackSecurity) UnmarshalJSON(data []byte) error {
 
-// NewNodeInfoXpackSecurity provides a builder for the NodeInfoXpackSecurity struct.
-func NewNodeInfoXpackSecurityBuilder() *NodeInfoXpackSecurityBuilder {
-	r := NodeInfoXpackSecurityBuilder{
-		&NodeInfoXpackSecurity{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "authc":
+			if err := dec.Decode(&s.Authc); err != nil {
+				return fmt.Errorf("%s | %w", "Authc", err)
+			}
+
+		case "enabled":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Enabled", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Enabled = o
+
+		case "http":
+			if err := dec.Decode(&s.Http); err != nil {
+				return fmt.Errorf("%s | %w", "Http", err)
+			}
+
+		case "transport":
+			if err := dec.Decode(&s.Transport); err != nil {
+				return fmt.Errorf("%s | %w", "Transport", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the NodeInfoXpackSecurity struct
-func (rb *NodeInfoXpackSecurityBuilder) Build() NodeInfoXpackSecurity {
-	return *rb.v
-}
+// NewNodeInfoXpackSecurity returns a NodeInfoXpackSecurity.
+func NewNodeInfoXpackSecurity() *NodeInfoXpackSecurity {
+	r := &NodeInfoXpackSecurity{}
 
-func (rb *NodeInfoXpackSecurityBuilder) Authc(authc *NodeInfoXpackSecurityAuthcBuilder) *NodeInfoXpackSecurityBuilder {
-	v := authc.Build()
-	rb.v.Authc = &v
-	return rb
-}
-
-func (rb *NodeInfoXpackSecurityBuilder) Enabled(enabled string) *NodeInfoXpackSecurityBuilder {
-	rb.v.Enabled = enabled
-	return rb
-}
-
-func (rb *NodeInfoXpackSecurityBuilder) Http(http *NodeInfoXpackSecuritySslBuilder) *NodeInfoXpackSecurityBuilder {
-	v := http.Build()
-	rb.v.Http = v
-	return rb
-}
-
-func (rb *NodeInfoXpackSecurityBuilder) Transport(transport *NodeInfoXpackSecuritySslBuilder) *NodeInfoXpackSecurityBuilder {
-	v := transport.Build()
-	rb.v.Transport = &v
-	return rb
+	return r
 }

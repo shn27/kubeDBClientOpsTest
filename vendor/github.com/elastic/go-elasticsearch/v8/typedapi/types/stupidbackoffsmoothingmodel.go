@@ -15,40 +15,67 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // StupidBackoffSmoothingModel type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/suggester.ts#L230-L232
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/suggester.ts#L463-L468
 type StupidBackoffSmoothingModel struct {
-	Discount float64 `json:"discount"`
+	// Discount A constant factor that the lower order n-gram model is discounted by.
+	Discount Float64 `json:"discount"`
 }
 
-// StupidBackoffSmoothingModelBuilder holds StupidBackoffSmoothingModel struct and provides a builder API.
-type StupidBackoffSmoothingModelBuilder struct {
-	v *StupidBackoffSmoothingModel
-}
+func (s *StupidBackoffSmoothingModel) UnmarshalJSON(data []byte) error {
 
-// NewStupidBackoffSmoothingModel provides a builder for the StupidBackoffSmoothingModel struct.
-func NewStupidBackoffSmoothingModelBuilder() *StupidBackoffSmoothingModelBuilder {
-	r := StupidBackoffSmoothingModelBuilder{
-		&StupidBackoffSmoothingModel{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "discount":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Discount", err)
+				}
+				f := Float64(value)
+				s.Discount = f
+			case float64:
+				f := Float64(v)
+				s.Discount = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the StupidBackoffSmoothingModel struct
-func (rb *StupidBackoffSmoothingModelBuilder) Build() StupidBackoffSmoothingModel {
-	return *rb.v
-}
+// NewStupidBackoffSmoothingModel returns a StupidBackoffSmoothingModel.
+func NewStupidBackoffSmoothingModel() *StupidBackoffSmoothingModel {
+	r := &StupidBackoffSmoothingModel{}
 
-func (rb *StupidBackoffSmoothingModelBuilder) Discount(discount float64) *StupidBackoffSmoothingModelBuilder {
-	rb.v.Discount = discount
-	return rb
+	return r
 }

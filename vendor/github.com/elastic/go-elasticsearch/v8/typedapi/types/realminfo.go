@@ -15,46 +15,68 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // RealmInfo type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/_types/RealmInfo.ts#L22-L25
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/_types/RealmInfo.ts#L22-L25
 type RealmInfo struct {
-	Name Name   `json:"name"`
+	Name string `json:"name"`
 	Type string `json:"type"`
 }
 
-// RealmInfoBuilder holds RealmInfo struct and provides a builder API.
-type RealmInfoBuilder struct {
-	v *RealmInfo
-}
+func (s *RealmInfo) UnmarshalJSON(data []byte) error {
 
-// NewRealmInfo provides a builder for the RealmInfo struct.
-func NewRealmInfoBuilder() *RealmInfoBuilder {
-	r := RealmInfoBuilder{
-		&RealmInfo{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		case "type":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Type = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RealmInfo struct
-func (rb *RealmInfoBuilder) Build() RealmInfo {
-	return *rb.v
-}
+// NewRealmInfo returns a RealmInfo.
+func NewRealmInfo() *RealmInfo {
+	r := &RealmInfo{}
 
-func (rb *RealmInfoBuilder) Name(name Name) *RealmInfoBuilder {
-	rb.v.Name = name
-	return rb
-}
-
-func (rb *RealmInfoBuilder) Type_(type_ string) *RealmInfoBuilder {
-	rb.v.Type = type_
-	return rb
+	return r
 }

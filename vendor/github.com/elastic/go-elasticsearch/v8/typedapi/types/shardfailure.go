@@ -15,65 +15,104 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ShardFailure type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Errors.ts#L50-L56
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Errors.ts#L52-L58
 type ShardFailure struct {
-	Index  *IndexName `json:"index,omitempty"`
+	Index  *string    `json:"index,omitempty"`
 	Node   *string    `json:"node,omitempty"`
 	Reason ErrorCause `json:"reason"`
 	Shard  int        `json:"shard"`
 	Status *string    `json:"status,omitempty"`
 }
 
-// ShardFailureBuilder holds ShardFailure struct and provides a builder API.
-type ShardFailureBuilder struct {
-	v *ShardFailure
-}
+func (s *ShardFailure) UnmarshalJSON(data []byte) error {
 
-// NewShardFailure provides a builder for the ShardFailure struct.
-func NewShardFailureBuilder() *ShardFailureBuilder {
-	r := ShardFailureBuilder{
-		&ShardFailure{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "index":
+			if err := dec.Decode(&s.Index); err != nil {
+				return fmt.Errorf("%s | %w", "Index", err)
+			}
+
+		case "node":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Node", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Node = &o
+
+		case "reason":
+			if err := dec.Decode(&s.Reason); err != nil {
+				return fmt.Errorf("%s | %w", "Reason", err)
+			}
+
+		case "shard":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Shard", err)
+				}
+				s.Shard = value
+			case float64:
+				f := int(v)
+				s.Shard = f
+			}
+
+		case "status":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Status", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Status = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ShardFailure struct
-func (rb *ShardFailureBuilder) Build() ShardFailure {
-	return *rb.v
-}
+// NewShardFailure returns a ShardFailure.
+func NewShardFailure() *ShardFailure {
+	r := &ShardFailure{}
 
-func (rb *ShardFailureBuilder) Index(index IndexName) *ShardFailureBuilder {
-	rb.v.Index = &index
-	return rb
-}
-
-func (rb *ShardFailureBuilder) Node(node string) *ShardFailureBuilder {
-	rb.v.Node = &node
-	return rb
-}
-
-func (rb *ShardFailureBuilder) Reason(reason *ErrorCauseBuilder) *ShardFailureBuilder {
-	v := reason.Build()
-	rb.v.Reason = v
-	return rb
-}
-
-func (rb *ShardFailureBuilder) Shard(shard int) *ShardFailureBuilder {
-	rb.v.Shard = shard
-	return rb
-}
-
-func (rb *ShardFailureBuilder) Status(status string) *ShardFailureBuilder {
-	rb.v.Status = &status
-	return rb
+	return r
 }

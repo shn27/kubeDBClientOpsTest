@@ -15,54 +15,66 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // SearchInput type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Input.ts#L114-L118
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Input.ts#L112-L116
 type SearchInput struct {
 	Extract []string                     `json:"extract,omitempty"`
 	Request SearchInputRequestDefinition `json:"request"`
-	Timeout *Duration                    `json:"timeout,omitempty"`
+	Timeout Duration                     `json:"timeout,omitempty"`
 }
 
-// SearchInputBuilder holds SearchInput struct and provides a builder API.
-type SearchInputBuilder struct {
-	v *SearchInput
-}
+func (s *SearchInput) UnmarshalJSON(data []byte) error {
 
-// NewSearchInput provides a builder for the SearchInput struct.
-func NewSearchInputBuilder() *SearchInputBuilder {
-	r := SearchInputBuilder{
-		&SearchInput{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "extract":
+			if err := dec.Decode(&s.Extract); err != nil {
+				return fmt.Errorf("%s | %w", "Extract", err)
+			}
+
+		case "request":
+			if err := dec.Decode(&s.Request); err != nil {
+				return fmt.Errorf("%s | %w", "Request", err)
+			}
+
+		case "timeout":
+			if err := dec.Decode(&s.Timeout); err != nil {
+				return fmt.Errorf("%s | %w", "Timeout", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SearchInput struct
-func (rb *SearchInputBuilder) Build() SearchInput {
-	return *rb.v
-}
+// NewSearchInput returns a SearchInput.
+func NewSearchInput() *SearchInput {
+	r := &SearchInput{}
 
-func (rb *SearchInputBuilder) Extract(extract ...string) *SearchInputBuilder {
-	rb.v.Extract = extract
-	return rb
-}
-
-func (rb *SearchInputBuilder) Request(request *SearchInputRequestDefinitionBuilder) *SearchInputBuilder {
-	v := request.Build()
-	rb.v.Request = v
-	return rb
-}
-
-func (rb *SearchInputBuilder) Timeout(timeout *DurationBuilder) *SearchInputBuilder {
-	v := timeout.Build()
-	rb.v.Timeout = &v
-	return rb
+	return r
 }

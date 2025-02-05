@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
@@ -27,38 +25,5 @@ package types
 //	map[string]MultiTermsBucket
 //	[]MultiTermsBucket
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L303-L312
-type BucketsMultiTermsBucket interface{}
-
-// BucketsMultiTermsBucketBuilder holds BucketsMultiTermsBucket struct and provides a builder API.
-type BucketsMultiTermsBucketBuilder struct {
-	v BucketsMultiTermsBucket
-}
-
-// NewBucketsMultiTermsBucket provides a builder for the BucketsMultiTermsBucket struct.
-func NewBucketsMultiTermsBucketBuilder() *BucketsMultiTermsBucketBuilder {
-	return &BucketsMultiTermsBucketBuilder{}
-}
-
-// Build finalize the chain and returns the BucketsMultiTermsBucket struct
-func (u *BucketsMultiTermsBucketBuilder) Build() BucketsMultiTermsBucket {
-	return u.v
-}
-
-func (u *BucketsMultiTermsBucketBuilder) Map(values map[string]*MultiTermsBucketBuilder) *BucketsMultiTermsBucketBuilder {
-	tmp := make(map[string]MultiTermsBucket, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	u.v = tmp
-	return u
-}
-
-func (u *BucketsMultiTermsBucketBuilder) MultiTermsBuckets(multitermsbuckets []MultiTermsBucketBuilder) *BucketsMultiTermsBucketBuilder {
-	tmp := make([]MultiTermsBucket, len(multitermsbuckets))
-	for _, value := range multitermsbuckets {
-		tmp = append(tmp, value.Build())
-	}
-	u.v = tmp
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L346-L355
+type BucketsMultiTermsBucket any

@@ -15,21 +15,26 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/appliesto"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/conditionoperator"
 )
 
 // RuleCondition type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/Rule.ts#L52-L65
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/Rule.ts#L52-L65
 type RuleCondition struct {
 	// AppliesTo Specifies the result property to which the condition applies. If your
 	// detector uses `lat_long`, `metric`, `rare`, or `freq_rare` functions, you can
@@ -39,48 +44,58 @@ type RuleCondition struct {
 	// greater than or equals, less than, and less than or equals.
 	Operator conditionoperator.ConditionOperator `json:"operator"`
 	// Value The value that is compared against the `applies_to` field using the operator.
-	Value float64 `json:"value"`
+	Value Float64 `json:"value"`
 }
 
-// RuleConditionBuilder holds RuleCondition struct and provides a builder API.
-type RuleConditionBuilder struct {
-	v *RuleCondition
-}
+func (s *RuleCondition) UnmarshalJSON(data []byte) error {
 
-// NewRuleCondition provides a builder for the RuleCondition struct.
-func NewRuleConditionBuilder() *RuleConditionBuilder {
-	r := RuleConditionBuilder{
-		&RuleCondition{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "applies_to":
+			if err := dec.Decode(&s.AppliesTo); err != nil {
+				return fmt.Errorf("%s | %w", "AppliesTo", err)
+			}
+
+		case "operator":
+			if err := dec.Decode(&s.Operator); err != nil {
+				return fmt.Errorf("%s | %w", "Operator", err)
+			}
+
+		case "value":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Value", err)
+				}
+				f := Float64(value)
+				s.Value = f
+			case float64:
+				f := Float64(v)
+				s.Value = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RuleCondition struct
-func (rb *RuleConditionBuilder) Build() RuleCondition {
-	return *rb.v
-}
+// NewRuleCondition returns a RuleCondition.
+func NewRuleCondition() *RuleCondition {
+	r := &RuleCondition{}
 
-// AppliesTo Specifies the result property to which the condition applies. If your
-// detector uses `lat_long`, `metric`, `rare`, or `freq_rare` functions, you can
-// only specify conditions that apply to time.
-
-func (rb *RuleConditionBuilder) AppliesTo(appliesto appliesto.AppliesTo) *RuleConditionBuilder {
-	rb.v.AppliesTo = appliesto
-	return rb
-}
-
-// Operator Specifies the condition operator. The available options are greater than,
-// greater than or equals, less than, and less than or equals.
-
-func (rb *RuleConditionBuilder) Operator(operator conditionoperator.ConditionOperator) *RuleConditionBuilder {
-	rb.v.Operator = operator
-	return rb
-}
-
-// Value The value that is compared against the `applies_to` field using the operator.
-
-func (rb *RuleConditionBuilder) Value(value float64) *RuleConditionBuilder {
-	rb.v.Value = value
-	return rb
+	return r
 }

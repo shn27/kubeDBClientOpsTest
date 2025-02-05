@@ -15,19 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package rangerelation
 package rangerelation
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/term.ts#L96-L100
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/term.ts#L188-L201
 type RangeRelation struct {
-	name string
+	Name string
 }
 
 var (
@@ -43,7 +41,7 @@ func (r RangeRelation) MarshalText() (text []byte, err error) {
 }
 
 func (r *RangeRelation) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
 	case "within":
 		*r = Within
@@ -59,5 +57,5 @@ func (r *RangeRelation) UnmarshalText(text []byte) error {
 }
 
 func (r RangeRelation) String() string {
-	return r.name
+	return r.Name
 }

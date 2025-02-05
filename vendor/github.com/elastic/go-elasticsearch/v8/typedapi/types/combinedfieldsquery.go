@@ -15,88 +15,150 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/combinedfieldsoperator"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/combinedfieldszeroterms"
 )
 
 // CombinedFieldsQuery type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/abstractions.ts#L181-L195
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/abstractions.ts#L465-L499
 type CombinedFieldsQuery struct {
-	AutoGenerateSynonymsPhraseQuery *bool                                            `json:"auto_generate_synonyms_phrase_query,omitempty"`
-	Boost                           *float32                                         `json:"boost,omitempty"`
-	Fields                          []Field                                          `json:"fields"`
-	MinimumShouldMatch              *MinimumShouldMatch                              `json:"minimum_should_match,omitempty"`
-	Operator                        *combinedfieldsoperator.CombinedFieldsOperator   `json:"operator,omitempty"`
-	Query                           string                                           `json:"query"`
-	QueryName_                      *string                                          `json:"_name,omitempty"`
-	ZeroTermsQuery                  *combinedfieldszeroterms.CombinedFieldsZeroTerms `json:"zero_terms_query,omitempty"`
+	// AutoGenerateSynonymsPhraseQuery If true, match phrase queries are automatically created for multi-term
+	// synonyms.
+	AutoGenerateSynonymsPhraseQuery *bool `json:"auto_generate_synonyms_phrase_query,omitempty"`
+	// Boost Floating point number used to decrease or increase the relevance scores of
+	// the query.
+	// Boost values are relative to the default value of 1.0.
+	// A boost value between 0 and 1.0 decreases the relevance score.
+	// A value greater than 1.0 increases the relevance score.
+	Boost *float32 `json:"boost,omitempty"`
+	// Fields List of fields to search. Field wildcard patterns are allowed. Only `text`
+	// fields are supported, and they must all have the same search `analyzer`.
+	Fields []string `json:"fields"`
+	// MinimumShouldMatch Minimum number of clauses that must match for a document to be returned.
+	MinimumShouldMatch MinimumShouldMatch `json:"minimum_should_match,omitempty"`
+	// Operator Boolean logic used to interpret text in the query value.
+	Operator *combinedfieldsoperator.CombinedFieldsOperator `json:"operator,omitempty"`
+	// Query Text to search for in the provided `fields`.
+	// The `combined_fields` query analyzes the provided text before performing a
+	// search.
+	Query      string  `json:"query"`
+	QueryName_ *string `json:"_name,omitempty"`
+	// ZeroTermsQuery Indicates whether no documents are returned if the analyzer removes all
+	// tokens, such as when using a `stop` filter.
+	ZeroTermsQuery *combinedfieldszeroterms.CombinedFieldsZeroTerms `json:"zero_terms_query,omitempty"`
 }
 
-// CombinedFieldsQueryBuilder holds CombinedFieldsQuery struct and provides a builder API.
-type CombinedFieldsQueryBuilder struct {
-	v *CombinedFieldsQuery
-}
+func (s *CombinedFieldsQuery) UnmarshalJSON(data []byte) error {
 
-// NewCombinedFieldsQuery provides a builder for the CombinedFieldsQuery struct.
-func NewCombinedFieldsQueryBuilder() *CombinedFieldsQueryBuilder {
-	r := CombinedFieldsQueryBuilder{
-		&CombinedFieldsQuery{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "auto_generate_synonyms_phrase_query":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "AutoGenerateSynonymsPhraseQuery", err)
+				}
+				s.AutoGenerateSynonymsPhraseQuery = &value
+			case bool:
+				s.AutoGenerateSynonymsPhraseQuery = &v
+			}
+
+		case "boost":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Boost", err)
+				}
+				f := float32(value)
+				s.Boost = &f
+			case float64:
+				f := float32(v)
+				s.Boost = &f
+			}
+
+		case "fields":
+			if err := dec.Decode(&s.Fields); err != nil {
+				return fmt.Errorf("%s | %w", "Fields", err)
+			}
+
+		case "minimum_should_match":
+			if err := dec.Decode(&s.MinimumShouldMatch); err != nil {
+				return fmt.Errorf("%s | %w", "MinimumShouldMatch", err)
+			}
+
+		case "operator":
+			if err := dec.Decode(&s.Operator); err != nil {
+				return fmt.Errorf("%s | %w", "Operator", err)
+			}
+
+		case "query":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Query", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Query = o
+
+		case "_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "QueryName_", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.QueryName_ = &o
+
+		case "zero_terms_query":
+			if err := dec.Decode(&s.ZeroTermsQuery); err != nil {
+				return fmt.Errorf("%s | %w", "ZeroTermsQuery", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the CombinedFieldsQuery struct
-func (rb *CombinedFieldsQueryBuilder) Build() CombinedFieldsQuery {
-	return *rb.v
-}
+// NewCombinedFieldsQuery returns a CombinedFieldsQuery.
+func NewCombinedFieldsQuery() *CombinedFieldsQuery {
+	r := &CombinedFieldsQuery{}
 
-func (rb *CombinedFieldsQueryBuilder) AutoGenerateSynonymsPhraseQuery(autogeneratesynonymsphrasequery bool) *CombinedFieldsQueryBuilder {
-	rb.v.AutoGenerateSynonymsPhraseQuery = &autogeneratesynonymsphrasequery
-	return rb
-}
-
-func (rb *CombinedFieldsQueryBuilder) Boost(boost float32) *CombinedFieldsQueryBuilder {
-	rb.v.Boost = &boost
-	return rb
-}
-
-func (rb *CombinedFieldsQueryBuilder) Fields(fields ...Field) *CombinedFieldsQueryBuilder {
-	rb.v.Fields = fields
-	return rb
-}
-
-func (rb *CombinedFieldsQueryBuilder) MinimumShouldMatch(minimumshouldmatch *MinimumShouldMatchBuilder) *CombinedFieldsQueryBuilder {
-	v := minimumshouldmatch.Build()
-	rb.v.MinimumShouldMatch = &v
-	return rb
-}
-
-func (rb *CombinedFieldsQueryBuilder) Operator(operator combinedfieldsoperator.CombinedFieldsOperator) *CombinedFieldsQueryBuilder {
-	rb.v.Operator = &operator
-	return rb
-}
-
-func (rb *CombinedFieldsQueryBuilder) Query(query string) *CombinedFieldsQueryBuilder {
-	rb.v.Query = query
-	return rb
-}
-
-func (rb *CombinedFieldsQueryBuilder) QueryName_(queryname_ string) *CombinedFieldsQueryBuilder {
-	rb.v.QueryName_ = &queryname_
-	return rb
-}
-
-func (rb *CombinedFieldsQueryBuilder) ZeroTermsQuery(zerotermsquery combinedfieldszeroterms.CombinedFieldsZeroTerms) *CombinedFieldsQueryBuilder {
-	rb.v.ZeroTermsQuery = &zerotermsquery
-	return rb
+	return r
 }

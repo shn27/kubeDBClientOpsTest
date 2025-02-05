@@ -15,71 +15,120 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/noridecompoundmode"
 )
 
 // NoriTokenizer type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/tokenizers.ts#L80-L86
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/nori-plugin.ts#L28-L34
 type NoriTokenizer struct {
 	DecompoundMode      *noridecompoundmode.NoriDecompoundMode `json:"decompound_mode,omitempty"`
 	DiscardPunctuation  *bool                                  `json:"discard_punctuation,omitempty"`
 	Type                string                                 `json:"type,omitempty"`
 	UserDictionary      *string                                `json:"user_dictionary,omitempty"`
 	UserDictionaryRules []string                               `json:"user_dictionary_rules,omitempty"`
-	Version             *VersionString                         `json:"version,omitempty"`
+	Version             *string                                `json:"version,omitempty"`
 }
 
-// NoriTokenizerBuilder holds NoriTokenizer struct and provides a builder API.
-type NoriTokenizerBuilder struct {
-	v *NoriTokenizer
+func (s *NoriTokenizer) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "decompound_mode":
+			if err := dec.Decode(&s.DecompoundMode); err != nil {
+				return fmt.Errorf("%s | %w", "DecompoundMode", err)
+			}
+
+		case "discard_punctuation":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DiscardPunctuation", err)
+				}
+				s.DiscardPunctuation = &value
+			case bool:
+				s.DiscardPunctuation = &v
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "user_dictionary":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "UserDictionary", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.UserDictionary = &o
+
+		case "user_dictionary_rules":
+			if err := dec.Decode(&s.UserDictionaryRules); err != nil {
+				return fmt.Errorf("%s | %w", "UserDictionaryRules", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewNoriTokenizer provides a builder for the NoriTokenizer struct.
-func NewNoriTokenizerBuilder() *NoriTokenizerBuilder {
-	r := NoriTokenizerBuilder{
-		&NoriTokenizer{},
+// MarshalJSON override marshalling to include literal value
+func (s NoriTokenizer) MarshalJSON() ([]byte, error) {
+	type innerNoriTokenizer NoriTokenizer
+	tmp := innerNoriTokenizer{
+		DecompoundMode:      s.DecompoundMode,
+		DiscardPunctuation:  s.DiscardPunctuation,
+		Type:                s.Type,
+		UserDictionary:      s.UserDictionary,
+		UserDictionaryRules: s.UserDictionaryRules,
+		Version:             s.Version,
 	}
 
-	r.v.Type = "nori_tokenizer"
+	tmp.Type = "nori_tokenizer"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the NoriTokenizer struct
-func (rb *NoriTokenizerBuilder) Build() NoriTokenizer {
-	return *rb.v
-}
+// NewNoriTokenizer returns a NoriTokenizer.
+func NewNoriTokenizer() *NoriTokenizer {
+	r := &NoriTokenizer{}
 
-func (rb *NoriTokenizerBuilder) DecompoundMode(decompoundmode noridecompoundmode.NoriDecompoundMode) *NoriTokenizerBuilder {
-	rb.v.DecompoundMode = &decompoundmode
-	return rb
-}
-
-func (rb *NoriTokenizerBuilder) DiscardPunctuation(discardpunctuation bool) *NoriTokenizerBuilder {
-	rb.v.DiscardPunctuation = &discardpunctuation
-	return rb
-}
-
-func (rb *NoriTokenizerBuilder) UserDictionary(userdictionary string) *NoriTokenizerBuilder {
-	rb.v.UserDictionary = &userdictionary
-	return rb
-}
-
-func (rb *NoriTokenizerBuilder) UserDictionaryRules(user_dictionary_rules ...string) *NoriTokenizerBuilder {
-	rb.v.UserDictionaryRules = user_dictionary_rules
-	return rb
-}
-
-func (rb *NoriTokenizerBuilder) Version(version VersionString) *NoriTokenizerBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

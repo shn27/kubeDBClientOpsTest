@@ -15,46 +15,72 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // SampleDiversity type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/graph/_types/ExploreControls.ts#L31-L34
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/graph/_types/ExploreControls.ts#L51-L54
 type SampleDiversity struct {
-	Field           Field `json:"field"`
-	MaxDocsPerValue int   `json:"max_docs_per_value"`
+	Field           string `json:"field"`
+	MaxDocsPerValue int    `json:"max_docs_per_value"`
 }
 
-// SampleDiversityBuilder holds SampleDiversity struct and provides a builder API.
-type SampleDiversityBuilder struct {
-	v *SampleDiversity
-}
+func (s *SampleDiversity) UnmarshalJSON(data []byte) error {
 
-// NewSampleDiversity provides a builder for the SampleDiversity struct.
-func NewSampleDiversityBuilder() *SampleDiversityBuilder {
-	r := SampleDiversityBuilder{
-		&SampleDiversity{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "max_docs_per_value":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxDocsPerValue", err)
+				}
+				s.MaxDocsPerValue = value
+			case float64:
+				f := int(v)
+				s.MaxDocsPerValue = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SampleDiversity struct
-func (rb *SampleDiversityBuilder) Build() SampleDiversity {
-	return *rb.v
-}
+// NewSampleDiversity returns a SampleDiversity.
+func NewSampleDiversity() *SampleDiversity {
+	r := &SampleDiversity{}
 
-func (rb *SampleDiversityBuilder) Field(field Field) *SampleDiversityBuilder {
-	rb.v.Field = field
-	return rb
-}
-
-func (rb *SampleDiversityBuilder) MaxDocsPerValue(maxdocspervalue int) *SampleDiversityBuilder {
-	rb.v.MaxDocsPerValue = maxdocspervalue
-	return rb
+	return r
 }

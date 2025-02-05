@@ -15,58 +15,114 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ScriptCache type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/_types/Stats.ts#L406-L411
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/_types/Stats.ts#L1102-L1116
 type ScriptCache struct {
-	CacheEvictions            *int64  `json:"cache_evictions,omitempty"`
-	CompilationLimitTriggered *int64  `json:"compilation_limit_triggered,omitempty"`
-	Compilations              *int64  `json:"compilations,omitempty"`
-	Context                   *string `json:"context,omitempty"`
+	// CacheEvictions Total number of times the script cache has evicted old data.
+	CacheEvictions *int64 `json:"cache_evictions,omitempty"`
+	// CompilationLimitTriggered Total number of times the script compilation circuit breaker has limited
+	// inline script compilations.
+	CompilationLimitTriggered *int64 `json:"compilation_limit_triggered,omitempty"`
+	// Compilations Total number of inline script compilations performed by the node.
+	Compilations *int64  `json:"compilations,omitempty"`
+	Context      *string `json:"context,omitempty"`
 }
 
-// ScriptCacheBuilder holds ScriptCache struct and provides a builder API.
-type ScriptCacheBuilder struct {
-	v *ScriptCache
-}
+func (s *ScriptCache) UnmarshalJSON(data []byte) error {
 
-// NewScriptCache provides a builder for the ScriptCache struct.
-func NewScriptCacheBuilder() *ScriptCacheBuilder {
-	r := ScriptCacheBuilder{
-		&ScriptCache{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "cache_evictions":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CacheEvictions", err)
+				}
+				s.CacheEvictions = &value
+			case float64:
+				f := int64(v)
+				s.CacheEvictions = &f
+			}
+
+		case "compilation_limit_triggered":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CompilationLimitTriggered", err)
+				}
+				s.CompilationLimitTriggered = &value
+			case float64:
+				f := int64(v)
+				s.CompilationLimitTriggered = &f
+			}
+
+		case "compilations":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Compilations", err)
+				}
+				s.Compilations = &value
+			case float64:
+				f := int64(v)
+				s.Compilations = &f
+			}
+
+		case "context":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Context", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Context = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ScriptCache struct
-func (rb *ScriptCacheBuilder) Build() ScriptCache {
-	return *rb.v
-}
+// NewScriptCache returns a ScriptCache.
+func NewScriptCache() *ScriptCache {
+	r := &ScriptCache{}
 
-func (rb *ScriptCacheBuilder) CacheEvictions(cacheevictions int64) *ScriptCacheBuilder {
-	rb.v.CacheEvictions = &cacheevictions
-	return rb
-}
-
-func (rb *ScriptCacheBuilder) CompilationLimitTriggered(compilationlimittriggered int64) *ScriptCacheBuilder {
-	rb.v.CompilationLimitTriggered = &compilationlimittriggered
-	return rb
-}
-
-func (rb *ScriptCacheBuilder) Compilations(compilations int64) *ScriptCacheBuilder {
-	rb.v.Compilations = &compilations
-	return rb
-}
-
-func (rb *ScriptCacheBuilder) Context(context string) *ScriptCacheBuilder {
-	rb.v.Context = &context
-	return rb
+	return r
 }

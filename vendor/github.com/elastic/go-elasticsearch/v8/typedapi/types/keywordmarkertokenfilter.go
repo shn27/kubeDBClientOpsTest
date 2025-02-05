@@ -15,67 +15,136 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // KeywordMarkerTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L230-L236
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L232-L238
 type KeywordMarkerTokenFilter struct {
-	IgnoreCase      *bool          `json:"ignore_case,omitempty"`
-	Keywords        []string       `json:"keywords,omitempty"`
-	KeywordsPath    *string        `json:"keywords_path,omitempty"`
-	KeywordsPattern *string        `json:"keywords_pattern,omitempty"`
-	Type            string         `json:"type,omitempty"`
-	Version         *VersionString `json:"version,omitempty"`
+	IgnoreCase      *bool    `json:"ignore_case,omitempty"`
+	Keywords        []string `json:"keywords,omitempty"`
+	KeywordsPath    *string  `json:"keywords_path,omitempty"`
+	KeywordsPattern *string  `json:"keywords_pattern,omitempty"`
+	Type            string   `json:"type,omitempty"`
+	Version         *string  `json:"version,omitempty"`
 }
 
-// KeywordMarkerTokenFilterBuilder holds KeywordMarkerTokenFilter struct and provides a builder API.
-type KeywordMarkerTokenFilterBuilder struct {
-	v *KeywordMarkerTokenFilter
+func (s *KeywordMarkerTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "ignore_case":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IgnoreCase", err)
+				}
+				s.IgnoreCase = &value
+			case bool:
+				s.IgnoreCase = &v
+			}
+
+		case "keywords":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Keywords", err)
+				}
+
+				s.Keywords = append(s.Keywords, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Keywords); err != nil {
+					return fmt.Errorf("%s | %w", "Keywords", err)
+				}
+			}
+
+		case "keywords_path":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "KeywordsPath", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.KeywordsPath = &o
+
+		case "keywords_pattern":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "KeywordsPattern", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.KeywordsPattern = &o
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewKeywordMarkerTokenFilter provides a builder for the KeywordMarkerTokenFilter struct.
-func NewKeywordMarkerTokenFilterBuilder() *KeywordMarkerTokenFilterBuilder {
-	r := KeywordMarkerTokenFilterBuilder{
-		&KeywordMarkerTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s KeywordMarkerTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerKeywordMarkerTokenFilter KeywordMarkerTokenFilter
+	tmp := innerKeywordMarkerTokenFilter{
+		IgnoreCase:      s.IgnoreCase,
+		Keywords:        s.Keywords,
+		KeywordsPath:    s.KeywordsPath,
+		KeywordsPattern: s.KeywordsPattern,
+		Type:            s.Type,
+		Version:         s.Version,
 	}
 
-	r.v.Type = "keyword_marker"
+	tmp.Type = "keyword_marker"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the KeywordMarkerTokenFilter struct
-func (rb *KeywordMarkerTokenFilterBuilder) Build() KeywordMarkerTokenFilter {
-	return *rb.v
-}
+// NewKeywordMarkerTokenFilter returns a KeywordMarkerTokenFilter.
+func NewKeywordMarkerTokenFilter() *KeywordMarkerTokenFilter {
+	r := &KeywordMarkerTokenFilter{}
 
-func (rb *KeywordMarkerTokenFilterBuilder) IgnoreCase(ignorecase bool) *KeywordMarkerTokenFilterBuilder {
-	rb.v.IgnoreCase = &ignorecase
-	return rb
-}
-
-func (rb *KeywordMarkerTokenFilterBuilder) Keywords(keywords ...string) *KeywordMarkerTokenFilterBuilder {
-	rb.v.Keywords = keywords
-	return rb
-}
-
-func (rb *KeywordMarkerTokenFilterBuilder) KeywordsPath(keywordspath string) *KeywordMarkerTokenFilterBuilder {
-	rb.v.KeywordsPath = &keywordspath
-	return rb
-}
-
-func (rb *KeywordMarkerTokenFilterBuilder) KeywordsPattern(keywordspattern string) *KeywordMarkerTokenFilterBuilder {
-	rb.v.KeywordsPattern = &keywordspattern
-	return rb
-}
-
-func (rb *KeywordMarkerTokenFilterBuilder) Version(version VersionString) *KeywordMarkerTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

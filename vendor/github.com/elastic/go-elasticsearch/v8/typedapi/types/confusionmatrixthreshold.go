@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ConfusionMatrixThreshold type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/evaluate_data_frame/types.ts#L96-L117
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/evaluate_data_frame/types.ts#L137-L158
 type ConfusionMatrixThreshold struct {
 	// FalseNegative False Negative
 	FalseNegative int `json:"fn"`
@@ -36,49 +43,93 @@ type ConfusionMatrixThreshold struct {
 	TruePositive int `json:"tp"`
 }
 
-// ConfusionMatrixThresholdBuilder holds ConfusionMatrixThreshold struct and provides a builder API.
-type ConfusionMatrixThresholdBuilder struct {
-	v *ConfusionMatrixThreshold
-}
+func (s *ConfusionMatrixThreshold) UnmarshalJSON(data []byte) error {
 
-// NewConfusionMatrixThreshold provides a builder for the ConfusionMatrixThreshold struct.
-func NewConfusionMatrixThresholdBuilder() *ConfusionMatrixThresholdBuilder {
-	r := ConfusionMatrixThresholdBuilder{
-		&ConfusionMatrixThreshold{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "fn":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "FalseNegative", err)
+				}
+				s.FalseNegative = value
+			case float64:
+				f := int(v)
+				s.FalseNegative = f
+			}
+
+		case "fp":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "FalsePositive", err)
+				}
+				s.FalsePositive = value
+			case float64:
+				f := int(v)
+				s.FalsePositive = f
+			}
+
+		case "tn":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TrueNegative", err)
+				}
+				s.TrueNegative = value
+			case float64:
+				f := int(v)
+				s.TrueNegative = f
+			}
+
+		case "tp":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TruePositive", err)
+				}
+				s.TruePositive = value
+			case float64:
+				f := int(v)
+				s.TruePositive = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ConfusionMatrixThreshold struct
-func (rb *ConfusionMatrixThresholdBuilder) Build() ConfusionMatrixThreshold {
-	return *rb.v
-}
+// NewConfusionMatrixThreshold returns a ConfusionMatrixThreshold.
+func NewConfusionMatrixThreshold() *ConfusionMatrixThreshold {
+	r := &ConfusionMatrixThreshold{}
 
-// FalseNegative False Negative
-
-func (rb *ConfusionMatrixThresholdBuilder) FalseNegative(falsenegative int) *ConfusionMatrixThresholdBuilder {
-	rb.v.FalseNegative = falsenegative
-	return rb
-}
-
-// FalsePositive False Positive
-
-func (rb *ConfusionMatrixThresholdBuilder) FalsePositive(falsepositive int) *ConfusionMatrixThresholdBuilder {
-	rb.v.FalsePositive = falsepositive
-	return rb
-}
-
-// TrueNegative True Negative
-
-func (rb *ConfusionMatrixThresholdBuilder) TrueNegative(truenegative int) *ConfusionMatrixThresholdBuilder {
-	rb.v.TrueNegative = truenegative
-	return rb
-}
-
-// TruePositive True Positive
-
-func (rb *ConfusionMatrixThresholdBuilder) TruePositive(truepositive int) *ConfusionMatrixThresholdBuilder {
-	rb.v.TruePositive = truepositive
-	return rb
+	return r
 }

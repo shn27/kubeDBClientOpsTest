@@ -15,56 +15,85 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // InferenceFeatureImportance type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L629-L633
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L778-L782
 type InferenceFeatureImportance struct {
 	Classes     []InferenceClassImportance `json:"classes,omitempty"`
 	FeatureName string                     `json:"feature_name"`
-	Importance  *float64                   `json:"importance,omitempty"`
+	Importance  *Float64                   `json:"importance,omitempty"`
 }
 
-// InferenceFeatureImportanceBuilder holds InferenceFeatureImportance struct and provides a builder API.
-type InferenceFeatureImportanceBuilder struct {
-	v *InferenceFeatureImportance
-}
+func (s *InferenceFeatureImportance) UnmarshalJSON(data []byte) error {
 
-// NewInferenceFeatureImportance provides a builder for the InferenceFeatureImportance struct.
-func NewInferenceFeatureImportanceBuilder() *InferenceFeatureImportanceBuilder {
-	r := InferenceFeatureImportanceBuilder{
-		&InferenceFeatureImportance{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "classes":
+			if err := dec.Decode(&s.Classes); err != nil {
+				return fmt.Errorf("%s | %w", "Classes", err)
+			}
+
+		case "feature_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "FeatureName", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.FeatureName = o
+
+		case "importance":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Importance", err)
+				}
+				f := Float64(value)
+				s.Importance = &f
+			case float64:
+				f := Float64(v)
+				s.Importance = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the InferenceFeatureImportance struct
-func (rb *InferenceFeatureImportanceBuilder) Build() InferenceFeatureImportance {
-	return *rb.v
-}
+// NewInferenceFeatureImportance returns a InferenceFeatureImportance.
+func NewInferenceFeatureImportance() *InferenceFeatureImportance {
+	r := &InferenceFeatureImportance{}
 
-func (rb *InferenceFeatureImportanceBuilder) Classes(classes []InferenceClassImportanceBuilder) *InferenceFeatureImportanceBuilder {
-	tmp := make([]InferenceClassImportance, len(classes))
-	for _, value := range classes {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Classes = tmp
-	return rb
-}
-
-func (rb *InferenceFeatureImportanceBuilder) FeatureName(featurename string) *InferenceFeatureImportanceBuilder {
-	rb.v.FeatureName = featurename
-	return rb
-}
-
-func (rb *InferenceFeatureImportanceBuilder) Importance(importance float64) *InferenceFeatureImportanceBuilder {
-	rb.v.Importance = &importance
-	return rb
+	return r
 }

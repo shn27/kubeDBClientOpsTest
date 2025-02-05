@@ -15,54 +15,77 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // MountedSnapshot type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/searchable_snapshots/mount/types.ts#L23-L27
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/searchable_snapshots/mount/types.ts#L23-L27
 type MountedSnapshot struct {
-	Indices  Indices         `json:"indices"`
+	Indices  []string        `json:"indices"`
 	Shards   ShardStatistics `json:"shards"`
-	Snapshot Name            `json:"snapshot"`
+	Snapshot string          `json:"snapshot"`
 }
 
-// MountedSnapshotBuilder holds MountedSnapshot struct and provides a builder API.
-type MountedSnapshotBuilder struct {
-	v *MountedSnapshot
-}
+func (s *MountedSnapshot) UnmarshalJSON(data []byte) error {
 
-// NewMountedSnapshot provides a builder for the MountedSnapshot struct.
-func NewMountedSnapshotBuilder() *MountedSnapshotBuilder {
-	r := MountedSnapshotBuilder{
-		&MountedSnapshot{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "indices":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Indices", err)
+				}
+
+				s.Indices = append(s.Indices, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Indices); err != nil {
+					return fmt.Errorf("%s | %w", "Indices", err)
+				}
+			}
+
+		case "shards":
+			if err := dec.Decode(&s.Shards); err != nil {
+				return fmt.Errorf("%s | %w", "Shards", err)
+			}
+
+		case "snapshot":
+			if err := dec.Decode(&s.Snapshot); err != nil {
+				return fmt.Errorf("%s | %w", "Snapshot", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the MountedSnapshot struct
-func (rb *MountedSnapshotBuilder) Build() MountedSnapshot {
-	return *rb.v
-}
+// NewMountedSnapshot returns a MountedSnapshot.
+func NewMountedSnapshot() *MountedSnapshot {
+	r := &MountedSnapshot{}
 
-func (rb *MountedSnapshotBuilder) Indices(indices *IndicesBuilder) *MountedSnapshotBuilder {
-	v := indices.Build()
-	rb.v.Indices = v
-	return rb
-}
-
-func (rb *MountedSnapshotBuilder) Shards(shards *ShardStatisticsBuilder) *MountedSnapshotBuilder {
-	v := shards.Build()
-	rb.v.Shards = v
-	return rb
-}
-
-func (rb *MountedSnapshotBuilder) Snapshot(snapshot Name) *MountedSnapshotBuilder {
-	rb.v.Snapshot = snapshot
-	return rb
+	return r
 }

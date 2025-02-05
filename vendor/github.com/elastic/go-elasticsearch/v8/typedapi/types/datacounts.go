@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DataCounts type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/Job.ts#L129-L149
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/Job.ts#L352-L372
 type DataCounts struct {
 	BucketCount                 int64  `json:"bucket_count"`
 	EarliestRecordTimestamp     *int64 `json:"earliest_record_timestamp,omitempty"`
@@ -33,7 +40,7 @@ type DataCounts struct {
 	InputFieldCount             int64  `json:"input_field_count"`
 	InputRecordCount            int64  `json:"input_record_count"`
 	InvalidDateCount            int64  `json:"invalid_date_count"`
-	JobId                       Id     `json:"job_id"`
+	JobId                       string `json:"job_id"`
 	LastDataTime                *int64 `json:"last_data_time,omitempty"`
 	LatestBucketTimestamp       *int64 `json:"latest_bucket_timestamp,omitempty"`
 	LatestEmptyBucketTimestamp  *int64 `json:"latest_empty_bucket_timestamp,omitempty"`
@@ -47,116 +54,304 @@ type DataCounts struct {
 	SparseBucketCount           int64  `json:"sparse_bucket_count"`
 }
 
-// DataCountsBuilder holds DataCounts struct and provides a builder API.
-type DataCountsBuilder struct {
-	v *DataCounts
-}
+func (s *DataCounts) UnmarshalJSON(data []byte) error {
 
-// NewDataCounts provides a builder for the DataCounts struct.
-func NewDataCountsBuilder() *DataCountsBuilder {
-	r := DataCountsBuilder{
-		&DataCounts{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "bucket_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "BucketCount", err)
+				}
+				s.BucketCount = value
+			case float64:
+				f := int64(v)
+				s.BucketCount = f
+			}
+
+		case "earliest_record_timestamp":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "EarliestRecordTimestamp", err)
+				}
+				s.EarliestRecordTimestamp = &value
+			case float64:
+				f := int64(v)
+				s.EarliestRecordTimestamp = &f
+			}
+
+		case "empty_bucket_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "EmptyBucketCount", err)
+				}
+				s.EmptyBucketCount = value
+			case float64:
+				f := int64(v)
+				s.EmptyBucketCount = f
+			}
+
+		case "input_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "InputBytes", err)
+				}
+				s.InputBytes = value
+			case float64:
+				f := int64(v)
+				s.InputBytes = f
+			}
+
+		case "input_field_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "InputFieldCount", err)
+				}
+				s.InputFieldCount = value
+			case float64:
+				f := int64(v)
+				s.InputFieldCount = f
+			}
+
+		case "input_record_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "InputRecordCount", err)
+				}
+				s.InputRecordCount = value
+			case float64:
+				f := int64(v)
+				s.InputRecordCount = f
+			}
+
+		case "invalid_date_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "InvalidDateCount", err)
+				}
+				s.InvalidDateCount = value
+			case float64:
+				f := int64(v)
+				s.InvalidDateCount = f
+			}
+
+		case "job_id":
+			if err := dec.Decode(&s.JobId); err != nil {
+				return fmt.Errorf("%s | %w", "JobId", err)
+			}
+
+		case "last_data_time":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "LastDataTime", err)
+				}
+				s.LastDataTime = &value
+			case float64:
+				f := int64(v)
+				s.LastDataTime = &f
+			}
+
+		case "latest_bucket_timestamp":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "LatestBucketTimestamp", err)
+				}
+				s.LatestBucketTimestamp = &value
+			case float64:
+				f := int64(v)
+				s.LatestBucketTimestamp = &f
+			}
+
+		case "latest_empty_bucket_timestamp":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "LatestEmptyBucketTimestamp", err)
+				}
+				s.LatestEmptyBucketTimestamp = &value
+			case float64:
+				f := int64(v)
+				s.LatestEmptyBucketTimestamp = &f
+			}
+
+		case "latest_record_timestamp":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "LatestRecordTimestamp", err)
+				}
+				s.LatestRecordTimestamp = &value
+			case float64:
+				f := int64(v)
+				s.LatestRecordTimestamp = &f
+			}
+
+		case "latest_sparse_bucket_timestamp":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "LatestSparseBucketTimestamp", err)
+				}
+				s.LatestSparseBucketTimestamp = &value
+			case float64:
+				f := int64(v)
+				s.LatestSparseBucketTimestamp = &f
+			}
+
+		case "log_time":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "LogTime", err)
+				}
+				s.LogTime = &value
+			case float64:
+				f := int64(v)
+				s.LogTime = &f
+			}
+
+		case "missing_field_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MissingFieldCount", err)
+				}
+				s.MissingFieldCount = value
+			case float64:
+				f := int64(v)
+				s.MissingFieldCount = f
+			}
+
+		case "out_of_order_timestamp_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "OutOfOrderTimestampCount", err)
+				}
+				s.OutOfOrderTimestampCount = value
+			case float64:
+				f := int64(v)
+				s.OutOfOrderTimestampCount = f
+			}
+
+		case "processed_field_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ProcessedFieldCount", err)
+				}
+				s.ProcessedFieldCount = value
+			case float64:
+				f := int64(v)
+				s.ProcessedFieldCount = f
+			}
+
+		case "processed_record_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ProcessedRecordCount", err)
+				}
+				s.ProcessedRecordCount = value
+			case float64:
+				f := int64(v)
+				s.ProcessedRecordCount = f
+			}
+
+		case "sparse_bucket_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "SparseBucketCount", err)
+				}
+				s.SparseBucketCount = value
+			case float64:
+				f := int64(v)
+				s.SparseBucketCount = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DataCounts struct
-func (rb *DataCountsBuilder) Build() DataCounts {
-	return *rb.v
-}
+// NewDataCounts returns a DataCounts.
+func NewDataCounts() *DataCounts {
+	r := &DataCounts{}
 
-func (rb *DataCountsBuilder) BucketCount(bucketcount int64) *DataCountsBuilder {
-	rb.v.BucketCount = bucketcount
-	return rb
-}
-
-func (rb *DataCountsBuilder) EarliestRecordTimestamp(earliestrecordtimestamp int64) *DataCountsBuilder {
-	rb.v.EarliestRecordTimestamp = &earliestrecordtimestamp
-	return rb
-}
-
-func (rb *DataCountsBuilder) EmptyBucketCount(emptybucketcount int64) *DataCountsBuilder {
-	rb.v.EmptyBucketCount = emptybucketcount
-	return rb
-}
-
-func (rb *DataCountsBuilder) InputBytes(inputbytes int64) *DataCountsBuilder {
-	rb.v.InputBytes = inputbytes
-	return rb
-}
-
-func (rb *DataCountsBuilder) InputFieldCount(inputfieldcount int64) *DataCountsBuilder {
-	rb.v.InputFieldCount = inputfieldcount
-	return rb
-}
-
-func (rb *DataCountsBuilder) InputRecordCount(inputrecordcount int64) *DataCountsBuilder {
-	rb.v.InputRecordCount = inputrecordcount
-	return rb
-}
-
-func (rb *DataCountsBuilder) InvalidDateCount(invaliddatecount int64) *DataCountsBuilder {
-	rb.v.InvalidDateCount = invaliddatecount
-	return rb
-}
-
-func (rb *DataCountsBuilder) JobId(jobid Id) *DataCountsBuilder {
-	rb.v.JobId = jobid
-	return rb
-}
-
-func (rb *DataCountsBuilder) LastDataTime(lastdatatime int64) *DataCountsBuilder {
-	rb.v.LastDataTime = &lastdatatime
-	return rb
-}
-
-func (rb *DataCountsBuilder) LatestBucketTimestamp(latestbuckettimestamp int64) *DataCountsBuilder {
-	rb.v.LatestBucketTimestamp = &latestbuckettimestamp
-	return rb
-}
-
-func (rb *DataCountsBuilder) LatestEmptyBucketTimestamp(latestemptybuckettimestamp int64) *DataCountsBuilder {
-	rb.v.LatestEmptyBucketTimestamp = &latestemptybuckettimestamp
-	return rb
-}
-
-func (rb *DataCountsBuilder) LatestRecordTimestamp(latestrecordtimestamp int64) *DataCountsBuilder {
-	rb.v.LatestRecordTimestamp = &latestrecordtimestamp
-	return rb
-}
-
-func (rb *DataCountsBuilder) LatestSparseBucketTimestamp(latestsparsebuckettimestamp int64) *DataCountsBuilder {
-	rb.v.LatestSparseBucketTimestamp = &latestsparsebuckettimestamp
-	return rb
-}
-
-func (rb *DataCountsBuilder) LogTime(logtime int64) *DataCountsBuilder {
-	rb.v.LogTime = &logtime
-	return rb
-}
-
-func (rb *DataCountsBuilder) MissingFieldCount(missingfieldcount int64) *DataCountsBuilder {
-	rb.v.MissingFieldCount = missingfieldcount
-	return rb
-}
-
-func (rb *DataCountsBuilder) OutOfOrderTimestampCount(outofordertimestampcount int64) *DataCountsBuilder {
-	rb.v.OutOfOrderTimestampCount = outofordertimestampcount
-	return rb
-}
-
-func (rb *DataCountsBuilder) ProcessedFieldCount(processedfieldcount int64) *DataCountsBuilder {
-	rb.v.ProcessedFieldCount = processedfieldcount
-	return rb
-}
-
-func (rb *DataCountsBuilder) ProcessedRecordCount(processedrecordcount int64) *DataCountsBuilder {
-	rb.v.ProcessedRecordCount = processedrecordcount
-	return rb
-}
-
-func (rb *DataCountsBuilder) SparseBucketCount(sparsebucketcount int64) *DataCountsBuilder {
-	rb.v.SparseBucketCount = sparsebucketcount
-	return rb
+	return r
 }

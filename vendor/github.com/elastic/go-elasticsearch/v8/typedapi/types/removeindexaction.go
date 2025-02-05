@@ -15,53 +15,92 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // RemoveIndexAction type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/update_aliases/types.ts#L55-L60
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/update_aliases/types.ts#L124-L139
 type RemoveIndexAction struct {
-	Index     *IndexName `json:"index,omitempty"`
-	Indices   *Indices   `json:"indices,omitempty"`
-	MustExist *bool      `json:"must_exist,omitempty"`
+	// Index Data stream or index for the action.
+	// Supports wildcards (`*`).
+	Index *string `json:"index,omitempty"`
+	// Indices Data streams or indices for the action.
+	// Supports wildcards (`*`).
+	Indices []string `json:"indices,omitempty"`
+	// MustExist If `true`, the alias must exist to perform the action.
+	MustExist *bool `json:"must_exist,omitempty"`
 }
 
-// RemoveIndexActionBuilder holds RemoveIndexAction struct and provides a builder API.
-type RemoveIndexActionBuilder struct {
-	v *RemoveIndexAction
-}
+func (s *RemoveIndexAction) UnmarshalJSON(data []byte) error {
 
-// NewRemoveIndexAction provides a builder for the RemoveIndexAction struct.
-func NewRemoveIndexActionBuilder() *RemoveIndexActionBuilder {
-	r := RemoveIndexActionBuilder{
-		&RemoveIndexAction{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "index":
+			if err := dec.Decode(&s.Index); err != nil {
+				return fmt.Errorf("%s | %w", "Index", err)
+			}
+
+		case "indices":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Indices", err)
+				}
+
+				s.Indices = append(s.Indices, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Indices); err != nil {
+					return fmt.Errorf("%s | %w", "Indices", err)
+				}
+			}
+
+		case "must_exist":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MustExist", err)
+				}
+				s.MustExist = &value
+			case bool:
+				s.MustExist = &v
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RemoveIndexAction struct
-func (rb *RemoveIndexActionBuilder) Build() RemoveIndexAction {
-	return *rb.v
-}
+// NewRemoveIndexAction returns a RemoveIndexAction.
+func NewRemoveIndexAction() *RemoveIndexAction {
+	r := &RemoveIndexAction{}
 
-func (rb *RemoveIndexActionBuilder) Index(index IndexName) *RemoveIndexActionBuilder {
-	rb.v.Index = &index
-	return rb
-}
-
-func (rb *RemoveIndexActionBuilder) Indices(indices *IndicesBuilder) *RemoveIndexActionBuilder {
-	v := indices.Build()
-	rb.v.Indices = &v
-	return rb
-}
-
-func (rb *RemoveIndexActionBuilder) MustExist(mustexist bool) *RemoveIndexActionBuilder {
-	rb.v.MustExist = &mustexist
-	return rb
+	return r
 }

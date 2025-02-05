@@ -15,46 +15,22 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // EqlFeaturesPipes type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/usage/types.ts#L120-L123
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/xpack/usage/types.ts#L123-L126
 type EqlFeaturesPipes struct {
 	PipeHead uint `json:"pipe_head"`
 	PipeTail uint `json:"pipe_tail"`
 }
 
-// EqlFeaturesPipesBuilder holds EqlFeaturesPipes struct and provides a builder API.
-type EqlFeaturesPipesBuilder struct {
-	v *EqlFeaturesPipes
-}
+// NewEqlFeaturesPipes returns a EqlFeaturesPipes.
+func NewEqlFeaturesPipes() *EqlFeaturesPipes {
+	r := &EqlFeaturesPipes{}
 
-// NewEqlFeaturesPipes provides a builder for the EqlFeaturesPipes struct.
-func NewEqlFeaturesPipesBuilder() *EqlFeaturesPipesBuilder {
-	r := EqlFeaturesPipesBuilder{
-		&EqlFeaturesPipes{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the EqlFeaturesPipes struct
-func (rb *EqlFeaturesPipesBuilder) Build() EqlFeaturesPipes {
-	return *rb.v
-}
-
-func (rb *EqlFeaturesPipesBuilder) PipeHead(pipehead uint) *EqlFeaturesPipesBuilder {
-	rb.v.PipeHead = pipehead
-	return rb
-}
-
-func (rb *EqlFeaturesPipesBuilder) PipeTail(pipetail uint) *EqlFeaturesPipesBuilder {
-	rb.v.PipeTail = pipetail
-	return rb
+	return r
 }

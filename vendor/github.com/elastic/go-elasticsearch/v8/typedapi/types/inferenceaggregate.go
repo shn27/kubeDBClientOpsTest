@@ -15,34 +15,102 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
 )
 
 // InferenceAggregate type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L610-L621
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L755-L770
 type InferenceAggregate struct {
-	Data              map[string]interface{}       `json:"-"`
+	Data              map[string]json.RawMessage   `json:"-"`
 	FeatureImportance []InferenceFeatureImportance `json:"feature_importance,omitempty"`
-	Meta              *Metadata                    `json:"meta,omitempty"`
+	Meta              Metadata                     `json:"meta,omitempty"`
 	TopClasses        []InferenceTopClassEntry     `json:"top_classes,omitempty"`
-	Value             *FieldValue                  `json:"value,omitempty"`
+	Value             FieldValue                   `json:"value,omitempty"`
 	Warning           *string                      `json:"warning,omitempty"`
+}
+
+func (s *InferenceAggregate) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "feature_importance":
+			if err := dec.Decode(&s.FeatureImportance); err != nil {
+				return fmt.Errorf("%s | %w", "FeatureImportance", err)
+			}
+
+		case "meta":
+			if err := dec.Decode(&s.Meta); err != nil {
+				return fmt.Errorf("%s | %w", "Meta", err)
+			}
+
+		case "top_classes":
+			if err := dec.Decode(&s.TopClasses); err != nil {
+				return fmt.Errorf("%s | %w", "TopClasses", err)
+			}
+
+		case "value":
+			if err := dec.Decode(&s.Value); err != nil {
+				return fmt.Errorf("%s | %w", "Value", err)
+			}
+
+		case "warning":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Warning", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Warning = &o
+
+		default:
+
+			if key, ok := t.(string); ok {
+				if s.Data == nil {
+					s.Data = make(map[string]json.RawMessage, 0)
+				}
+				raw := new(json.RawMessage)
+				if err := dec.Decode(&raw); err != nil {
+					return fmt.Errorf("%s | %w", "Data", err)
+				}
+				s.Data[key] = *raw
+			}
+
+		}
+	}
+	return nil
 }
 
 // MarhsalJSON overrides marshalling for types with additional properties
 func (s InferenceAggregate) MarshalJSON() ([]byte, error) {
 	type opt InferenceAggregate
 	// We transform the struct to a map without the embedded additional properties map
-	tmp := make(map[string]interface{}, 0)
+	tmp := make(map[string]any, 0)
 
 	data, err := json.Marshal(opt(s))
 	if err != nil {
@@ -55,8 +123,9 @@ func (s InferenceAggregate) MarshalJSON() ([]byte, error) {
 
 	// We inline the additional fields from the underlying map
 	for key, value := range s.Data {
-		tmp[string(key)] = value
+		tmp[fmt.Sprintf("%s", key)] = value
 	}
+	delete(tmp, "Data")
 
 	data, err = json.Marshal(tmp)
 	if err != nil {
@@ -66,63 +135,11 @@ func (s InferenceAggregate) MarshalJSON() ([]byte, error) {
 	return data, nil
 }
 
-// InferenceAggregateBuilder holds InferenceAggregate struct and provides a builder API.
-type InferenceAggregateBuilder struct {
-	v *InferenceAggregate
-}
-
-// NewInferenceAggregate provides a builder for the InferenceAggregate struct.
-func NewInferenceAggregateBuilder() *InferenceAggregateBuilder {
-	r := InferenceAggregateBuilder{
-		&InferenceAggregate{
-			Data: make(map[string]interface{}, 0),
-		},
+// NewInferenceAggregate returns a InferenceAggregate.
+func NewInferenceAggregate() *InferenceAggregate {
+	r := &InferenceAggregate{
+		Data: make(map[string]json.RawMessage, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the InferenceAggregate struct
-func (rb *InferenceAggregateBuilder) Build() InferenceAggregate {
-	return *rb.v
-}
-
-func (rb *InferenceAggregateBuilder) Data(value map[string]interface{}) *InferenceAggregateBuilder {
-	rb.v.Data = value
-	return rb
-}
-
-func (rb *InferenceAggregateBuilder) FeatureImportance(feature_importance []InferenceFeatureImportanceBuilder) *InferenceAggregateBuilder {
-	tmp := make([]InferenceFeatureImportance, len(feature_importance))
-	for _, value := range feature_importance {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.FeatureImportance = tmp
-	return rb
-}
-
-func (rb *InferenceAggregateBuilder) Meta(meta *MetadataBuilder) *InferenceAggregateBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *InferenceAggregateBuilder) TopClasses(top_classes []InferenceTopClassEntryBuilder) *InferenceAggregateBuilder {
-	tmp := make([]InferenceTopClassEntry, len(top_classes))
-	for _, value := range top_classes {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.TopClasses = tmp
-	return rb
-}
-
-func (rb *InferenceAggregateBuilder) Value(value *FieldValueBuilder) *InferenceAggregateBuilder {
-	v := value.Build()
-	rb.v.Value = &v
-	return rb
-}
-
-func (rb *InferenceAggregateBuilder) Warning(warning string) *InferenceAggregateBuilder {
-	rb.v.Warning = &warning
-	return rb
+	return r
 }

@@ -15,77 +15,108 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/datafeedstate"
 )
 
 // DatafeedStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/Datafeed.ts#L140-L147
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/Datafeed.ts#L143-L172
 type DatafeedStats struct {
-	AssignmentExplanation *string                     `json:"assignment_explanation,omitempty"`
-	DatafeedId            Id                          `json:"datafeed_id"`
-	Node                  *DiscoveryNode              `json:"node,omitempty"`
-	RunningState          *DatafeedRunningState       `json:"running_state,omitempty"`
-	State                 datafeedstate.DatafeedState `json:"state"`
-	TimingStats           DatafeedTimingStats         `json:"timing_stats"`
+	// AssignmentExplanation For started datafeeds only, contains messages relating to the selection of a
+	// node.
+	AssignmentExplanation *string `json:"assignment_explanation,omitempty"`
+	// DatafeedId A numerical character string that uniquely identifies the datafeed.
+	// This identifier can contain lowercase alphanumeric characters (a-z and 0-9),
+	// hyphens, and underscores.
+	// It must start and end with alphanumeric characters.
+	DatafeedId string `json:"datafeed_id"`
+	// Node For started datafeeds only, this information pertains to the node upon which
+	// the datafeed is started.
+	Node *DiscoveryNodeCompact `json:"node,omitempty"`
+	// RunningState An object containing the running state for this datafeed.
+	// It is only provided if the datafeed is started.
+	RunningState *DatafeedRunningState `json:"running_state,omitempty"`
+	// State The status of the datafeed, which can be one of the following values:
+	// `starting`, `started`, `stopping`, `stopped`.
+	State datafeedstate.DatafeedState `json:"state"`
+	// TimingStats An object that provides statistical information about timing aspect of this
+	// datafeed.
+	TimingStats *DatafeedTimingStats `json:"timing_stats,omitempty"`
 }
 
-// DatafeedStatsBuilder holds DatafeedStats struct and provides a builder API.
-type DatafeedStatsBuilder struct {
-	v *DatafeedStats
-}
+func (s *DatafeedStats) UnmarshalJSON(data []byte) error {
 
-// NewDatafeedStats provides a builder for the DatafeedStats struct.
-func NewDatafeedStatsBuilder() *DatafeedStatsBuilder {
-	r := DatafeedStatsBuilder{
-		&DatafeedStats{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "assignment_explanation":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "AssignmentExplanation", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.AssignmentExplanation = &o
+
+		case "datafeed_id":
+			if err := dec.Decode(&s.DatafeedId); err != nil {
+				return fmt.Errorf("%s | %w", "DatafeedId", err)
+			}
+
+		case "node":
+			if err := dec.Decode(&s.Node); err != nil {
+				return fmt.Errorf("%s | %w", "Node", err)
+			}
+
+		case "running_state":
+			if err := dec.Decode(&s.RunningState); err != nil {
+				return fmt.Errorf("%s | %w", "RunningState", err)
+			}
+
+		case "state":
+			if err := dec.Decode(&s.State); err != nil {
+				return fmt.Errorf("%s | %w", "State", err)
+			}
+
+		case "timing_stats":
+			if err := dec.Decode(&s.TimingStats); err != nil {
+				return fmt.Errorf("%s | %w", "TimingStats", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DatafeedStats struct
-func (rb *DatafeedStatsBuilder) Build() DatafeedStats {
-	return *rb.v
-}
+// NewDatafeedStats returns a DatafeedStats.
+func NewDatafeedStats() *DatafeedStats {
+	r := &DatafeedStats{}
 
-func (rb *DatafeedStatsBuilder) AssignmentExplanation(assignmentexplanation string) *DatafeedStatsBuilder {
-	rb.v.AssignmentExplanation = &assignmentexplanation
-	return rb
-}
-
-func (rb *DatafeedStatsBuilder) DatafeedId(datafeedid Id) *DatafeedStatsBuilder {
-	rb.v.DatafeedId = datafeedid
-	return rb
-}
-
-func (rb *DatafeedStatsBuilder) Node(node *DiscoveryNodeBuilder) *DatafeedStatsBuilder {
-	v := node.Build()
-	rb.v.Node = &v
-	return rb
-}
-
-func (rb *DatafeedStatsBuilder) RunningState(runningstate *DatafeedRunningStateBuilder) *DatafeedStatsBuilder {
-	v := runningstate.Build()
-	rb.v.RunningState = &v
-	return rb
-}
-
-func (rb *DatafeedStatsBuilder) State(state datafeedstate.DatafeedState) *DatafeedStatsBuilder {
-	rb.v.State = state
-	return rb
-}
-
-func (rb *DatafeedStatsBuilder) TimingStats(timingstats *DatafeedTimingStatsBuilder) *DatafeedStatsBuilder {
-	v := timingstats.Build()
-	rb.v.TimingStats = v
-	return rb
+	return r
 }

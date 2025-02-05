@@ -15,92 +15,176 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // GsubProcessor type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ingest/_types/Processors.ts#L229-L235
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ingest/_types/Processors.ts#L983-L1007
 type GsubProcessor struct {
-	Field         Field                `json:"field"`
-	If            *string              `json:"if,omitempty"`
-	IgnoreFailure *bool                `json:"ignore_failure,omitempty"`
-	IgnoreMissing *bool                `json:"ignore_missing,omitempty"`
-	OnFailure     []ProcessorContainer `json:"on_failure,omitempty"`
-	Pattern       string               `json:"pattern"`
-	Replacement   string               `json:"replacement"`
-	Tag           *string              `json:"tag,omitempty"`
-	TargetField   *Field               `json:"target_field,omitempty"`
+	// Description Description of the processor.
+	// Useful for describing the purpose of the processor or its configuration.
+	Description *string `json:"description,omitempty"`
+	// Field The field to apply the replacement to.
+	Field string `json:"field"`
+	// If Conditionally execute the processor.
+	If *string `json:"if,omitempty"`
+	// IgnoreFailure Ignore failures for the processor.
+	IgnoreFailure *bool `json:"ignore_failure,omitempty"`
+	// IgnoreMissing If `true` and `field` does not exist or is `null`, the processor quietly
+	// exits without modifying the document.
+	IgnoreMissing *bool `json:"ignore_missing,omitempty"`
+	// OnFailure Handle failures for the processor.
+	OnFailure []ProcessorContainer `json:"on_failure,omitempty"`
+	// Pattern The pattern to be replaced.
+	Pattern string `json:"pattern"`
+	// Replacement The string to replace the matching patterns with.
+	Replacement string `json:"replacement"`
+	// Tag Identifier for the processor.
+	// Useful for debugging and metrics.
+	Tag *string `json:"tag,omitempty"`
+	// TargetField The field to assign the converted value to
+	// By default, the `field` is updated in-place.
+	TargetField *string `json:"target_field,omitempty"`
 }
 
-// GsubProcessorBuilder holds GsubProcessor struct and provides a builder API.
-type GsubProcessorBuilder struct {
-	v *GsubProcessor
-}
+func (s *GsubProcessor) UnmarshalJSON(data []byte) error {
 
-// NewGsubProcessor provides a builder for the GsubProcessor struct.
-func NewGsubProcessorBuilder() *GsubProcessorBuilder {
-	r := GsubProcessorBuilder{
-		&GsubProcessor{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "description":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Description", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Description = &o
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "if":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "If", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.If = &o
+
+		case "ignore_failure":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IgnoreFailure", err)
+				}
+				s.IgnoreFailure = &value
+			case bool:
+				s.IgnoreFailure = &v
+			}
+
+		case "ignore_missing":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IgnoreMissing", err)
+				}
+				s.IgnoreMissing = &value
+			case bool:
+				s.IgnoreMissing = &v
+			}
+
+		case "on_failure":
+			if err := dec.Decode(&s.OnFailure); err != nil {
+				return fmt.Errorf("%s | %w", "OnFailure", err)
+			}
+
+		case "pattern":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Pattern", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Pattern = o
+
+		case "replacement":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Replacement", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Replacement = o
+
+		case "tag":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Tag", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Tag = &o
+
+		case "target_field":
+			if err := dec.Decode(&s.TargetField); err != nil {
+				return fmt.Errorf("%s | %w", "TargetField", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the GsubProcessor struct
-func (rb *GsubProcessorBuilder) Build() GsubProcessor {
-	return *rb.v
-}
+// NewGsubProcessor returns a GsubProcessor.
+func NewGsubProcessor() *GsubProcessor {
+	r := &GsubProcessor{}
 
-func (rb *GsubProcessorBuilder) Field(field Field) *GsubProcessorBuilder {
-	rb.v.Field = field
-	return rb
-}
-
-func (rb *GsubProcessorBuilder) If_(if_ string) *GsubProcessorBuilder {
-	rb.v.If = &if_
-	return rb
-}
-
-func (rb *GsubProcessorBuilder) IgnoreFailure(ignorefailure bool) *GsubProcessorBuilder {
-	rb.v.IgnoreFailure = &ignorefailure
-	return rb
-}
-
-func (rb *GsubProcessorBuilder) IgnoreMissing(ignoremissing bool) *GsubProcessorBuilder {
-	rb.v.IgnoreMissing = &ignoremissing
-	return rb
-}
-
-func (rb *GsubProcessorBuilder) OnFailure(on_failure []ProcessorContainerBuilder) *GsubProcessorBuilder {
-	tmp := make([]ProcessorContainer, len(on_failure))
-	for _, value := range on_failure {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.OnFailure = tmp
-	return rb
-}
-
-func (rb *GsubProcessorBuilder) Pattern(pattern string) *GsubProcessorBuilder {
-	rb.v.Pattern = pattern
-	return rb
-}
-
-func (rb *GsubProcessorBuilder) Replacement(replacement string) *GsubProcessorBuilder {
-	rb.v.Replacement = replacement
-	return rb
-}
-
-func (rb *GsubProcessorBuilder) Tag(tag string) *GsubProcessorBuilder {
-	rb.v.Tag = &tag
-	return rb
-}
-
-func (rb *GsubProcessorBuilder) TargetField(targetfield Field) *GsubProcessorBuilder {
-	rb.v.TargetField = &targetfield
-	return rb
+	return r
 }

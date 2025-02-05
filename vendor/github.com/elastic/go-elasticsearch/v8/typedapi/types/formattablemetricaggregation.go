@@ -15,60 +15,83 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // FormattableMetricAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/metric.ts#L44-L46
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/metric.ts#L51-L53
 type FormattableMetricAggregation struct {
-	Field   *Field   `json:"field,omitempty"`
-	Format  *string  `json:"format,omitempty"`
-	Missing *Missing `json:"missing,omitempty"`
-	Script  *Script  `json:"script,omitempty"`
+	// Field The field on which to run the aggregation.
+	Field  *string `json:"field,omitempty"`
+	Format *string `json:"format,omitempty"`
+	// Missing The value to apply to documents that do not have a value.
+	// By default, documents without a value are ignored.
+	Missing Missing `json:"missing,omitempty"`
+	Script  *Script `json:"script,omitempty"`
 }
 
-// FormattableMetricAggregationBuilder holds FormattableMetricAggregation struct and provides a builder API.
-type FormattableMetricAggregationBuilder struct {
-	v *FormattableMetricAggregation
-}
+func (s *FormattableMetricAggregation) UnmarshalJSON(data []byte) error {
 
-// NewFormattableMetricAggregation provides a builder for the FormattableMetricAggregation struct.
-func NewFormattableMetricAggregationBuilder() *FormattableMetricAggregationBuilder {
-	r := FormattableMetricAggregationBuilder{
-		&FormattableMetricAggregation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "format":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Format", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Format = &o
+
+		case "missing":
+			if err := dec.Decode(&s.Missing); err != nil {
+				return fmt.Errorf("%s | %w", "Missing", err)
+			}
+
+		case "script":
+			if err := dec.Decode(&s.Script); err != nil {
+				return fmt.Errorf("%s | %w", "Script", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the FormattableMetricAggregation struct
-func (rb *FormattableMetricAggregationBuilder) Build() FormattableMetricAggregation {
-	return *rb.v
-}
+// NewFormattableMetricAggregation returns a FormattableMetricAggregation.
+func NewFormattableMetricAggregation() *FormattableMetricAggregation {
+	r := &FormattableMetricAggregation{}
 
-func (rb *FormattableMetricAggregationBuilder) Field(field Field) *FormattableMetricAggregationBuilder {
-	rb.v.Field = &field
-	return rb
-}
-
-func (rb *FormattableMetricAggregationBuilder) Format(format string) *FormattableMetricAggregationBuilder {
-	rb.v.Format = &format
-	return rb
-}
-
-func (rb *FormattableMetricAggregationBuilder) Missing(missing *MissingBuilder) *FormattableMetricAggregationBuilder {
-	v := missing.Build()
-	rb.v.Missing = &v
-	return rb
-}
-
-func (rb *FormattableMetricAggregationBuilder) Script(script *ScriptBuilder) *FormattableMetricAggregationBuilder {
-	v := script.Build()
-	rb.v.Script = &v
-	return rb
+	return r
 }

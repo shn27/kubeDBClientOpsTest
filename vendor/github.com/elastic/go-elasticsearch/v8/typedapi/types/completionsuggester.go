@@ -15,85 +15,151 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // CompletionSuggester type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/suggester.ts#L127-L133
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/suggester.ts#L163-L181
 type CompletionSuggester struct {
-	Analyzer       *string                       `json:"analyzer,omitempty"`
-	Contexts       map[Field][]CompletionContext `json:"contexts,omitempty"`
-	Field          Field                         `json:"field"`
-	Fuzzy          *SuggestFuzziness             `json:"fuzzy,omitempty"`
-	Prefix         *string                       `json:"prefix,omitempty"`
-	Regex          *string                       `json:"regex,omitempty"`
-	Size           *int                          `json:"size,omitempty"`
-	SkipDuplicates *bool                         `json:"skip_duplicates,omitempty"`
+	// Analyzer The analyzer to analyze the suggest text with.
+	// Defaults to the search analyzer of the suggest field.
+	Analyzer *string `json:"analyzer,omitempty"`
+	// Contexts A value, geo point object, or a geo hash string to filter or boost the
+	// suggestion on.
+	Contexts map[string][]CompletionContext `json:"contexts,omitempty"`
+	// Field The field to fetch the candidate suggestions from.
+	// Needs to be set globally or per suggestion.
+	Field string `json:"field"`
+	// Fuzzy Enables fuzziness, meaning you can have a typo in your search and still get
+	// results back.
+	Fuzzy *SuggestFuzziness `json:"fuzzy,omitempty"`
+	// Regex A regex query that expresses a prefix as a regular expression.
+	Regex *RegexOptions `json:"regex,omitempty"`
+	// Size The maximum corrections to be returned per suggest text token.
+	Size *int `json:"size,omitempty"`
+	// SkipDuplicates Whether duplicate suggestions should be filtered out.
+	SkipDuplicates *bool `json:"skip_duplicates,omitempty"`
 }
 
-// CompletionSuggesterBuilder holds CompletionSuggester struct and provides a builder API.
-type CompletionSuggesterBuilder struct {
-	v *CompletionSuggester
+func (s *CompletionSuggester) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "analyzer":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Analyzer", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Analyzer = &o
+
+		case "contexts":
+			if s.Contexts == nil {
+				s.Contexts = make(map[string][]CompletionContext, 0)
+			}
+			rawMsg := make(map[string]json.RawMessage, 0)
+			dec.Decode(&rawMsg)
+			for key, value := range rawMsg {
+				switch {
+				case bytes.HasPrefix(value, []byte("\"")), bytes.HasPrefix(value, []byte("{")):
+					o := NewCompletionContext()
+					err := json.NewDecoder(bytes.NewReader(value)).Decode(&o)
+					if err != nil {
+						return fmt.Errorf("%s | %w", "Contexts", err)
+					}
+					s.Contexts[key] = append(s.Contexts[key], *o)
+				default:
+					o := []CompletionContext{}
+					err := json.NewDecoder(bytes.NewReader(value)).Decode(&o)
+					if err != nil {
+						return fmt.Errorf("%s | %w", "Contexts", err)
+					}
+					s.Contexts[key] = o
+				}
+			}
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "fuzzy":
+			if err := dec.Decode(&s.Fuzzy); err != nil {
+				return fmt.Errorf("%s | %w", "Fuzzy", err)
+			}
+
+		case "regex":
+			if err := dec.Decode(&s.Regex); err != nil {
+				return fmt.Errorf("%s | %w", "Regex", err)
+			}
+
+		case "size":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Size", err)
+				}
+				s.Size = &value
+			case float64:
+				f := int(v)
+				s.Size = &f
+			}
+
+		case "skip_duplicates":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "SkipDuplicates", err)
+				}
+				s.SkipDuplicates = &value
+			case bool:
+				s.SkipDuplicates = &v
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewCompletionSuggester provides a builder for the CompletionSuggester struct.
-func NewCompletionSuggesterBuilder() *CompletionSuggesterBuilder {
-	r := CompletionSuggesterBuilder{
-		&CompletionSuggester{
-			Contexts: make(map[Field][]CompletionContext, 0),
-		},
+// NewCompletionSuggester returns a CompletionSuggester.
+func NewCompletionSuggester() *CompletionSuggester {
+	r := &CompletionSuggester{
+		Contexts: make(map[string][]CompletionContext, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the CompletionSuggester struct
-func (rb *CompletionSuggesterBuilder) Build() CompletionSuggester {
-	return *rb.v
-}
-
-func (rb *CompletionSuggesterBuilder) Analyzer(analyzer string) *CompletionSuggesterBuilder {
-	rb.v.Analyzer = &analyzer
-	return rb
-}
-
-func (rb *CompletionSuggesterBuilder) Contexts(value map[Field][]CompletionContext) *CompletionSuggesterBuilder {
-	rb.v.Contexts = value
-	return rb
-}
-
-func (rb *CompletionSuggesterBuilder) Field(field Field) *CompletionSuggesterBuilder {
-	rb.v.Field = field
-	return rb
-}
-
-func (rb *CompletionSuggesterBuilder) Fuzzy(fuzzy *SuggestFuzzinessBuilder) *CompletionSuggesterBuilder {
-	v := fuzzy.Build()
-	rb.v.Fuzzy = &v
-	return rb
-}
-
-func (rb *CompletionSuggesterBuilder) Prefix(prefix string) *CompletionSuggesterBuilder {
-	rb.v.Prefix = &prefix
-	return rb
-}
-
-func (rb *CompletionSuggesterBuilder) Regex(regex string) *CompletionSuggesterBuilder {
-	rb.v.Regex = &regex
-	return rb
-}
-
-func (rb *CompletionSuggesterBuilder) Size(size int) *CompletionSuggesterBuilder {
-	rb.v.Size = &size
-	return rb
-}
-
-func (rb *CompletionSuggesterBuilder) SkipDuplicates(skipduplicates bool) *CompletionSuggesterBuilder {
-	rb.v.SkipDuplicates = &skipduplicates
-	return rb
+	return r
 }

@@ -15,53 +15,55 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // ParentAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/bucket.ts#L281-L283
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/bucket.ts#L662-L667
 type ParentAggregation struct {
-	Meta *Metadata     `json:"meta,omitempty"`
-	Name *string       `json:"name,omitempty"`
-	Type *RelationName `json:"type,omitempty"`
+	// Type The child type that should be selected.
+	Type *string `json:"type,omitempty"`
 }
 
-// ParentAggregationBuilder holds ParentAggregation struct and provides a builder API.
-type ParentAggregationBuilder struct {
-	v *ParentAggregation
-}
+func (s *ParentAggregation) UnmarshalJSON(data []byte) error {
 
-// NewParentAggregation provides a builder for the ParentAggregation struct.
-func NewParentAggregationBuilder() *ParentAggregationBuilder {
-	r := ParentAggregationBuilder{
-		&ParentAggregation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ParentAggregation struct
-func (rb *ParentAggregationBuilder) Build() ParentAggregation {
-	return *rb.v
-}
+// NewParentAggregation returns a ParentAggregation.
+func NewParentAggregation() *ParentAggregation {
+	r := &ParentAggregation{}
 
-func (rb *ParentAggregationBuilder) Meta(meta *MetadataBuilder) *ParentAggregationBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *ParentAggregationBuilder) Name(name string) *ParentAggregationBuilder {
-	rb.v.Name = &name
-	return rb
-}
-
-func (rb *ParentAggregationBuilder) Type_(type_ RelationName) *ParentAggregationBuilder {
-	rb.v.Type = &type_
-	return rb
+	return r
 }

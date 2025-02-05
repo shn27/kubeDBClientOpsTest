@@ -15,48 +15,22 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // IndexRouting type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/IndexRouting.ts#L22-L25
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/IndexRouting.ts#L22-L25
 type IndexRouting struct {
 	Allocation *IndexRoutingAllocation `json:"allocation,omitempty"`
 	Rebalance  *IndexRoutingRebalance  `json:"rebalance,omitempty"`
 }
 
-// IndexRoutingBuilder holds IndexRouting struct and provides a builder API.
-type IndexRoutingBuilder struct {
-	v *IndexRouting
-}
+// NewIndexRouting returns a IndexRouting.
+func NewIndexRouting() *IndexRouting {
+	r := &IndexRouting{}
 
-// NewIndexRouting provides a builder for the IndexRouting struct.
-func NewIndexRoutingBuilder() *IndexRoutingBuilder {
-	r := IndexRoutingBuilder{
-		&IndexRouting{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the IndexRouting struct
-func (rb *IndexRoutingBuilder) Build() IndexRouting {
-	return *rb.v
-}
-
-func (rb *IndexRoutingBuilder) Allocation(allocation *IndexRoutingAllocationBuilder) *IndexRoutingBuilder {
-	v := allocation.Build()
-	rb.v.Allocation = &v
-	return rb
-}
-
-func (rb *IndexRoutingBuilder) Rebalance(rebalance *IndexRoutingRebalanceBuilder) *IndexRoutingBuilder {
-	v := rebalance.Build()
-	rb.v.Rebalance = &v
-	return rb
+	return r
 }

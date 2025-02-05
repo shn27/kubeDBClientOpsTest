@@ -15,110 +15,124 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/executionstatus"
 )
 
 // WatchRecord type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/execute_watch/types.ts#L27-L39
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/execute_watch/types.ts#L27-L39
 type WatchRecord struct {
-	Condition    ConditionContainer              `json:"condition"`
-	Input        InputContainer                  `json:"input"`
+	Condition    WatcherCondition                `json:"condition"`
+	Input        WatcherInput                    `json:"input"`
 	Messages     []string                        `json:"messages"`
-	Metadata     *Metadata                       `json:"metadata,omitempty"`
+	Metadata     Metadata                        `json:"metadata,omitempty"`
 	Node         string                          `json:"node"`
 	Result       ExecutionResult                 `json:"result"`
 	State        executionstatus.ExecutionStatus `json:"state"`
 	Status       *WatchStatus                    `json:"status,omitempty"`
 	TriggerEvent TriggerEventResult              `json:"trigger_event"`
-	User         Username                        `json:"user"`
-	WatchId      Id                              `json:"watch_id"`
+	User         string                          `json:"user"`
+	WatchId      string                          `json:"watch_id"`
 }
 
-// WatchRecordBuilder holds WatchRecord struct and provides a builder API.
-type WatchRecordBuilder struct {
-	v *WatchRecord
-}
+func (s *WatchRecord) UnmarshalJSON(data []byte) error {
 
-// NewWatchRecord provides a builder for the WatchRecord struct.
-func NewWatchRecordBuilder() *WatchRecordBuilder {
-	r := WatchRecordBuilder{
-		&WatchRecord{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "condition":
+			if err := dec.Decode(&s.Condition); err != nil {
+				return fmt.Errorf("%s | %w", "Condition", err)
+			}
+
+		case "input":
+			if err := dec.Decode(&s.Input); err != nil {
+				return fmt.Errorf("%s | %w", "Input", err)
+			}
+
+		case "messages":
+			if err := dec.Decode(&s.Messages); err != nil {
+				return fmt.Errorf("%s | %w", "Messages", err)
+			}
+
+		case "metadata":
+			if err := dec.Decode(&s.Metadata); err != nil {
+				return fmt.Errorf("%s | %w", "Metadata", err)
+			}
+
+		case "node":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Node", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Node = o
+
+		case "result":
+			if err := dec.Decode(&s.Result); err != nil {
+				return fmt.Errorf("%s | %w", "Result", err)
+			}
+
+		case "state":
+			if err := dec.Decode(&s.State); err != nil {
+				return fmt.Errorf("%s | %w", "State", err)
+			}
+
+		case "status":
+			if err := dec.Decode(&s.Status); err != nil {
+				return fmt.Errorf("%s | %w", "Status", err)
+			}
+
+		case "trigger_event":
+			if err := dec.Decode(&s.TriggerEvent); err != nil {
+				return fmt.Errorf("%s | %w", "TriggerEvent", err)
+			}
+
+		case "user":
+			if err := dec.Decode(&s.User); err != nil {
+				return fmt.Errorf("%s | %w", "User", err)
+			}
+
+		case "watch_id":
+			if err := dec.Decode(&s.WatchId); err != nil {
+				return fmt.Errorf("%s | %w", "WatchId", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the WatchRecord struct
-func (rb *WatchRecordBuilder) Build() WatchRecord {
-	return *rb.v
-}
+// NewWatchRecord returns a WatchRecord.
+func NewWatchRecord() *WatchRecord {
+	r := &WatchRecord{}
 
-func (rb *WatchRecordBuilder) Condition(condition *ConditionContainerBuilder) *WatchRecordBuilder {
-	v := condition.Build()
-	rb.v.Condition = v
-	return rb
-}
-
-func (rb *WatchRecordBuilder) Input(input *InputContainerBuilder) *WatchRecordBuilder {
-	v := input.Build()
-	rb.v.Input = v
-	return rb
-}
-
-func (rb *WatchRecordBuilder) Messages(messages ...string) *WatchRecordBuilder {
-	rb.v.Messages = messages
-	return rb
-}
-
-func (rb *WatchRecordBuilder) Metadata(metadata *MetadataBuilder) *WatchRecordBuilder {
-	v := metadata.Build()
-	rb.v.Metadata = &v
-	return rb
-}
-
-func (rb *WatchRecordBuilder) Node(node string) *WatchRecordBuilder {
-	rb.v.Node = node
-	return rb
-}
-
-func (rb *WatchRecordBuilder) Result(result *ExecutionResultBuilder) *WatchRecordBuilder {
-	v := result.Build()
-	rb.v.Result = v
-	return rb
-}
-
-func (rb *WatchRecordBuilder) State(state executionstatus.ExecutionStatus) *WatchRecordBuilder {
-	rb.v.State = state
-	return rb
-}
-
-func (rb *WatchRecordBuilder) Status(status *WatchStatusBuilder) *WatchRecordBuilder {
-	v := status.Build()
-	rb.v.Status = &v
-	return rb
-}
-
-func (rb *WatchRecordBuilder) TriggerEvent(triggerevent *TriggerEventResultBuilder) *WatchRecordBuilder {
-	v := triggerevent.Build()
-	rb.v.TriggerEvent = v
-	return rb
-}
-
-func (rb *WatchRecordBuilder) User(user Username) *WatchRecordBuilder {
-	rb.v.User = user
-	return rb
-}
-
-func (rb *WatchRecordBuilder) WatchId(watchid Id) *WatchRecordBuilder {
-	rb.v.WatchId = watchid
-	return rb
+	return r
 }

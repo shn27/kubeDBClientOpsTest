@@ -15,41 +15,22 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // ScriptScoreFunction type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/compound.ts#L61-L63
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/compound.ts#L137-L142
 type ScriptScoreFunction struct {
+	// Script A script that computes a score.
 	Script Script `json:"script"`
 }
 
-// ScriptScoreFunctionBuilder holds ScriptScoreFunction struct and provides a builder API.
-type ScriptScoreFunctionBuilder struct {
-	v *ScriptScoreFunction
-}
+// NewScriptScoreFunction returns a ScriptScoreFunction.
+func NewScriptScoreFunction() *ScriptScoreFunction {
+	r := &ScriptScoreFunction{}
 
-// NewScriptScoreFunction provides a builder for the ScriptScoreFunction struct.
-func NewScriptScoreFunctionBuilder() *ScriptScoreFunctionBuilder {
-	r := ScriptScoreFunctionBuilder{
-		&ScriptScoreFunction{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the ScriptScoreFunction struct
-func (rb *ScriptScoreFunctionBuilder) Build() ScriptScoreFunction {
-	return *rb.v
-}
-
-func (rb *ScriptScoreFunctionBuilder) Script(script *ScriptBuilder) *ScriptScoreFunctionBuilder {
-	v := script.Build()
-	rb.v.Script = v
-	return rb
+	return r
 }

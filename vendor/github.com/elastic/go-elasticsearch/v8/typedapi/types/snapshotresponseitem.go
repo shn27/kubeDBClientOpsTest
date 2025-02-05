@@ -15,57 +15,66 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // SnapshotResponseItem type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/snapshot/get/SnapshotGetResponse.ts#L42-L46
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/snapshot/get/SnapshotGetResponse.ts#L44-L48
 type SnapshotResponseItem struct {
 	Error      *ErrorCause    `json:"error,omitempty"`
-	Repository Name           `json:"repository"`
+	Repository string         `json:"repository"`
 	Snapshots  []SnapshotInfo `json:"snapshots,omitempty"`
 }
 
-// SnapshotResponseItemBuilder holds SnapshotResponseItem struct and provides a builder API.
-type SnapshotResponseItemBuilder struct {
-	v *SnapshotResponseItem
-}
+func (s *SnapshotResponseItem) UnmarshalJSON(data []byte) error {
 
-// NewSnapshotResponseItem provides a builder for the SnapshotResponseItem struct.
-func NewSnapshotResponseItemBuilder() *SnapshotResponseItemBuilder {
-	r := SnapshotResponseItemBuilder{
-		&SnapshotResponseItem{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "error":
+			if err := dec.Decode(&s.Error); err != nil {
+				return fmt.Errorf("%s | %w", "Error", err)
+			}
+
+		case "repository":
+			if err := dec.Decode(&s.Repository); err != nil {
+				return fmt.Errorf("%s | %w", "Repository", err)
+			}
+
+		case "snapshots":
+			if err := dec.Decode(&s.Snapshots); err != nil {
+				return fmt.Errorf("%s | %w", "Snapshots", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SnapshotResponseItem struct
-func (rb *SnapshotResponseItemBuilder) Build() SnapshotResponseItem {
-	return *rb.v
-}
+// NewSnapshotResponseItem returns a SnapshotResponseItem.
+func NewSnapshotResponseItem() *SnapshotResponseItem {
+	r := &SnapshotResponseItem{}
 
-func (rb *SnapshotResponseItemBuilder) Error(error *ErrorCauseBuilder) *SnapshotResponseItemBuilder {
-	v := error.Build()
-	rb.v.Error = &v
-	return rb
-}
-
-func (rb *SnapshotResponseItemBuilder) Repository(repository Name) *SnapshotResponseItemBuilder {
-	rb.v.Repository = repository
-	return rb
-}
-
-func (rb *SnapshotResponseItemBuilder) Snapshots(snapshots []SnapshotInfoBuilder) *SnapshotResponseItemBuilder {
-	tmp := make([]SnapshotInfo, len(snapshots))
-	for _, value := range snapshots {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Snapshots = tmp
-	return rb
+	return r
 }

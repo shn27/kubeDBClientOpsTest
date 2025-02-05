@@ -15,59 +15,109 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // SpanFirstQuery type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/span.ts#L35-L38
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/span.ts#L49-L61
 type SpanFirstQuery struct {
-	Boost      *float32   `json:"boost,omitempty"`
-	End        int        `json:"end"`
+	// Boost Floating point number used to decrease or increase the relevance scores of
+	// the query.
+	// Boost values are relative to the default value of 1.0.
+	// A boost value between 0 and 1.0 decreases the relevance score.
+	// A value greater than 1.0 increases the relevance score.
+	Boost *float32 `json:"boost,omitempty"`
+	// End Controls the maximum end position permitted in a match.
+	End int `json:"end"`
+	// Match Can be any other span type query.
 	Match      *SpanQuery `json:"match,omitempty"`
 	QueryName_ *string    `json:"_name,omitempty"`
 }
 
-// SpanFirstQueryBuilder holds SpanFirstQuery struct and provides a builder API.
-type SpanFirstQueryBuilder struct {
-	v *SpanFirstQuery
-}
+func (s *SpanFirstQuery) UnmarshalJSON(data []byte) error {
 
-// NewSpanFirstQuery provides a builder for the SpanFirstQuery struct.
-func NewSpanFirstQueryBuilder() *SpanFirstQueryBuilder {
-	r := SpanFirstQueryBuilder{
-		&SpanFirstQuery{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "boost":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Boost", err)
+				}
+				f := float32(value)
+				s.Boost = &f
+			case float64:
+				f := float32(v)
+				s.Boost = &f
+			}
+
+		case "end":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "End", err)
+				}
+				s.End = value
+			case float64:
+				f := int(v)
+				s.End = f
+			}
+
+		case "match":
+			if err := dec.Decode(&s.Match); err != nil {
+				return fmt.Errorf("%s | %w", "Match", err)
+			}
+
+		case "_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "QueryName_", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.QueryName_ = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SpanFirstQuery struct
-func (rb *SpanFirstQueryBuilder) Build() SpanFirstQuery {
-	return *rb.v
-}
+// NewSpanFirstQuery returns a SpanFirstQuery.
+func NewSpanFirstQuery() *SpanFirstQuery {
+	r := &SpanFirstQuery{}
 
-func (rb *SpanFirstQueryBuilder) Boost(boost float32) *SpanFirstQueryBuilder {
-	rb.v.Boost = &boost
-	return rb
-}
-
-func (rb *SpanFirstQueryBuilder) End(end int) *SpanFirstQueryBuilder {
-	rb.v.End = end
-	return rb
-}
-
-func (rb *SpanFirstQueryBuilder) Match(match *SpanQueryBuilder) *SpanFirstQueryBuilder {
-	v := match.Build()
-	rb.v.Match = &v
-	return rb
-}
-
-func (rb *SpanFirstQueryBuilder) QueryName_(queryname_ string) *SpanFirstQueryBuilder {
-	rb.v.QueryName_ = &queryname_
-	return rb
+	return r
 }

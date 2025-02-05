@@ -15,72 +15,78 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // ExecutionResult type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Execution.ts#L60-L66
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Execution.ts#L60-L66
 type ExecutionResult struct {
 	Actions           []ExecutionResultAction  `json:"actions"`
 	Condition         ExecutionResultCondition `json:"condition"`
-	ExecutionDuration DurationValueUnitMillis  `json:"execution_duration"`
+	ExecutionDuration int64                    `json:"execution_duration"`
 	ExecutionTime     DateTime                 `json:"execution_time"`
 	Input             ExecutionResultInput     `json:"input"`
 }
 
-// ExecutionResultBuilder holds ExecutionResult struct and provides a builder API.
-type ExecutionResultBuilder struct {
-	v *ExecutionResult
-}
+func (s *ExecutionResult) UnmarshalJSON(data []byte) error {
 
-// NewExecutionResult provides a builder for the ExecutionResult struct.
-func NewExecutionResultBuilder() *ExecutionResultBuilder {
-	r := ExecutionResultBuilder{
-		&ExecutionResult{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "actions":
+			if err := dec.Decode(&s.Actions); err != nil {
+				return fmt.Errorf("%s | %w", "Actions", err)
+			}
+
+		case "condition":
+			if err := dec.Decode(&s.Condition); err != nil {
+				return fmt.Errorf("%s | %w", "Condition", err)
+			}
+
+		case "execution_duration":
+			if err := dec.Decode(&s.ExecutionDuration); err != nil {
+				return fmt.Errorf("%s | %w", "ExecutionDuration", err)
+			}
+
+		case "execution_time":
+			if err := dec.Decode(&s.ExecutionTime); err != nil {
+				return fmt.Errorf("%s | %w", "ExecutionTime", err)
+			}
+
+		case "input":
+			if err := dec.Decode(&s.Input); err != nil {
+				return fmt.Errorf("%s | %w", "Input", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ExecutionResult struct
-func (rb *ExecutionResultBuilder) Build() ExecutionResult {
-	return *rb.v
-}
+// NewExecutionResult returns a ExecutionResult.
+func NewExecutionResult() *ExecutionResult {
+	r := &ExecutionResult{}
 
-func (rb *ExecutionResultBuilder) Actions(actions []ExecutionResultActionBuilder) *ExecutionResultBuilder {
-	tmp := make([]ExecutionResultAction, len(actions))
-	for _, value := range actions {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Actions = tmp
-	return rb
-}
-
-func (rb *ExecutionResultBuilder) Condition(condition *ExecutionResultConditionBuilder) *ExecutionResultBuilder {
-	v := condition.Build()
-	rb.v.Condition = v
-	return rb
-}
-
-func (rb *ExecutionResultBuilder) ExecutionDuration(executionduration *DurationValueUnitMillisBuilder) *ExecutionResultBuilder {
-	v := executionduration.Build()
-	rb.v.ExecutionDuration = v
-	return rb
-}
-
-func (rb *ExecutionResultBuilder) ExecutionTime(executiontime *DateTimeBuilder) *ExecutionResultBuilder {
-	v := executiontime.Build()
-	rb.v.ExecutionTime = v
-	return rb
-}
-
-func (rb *ExecutionResultBuilder) Input(input *ExecutionResultInputBuilder) *ExecutionResultBuilder {
-	v := input.Build()
-	rb.v.Input = v
-	return rb
+	return r
 }

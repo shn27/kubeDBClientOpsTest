@@ -15,92 +15,169 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // RareTermsAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/bucket.ts#L300-L308
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/bucket.ts#L706-L739
 type RareTermsAggregation struct {
-	Exclude     *TermsExclude `json:"exclude,omitempty"`
-	Field       *Field        `json:"field,omitempty"`
-	Include     *TermsInclude `json:"include,omitempty"`
-	MaxDocCount *int64        `json:"max_doc_count,omitempty"`
-	Meta        *Metadata     `json:"meta,omitempty"`
-	Missing     *Missing      `json:"missing,omitempty"`
-	Name        *string       `json:"name,omitempty"`
-	Precision   *float64      `json:"precision,omitempty"`
-	ValueType   *string       `json:"value_type,omitempty"`
+	// Exclude Terms that should be excluded from the aggregation.
+	Exclude []string `json:"exclude,omitempty"`
+	// Field The field from which to return rare terms.
+	Field *string `json:"field,omitempty"`
+	// Include Terms that should be included in the aggregation.
+	Include TermsInclude `json:"include,omitempty"`
+	// MaxDocCount The maximum number of documents a term should appear in.
+	MaxDocCount *int64 `json:"max_doc_count,omitempty"`
+	// Missing The value to apply to documents that do not have a value.
+	// By default, documents without a value are ignored.
+	Missing Missing `json:"missing,omitempty"`
+	// Precision The precision of the internal CuckooFilters.
+	// Smaller precision leads to better approximation, but higher memory usage.
+	Precision *Float64 `json:"precision,omitempty"`
+	ValueType *string  `json:"value_type,omitempty"`
 }
 
-// RareTermsAggregationBuilder holds RareTermsAggregation struct and provides a builder API.
-type RareTermsAggregationBuilder struct {
-	v *RareTermsAggregation
-}
+func (s *RareTermsAggregation) UnmarshalJSON(data []byte) error {
 
-// NewRareTermsAggregation provides a builder for the RareTermsAggregation struct.
-func NewRareTermsAggregationBuilder() *RareTermsAggregationBuilder {
-	r := RareTermsAggregationBuilder{
-		&RareTermsAggregation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "exclude":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Exclude", err)
+				}
+
+				s.Exclude = append(s.Exclude, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Exclude); err != nil {
+					return fmt.Errorf("%s | %w", "Exclude", err)
+				}
+			}
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "include":
+			message := json.RawMessage{}
+			if err := dec.Decode(&message); err != nil {
+				return fmt.Errorf("%s | %w", "Include", err)
+			}
+			keyDec := json.NewDecoder(bytes.NewReader(message))
+		include_field:
+			for {
+				t, err := keyDec.Token()
+				if err != nil {
+					if errors.Is(err, io.EOF) {
+						break
+					}
+					return fmt.Errorf("%s | %w", "Include", err)
+				}
+
+				switch t {
+
+				case "num_partitions", "partition":
+					o := NewTermsPartition()
+					localDec := json.NewDecoder(bytes.NewReader(message))
+					if err := localDec.Decode(&o); err != nil {
+						return fmt.Errorf("%s | %w", "Include", err)
+					}
+					s.Include = o
+					break include_field
+
+				}
+			}
+			if s.Include == nil {
+				localDec := json.NewDecoder(bytes.NewReader(message))
+				if err := localDec.Decode(&s.Include); err != nil {
+					return fmt.Errorf("%s | %w", "Include", err)
+				}
+			}
+
+		case "max_doc_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxDocCount", err)
+				}
+				s.MaxDocCount = &value
+			case float64:
+				f := int64(v)
+				s.MaxDocCount = &f
+			}
+
+		case "missing":
+			if err := dec.Decode(&s.Missing); err != nil {
+				return fmt.Errorf("%s | %w", "Missing", err)
+			}
+
+		case "precision":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Precision", err)
+				}
+				f := Float64(value)
+				s.Precision = &f
+			case float64:
+				f := Float64(v)
+				s.Precision = &f
+			}
+
+		case "value_type":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ValueType", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ValueType = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RareTermsAggregation struct
-func (rb *RareTermsAggregationBuilder) Build() RareTermsAggregation {
-	return *rb.v
-}
+// NewRareTermsAggregation returns a RareTermsAggregation.
+func NewRareTermsAggregation() *RareTermsAggregation {
+	r := &RareTermsAggregation{}
 
-func (rb *RareTermsAggregationBuilder) Exclude(exclude *TermsExcludeBuilder) *RareTermsAggregationBuilder {
-	v := exclude.Build()
-	rb.v.Exclude = &v
-	return rb
-}
-
-func (rb *RareTermsAggregationBuilder) Field(field Field) *RareTermsAggregationBuilder {
-	rb.v.Field = &field
-	return rb
-}
-
-func (rb *RareTermsAggregationBuilder) Include(include *TermsIncludeBuilder) *RareTermsAggregationBuilder {
-	v := include.Build()
-	rb.v.Include = &v
-	return rb
-}
-
-func (rb *RareTermsAggregationBuilder) MaxDocCount(maxdoccount int64) *RareTermsAggregationBuilder {
-	rb.v.MaxDocCount = &maxdoccount
-	return rb
-}
-
-func (rb *RareTermsAggregationBuilder) Meta(meta *MetadataBuilder) *RareTermsAggregationBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *RareTermsAggregationBuilder) Missing(missing *MissingBuilder) *RareTermsAggregationBuilder {
-	v := missing.Build()
-	rb.v.Missing = &v
-	return rb
-}
-
-func (rb *RareTermsAggregationBuilder) Name(name string) *RareTermsAggregationBuilder {
-	rb.v.Name = &name
-	return rb
-}
-
-func (rb *RareTermsAggregationBuilder) Precision(precision float64) *RareTermsAggregationBuilder {
-	rb.v.Precision = &precision
-	return rb
-}
-
-func (rb *RareTermsAggregationBuilder) ValueType(valuetype string) *RareTermsAggregationBuilder {
-	rb.v.ValueType = &valuetype
-	return rb
+	return r
 }

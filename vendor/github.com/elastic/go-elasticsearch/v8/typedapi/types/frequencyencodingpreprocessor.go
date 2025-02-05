@@ -15,54 +15,86 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // FrequencyEncodingPreprocessor type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/put_trained_model/types.ts#L38-L42
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/put_trained_model/types.ts#L38-L42
 type FrequencyEncodingPreprocessor struct {
 	FeatureName  string             `json:"feature_name"`
 	Field        string             `json:"field"`
-	FrequencyMap map[string]float64 `json:"frequency_map"`
+	FrequencyMap map[string]Float64 `json:"frequency_map"`
 }
 
-// FrequencyEncodingPreprocessorBuilder holds FrequencyEncodingPreprocessor struct and provides a builder API.
-type FrequencyEncodingPreprocessorBuilder struct {
-	v *FrequencyEncodingPreprocessor
+func (s *FrequencyEncodingPreprocessor) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "feature_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "FeatureName", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.FeatureName = o
+
+		case "field":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Field = o
+
+		case "frequency_map":
+			if s.FrequencyMap == nil {
+				s.FrequencyMap = make(map[string]Float64, 0)
+			}
+			if err := dec.Decode(&s.FrequencyMap); err != nil {
+				return fmt.Errorf("%s | %w", "FrequencyMap", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewFrequencyEncodingPreprocessor provides a builder for the FrequencyEncodingPreprocessor struct.
-func NewFrequencyEncodingPreprocessorBuilder() *FrequencyEncodingPreprocessorBuilder {
-	r := FrequencyEncodingPreprocessorBuilder{
-		&FrequencyEncodingPreprocessor{
-			FrequencyMap: make(map[string]float64, 0),
-		},
+// NewFrequencyEncodingPreprocessor returns a FrequencyEncodingPreprocessor.
+func NewFrequencyEncodingPreprocessor() *FrequencyEncodingPreprocessor {
+	r := &FrequencyEncodingPreprocessor{
+		FrequencyMap: make(map[string]Float64, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the FrequencyEncodingPreprocessor struct
-func (rb *FrequencyEncodingPreprocessorBuilder) Build() FrequencyEncodingPreprocessor {
-	return *rb.v
-}
-
-func (rb *FrequencyEncodingPreprocessorBuilder) FeatureName(featurename string) *FrequencyEncodingPreprocessorBuilder {
-	rb.v.FeatureName = featurename
-	return rb
-}
-
-func (rb *FrequencyEncodingPreprocessorBuilder) Field(field string) *FrequencyEncodingPreprocessorBuilder {
-	rb.v.Field = field
-	return rb
-}
-
-func (rb *FrequencyEncodingPreprocessorBuilder) FrequencyMap(value map[string]float64) *FrequencyEncodingPreprocessorBuilder {
-	rb.v.FrequencyMap = value
-	return rb
+	return r
 }

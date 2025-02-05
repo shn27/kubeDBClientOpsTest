@@ -15,47 +15,68 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // SlackResult type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Actions.ts#L96-L99
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Actions.ts#L96-L99
 type SlackResult struct {
 	Account *string      `json:"account,omitempty"`
 	Message SlackMessage `json:"message"`
 }
 
-// SlackResultBuilder holds SlackResult struct and provides a builder API.
-type SlackResultBuilder struct {
-	v *SlackResult
-}
+func (s *SlackResult) UnmarshalJSON(data []byte) error {
 
-// NewSlackResult provides a builder for the SlackResult struct.
-func NewSlackResultBuilder() *SlackResultBuilder {
-	r := SlackResultBuilder{
-		&SlackResult{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "account":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Account", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Account = &o
+
+		case "message":
+			if err := dec.Decode(&s.Message); err != nil {
+				return fmt.Errorf("%s | %w", "Message", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SlackResult struct
-func (rb *SlackResultBuilder) Build() SlackResult {
-	return *rb.v
-}
+// NewSlackResult returns a SlackResult.
+func NewSlackResult() *SlackResult {
+	r := &SlackResult{}
 
-func (rb *SlackResultBuilder) Account(account string) *SlackResultBuilder {
-	rb.v.Account = &account
-	return rb
-}
-
-func (rb *SlackResultBuilder) Message(message *SlackMessageBuilder) *SlackResultBuilder {
-	v := message.Build()
-	rb.v.Message = v
-	return rb
+	return r
 }

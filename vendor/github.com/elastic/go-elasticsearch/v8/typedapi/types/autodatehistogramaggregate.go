@@ -15,54 +15,82 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // AutoDateHistogramAggregate type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L343-L347
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L393-L400
 type AutoDateHistogramAggregate struct {
 	Buckets  BucketsDateHistogramBucket `json:"buckets"`
-	Interval DurationLarge              `json:"interval"`
-	Meta     *Metadata                  `json:"meta,omitempty"`
+	Interval string                     `json:"interval"`
+	Meta     Metadata                   `json:"meta,omitempty"`
 }
 
-// AutoDateHistogramAggregateBuilder holds AutoDateHistogramAggregate struct and provides a builder API.
-type AutoDateHistogramAggregateBuilder struct {
-	v *AutoDateHistogramAggregate
-}
+func (s *AutoDateHistogramAggregate) UnmarshalJSON(data []byte) error {
 
-// NewAutoDateHistogramAggregate provides a builder for the AutoDateHistogramAggregate struct.
-func NewAutoDateHistogramAggregateBuilder() *AutoDateHistogramAggregateBuilder {
-	r := AutoDateHistogramAggregateBuilder{
-		&AutoDateHistogramAggregate{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "buckets":
+
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			source := bytes.NewReader(rawMsg)
+			localDec := json.NewDecoder(source)
+			switch rawMsg[0] {
+			case '{':
+				o := make(map[string]DateHistogramBucket, 0)
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Buckets", err)
+				}
+				s.Buckets = o
+			case '[':
+				o := []DateHistogramBucket{}
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Buckets", err)
+				}
+				s.Buckets = o
+			}
+
+		case "interval":
+			if err := dec.Decode(&s.Interval); err != nil {
+				return fmt.Errorf("%s | %w", "Interval", err)
+			}
+
+		case "meta":
+			if err := dec.Decode(&s.Meta); err != nil {
+				return fmt.Errorf("%s | %w", "Meta", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the AutoDateHistogramAggregate struct
-func (rb *AutoDateHistogramAggregateBuilder) Build() AutoDateHistogramAggregate {
-	return *rb.v
-}
+// NewAutoDateHistogramAggregate returns a AutoDateHistogramAggregate.
+func NewAutoDateHistogramAggregate() *AutoDateHistogramAggregate {
+	r := &AutoDateHistogramAggregate{}
 
-func (rb *AutoDateHistogramAggregateBuilder) Buckets(buckets *BucketsDateHistogramBucketBuilder) *AutoDateHistogramAggregateBuilder {
-	v := buckets.Build()
-	rb.v.Buckets = v
-	return rb
-}
-
-func (rb *AutoDateHistogramAggregateBuilder) Interval(interval DurationLarge) *AutoDateHistogramAggregateBuilder {
-	rb.v.Interval = interval
-	return rb
-}
-
-func (rb *AutoDateHistogramAggregateBuilder) Meta(meta *MetadataBuilder) *AutoDateHistogramAggregateBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
+	return r
 }

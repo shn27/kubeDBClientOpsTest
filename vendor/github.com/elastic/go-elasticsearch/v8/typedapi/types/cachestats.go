@@ -15,64 +15,151 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // CacheStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/enrich/stats/types.ts#L37-L43
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/enrich/stats/types.ts#L38-L50
 type CacheStats struct {
-	Count     int `json:"count"`
-	Evictions int `json:"evictions"`
-	Hits      int `json:"hits"`
-	Misses    int `json:"misses"`
-	NodeId    Id  `json:"node_id"`
+	Count              int    `json:"count"`
+	Evictions          int    `json:"evictions"`
+	Hits               int    `json:"hits"`
+	HitsTimeInMillis   int64  `json:"hits_time_in_millis"`
+	Misses             int    `json:"misses"`
+	MissesTimeInMillis int64  `json:"misses_time_in_millis"`
+	NodeId             string `json:"node_id"`
+	SizeInBytes        int64  `json:"size_in_bytes"`
 }
 
-// CacheStatsBuilder holds CacheStats struct and provides a builder API.
-type CacheStatsBuilder struct {
-	v *CacheStats
-}
+func (s *CacheStats) UnmarshalJSON(data []byte) error {
 
-// NewCacheStats provides a builder for the CacheStats struct.
-func NewCacheStatsBuilder() *CacheStatsBuilder {
-	r := CacheStatsBuilder{
-		&CacheStats{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Count", err)
+				}
+				s.Count = value
+			case float64:
+				f := int(v)
+				s.Count = f
+			}
+
+		case "evictions":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Evictions", err)
+				}
+				s.Evictions = value
+			case float64:
+				f := int(v)
+				s.Evictions = f
+			}
+
+		case "hits":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Hits", err)
+				}
+				s.Hits = value
+			case float64:
+				f := int(v)
+				s.Hits = f
+			}
+
+		case "hits_time_in_millis":
+			if err := dec.Decode(&s.HitsTimeInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "HitsTimeInMillis", err)
+			}
+
+		case "misses":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Misses", err)
+				}
+				s.Misses = value
+			case float64:
+				f := int(v)
+				s.Misses = f
+			}
+
+		case "misses_time_in_millis":
+			if err := dec.Decode(&s.MissesTimeInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "MissesTimeInMillis", err)
+			}
+
+		case "node_id":
+			if err := dec.Decode(&s.NodeId); err != nil {
+				return fmt.Errorf("%s | %w", "NodeId", err)
+			}
+
+		case "size_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "SizeInBytes", err)
+				}
+				s.SizeInBytes = value
+			case float64:
+				f := int64(v)
+				s.SizeInBytes = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the CacheStats struct
-func (rb *CacheStatsBuilder) Build() CacheStats {
-	return *rb.v
-}
+// NewCacheStats returns a CacheStats.
+func NewCacheStats() *CacheStats {
+	r := &CacheStats{}
 
-func (rb *CacheStatsBuilder) Count(count int) *CacheStatsBuilder {
-	rb.v.Count = count
-	return rb
-}
-
-func (rb *CacheStatsBuilder) Evictions(evictions int) *CacheStatsBuilder {
-	rb.v.Evictions = evictions
-	return rb
-}
-
-func (rb *CacheStatsBuilder) Hits(hits int) *CacheStatsBuilder {
-	rb.v.Hits = hits
-	return rb
-}
-
-func (rb *CacheStatsBuilder) Misses(misses int) *CacheStatsBuilder {
-	rb.v.Misses = misses
-	return rb
-}
-
-func (rb *CacheStatsBuilder) NodeId(nodeid Id) *CacheStatsBuilder {
-	rb.v.NodeId = nodeid
-	return rb
+	return r
 }

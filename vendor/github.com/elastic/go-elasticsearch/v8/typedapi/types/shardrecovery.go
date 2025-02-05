@@ -15,142 +15,178 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ShardRecovery type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/recovery/types.ts#L118-L135
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/recovery/types.ts#L118-L135
 type ShardRecovery struct {
-	Id                int64                   `json:"id"`
-	Index             RecoveryIndexStatus     `json:"index"`
-	Primary           bool                    `json:"primary"`
-	Source            RecoveryOrigin          `json:"source"`
-	Stage             string                  `json:"stage"`
-	Start             *RecoveryStartStatus    `json:"start,omitempty"`
-	StartTime         *DateTime               `json:"start_time,omitempty"`
-	StartTimeInMillis EpochTimeUnitMillis     `json:"start_time_in_millis"`
-	StopTime          *DateTime               `json:"stop_time,omitempty"`
-	StopTimeInMillis  *EpochTimeUnitMillis    `json:"stop_time_in_millis,omitempty"`
-	Target            RecoveryOrigin          `json:"target"`
-	TotalTime         *Duration               `json:"total_time,omitempty"`
-	TotalTimeInMillis DurationValueUnitMillis `json:"total_time_in_millis"`
-	Translog          TranslogStatus          `json:"translog"`
-	Type              string                  `json:"type"`
-	VerifyIndex       VerifyIndex             `json:"verify_index"`
+	Id                int64                `json:"id"`
+	Index             RecoveryIndexStatus  `json:"index"`
+	Primary           bool                 `json:"primary"`
+	Source            RecoveryOrigin       `json:"source"`
+	Stage             string               `json:"stage"`
+	Start             *RecoveryStartStatus `json:"start,omitempty"`
+	StartTime         DateTime             `json:"start_time,omitempty"`
+	StartTimeInMillis int64                `json:"start_time_in_millis"`
+	StopTime          DateTime             `json:"stop_time,omitempty"`
+	StopTimeInMillis  *int64               `json:"stop_time_in_millis,omitempty"`
+	Target            RecoveryOrigin       `json:"target"`
+	TotalTime         Duration             `json:"total_time,omitempty"`
+	TotalTimeInMillis int64                `json:"total_time_in_millis"`
+	Translog          TranslogStatus       `json:"translog"`
+	Type              string               `json:"type"`
+	VerifyIndex       VerifyIndex          `json:"verify_index"`
 }
 
-// ShardRecoveryBuilder holds ShardRecovery struct and provides a builder API.
-type ShardRecoveryBuilder struct {
-	v *ShardRecovery
-}
+func (s *ShardRecovery) UnmarshalJSON(data []byte) error {
 
-// NewShardRecovery provides a builder for the ShardRecovery struct.
-func NewShardRecoveryBuilder() *ShardRecoveryBuilder {
-	r := ShardRecoveryBuilder{
-		&ShardRecovery{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "id":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Id", err)
+				}
+				s.Id = value
+			case float64:
+				f := int64(v)
+				s.Id = f
+			}
+
+		case "index":
+			if err := dec.Decode(&s.Index); err != nil {
+				return fmt.Errorf("%s | %w", "Index", err)
+			}
+
+		case "primary":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Primary", err)
+				}
+				s.Primary = value
+			case bool:
+				s.Primary = v
+			}
+
+		case "source":
+			if err := dec.Decode(&s.Source); err != nil {
+				return fmt.Errorf("%s | %w", "Source", err)
+			}
+
+		case "stage":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Stage", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Stage = o
+
+		case "start":
+			if err := dec.Decode(&s.Start); err != nil {
+				return fmt.Errorf("%s | %w", "Start", err)
+			}
+
+		case "start_time":
+			if err := dec.Decode(&s.StartTime); err != nil {
+				return fmt.Errorf("%s | %w", "StartTime", err)
+			}
+
+		case "start_time_in_millis":
+			if err := dec.Decode(&s.StartTimeInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "StartTimeInMillis", err)
+			}
+
+		case "stop_time":
+			if err := dec.Decode(&s.StopTime); err != nil {
+				return fmt.Errorf("%s | %w", "StopTime", err)
+			}
+
+		case "stop_time_in_millis":
+			if err := dec.Decode(&s.StopTimeInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "StopTimeInMillis", err)
+			}
+
+		case "target":
+			if err := dec.Decode(&s.Target); err != nil {
+				return fmt.Errorf("%s | %w", "Target", err)
+			}
+
+		case "total_time":
+			if err := dec.Decode(&s.TotalTime); err != nil {
+				return fmt.Errorf("%s | %w", "TotalTime", err)
+			}
+
+		case "total_time_in_millis":
+			if err := dec.Decode(&s.TotalTimeInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "TotalTimeInMillis", err)
+			}
+
+		case "translog":
+			if err := dec.Decode(&s.Translog); err != nil {
+				return fmt.Errorf("%s | %w", "Translog", err)
+			}
+
+		case "type":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Type = o
+
+		case "verify_index":
+			if err := dec.Decode(&s.VerifyIndex); err != nil {
+				return fmt.Errorf("%s | %w", "VerifyIndex", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ShardRecovery struct
-func (rb *ShardRecoveryBuilder) Build() ShardRecovery {
-	return *rb.v
-}
+// NewShardRecovery returns a ShardRecovery.
+func NewShardRecovery() *ShardRecovery {
+	r := &ShardRecovery{}
 
-func (rb *ShardRecoveryBuilder) Id(id int64) *ShardRecoveryBuilder {
-	rb.v.Id = id
-	return rb
-}
-
-func (rb *ShardRecoveryBuilder) Index(index *RecoveryIndexStatusBuilder) *ShardRecoveryBuilder {
-	v := index.Build()
-	rb.v.Index = v
-	return rb
-}
-
-func (rb *ShardRecoveryBuilder) Primary(primary bool) *ShardRecoveryBuilder {
-	rb.v.Primary = primary
-	return rb
-}
-
-func (rb *ShardRecoveryBuilder) Source(source *RecoveryOriginBuilder) *ShardRecoveryBuilder {
-	v := source.Build()
-	rb.v.Source = v
-	return rb
-}
-
-func (rb *ShardRecoveryBuilder) Stage(stage string) *ShardRecoveryBuilder {
-	rb.v.Stage = stage
-	return rb
-}
-
-func (rb *ShardRecoveryBuilder) Start(start *RecoveryStartStatusBuilder) *ShardRecoveryBuilder {
-	v := start.Build()
-	rb.v.Start = &v
-	return rb
-}
-
-func (rb *ShardRecoveryBuilder) StartTime(starttime *DateTimeBuilder) *ShardRecoveryBuilder {
-	v := starttime.Build()
-	rb.v.StartTime = &v
-	return rb
-}
-
-func (rb *ShardRecoveryBuilder) StartTimeInMillis(starttimeinmillis *EpochTimeUnitMillisBuilder) *ShardRecoveryBuilder {
-	v := starttimeinmillis.Build()
-	rb.v.StartTimeInMillis = v
-	return rb
-}
-
-func (rb *ShardRecoveryBuilder) StopTime(stoptime *DateTimeBuilder) *ShardRecoveryBuilder {
-	v := stoptime.Build()
-	rb.v.StopTime = &v
-	return rb
-}
-
-func (rb *ShardRecoveryBuilder) StopTimeInMillis(stoptimeinmillis *EpochTimeUnitMillisBuilder) *ShardRecoveryBuilder {
-	v := stoptimeinmillis.Build()
-	rb.v.StopTimeInMillis = &v
-	return rb
-}
-
-func (rb *ShardRecoveryBuilder) Target(target *RecoveryOriginBuilder) *ShardRecoveryBuilder {
-	v := target.Build()
-	rb.v.Target = v
-	return rb
-}
-
-func (rb *ShardRecoveryBuilder) TotalTime(totaltime *DurationBuilder) *ShardRecoveryBuilder {
-	v := totaltime.Build()
-	rb.v.TotalTime = &v
-	return rb
-}
-
-func (rb *ShardRecoveryBuilder) TotalTimeInMillis(totaltimeinmillis *DurationValueUnitMillisBuilder) *ShardRecoveryBuilder {
-	v := totaltimeinmillis.Build()
-	rb.v.TotalTimeInMillis = v
-	return rb
-}
-
-func (rb *ShardRecoveryBuilder) Translog(translog *TranslogStatusBuilder) *ShardRecoveryBuilder {
-	v := translog.Build()
-	rb.v.Translog = v
-	return rb
-}
-
-func (rb *ShardRecoveryBuilder) Type_(type_ string) *ShardRecoveryBuilder {
-	rb.v.Type = type_
-	return rb
-}
-
-func (rb *ShardRecoveryBuilder) VerifyIndex(verifyindex *VerifyIndexBuilder) *ShardRecoveryBuilder {
-	v := verifyindex.Build()
-	rb.v.VerifyIndex = v
-	return rb
+	return r
 }

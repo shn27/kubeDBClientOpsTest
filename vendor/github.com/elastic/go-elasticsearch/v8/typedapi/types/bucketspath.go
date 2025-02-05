@@ -15,34 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
-// BucketsPath type alias.
+// BucketsPath holds the union for the following types:
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/pipeline.ts#L44-L50
-type BucketsPath map[string]string
-
-// BucketsPathBuilder holds BucketsPath struct and provides a builder API.
-type BucketsPathBuilder struct {
-	v BucketsPath
-}
-
-// NewBucketsPath provides a builder for the BucketsPath struct.
-func NewBucketsPathBuilder() *BucketsPathBuilder {
-	return &BucketsPathBuilder{}
-}
-
-// Build finalize the chain and returns the BucketsPath struct
-func (b *BucketsPathBuilder) Build() BucketsPath {
-	return b.v
-}
-
-func (b *BucketsPathBuilder) BucketsPath(value BucketsPath) *BucketsPathBuilder {
-	b.v = value
-	return b
-}
+//	string
+//	[]string
+//	map[string]string
+//
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/pipeline.ts#L53-L59
+type BucketsPath any

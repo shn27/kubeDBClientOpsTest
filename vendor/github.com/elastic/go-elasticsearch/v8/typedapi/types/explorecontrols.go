@@ -15,60 +15,111 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ExploreControls type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/graph/_types/ExploreControls.ts#L24-L29
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/graph/_types/ExploreControls.ts#L24-L49
 type ExploreControls struct {
+	// SampleDiversity To avoid the top-matching documents sample being dominated by a single source
+	// of results, it is sometimes necessary to request diversity in the sample.
+	// You can do this by selecting a single-value field and setting a maximum
+	// number of documents per value for that field.
 	SampleDiversity *SampleDiversity `json:"sample_diversity,omitempty"`
-	SampleSize      *int             `json:"sample_size,omitempty"`
-	Timeout         *Duration        `json:"timeout,omitempty"`
-	UseSignificance bool             `json:"use_significance"`
+	// SampleSize Each hop considers a sample of the best-matching documents on each shard.
+	// Using samples improves the speed of execution and keeps exploration focused
+	// on meaningfully-connected terms.
+	// Very small values (less than 50) might not provide sufficient
+	// weight-of-evidence to identify significant connections between terms.
+	// Very large sample sizes can dilute the quality of the results and increase
+	// execution times.
+	SampleSize *int `json:"sample_size,omitempty"`
+	// Timeout The length of time in milliseconds after which exploration will be halted and
+	// the results gathered so far are returned.
+	// This timeout is honored on a best-effort basis.
+	// Execution might overrun this timeout if, for example, a long pause is
+	// encountered while FieldData is loaded for a field.
+	Timeout Duration `json:"timeout,omitempty"`
+	// UseSignificance Filters associated terms so only those that are significantly associated with
+	// your query are included.
+	UseSignificance bool `json:"use_significance"`
 }
 
-// ExploreControlsBuilder holds ExploreControls struct and provides a builder API.
-type ExploreControlsBuilder struct {
-	v *ExploreControls
-}
+func (s *ExploreControls) UnmarshalJSON(data []byte) error {
 
-// NewExploreControls provides a builder for the ExploreControls struct.
-func NewExploreControlsBuilder() *ExploreControlsBuilder {
-	r := ExploreControlsBuilder{
-		&ExploreControls{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "sample_diversity":
+			if err := dec.Decode(&s.SampleDiversity); err != nil {
+				return fmt.Errorf("%s | %w", "SampleDiversity", err)
+			}
+
+		case "sample_size":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "SampleSize", err)
+				}
+				s.SampleSize = &value
+			case float64:
+				f := int(v)
+				s.SampleSize = &f
+			}
+
+		case "timeout":
+			if err := dec.Decode(&s.Timeout); err != nil {
+				return fmt.Errorf("%s | %w", "Timeout", err)
+			}
+
+		case "use_significance":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "UseSignificance", err)
+				}
+				s.UseSignificance = value
+			case bool:
+				s.UseSignificance = v
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ExploreControls struct
-func (rb *ExploreControlsBuilder) Build() ExploreControls {
-	return *rb.v
-}
+// NewExploreControls returns a ExploreControls.
+func NewExploreControls() *ExploreControls {
+	r := &ExploreControls{}
 
-func (rb *ExploreControlsBuilder) SampleDiversity(samplediversity *SampleDiversityBuilder) *ExploreControlsBuilder {
-	v := samplediversity.Build()
-	rb.v.SampleDiversity = &v
-	return rb
-}
-
-func (rb *ExploreControlsBuilder) SampleSize(samplesize int) *ExploreControlsBuilder {
-	rb.v.SampleSize = &samplesize
-	return rb
-}
-
-func (rb *ExploreControlsBuilder) Timeout(timeout *DurationBuilder) *ExploreControlsBuilder {
-	v := timeout.Build()
-	rb.v.Timeout = &v
-	return rb
-}
-
-func (rb *ExploreControlsBuilder) UseSignificance(usesignificance bool) *ExploreControlsBuilder {
-	rb.v.UseSignificance = usesignificance
-	return rb
+	return r
 }

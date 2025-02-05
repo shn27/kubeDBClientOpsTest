@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ZeroShotClassificationInferenceOptions type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/inference.ts#L186-L207
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/inference.ts#L185-L206
 type ZeroShotClassificationInferenceOptions struct {
 	// ClassificationLabels The zero shot classification labels indicating entailment, neutral, and
 	// contradiction
@@ -43,67 +50,82 @@ type ZeroShotClassificationInferenceOptions struct {
 	Tokenization *TokenizationConfigContainer `json:"tokenization,omitempty"`
 }
 
-// ZeroShotClassificationInferenceOptionsBuilder holds ZeroShotClassificationInferenceOptions struct and provides a builder API.
-type ZeroShotClassificationInferenceOptionsBuilder struct {
-	v *ZeroShotClassificationInferenceOptions
-}
+func (s *ZeroShotClassificationInferenceOptions) UnmarshalJSON(data []byte) error {
 
-// NewZeroShotClassificationInferenceOptions provides a builder for the ZeroShotClassificationInferenceOptions struct.
-func NewZeroShotClassificationInferenceOptionsBuilder() *ZeroShotClassificationInferenceOptionsBuilder {
-	r := ZeroShotClassificationInferenceOptionsBuilder{
-		&ZeroShotClassificationInferenceOptions{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "classification_labels":
+			if err := dec.Decode(&s.ClassificationLabels); err != nil {
+				return fmt.Errorf("%s | %w", "ClassificationLabels", err)
+			}
+
+		case "hypothesis_template":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "HypothesisTemplate", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.HypothesisTemplate = &o
+
+		case "labels":
+			if err := dec.Decode(&s.Labels); err != nil {
+				return fmt.Errorf("%s | %w", "Labels", err)
+			}
+
+		case "multi_label":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MultiLabel", err)
+				}
+				s.MultiLabel = &value
+			case bool:
+				s.MultiLabel = &v
+			}
+
+		case "results_field":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ResultsField", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ResultsField = &o
+
+		case "tokenization":
+			if err := dec.Decode(&s.Tokenization); err != nil {
+				return fmt.Errorf("%s | %w", "Tokenization", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ZeroShotClassificationInferenceOptions struct
-func (rb *ZeroShotClassificationInferenceOptionsBuilder) Build() ZeroShotClassificationInferenceOptions {
-	return *rb.v
-}
+// NewZeroShotClassificationInferenceOptions returns a ZeroShotClassificationInferenceOptions.
+func NewZeroShotClassificationInferenceOptions() *ZeroShotClassificationInferenceOptions {
+	r := &ZeroShotClassificationInferenceOptions{}
 
-// ClassificationLabels The zero shot classification labels indicating entailment, neutral, and
-// contradiction
-// Must contain exactly and only entailment, neutral, and contradiction
-
-func (rb *ZeroShotClassificationInferenceOptionsBuilder) ClassificationLabels(classification_labels ...string) *ZeroShotClassificationInferenceOptionsBuilder {
-	rb.v.ClassificationLabels = classification_labels
-	return rb
-}
-
-// HypothesisTemplate Hypothesis template used when tokenizing labels for prediction
-
-func (rb *ZeroShotClassificationInferenceOptionsBuilder) HypothesisTemplate(hypothesistemplate string) *ZeroShotClassificationInferenceOptionsBuilder {
-	rb.v.HypothesisTemplate = &hypothesistemplate
-	return rb
-}
-
-// Labels The labels to predict.
-
-func (rb *ZeroShotClassificationInferenceOptionsBuilder) Labels(labels ...string) *ZeroShotClassificationInferenceOptionsBuilder {
-	rb.v.Labels = labels
-	return rb
-}
-
-// MultiLabel Indicates if more than one true label exists.
-
-func (rb *ZeroShotClassificationInferenceOptionsBuilder) MultiLabel(multilabel bool) *ZeroShotClassificationInferenceOptionsBuilder {
-	rb.v.MultiLabel = &multilabel
-	return rb
-}
-
-// ResultsField The field that is added to incoming documents to contain the inference
-// prediction. Defaults to predicted_value.
-
-func (rb *ZeroShotClassificationInferenceOptionsBuilder) ResultsField(resultsfield string) *ZeroShotClassificationInferenceOptionsBuilder {
-	rb.v.ResultsField = &resultsfield
-	return rb
-}
-
-// Tokenization The tokenization options to update when inferring
-
-func (rb *ZeroShotClassificationInferenceOptionsBuilder) Tokenization(tokenization *TokenizationConfigContainerBuilder) *ZeroShotClassificationInferenceOptionsBuilder {
-	v := tokenization.Build()
-	rb.v.Tokenization = &v
-	return rb
+	return r
 }

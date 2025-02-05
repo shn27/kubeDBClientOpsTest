@@ -15,52 +15,100 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // PublishedClusterStates type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/_types/Stats.ts#L114-L118
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/_types/Stats.ts#L263-L276
 type PublishedClusterStates struct {
-	CompatibleDiffs   *int64 `json:"compatible_diffs,omitempty"`
-	FullStates        *int64 `json:"full_states,omitempty"`
+	// CompatibleDiffs Number of compatible differences between published cluster states.
+	CompatibleDiffs *int64 `json:"compatible_diffs,omitempty"`
+	// FullStates Number of published cluster states.
+	FullStates *int64 `json:"full_states,omitempty"`
+	// IncompatibleDiffs Number of incompatible differences between published cluster states.
 	IncompatibleDiffs *int64 `json:"incompatible_diffs,omitempty"`
 }
 
-// PublishedClusterStatesBuilder holds PublishedClusterStates struct and provides a builder API.
-type PublishedClusterStatesBuilder struct {
-	v *PublishedClusterStates
-}
+func (s *PublishedClusterStates) UnmarshalJSON(data []byte) error {
 
-// NewPublishedClusterStates provides a builder for the PublishedClusterStates struct.
-func NewPublishedClusterStatesBuilder() *PublishedClusterStatesBuilder {
-	r := PublishedClusterStatesBuilder{
-		&PublishedClusterStates{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "compatible_diffs":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CompatibleDiffs", err)
+				}
+				s.CompatibleDiffs = &value
+			case float64:
+				f := int64(v)
+				s.CompatibleDiffs = &f
+			}
+
+		case "full_states":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "FullStates", err)
+				}
+				s.FullStates = &value
+			case float64:
+				f := int64(v)
+				s.FullStates = &f
+			}
+
+		case "incompatible_diffs":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IncompatibleDiffs", err)
+				}
+				s.IncompatibleDiffs = &value
+			case float64:
+				f := int64(v)
+				s.IncompatibleDiffs = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the PublishedClusterStates struct
-func (rb *PublishedClusterStatesBuilder) Build() PublishedClusterStates {
-	return *rb.v
-}
+// NewPublishedClusterStates returns a PublishedClusterStates.
+func NewPublishedClusterStates() *PublishedClusterStates {
+	r := &PublishedClusterStates{}
 
-func (rb *PublishedClusterStatesBuilder) CompatibleDiffs(compatiblediffs int64) *PublishedClusterStatesBuilder {
-	rb.v.CompatibleDiffs = &compatiblediffs
-	return rb
-}
-
-func (rb *PublishedClusterStatesBuilder) FullStates(fullstates int64) *PublishedClusterStatesBuilder {
-	rb.v.FullStates = &fullstates
-	return rb
-}
-
-func (rb *PublishedClusterStatesBuilder) IncompatibleDiffs(incompatiblediffs int64) *PublishedClusterStatesBuilder {
-	rb.v.IncompatibleDiffs = &incompatiblediffs
-	return rb
+	return r
 }

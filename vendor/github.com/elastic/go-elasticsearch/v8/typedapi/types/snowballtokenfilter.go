@@ -15,53 +15,82 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/snowballlanguage"
 )
 
 // SnowballTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L308-L311
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L310-L313
 type SnowballTokenFilter struct {
-	Language snowballlanguage.SnowballLanguage `json:"language"`
-	Type     string                            `json:"type,omitempty"`
-	Version  *VersionString                    `json:"version,omitempty"`
+	Language *snowballlanguage.SnowballLanguage `json:"language,omitempty"`
+	Type     string                             `json:"type,omitempty"`
+	Version  *string                            `json:"version,omitempty"`
 }
 
-// SnowballTokenFilterBuilder holds SnowballTokenFilter struct and provides a builder API.
-type SnowballTokenFilterBuilder struct {
-	v *SnowballTokenFilter
+func (s *SnowballTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "language":
+			if err := dec.Decode(&s.Language); err != nil {
+				return fmt.Errorf("%s | %w", "Language", err)
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewSnowballTokenFilter provides a builder for the SnowballTokenFilter struct.
-func NewSnowballTokenFilterBuilder() *SnowballTokenFilterBuilder {
-	r := SnowballTokenFilterBuilder{
-		&SnowballTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s SnowballTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerSnowballTokenFilter SnowballTokenFilter
+	tmp := innerSnowballTokenFilter{
+		Language: s.Language,
+		Type:     s.Type,
+		Version:  s.Version,
 	}
 
-	r.v.Type = "snowball"
+	tmp.Type = "snowball"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the SnowballTokenFilter struct
-func (rb *SnowballTokenFilterBuilder) Build() SnowballTokenFilter {
-	return *rb.v
-}
+// NewSnowballTokenFilter returns a SnowballTokenFilter.
+func NewSnowballTokenFilter() *SnowballTokenFilter {
+	r := &SnowballTokenFilter{}
 
-func (rb *SnowballTokenFilterBuilder) Language(language snowballlanguage.SnowballLanguage) *SnowballTokenFilterBuilder {
-	rb.v.Language = language
-	return rb
-}
-
-func (rb *SnowballTokenFilterBuilder) Version(version VersionString) *SnowballTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

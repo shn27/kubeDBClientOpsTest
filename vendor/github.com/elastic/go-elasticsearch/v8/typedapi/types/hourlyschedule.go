@@ -15,40 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // HourlySchedule type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Schedule.ts#L47-L49
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Schedule.ts#L47-L49
 type HourlySchedule struct {
 	Minute []int `json:"minute"`
 }
 
-// HourlyScheduleBuilder holds HourlySchedule struct and provides a builder API.
-type HourlyScheduleBuilder struct {
-	v *HourlySchedule
-}
+// NewHourlySchedule returns a HourlySchedule.
+func NewHourlySchedule() *HourlySchedule {
+	r := &HourlySchedule{}
 
-// NewHourlySchedule provides a builder for the HourlySchedule struct.
-func NewHourlyScheduleBuilder() *HourlyScheduleBuilder {
-	r := HourlyScheduleBuilder{
-		&HourlySchedule{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the HourlySchedule struct
-func (rb *HourlyScheduleBuilder) Build() HourlySchedule {
-	return *rb.v
-}
-
-func (rb *HourlyScheduleBuilder) Minute(minute ...int) *HourlyScheduleBuilder {
-	rb.v.Minute = minute
-	return rb
+	return r
 }

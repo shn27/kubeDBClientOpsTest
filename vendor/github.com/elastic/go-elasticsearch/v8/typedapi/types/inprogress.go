@@ -15,59 +15,80 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // InProgress type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/slm/_types/SnapshotLifecycle.ts#L131-L136
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/slm/_types/SnapshotLifecycle.ts#L131-L136
 type InProgress struct {
-	Name            Name                `json:"name"`
-	StartTimeMillis EpochTimeUnitMillis `json:"start_time_millis"`
-	State           string              `json:"state"`
-	Uuid            Uuid                `json:"uuid"`
+	Name            string `json:"name"`
+	StartTimeMillis int64  `json:"start_time_millis"`
+	State           string `json:"state"`
+	Uuid            string `json:"uuid"`
 }
 
-// InProgressBuilder holds InProgress struct and provides a builder API.
-type InProgressBuilder struct {
-	v *InProgress
-}
+func (s *InProgress) UnmarshalJSON(data []byte) error {
 
-// NewInProgress provides a builder for the InProgress struct.
-func NewInProgressBuilder() *InProgressBuilder {
-	r := InProgressBuilder{
-		&InProgress{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		case "start_time_millis":
+			if err := dec.Decode(&s.StartTimeMillis); err != nil {
+				return fmt.Errorf("%s | %w", "StartTimeMillis", err)
+			}
+
+		case "state":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "State", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.State = o
+
+		case "uuid":
+			if err := dec.Decode(&s.Uuid); err != nil {
+				return fmt.Errorf("%s | %w", "Uuid", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the InProgress struct
-func (rb *InProgressBuilder) Build() InProgress {
-	return *rb.v
-}
+// NewInProgress returns a InProgress.
+func NewInProgress() *InProgress {
+	r := &InProgress{}
 
-func (rb *InProgressBuilder) Name(name Name) *InProgressBuilder {
-	rb.v.Name = name
-	return rb
-}
-
-func (rb *InProgressBuilder) StartTimeMillis(starttimemillis *EpochTimeUnitMillisBuilder) *InProgressBuilder {
-	v := starttimemillis.Build()
-	rb.v.StartTimeMillis = v
-	return rb
-}
-
-func (rb *InProgressBuilder) State(state string) *InProgressBuilder {
-	rb.v.State = state
-	return rb
-}
-
-func (rb *InProgressBuilder) Uuid(uuid Uuid) *InProgressBuilder {
-	rb.v.Uuid = uuid
-	return rb
+	return r
 }

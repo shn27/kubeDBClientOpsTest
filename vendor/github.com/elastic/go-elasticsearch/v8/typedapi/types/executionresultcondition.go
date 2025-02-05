@@ -15,57 +15,79 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/actionstatusoptions"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/conditiontype"
 )
 
 // ExecutionResultCondition type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Execution.ts#L68-L72
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Execution.ts#L68-L72
 type ExecutionResultCondition struct {
 	Met    bool                                    `json:"met"`
 	Status actionstatusoptions.ActionStatusOptions `json:"status"`
 	Type   conditiontype.ConditionType             `json:"type"`
 }
 
-// ExecutionResultConditionBuilder holds ExecutionResultCondition struct and provides a builder API.
-type ExecutionResultConditionBuilder struct {
-	v *ExecutionResultCondition
-}
+func (s *ExecutionResultCondition) UnmarshalJSON(data []byte) error {
 
-// NewExecutionResultCondition provides a builder for the ExecutionResultCondition struct.
-func NewExecutionResultConditionBuilder() *ExecutionResultConditionBuilder {
-	r := ExecutionResultConditionBuilder{
-		&ExecutionResultCondition{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "met":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Met", err)
+				}
+				s.Met = value
+			case bool:
+				s.Met = v
+			}
+
+		case "status":
+			if err := dec.Decode(&s.Status); err != nil {
+				return fmt.Errorf("%s | %w", "Status", err)
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ExecutionResultCondition struct
-func (rb *ExecutionResultConditionBuilder) Build() ExecutionResultCondition {
-	return *rb.v
-}
+// NewExecutionResultCondition returns a ExecutionResultCondition.
+func NewExecutionResultCondition() *ExecutionResultCondition {
+	r := &ExecutionResultCondition{}
 
-func (rb *ExecutionResultConditionBuilder) Met(met bool) *ExecutionResultConditionBuilder {
-	rb.v.Met = met
-	return rb
-}
-
-func (rb *ExecutionResultConditionBuilder) Status(status actionstatusoptions.ActionStatusOptions) *ExecutionResultConditionBuilder {
-	rb.v.Status = status
-	return rb
-}
-
-func (rb *ExecutionResultConditionBuilder) Type_(type_ conditiontype.ConditionType) *ExecutionResultConditionBuilder {
-	rb.v.Type = type_
-	return rb
+	return r
 }

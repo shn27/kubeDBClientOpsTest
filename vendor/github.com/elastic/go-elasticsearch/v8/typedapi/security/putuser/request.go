@@ -15,56 +15,45 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package putuser
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"strconv"
 
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 )
 
 // Request holds the request body struct for the package putuser
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/put_user/SecurityPutUserRequest.ts#L23-L45
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/put_user/SecurityPutUserRequest.ts#L23-L48
 type Request struct {
-	Email string `json:"email,omitempty"`
-
-	Enabled *bool `json:"enabled,omitempty"`
-
-	FullName string `json:"full_name,omitempty"`
-
-	Metadata *types.Metadata `json:"metadata,omitempty"`
-
-	Password *types.Password `json:"password,omitempty"`
-
-	PasswordHash *string `json:"password_hash,omitempty"`
-
-	Roles []string `json:"roles,omitempty"`
-
-	Username *types.Username `json:"username,omitempty"`
+	Email        *string        `json:"email,omitempty"`
+	Enabled      *bool          `json:"enabled,omitempty"`
+	FullName     *string        `json:"full_name,omitempty"`
+	Metadata     types.Metadata `json:"metadata,omitempty"`
+	Password     *string        `json:"password,omitempty"`
+	PasswordHash *string        `json:"password_hash,omitempty"`
+	Roles        []string       `json:"roles,omitempty"`
+	Username     *string        `json:"username,omitempty"`
 }
 
-// RequestBuilder is the builder API for the putuser.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -75,48 +64,91 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) Email(email string) *RequestBuilder {
-	rb.v.Email = email
-	return rb
-}
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
 
-func (rb *RequestBuilder) Enabled(enabled bool) *RequestBuilder {
-	rb.v.Enabled = &enabled
-	return rb
-}
+		switch t {
 
-func (rb *RequestBuilder) FullName(fullname string) *RequestBuilder {
-	rb.v.FullName = fullname
-	return rb
-}
+		case "email":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Email", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Email = &o
 
-func (rb *RequestBuilder) Metadata(metadata *types.MetadataBuilder) *RequestBuilder {
-	v := metadata.Build()
-	rb.v.Metadata = &v
-	return rb
-}
+		case "enabled":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Enabled", err)
+				}
+				s.Enabled = &value
+			case bool:
+				s.Enabled = &v
+			}
 
-func (rb *RequestBuilder) Password(password types.Password) *RequestBuilder {
-	rb.v.Password = &password
-	return rb
-}
+		case "full_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "FullName", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.FullName = &o
 
-func (rb *RequestBuilder) PasswordHash(passwordhash string) *RequestBuilder {
-	rb.v.PasswordHash = &passwordhash
-	return rb
-}
+		case "metadata":
+			if err := dec.Decode(&s.Metadata); err != nil {
+				return fmt.Errorf("%s | %w", "Metadata", err)
+			}
 
-func (rb *RequestBuilder) Roles(roles ...string) *RequestBuilder {
-	rb.v.Roles = roles
-	return rb
-}
+		case "password":
+			if err := dec.Decode(&s.Password); err != nil {
+				return fmt.Errorf("%s | %w", "Password", err)
+			}
 
-func (rb *RequestBuilder) Username(username types.Username) *RequestBuilder {
-	rb.v.Username = &username
-	return rb
+		case "password_hash":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PasswordHash", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PasswordHash = &o
+
+		case "roles":
+			if err := dec.Decode(&s.Roles); err != nil {
+				return fmt.Errorf("%s | %w", "Roles", err)
+			}
+
+		case "username":
+			if err := dec.Decode(&s.Username); err != nil {
+				return fmt.Errorf("%s | %w", "Username", err)
+			}
+
+		}
+	}
+	return nil
 }

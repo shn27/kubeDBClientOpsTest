@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // IndicesRecord type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cat/indices/types.ts#L20-L801
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cat/indices/types.ts#L20-L808
 type IndicesRecord struct {
 	// BulkAvgSizeInBytes average size in bytes of shard bulk
 	BulkAvgSizeInBytes *string `json:"bulk.avg_size_in_bytes,omitempty"`
@@ -42,10 +49,12 @@ type IndicesRecord struct {
 	CreationDate *string `json:"creation.date,omitempty"`
 	// CreationDateString index creation date (as string)
 	CreationDateString *string `json:"creation.date.string,omitempty"`
+	// DatasetSize total size of dataset (including the cache for partially mounted indices)
+	DatasetSize *string `json:"dataset.size,omitempty"`
 	// DocsCount available docs
-	DocsCount string `json:"docs.count,omitempty"`
+	DocsCount *string `json:"docs.count,omitempty"`
 	// DocsDeleted deleted docs
-	DocsDeleted string `json:"docs.deleted,omitempty"`
+	DocsDeleted *string `json:"docs.deleted,omitempty"`
 	// FielddataEvictions fielddata evictions
 	FielddataEvictions *string `json:"fielddata.evictions,omitempty"`
 	// FielddataMemorySize used fielddata cache
@@ -222,7 +231,7 @@ type IndicesRecord struct {
 	// PriSegmentsVersionMapMemory memory used by version map
 	PriSegmentsVersionMapMemory *string `json:"pri.segments.version_map_memory,omitempty"`
 	// PriStoreSize store size of primaries
-	PriStoreSize string `json:"pri.store.size,omitempty"`
+	PriStoreSize *string `json:"pri.store.size,omitempty"`
 	// PriSuggestCurrent number of current suggest ops
 	PriSuggestCurrent *string `json:"pri.suggest.current,omitempty"`
 	// PriSuggestTime time spend in suggest
@@ -295,7 +304,7 @@ type IndicesRecord struct {
 	// Status open/close status
 	Status *string `json:"status,omitempty"`
 	// StoreSize store size of primaries & replicas
-	StoreSize string `json:"store.size,omitempty"`
+	StoreSize *string `json:"store.size,omitempty"`
 	// SuggestCurrent number of current suggest ops
 	SuggestCurrent *string `json:"suggest.current,omitempty"`
 	// SuggestTime time spend in suggest
@@ -312,1010 +321,1733 @@ type IndicesRecord struct {
 	WarmerTotalTime *string `json:"warmer.total_time,omitempty"`
 }
 
-// IndicesRecordBuilder holds IndicesRecord struct and provides a builder API.
-type IndicesRecordBuilder struct {
-	v *IndicesRecord
-}
+func (s *IndicesRecord) UnmarshalJSON(data []byte) error {
 
-// NewIndicesRecord provides a builder for the IndicesRecord struct.
-func NewIndicesRecordBuilder() *IndicesRecordBuilder {
-	r := IndicesRecordBuilder{
-		&IndicesRecord{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "bulk.avg_size_in_bytes", "basi", "bulkAvgSizeInBytes":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "BulkAvgSizeInBytes", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.BulkAvgSizeInBytes = &o
+
+		case "bulk.avg_time", "bati", "bulkAvgTime":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "BulkAvgTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.BulkAvgTime = &o
+
+		case "bulk.total_operations", "bto", "bulkTotalOperation":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "BulkTotalOperations", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.BulkTotalOperations = &o
+
+		case "bulk.total_size_in_bytes", "btsi", "bulkTotalSizeInBytes":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "BulkTotalSizeInBytes", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.BulkTotalSizeInBytes = &o
+
+		case "bulk.total_time", "btti", "bulkTotalTime":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "BulkTotalTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.BulkTotalTime = &o
+
+		case "completion.size", "cs", "completionSize":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "CompletionSize", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.CompletionSize = &o
+
+		case "creation.date", "cd":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "CreationDate", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.CreationDate = &o
+
+		case "creation.date.string", "cds":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "CreationDateString", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.CreationDateString = &o
+
+		case "dataset.size":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "DatasetSize", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.DatasetSize = &o
+
+		case "docs.count", "dc", "docsCount":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "DocsCount", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.DocsCount = &o
+
+		case "docs.deleted", "dd", "docsDeleted":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "DocsDeleted", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.DocsDeleted = &o
+
+		case "fielddata.evictions", "fe", "fielddataEvictions":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "FielddataEvictions", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.FielddataEvictions = &o
+
+		case "fielddata.memory_size", "fm", "fielddataMemory":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "FielddataMemorySize", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.FielddataMemorySize = &o
+
+		case "flush.total", "ft", "flushTotal":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "FlushTotal", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.FlushTotal = &o
+
+		case "flush.total_time", "ftt", "flushTotalTime":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "FlushTotalTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.FlushTotalTime = &o
+
+		case "get.current", "gc", "getCurrent":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "GetCurrent", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.GetCurrent = &o
+
+		case "get.exists_time", "geti", "getExistsTime":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "GetExistsTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.GetExistsTime = &o
+
+		case "get.exists_total", "geto", "getExistsTotal":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "GetExistsTotal", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.GetExistsTotal = &o
+
+		case "get.missing_time", "gmti", "getMissingTime":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "GetMissingTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.GetMissingTime = &o
+
+		case "get.missing_total", "gmto", "getMissingTotal":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "GetMissingTotal", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.GetMissingTotal = &o
+
+		case "get.time", "gti", "getTime":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "GetTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.GetTime = &o
+
+		case "get.total", "gto", "getTotal":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "GetTotal", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.GetTotal = &o
+
+		case "health", "h":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Health", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Health = &o
+
+		case "index", "i", "idx":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Index", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Index = &o
+
+		case "indexing.delete_current", "idc", "indexingDeleteCurrent":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "IndexingDeleteCurrent", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.IndexingDeleteCurrent = &o
+
+		case "indexing.delete_time", "idti", "indexingDeleteTime":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "IndexingDeleteTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.IndexingDeleteTime = &o
+
+		case "indexing.delete_total", "idto", "indexingDeleteTotal":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "IndexingDeleteTotal", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.IndexingDeleteTotal = &o
+
+		case "indexing.index_current", "iic", "indexingIndexCurrent":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "IndexingIndexCurrent", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.IndexingIndexCurrent = &o
+
+		case "indexing.index_failed", "iif", "indexingIndexFailed":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "IndexingIndexFailed", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.IndexingIndexFailed = &o
+
+		case "indexing.index_time", "iiti", "indexingIndexTime":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "IndexingIndexTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.IndexingIndexTime = &o
+
+		case "indexing.index_total", "iito", "indexingIndexTotal":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "IndexingIndexTotal", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.IndexingIndexTotal = &o
+
+		case "memory.total", "tm", "memoryTotal":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "MemoryTotal", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.MemoryTotal = &o
+
+		case "merges.current", "mc", "mergesCurrent":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "MergesCurrent", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.MergesCurrent = &o
+
+		case "merges.current_docs", "mcd", "mergesCurrentDocs":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "MergesCurrentDocs", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.MergesCurrentDocs = &o
+
+		case "merges.current_size", "mcs", "mergesCurrentSize":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "MergesCurrentSize", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.MergesCurrentSize = &o
+
+		case "merges.total", "mt", "mergesTotal":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "MergesTotal", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.MergesTotal = &o
+
+		case "merges.total_docs", "mtd", "mergesTotalDocs":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "MergesTotalDocs", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.MergesTotalDocs = &o
+
+		case "merges.total_size", "mts", "mergesTotalSize":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "MergesTotalSize", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.MergesTotalSize = &o
+
+		case "merges.total_time", "mtt", "mergesTotalTime":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "MergesTotalTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.MergesTotalTime = &o
+
+		case "pri", "p", "shards.primary", "shardsPrimary":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Pri", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Pri = &o
+
+		case "pri.bulk.avg_size_in_bytes":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriBulkAvgSizeInBytes", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriBulkAvgSizeInBytes = &o
+
+		case "pri.bulk.avg_time":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriBulkAvgTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriBulkAvgTime = &o
+
+		case "pri.bulk.total_operations":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriBulkTotalOperations", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriBulkTotalOperations = &o
+
+		case "pri.bulk.total_size_in_bytes":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriBulkTotalSizeInBytes", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriBulkTotalSizeInBytes = &o
+
+		case "pri.bulk.total_time":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriBulkTotalTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriBulkTotalTime = &o
+
+		case "pri.completion.size":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriCompletionSize", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriCompletionSize = &o
+
+		case "pri.fielddata.evictions":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriFielddataEvictions", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriFielddataEvictions = &o
+
+		case "pri.fielddata.memory_size":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriFielddataMemorySize", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriFielddataMemorySize = &o
+
+		case "pri.flush.total":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriFlushTotal", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriFlushTotal = &o
+
+		case "pri.flush.total_time":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriFlushTotalTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriFlushTotalTime = &o
+
+		case "pri.get.current":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriGetCurrent", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriGetCurrent = &o
+
+		case "pri.get.exists_time":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriGetExistsTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriGetExistsTime = &o
+
+		case "pri.get.exists_total":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriGetExistsTotal", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriGetExistsTotal = &o
+
+		case "pri.get.missing_time":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriGetMissingTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriGetMissingTime = &o
+
+		case "pri.get.missing_total":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriGetMissingTotal", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriGetMissingTotal = &o
+
+		case "pri.get.time":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriGetTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriGetTime = &o
+
+		case "pri.get.total":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriGetTotal", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriGetTotal = &o
+
+		case "pri.indexing.delete_current":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriIndexingDeleteCurrent", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriIndexingDeleteCurrent = &o
+
+		case "pri.indexing.delete_time":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriIndexingDeleteTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriIndexingDeleteTime = &o
+
+		case "pri.indexing.delete_total":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriIndexingDeleteTotal", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriIndexingDeleteTotal = &o
+
+		case "pri.indexing.index_current":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriIndexingIndexCurrent", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriIndexingIndexCurrent = &o
+
+		case "pri.indexing.index_failed":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriIndexingIndexFailed", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriIndexingIndexFailed = &o
+
+		case "pri.indexing.index_time":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriIndexingIndexTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriIndexingIndexTime = &o
+
+		case "pri.indexing.index_total":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriIndexingIndexTotal", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriIndexingIndexTotal = &o
+
+		case "pri.memory.total":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriMemoryTotal", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriMemoryTotal = &o
+
+		case "pri.merges.current":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriMergesCurrent", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriMergesCurrent = &o
+
+		case "pri.merges.current_docs":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriMergesCurrentDocs", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriMergesCurrentDocs = &o
+
+		case "pri.merges.current_size":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriMergesCurrentSize", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriMergesCurrentSize = &o
+
+		case "pri.merges.total":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriMergesTotal", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriMergesTotal = &o
+
+		case "pri.merges.total_docs":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriMergesTotalDocs", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriMergesTotalDocs = &o
+
+		case "pri.merges.total_size":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriMergesTotalSize", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriMergesTotalSize = &o
+
+		case "pri.merges.total_time":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriMergesTotalTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriMergesTotalTime = &o
+
+		case "pri.query_cache.evictions":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriQueryCacheEvictions", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriQueryCacheEvictions = &o
+
+		case "pri.query_cache.memory_size":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriQueryCacheMemorySize", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriQueryCacheMemorySize = &o
+
+		case "pri.refresh.external_time":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriRefreshExternalTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriRefreshExternalTime = &o
+
+		case "pri.refresh.external_total":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriRefreshExternalTotal", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriRefreshExternalTotal = &o
+
+		case "pri.refresh.listeners":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriRefreshListeners", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriRefreshListeners = &o
+
+		case "pri.refresh.time":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriRefreshTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriRefreshTime = &o
+
+		case "pri.refresh.total":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriRefreshTotal", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriRefreshTotal = &o
+
+		case "pri.request_cache.evictions":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriRequestCacheEvictions", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriRequestCacheEvictions = &o
+
+		case "pri.request_cache.hit_count":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriRequestCacheHitCount", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriRequestCacheHitCount = &o
+
+		case "pri.request_cache.memory_size":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriRequestCacheMemorySize", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriRequestCacheMemorySize = &o
+
+		case "pri.request_cache.miss_count":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriRequestCacheMissCount", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriRequestCacheMissCount = &o
+
+		case "pri.search.fetch_current":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriSearchFetchCurrent", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriSearchFetchCurrent = &o
+
+		case "pri.search.fetch_time":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriSearchFetchTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriSearchFetchTime = &o
+
+		case "pri.search.fetch_total":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriSearchFetchTotal", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriSearchFetchTotal = &o
+
+		case "pri.search.open_contexts":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriSearchOpenContexts", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriSearchOpenContexts = &o
+
+		case "pri.search.query_current":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriSearchQueryCurrent", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriSearchQueryCurrent = &o
+
+		case "pri.search.query_time":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriSearchQueryTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriSearchQueryTime = &o
+
+		case "pri.search.query_total":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriSearchQueryTotal", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriSearchQueryTotal = &o
+
+		case "pri.search.scroll_current":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriSearchScrollCurrent", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriSearchScrollCurrent = &o
+
+		case "pri.search.scroll_time":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriSearchScrollTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriSearchScrollTime = &o
+
+		case "pri.search.scroll_total":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriSearchScrollTotal", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriSearchScrollTotal = &o
+
+		case "pri.segments.count":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriSegmentsCount", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriSegmentsCount = &o
+
+		case "pri.segments.fixed_bitset_memory":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriSegmentsFixedBitsetMemory", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriSegmentsFixedBitsetMemory = &o
+
+		case "pri.segments.index_writer_memory":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriSegmentsIndexWriterMemory", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriSegmentsIndexWriterMemory = &o
+
+		case "pri.segments.memory":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriSegmentsMemory", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriSegmentsMemory = &o
+
+		case "pri.segments.version_map_memory":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriSegmentsVersionMapMemory", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriSegmentsVersionMapMemory = &o
+
+		case "pri.store.size":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriStoreSize", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriStoreSize = &o
+
+		case "pri.suggest.current":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriSuggestCurrent", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriSuggestCurrent = &o
+
+		case "pri.suggest.time":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriSuggestTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriSuggestTime = &o
+
+		case "pri.suggest.total":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriSuggestTotal", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriSuggestTotal = &o
+
+		case "pri.warmer.current":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriWarmerCurrent", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriWarmerCurrent = &o
+
+		case "pri.warmer.total":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriWarmerTotal", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriWarmerTotal = &o
+
+		case "pri.warmer.total_time":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PriWarmerTotalTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PriWarmerTotalTime = &o
+
+		case "query_cache.evictions", "qce", "queryCacheEvictions":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "QueryCacheEvictions", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.QueryCacheEvictions = &o
+
+		case "query_cache.memory_size", "qcm", "queryCacheMemory":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "QueryCacheMemorySize", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.QueryCacheMemorySize = &o
+
+		case "refresh.external_time", "reti":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "RefreshExternalTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.RefreshExternalTime = &o
+
+		case "refresh.external_total", "reto":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "RefreshExternalTotal", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.RefreshExternalTotal = &o
+
+		case "refresh.listeners", "rli", "refreshListeners":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "RefreshListeners", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.RefreshListeners = &o
+
+		case "refresh.time", "rti", "refreshTime":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "RefreshTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.RefreshTime = &o
+
+		case "refresh.total", "rto", "refreshTotal":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "RefreshTotal", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.RefreshTotal = &o
+
+		case "rep", "r", "shards.replica", "shardsReplica":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Rep", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Rep = &o
+
+		case "request_cache.evictions", "rce", "requestCacheEvictions":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "RequestCacheEvictions", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.RequestCacheEvictions = &o
+
+		case "request_cache.hit_count", "rchc", "requestCacheHitCount":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "RequestCacheHitCount", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.RequestCacheHitCount = &o
+
+		case "request_cache.memory_size", "rcm", "requestCacheMemory":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "RequestCacheMemorySize", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.RequestCacheMemorySize = &o
+
+		case "request_cache.miss_count", "rcmc", "requestCacheMissCount":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "RequestCacheMissCount", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.RequestCacheMissCount = &o
+
+		case "search.fetch_current", "sfc", "searchFetchCurrent":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SearchFetchCurrent", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SearchFetchCurrent = &o
+
+		case "search.fetch_time", "sfti", "searchFetchTime":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SearchFetchTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SearchFetchTime = &o
+
+		case "search.fetch_total", "sfto", "searchFetchTotal":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SearchFetchTotal", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SearchFetchTotal = &o
+
+		case "search.open_contexts", "so", "searchOpenContexts":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SearchOpenContexts", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SearchOpenContexts = &o
+
+		case "search.query_current", "sqc", "searchQueryCurrent":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SearchQueryCurrent", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SearchQueryCurrent = &o
+
+		case "search.query_time", "sqti", "searchQueryTime":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SearchQueryTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SearchQueryTime = &o
+
+		case "search.query_total", "sqto", "searchQueryTotal":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SearchQueryTotal", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SearchQueryTotal = &o
+
+		case "search.scroll_current", "scc", "searchScrollCurrent":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SearchScrollCurrent", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SearchScrollCurrent = &o
+
+		case "search.scroll_time", "scti", "searchScrollTime":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SearchScrollTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SearchScrollTime = &o
+
+		case "search.scroll_total", "scto", "searchScrollTotal":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SearchScrollTotal", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SearchScrollTotal = &o
+
+		case "search.throttled", "sth":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SearchThrottled", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SearchThrottled = &o
+
+		case "segments.count", "sc", "segmentsCount":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SegmentsCount", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SegmentsCount = &o
+
+		case "segments.fixed_bitset_memory", "sfbm", "fixedBitsetMemory":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SegmentsFixedBitsetMemory", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SegmentsFixedBitsetMemory = &o
+
+		case "segments.index_writer_memory", "siwm", "segmentsIndexWriterMemory":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SegmentsIndexWriterMemory", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SegmentsIndexWriterMemory = &o
+
+		case "segments.memory", "sm", "segmentsMemory":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SegmentsMemory", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SegmentsMemory = &o
+
+		case "segments.version_map_memory", "svmm", "segmentsVersionMapMemory":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SegmentsVersionMapMemory", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SegmentsVersionMapMemory = &o
+
+		case "status", "s":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Status", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Status = &o
+
+		case "store.size", "ss", "storeSize":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "StoreSize", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.StoreSize = &o
+
+		case "suggest.current", "suc", "suggestCurrent":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SuggestCurrent", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SuggestCurrent = &o
+
+		case "suggest.time", "suti", "suggestTime":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SuggestTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SuggestTime = &o
+
+		case "suggest.total", "suto", "suggestTotal":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SuggestTotal", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SuggestTotal = &o
+
+		case "uuid", "id":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Uuid", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Uuid = &o
+
+		case "warmer.current", "wc", "warmerCurrent":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "WarmerCurrent", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.WarmerCurrent = &o
+
+		case "warmer.total", "wto", "warmerTotal":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "WarmerTotal", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.WarmerTotal = &o
+
+		case "warmer.total_time", "wtt", "warmerTotalTime":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "WarmerTotalTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.WarmerTotalTime = &o
+
+		}
 	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the IndicesRecord struct
-func (rb *IndicesRecordBuilder) Build() IndicesRecord {
-	return *rb.v
-}
-
-// BulkAvgSizeInBytes average size in bytes of shard bulk
-
-func (rb *IndicesRecordBuilder) BulkAvgSizeInBytes(bulkavgsizeinbytes string) *IndicesRecordBuilder {
-	rb.v.BulkAvgSizeInBytes = &bulkavgsizeinbytes
-	return rb
-}
-
-// BulkAvgTime average time spend in shard bulk
-
-func (rb *IndicesRecordBuilder) BulkAvgTime(bulkavgtime string) *IndicesRecordBuilder {
-	rb.v.BulkAvgTime = &bulkavgtime
-	return rb
-}
-
-// BulkTotalOperations number of bulk shard ops
-
-func (rb *IndicesRecordBuilder) BulkTotalOperations(bulktotaloperations string) *IndicesRecordBuilder {
-	rb.v.BulkTotalOperations = &bulktotaloperations
-	return rb
-}
-
-// BulkTotalSizeInBytes total size in bytes of shard bulk
-
-func (rb *IndicesRecordBuilder) BulkTotalSizeInBytes(bulktotalsizeinbytes string) *IndicesRecordBuilder {
-	rb.v.BulkTotalSizeInBytes = &bulktotalsizeinbytes
-	return rb
-}
-
-// BulkTotalTime time spend in shard bulk
-
-func (rb *IndicesRecordBuilder) BulkTotalTime(bulktotaltime string) *IndicesRecordBuilder {
-	rb.v.BulkTotalTime = &bulktotaltime
-	return rb
-}
-
-// CompletionSize size of completion
-
-func (rb *IndicesRecordBuilder) CompletionSize(completionsize string) *IndicesRecordBuilder {
-	rb.v.CompletionSize = &completionsize
-	return rb
-}
-
-// CreationDate index creation date (millisecond value)
-
-func (rb *IndicesRecordBuilder) CreationDate(creationdate string) *IndicesRecordBuilder {
-	rb.v.CreationDate = &creationdate
-	return rb
-}
-
-// CreationDateString index creation date (as string)
-
-func (rb *IndicesRecordBuilder) CreationDateString(creationdatestring string) *IndicesRecordBuilder {
-	rb.v.CreationDateString = &creationdatestring
-	return rb
-}
-
-// DocsCount available docs
-
-func (rb *IndicesRecordBuilder) DocsCount(docscount string) *IndicesRecordBuilder {
-	rb.v.DocsCount = docscount
-	return rb
-}
-
-// DocsDeleted deleted docs
-
-func (rb *IndicesRecordBuilder) DocsDeleted(docsdeleted string) *IndicesRecordBuilder {
-	rb.v.DocsDeleted = docsdeleted
-	return rb
-}
-
-// FielddataEvictions fielddata evictions
-
-func (rb *IndicesRecordBuilder) FielddataEvictions(fielddataevictions string) *IndicesRecordBuilder {
-	rb.v.FielddataEvictions = &fielddataevictions
-	return rb
-}
-
-// FielddataMemorySize used fielddata cache
-
-func (rb *IndicesRecordBuilder) FielddataMemorySize(fielddatamemorysize string) *IndicesRecordBuilder {
-	rb.v.FielddataMemorySize = &fielddatamemorysize
-	return rb
-}
-
-// FlushTotal number of flushes
-
-func (rb *IndicesRecordBuilder) FlushTotal(flushtotal string) *IndicesRecordBuilder {
-	rb.v.FlushTotal = &flushtotal
-	return rb
-}
-
-// FlushTotalTime time spent in flush
-
-func (rb *IndicesRecordBuilder) FlushTotalTime(flushtotaltime string) *IndicesRecordBuilder {
-	rb.v.FlushTotalTime = &flushtotaltime
-	return rb
-}
-
-// GetCurrent number of current get ops
-
-func (rb *IndicesRecordBuilder) GetCurrent(getcurrent string) *IndicesRecordBuilder {
-	rb.v.GetCurrent = &getcurrent
-	return rb
-}
-
-// GetExistsTime time spent in successful gets
-
-func (rb *IndicesRecordBuilder) GetExistsTime(getexiststime string) *IndicesRecordBuilder {
-	rb.v.GetExistsTime = &getexiststime
-	return rb
-}
-
-// GetExistsTotal number of successful gets
-
-func (rb *IndicesRecordBuilder) GetExistsTotal(getexiststotal string) *IndicesRecordBuilder {
-	rb.v.GetExistsTotal = &getexiststotal
-	return rb
-}
-
-// GetMissingTime time spent in failed gets
-
-func (rb *IndicesRecordBuilder) GetMissingTime(getmissingtime string) *IndicesRecordBuilder {
-	rb.v.GetMissingTime = &getmissingtime
-	return rb
-}
-
-// GetMissingTotal number of failed gets
-
-func (rb *IndicesRecordBuilder) GetMissingTotal(getmissingtotal string) *IndicesRecordBuilder {
-	rb.v.GetMissingTotal = &getmissingtotal
-	return rb
-}
-
-// GetTime time spent in get
-
-func (rb *IndicesRecordBuilder) GetTime(gettime string) *IndicesRecordBuilder {
-	rb.v.GetTime = &gettime
-	return rb
-}
-
-// GetTotal number of get ops
-
-func (rb *IndicesRecordBuilder) GetTotal(gettotal string) *IndicesRecordBuilder {
-	rb.v.GetTotal = &gettotal
-	return rb
-}
-
-// Health current health status
-
-func (rb *IndicesRecordBuilder) Health(health string) *IndicesRecordBuilder {
-	rb.v.Health = &health
-	return rb
-}
-
-// Index index name
-
-func (rb *IndicesRecordBuilder) Index(index string) *IndicesRecordBuilder {
-	rb.v.Index = &index
-	return rb
-}
-
-// IndexingDeleteCurrent number of current deletions
-
-func (rb *IndicesRecordBuilder) IndexingDeleteCurrent(indexingdeletecurrent string) *IndicesRecordBuilder {
-	rb.v.IndexingDeleteCurrent = &indexingdeletecurrent
-	return rb
-}
-
-// IndexingDeleteTime time spent in deletions
-
-func (rb *IndicesRecordBuilder) IndexingDeleteTime(indexingdeletetime string) *IndicesRecordBuilder {
-	rb.v.IndexingDeleteTime = &indexingdeletetime
-	return rb
-}
-
-// IndexingDeleteTotal number of delete ops
-
-func (rb *IndicesRecordBuilder) IndexingDeleteTotal(indexingdeletetotal string) *IndicesRecordBuilder {
-	rb.v.IndexingDeleteTotal = &indexingdeletetotal
-	return rb
-}
-
-// IndexingIndexCurrent number of current indexing ops
-
-func (rb *IndicesRecordBuilder) IndexingIndexCurrent(indexingindexcurrent string) *IndicesRecordBuilder {
-	rb.v.IndexingIndexCurrent = &indexingindexcurrent
-	return rb
-}
-
-// IndexingIndexFailed number of failed indexing ops
-
-func (rb *IndicesRecordBuilder) IndexingIndexFailed(indexingindexfailed string) *IndicesRecordBuilder {
-	rb.v.IndexingIndexFailed = &indexingindexfailed
-	return rb
-}
-
-// IndexingIndexTime time spent in indexing
-
-func (rb *IndicesRecordBuilder) IndexingIndexTime(indexingindextime string) *IndicesRecordBuilder {
-	rb.v.IndexingIndexTime = &indexingindextime
-	return rb
-}
-
-// IndexingIndexTotal number of indexing ops
-
-func (rb *IndicesRecordBuilder) IndexingIndexTotal(indexingindextotal string) *IndicesRecordBuilder {
-	rb.v.IndexingIndexTotal = &indexingindextotal
-	return rb
-}
-
-// MemoryTotal total used memory
-
-func (rb *IndicesRecordBuilder) MemoryTotal(memorytotal string) *IndicesRecordBuilder {
-	rb.v.MemoryTotal = &memorytotal
-	return rb
-}
-
-// MergesCurrent number of current merges
-
-func (rb *IndicesRecordBuilder) MergesCurrent(mergescurrent string) *IndicesRecordBuilder {
-	rb.v.MergesCurrent = &mergescurrent
-	return rb
-}
-
-// MergesCurrentDocs number of current merging docs
-
-func (rb *IndicesRecordBuilder) MergesCurrentDocs(mergescurrentdocs string) *IndicesRecordBuilder {
-	rb.v.MergesCurrentDocs = &mergescurrentdocs
-	return rb
-}
-
-// MergesCurrentSize size of current merges
-
-func (rb *IndicesRecordBuilder) MergesCurrentSize(mergescurrentsize string) *IndicesRecordBuilder {
-	rb.v.MergesCurrentSize = &mergescurrentsize
-	return rb
-}
-
-// MergesTotal number of completed merge ops
-
-func (rb *IndicesRecordBuilder) MergesTotal(mergestotal string) *IndicesRecordBuilder {
-	rb.v.MergesTotal = &mergestotal
-	return rb
-}
-
-// MergesTotalDocs docs merged
-
-func (rb *IndicesRecordBuilder) MergesTotalDocs(mergestotaldocs string) *IndicesRecordBuilder {
-	rb.v.MergesTotalDocs = &mergestotaldocs
-	return rb
-}
-
-// MergesTotalSize size merged
-
-func (rb *IndicesRecordBuilder) MergesTotalSize(mergestotalsize string) *IndicesRecordBuilder {
-	rb.v.MergesTotalSize = &mergestotalsize
-	return rb
-}
-
-// MergesTotalTime time spent in merges
-
-func (rb *IndicesRecordBuilder) MergesTotalTime(mergestotaltime string) *IndicesRecordBuilder {
-	rb.v.MergesTotalTime = &mergestotaltime
-	return rb
-}
-
-// Pri number of primary shards
-
-func (rb *IndicesRecordBuilder) Pri(pri string) *IndicesRecordBuilder {
-	rb.v.Pri = &pri
-	return rb
-}
-
-// PriBulkAvgSizeInBytes average size in bytes of shard bulk
-
-func (rb *IndicesRecordBuilder) PriBulkAvgSizeInBytes(pribulkavgsizeinbytes string) *IndicesRecordBuilder {
-	rb.v.PriBulkAvgSizeInBytes = &pribulkavgsizeinbytes
-	return rb
-}
-
-// PriBulkAvgTime average time spend in shard bulk
-
-func (rb *IndicesRecordBuilder) PriBulkAvgTime(pribulkavgtime string) *IndicesRecordBuilder {
-	rb.v.PriBulkAvgTime = &pribulkavgtime
-	return rb
-}
-
-// PriBulkTotalOperations number of bulk shard ops
-
-func (rb *IndicesRecordBuilder) PriBulkTotalOperations(pribulktotaloperations string) *IndicesRecordBuilder {
-	rb.v.PriBulkTotalOperations = &pribulktotaloperations
-	return rb
-}
-
-// PriBulkTotalSizeInBytes total size in bytes of shard bulk
-
-func (rb *IndicesRecordBuilder) PriBulkTotalSizeInBytes(pribulktotalsizeinbytes string) *IndicesRecordBuilder {
-	rb.v.PriBulkTotalSizeInBytes = &pribulktotalsizeinbytes
-	return rb
-}
-
-// PriBulkTotalTime time spend in shard bulk
-
-func (rb *IndicesRecordBuilder) PriBulkTotalTime(pribulktotaltime string) *IndicesRecordBuilder {
-	rb.v.PriBulkTotalTime = &pribulktotaltime
-	return rb
-}
-
-// PriCompletionSize size of completion
-
-func (rb *IndicesRecordBuilder) PriCompletionSize(pricompletionsize string) *IndicesRecordBuilder {
-	rb.v.PriCompletionSize = &pricompletionsize
-	return rb
-}
-
-// PriFielddataEvictions fielddata evictions
-
-func (rb *IndicesRecordBuilder) PriFielddataEvictions(prifielddataevictions string) *IndicesRecordBuilder {
-	rb.v.PriFielddataEvictions = &prifielddataevictions
-	return rb
-}
-
-// PriFielddataMemorySize used fielddata cache
-
-func (rb *IndicesRecordBuilder) PriFielddataMemorySize(prifielddatamemorysize string) *IndicesRecordBuilder {
-	rb.v.PriFielddataMemorySize = &prifielddatamemorysize
-	return rb
-}
-
-// PriFlushTotal number of flushes
-
-func (rb *IndicesRecordBuilder) PriFlushTotal(priflushtotal string) *IndicesRecordBuilder {
-	rb.v.PriFlushTotal = &priflushtotal
-	return rb
-}
-
-// PriFlushTotalTime time spent in flush
-
-func (rb *IndicesRecordBuilder) PriFlushTotalTime(priflushtotaltime string) *IndicesRecordBuilder {
-	rb.v.PriFlushTotalTime = &priflushtotaltime
-	return rb
-}
-
-// PriGetCurrent number of current get ops
-
-func (rb *IndicesRecordBuilder) PriGetCurrent(prigetcurrent string) *IndicesRecordBuilder {
-	rb.v.PriGetCurrent = &prigetcurrent
-	return rb
-}
-
-// PriGetExistsTime time spent in successful gets
-
-func (rb *IndicesRecordBuilder) PriGetExistsTime(prigetexiststime string) *IndicesRecordBuilder {
-	rb.v.PriGetExistsTime = &prigetexiststime
-	return rb
-}
-
-// PriGetExistsTotal number of successful gets
-
-func (rb *IndicesRecordBuilder) PriGetExistsTotal(prigetexiststotal string) *IndicesRecordBuilder {
-	rb.v.PriGetExistsTotal = &prigetexiststotal
-	return rb
-}
-
-// PriGetMissingTime time spent in failed gets
-
-func (rb *IndicesRecordBuilder) PriGetMissingTime(prigetmissingtime string) *IndicesRecordBuilder {
-	rb.v.PriGetMissingTime = &prigetmissingtime
-	return rb
-}
-
-// PriGetMissingTotal number of failed gets
-
-func (rb *IndicesRecordBuilder) PriGetMissingTotal(prigetmissingtotal string) *IndicesRecordBuilder {
-	rb.v.PriGetMissingTotal = &prigetmissingtotal
-	return rb
-}
-
-// PriGetTime time spent in get
-
-func (rb *IndicesRecordBuilder) PriGetTime(prigettime string) *IndicesRecordBuilder {
-	rb.v.PriGetTime = &prigettime
-	return rb
-}
-
-// PriGetTotal number of get ops
-
-func (rb *IndicesRecordBuilder) PriGetTotal(prigettotal string) *IndicesRecordBuilder {
-	rb.v.PriGetTotal = &prigettotal
-	return rb
-}
-
-// PriIndexingDeleteCurrent number of current deletions
-
-func (rb *IndicesRecordBuilder) PriIndexingDeleteCurrent(priindexingdeletecurrent string) *IndicesRecordBuilder {
-	rb.v.PriIndexingDeleteCurrent = &priindexingdeletecurrent
-	return rb
-}
-
-// PriIndexingDeleteTime time spent in deletions
-
-func (rb *IndicesRecordBuilder) PriIndexingDeleteTime(priindexingdeletetime string) *IndicesRecordBuilder {
-	rb.v.PriIndexingDeleteTime = &priindexingdeletetime
-	return rb
-}
-
-// PriIndexingDeleteTotal number of delete ops
-
-func (rb *IndicesRecordBuilder) PriIndexingDeleteTotal(priindexingdeletetotal string) *IndicesRecordBuilder {
-	rb.v.PriIndexingDeleteTotal = &priindexingdeletetotal
-	return rb
-}
-
-// PriIndexingIndexCurrent number of current indexing ops
-
-func (rb *IndicesRecordBuilder) PriIndexingIndexCurrent(priindexingindexcurrent string) *IndicesRecordBuilder {
-	rb.v.PriIndexingIndexCurrent = &priindexingindexcurrent
-	return rb
-}
-
-// PriIndexingIndexFailed number of failed indexing ops
-
-func (rb *IndicesRecordBuilder) PriIndexingIndexFailed(priindexingindexfailed string) *IndicesRecordBuilder {
-	rb.v.PriIndexingIndexFailed = &priindexingindexfailed
-	return rb
-}
-
-// PriIndexingIndexTime time spent in indexing
-
-func (rb *IndicesRecordBuilder) PriIndexingIndexTime(priindexingindextime string) *IndicesRecordBuilder {
-	rb.v.PriIndexingIndexTime = &priindexingindextime
-	return rb
-}
-
-// PriIndexingIndexTotal number of indexing ops
-
-func (rb *IndicesRecordBuilder) PriIndexingIndexTotal(priindexingindextotal string) *IndicesRecordBuilder {
-	rb.v.PriIndexingIndexTotal = &priindexingindextotal
-	return rb
-}
-
-// PriMemoryTotal total user memory
-
-func (rb *IndicesRecordBuilder) PriMemoryTotal(primemorytotal string) *IndicesRecordBuilder {
-	rb.v.PriMemoryTotal = &primemorytotal
-	return rb
-}
-
-// PriMergesCurrent number of current merges
-
-func (rb *IndicesRecordBuilder) PriMergesCurrent(primergescurrent string) *IndicesRecordBuilder {
-	rb.v.PriMergesCurrent = &primergescurrent
-	return rb
-}
-
-// PriMergesCurrentDocs number of current merging docs
-
-func (rb *IndicesRecordBuilder) PriMergesCurrentDocs(primergescurrentdocs string) *IndicesRecordBuilder {
-	rb.v.PriMergesCurrentDocs = &primergescurrentdocs
-	return rb
-}
-
-// PriMergesCurrentSize size of current merges
-
-func (rb *IndicesRecordBuilder) PriMergesCurrentSize(primergescurrentsize string) *IndicesRecordBuilder {
-	rb.v.PriMergesCurrentSize = &primergescurrentsize
-	return rb
-}
-
-// PriMergesTotal number of completed merge ops
-
-func (rb *IndicesRecordBuilder) PriMergesTotal(primergestotal string) *IndicesRecordBuilder {
-	rb.v.PriMergesTotal = &primergestotal
-	return rb
-}
-
-// PriMergesTotalDocs docs merged
-
-func (rb *IndicesRecordBuilder) PriMergesTotalDocs(primergestotaldocs string) *IndicesRecordBuilder {
-	rb.v.PriMergesTotalDocs = &primergestotaldocs
-	return rb
-}
-
-// PriMergesTotalSize size merged
-
-func (rb *IndicesRecordBuilder) PriMergesTotalSize(primergestotalsize string) *IndicesRecordBuilder {
-	rb.v.PriMergesTotalSize = &primergestotalsize
-	return rb
-}
-
-// PriMergesTotalTime time spent in merges
-
-func (rb *IndicesRecordBuilder) PriMergesTotalTime(primergestotaltime string) *IndicesRecordBuilder {
-	rb.v.PriMergesTotalTime = &primergestotaltime
-	return rb
-}
-
-// PriQueryCacheEvictions query cache evictions
-
-func (rb *IndicesRecordBuilder) PriQueryCacheEvictions(priquerycacheevictions string) *IndicesRecordBuilder {
-	rb.v.PriQueryCacheEvictions = &priquerycacheevictions
-	return rb
-}
-
-// PriQueryCacheMemorySize used query cache
-
-func (rb *IndicesRecordBuilder) PriQueryCacheMemorySize(priquerycachememorysize string) *IndicesRecordBuilder {
-	rb.v.PriQueryCacheMemorySize = &priquerycachememorysize
-	return rb
-}
-
-// PriRefreshExternalTime time spent in external refreshes
-
-func (rb *IndicesRecordBuilder) PriRefreshExternalTime(prirefreshexternaltime string) *IndicesRecordBuilder {
-	rb.v.PriRefreshExternalTime = &prirefreshexternaltime
-	return rb
-}
-
-// PriRefreshExternalTotal total external refreshes
-
-func (rb *IndicesRecordBuilder) PriRefreshExternalTotal(prirefreshexternaltotal string) *IndicesRecordBuilder {
-	rb.v.PriRefreshExternalTotal = &prirefreshexternaltotal
-	return rb
-}
-
-// PriRefreshListeners number of pending refresh listeners
-
-func (rb *IndicesRecordBuilder) PriRefreshListeners(prirefreshlisteners string) *IndicesRecordBuilder {
-	rb.v.PriRefreshListeners = &prirefreshlisteners
-	return rb
-}
-
-// PriRefreshTime time spent in refreshes
-
-func (rb *IndicesRecordBuilder) PriRefreshTime(prirefreshtime string) *IndicesRecordBuilder {
-	rb.v.PriRefreshTime = &prirefreshtime
-	return rb
-}
-
-// PriRefreshTotal total refreshes
-
-func (rb *IndicesRecordBuilder) PriRefreshTotal(prirefreshtotal string) *IndicesRecordBuilder {
-	rb.v.PriRefreshTotal = &prirefreshtotal
-	return rb
-}
-
-// PriRequestCacheEvictions request cache evictions
-
-func (rb *IndicesRecordBuilder) PriRequestCacheEvictions(prirequestcacheevictions string) *IndicesRecordBuilder {
-	rb.v.PriRequestCacheEvictions = &prirequestcacheevictions
-	return rb
-}
-
-// PriRequestCacheHitCount request cache hit count
-
-func (rb *IndicesRecordBuilder) PriRequestCacheHitCount(prirequestcachehitcount string) *IndicesRecordBuilder {
-	rb.v.PriRequestCacheHitCount = &prirequestcachehitcount
-	return rb
-}
-
-// PriRequestCacheMemorySize used request cache
-
-func (rb *IndicesRecordBuilder) PriRequestCacheMemorySize(prirequestcachememorysize string) *IndicesRecordBuilder {
-	rb.v.PriRequestCacheMemorySize = &prirequestcachememorysize
-	return rb
-}
-
-// PriRequestCacheMissCount request cache miss count
-
-func (rb *IndicesRecordBuilder) PriRequestCacheMissCount(prirequestcachemisscount string) *IndicesRecordBuilder {
-	rb.v.PriRequestCacheMissCount = &prirequestcachemisscount
-	return rb
-}
-
-// PriSearchFetchCurrent current fetch phase ops
-
-func (rb *IndicesRecordBuilder) PriSearchFetchCurrent(prisearchfetchcurrent string) *IndicesRecordBuilder {
-	rb.v.PriSearchFetchCurrent = &prisearchfetchcurrent
-	return rb
-}
-
-// PriSearchFetchTime time spent in fetch phase
-
-func (rb *IndicesRecordBuilder) PriSearchFetchTime(prisearchfetchtime string) *IndicesRecordBuilder {
-	rb.v.PriSearchFetchTime = &prisearchfetchtime
-	return rb
-}
-
-// PriSearchFetchTotal total fetch ops
-
-func (rb *IndicesRecordBuilder) PriSearchFetchTotal(prisearchfetchtotal string) *IndicesRecordBuilder {
-	rb.v.PriSearchFetchTotal = &prisearchfetchtotal
-	return rb
-}
-
-// PriSearchOpenContexts open search contexts
-
-func (rb *IndicesRecordBuilder) PriSearchOpenContexts(prisearchopencontexts string) *IndicesRecordBuilder {
-	rb.v.PriSearchOpenContexts = &prisearchopencontexts
-	return rb
-}
-
-// PriSearchQueryCurrent current query phase ops
-
-func (rb *IndicesRecordBuilder) PriSearchQueryCurrent(prisearchquerycurrent string) *IndicesRecordBuilder {
-	rb.v.PriSearchQueryCurrent = &prisearchquerycurrent
-	return rb
-}
-
-// PriSearchQueryTime time spent in query phase
-
-func (rb *IndicesRecordBuilder) PriSearchQueryTime(prisearchquerytime string) *IndicesRecordBuilder {
-	rb.v.PriSearchQueryTime = &prisearchquerytime
-	return rb
-}
-
-// PriSearchQueryTotal total query phase ops
-
-func (rb *IndicesRecordBuilder) PriSearchQueryTotal(prisearchquerytotal string) *IndicesRecordBuilder {
-	rb.v.PriSearchQueryTotal = &prisearchquerytotal
-	return rb
-}
-
-// PriSearchScrollCurrent open scroll contexts
-
-func (rb *IndicesRecordBuilder) PriSearchScrollCurrent(prisearchscrollcurrent string) *IndicesRecordBuilder {
-	rb.v.PriSearchScrollCurrent = &prisearchscrollcurrent
-	return rb
-}
-
-// PriSearchScrollTime time scroll contexts held open
-
-func (rb *IndicesRecordBuilder) PriSearchScrollTime(prisearchscrolltime string) *IndicesRecordBuilder {
-	rb.v.PriSearchScrollTime = &prisearchscrolltime
-	return rb
-}
-
-// PriSearchScrollTotal completed scroll contexts
-
-func (rb *IndicesRecordBuilder) PriSearchScrollTotal(prisearchscrolltotal string) *IndicesRecordBuilder {
-	rb.v.PriSearchScrollTotal = &prisearchscrolltotal
-	return rb
-}
-
-// PriSegmentsCount number of segments
-
-func (rb *IndicesRecordBuilder) PriSegmentsCount(prisegmentscount string) *IndicesRecordBuilder {
-	rb.v.PriSegmentsCount = &prisegmentscount
-	return rb
-}
-
-// PriSegmentsFixedBitsetMemory memory used by fixed bit sets for nested object field types and export type
-// filters for types referred in _parent fields
-
-func (rb *IndicesRecordBuilder) PriSegmentsFixedBitsetMemory(prisegmentsfixedbitsetmemory string) *IndicesRecordBuilder {
-	rb.v.PriSegmentsFixedBitsetMemory = &prisegmentsfixedbitsetmemory
-	return rb
-}
-
-// PriSegmentsIndexWriterMemory memory used by index writer
-
-func (rb *IndicesRecordBuilder) PriSegmentsIndexWriterMemory(prisegmentsindexwritermemory string) *IndicesRecordBuilder {
-	rb.v.PriSegmentsIndexWriterMemory = &prisegmentsindexwritermemory
-	return rb
-}
-
-// PriSegmentsMemory memory used by segments
-
-func (rb *IndicesRecordBuilder) PriSegmentsMemory(prisegmentsmemory string) *IndicesRecordBuilder {
-	rb.v.PriSegmentsMemory = &prisegmentsmemory
-	return rb
-}
-
-// PriSegmentsVersionMapMemory memory used by version map
-
-func (rb *IndicesRecordBuilder) PriSegmentsVersionMapMemory(prisegmentsversionmapmemory string) *IndicesRecordBuilder {
-	rb.v.PriSegmentsVersionMapMemory = &prisegmentsversionmapmemory
-	return rb
-}
-
-// PriStoreSize store size of primaries
-
-func (rb *IndicesRecordBuilder) PriStoreSize(pristoresize string) *IndicesRecordBuilder {
-	rb.v.PriStoreSize = pristoresize
-	return rb
-}
-
-// PriSuggestCurrent number of current suggest ops
-
-func (rb *IndicesRecordBuilder) PriSuggestCurrent(prisuggestcurrent string) *IndicesRecordBuilder {
-	rb.v.PriSuggestCurrent = &prisuggestcurrent
-	return rb
-}
-
-// PriSuggestTime time spend in suggest
-
-func (rb *IndicesRecordBuilder) PriSuggestTime(prisuggesttime string) *IndicesRecordBuilder {
-	rb.v.PriSuggestTime = &prisuggesttime
-	return rb
-}
-
-// PriSuggestTotal number of suggest ops
-
-func (rb *IndicesRecordBuilder) PriSuggestTotal(prisuggesttotal string) *IndicesRecordBuilder {
-	rb.v.PriSuggestTotal = &prisuggesttotal
-	return rb
-}
-
-// PriWarmerCurrent current warmer ops
-
-func (rb *IndicesRecordBuilder) PriWarmerCurrent(priwarmercurrent string) *IndicesRecordBuilder {
-	rb.v.PriWarmerCurrent = &priwarmercurrent
-	return rb
-}
-
-// PriWarmerTotal total warmer ops
-
-func (rb *IndicesRecordBuilder) PriWarmerTotal(priwarmertotal string) *IndicesRecordBuilder {
-	rb.v.PriWarmerTotal = &priwarmertotal
-	return rb
-}
-
-// PriWarmerTotalTime time spent in warmers
-
-func (rb *IndicesRecordBuilder) PriWarmerTotalTime(priwarmertotaltime string) *IndicesRecordBuilder {
-	rb.v.PriWarmerTotalTime = &priwarmertotaltime
-	return rb
-}
-
-// QueryCacheEvictions query cache evictions
-
-func (rb *IndicesRecordBuilder) QueryCacheEvictions(querycacheevictions string) *IndicesRecordBuilder {
-	rb.v.QueryCacheEvictions = &querycacheevictions
-	return rb
-}
-
-// QueryCacheMemorySize used query cache
-
-func (rb *IndicesRecordBuilder) QueryCacheMemorySize(querycachememorysize string) *IndicesRecordBuilder {
-	rb.v.QueryCacheMemorySize = &querycachememorysize
-	return rb
-}
-
-// RefreshExternalTime time spent in external refreshes
-
-func (rb *IndicesRecordBuilder) RefreshExternalTime(refreshexternaltime string) *IndicesRecordBuilder {
-	rb.v.RefreshExternalTime = &refreshexternaltime
-	return rb
-}
-
-// RefreshExternalTotal total external refreshes
-
-func (rb *IndicesRecordBuilder) RefreshExternalTotal(refreshexternaltotal string) *IndicesRecordBuilder {
-	rb.v.RefreshExternalTotal = &refreshexternaltotal
-	return rb
-}
-
-// RefreshListeners number of pending refresh listeners
-
-func (rb *IndicesRecordBuilder) RefreshListeners(refreshlisteners string) *IndicesRecordBuilder {
-	rb.v.RefreshListeners = &refreshlisteners
-	return rb
-}
-
-// RefreshTime time spent in refreshes
-
-func (rb *IndicesRecordBuilder) RefreshTime(refreshtime string) *IndicesRecordBuilder {
-	rb.v.RefreshTime = &refreshtime
-	return rb
-}
-
-// RefreshTotal total refreshes
-
-func (rb *IndicesRecordBuilder) RefreshTotal(refreshtotal string) *IndicesRecordBuilder {
-	rb.v.RefreshTotal = &refreshtotal
-	return rb
-}
-
-// Rep number of replica shards
-
-func (rb *IndicesRecordBuilder) Rep(rep string) *IndicesRecordBuilder {
-	rb.v.Rep = &rep
-	return rb
-}
-
-// RequestCacheEvictions request cache evictions
-
-func (rb *IndicesRecordBuilder) RequestCacheEvictions(requestcacheevictions string) *IndicesRecordBuilder {
-	rb.v.RequestCacheEvictions = &requestcacheevictions
-	return rb
-}
-
-// RequestCacheHitCount request cache hit count
-
-func (rb *IndicesRecordBuilder) RequestCacheHitCount(requestcachehitcount string) *IndicesRecordBuilder {
-	rb.v.RequestCacheHitCount = &requestcachehitcount
-	return rb
-}
-
-// RequestCacheMemorySize used request cache
-
-func (rb *IndicesRecordBuilder) RequestCacheMemorySize(requestcachememorysize string) *IndicesRecordBuilder {
-	rb.v.RequestCacheMemorySize = &requestcachememorysize
-	return rb
-}
-
-// RequestCacheMissCount request cache miss count
-
-func (rb *IndicesRecordBuilder) RequestCacheMissCount(requestcachemisscount string) *IndicesRecordBuilder {
-	rb.v.RequestCacheMissCount = &requestcachemisscount
-	return rb
-}
-
-// SearchFetchCurrent current fetch phase ops
-
-func (rb *IndicesRecordBuilder) SearchFetchCurrent(searchfetchcurrent string) *IndicesRecordBuilder {
-	rb.v.SearchFetchCurrent = &searchfetchcurrent
-	return rb
-}
-
-// SearchFetchTime time spent in fetch phase
-
-func (rb *IndicesRecordBuilder) SearchFetchTime(searchfetchtime string) *IndicesRecordBuilder {
-	rb.v.SearchFetchTime = &searchfetchtime
-	return rb
-}
-
-// SearchFetchTotal total fetch ops
-
-func (rb *IndicesRecordBuilder) SearchFetchTotal(searchfetchtotal string) *IndicesRecordBuilder {
-	rb.v.SearchFetchTotal = &searchfetchtotal
-	return rb
-}
-
-// SearchOpenContexts open search contexts
-
-func (rb *IndicesRecordBuilder) SearchOpenContexts(searchopencontexts string) *IndicesRecordBuilder {
-	rb.v.SearchOpenContexts = &searchopencontexts
-	return rb
-}
-
-// SearchQueryCurrent current query phase ops
-
-func (rb *IndicesRecordBuilder) SearchQueryCurrent(searchquerycurrent string) *IndicesRecordBuilder {
-	rb.v.SearchQueryCurrent = &searchquerycurrent
-	return rb
-}
-
-// SearchQueryTime time spent in query phase
-
-func (rb *IndicesRecordBuilder) SearchQueryTime(searchquerytime string) *IndicesRecordBuilder {
-	rb.v.SearchQueryTime = &searchquerytime
-	return rb
-}
-
-// SearchQueryTotal total query phase ops
-
-func (rb *IndicesRecordBuilder) SearchQueryTotal(searchquerytotal string) *IndicesRecordBuilder {
-	rb.v.SearchQueryTotal = &searchquerytotal
-	return rb
-}
-
-// SearchScrollCurrent open scroll contexts
-
-func (rb *IndicesRecordBuilder) SearchScrollCurrent(searchscrollcurrent string) *IndicesRecordBuilder {
-	rb.v.SearchScrollCurrent = &searchscrollcurrent
-	return rb
-}
-
-// SearchScrollTime time scroll contexts held open
-
-func (rb *IndicesRecordBuilder) SearchScrollTime(searchscrolltime string) *IndicesRecordBuilder {
-	rb.v.SearchScrollTime = &searchscrolltime
-	return rb
-}
-
-// SearchScrollTotal completed scroll contexts
-
-func (rb *IndicesRecordBuilder) SearchScrollTotal(searchscrolltotal string) *IndicesRecordBuilder {
-	rb.v.SearchScrollTotal = &searchscrolltotal
-	return rb
-}
-
-// SearchThrottled indicates if the index is search throttled
-
-func (rb *IndicesRecordBuilder) SearchThrottled(searchthrottled string) *IndicesRecordBuilder {
-	rb.v.SearchThrottled = &searchthrottled
-	return rb
-}
-
-// SegmentsCount number of segments
-
-func (rb *IndicesRecordBuilder) SegmentsCount(segmentscount string) *IndicesRecordBuilder {
-	rb.v.SegmentsCount = &segmentscount
-	return rb
-}
-
-// SegmentsFixedBitsetMemory memory used by fixed bit sets for nested object field types and export type
-// filters for types referred in _parent fields
-
-func (rb *IndicesRecordBuilder) SegmentsFixedBitsetMemory(segmentsfixedbitsetmemory string) *IndicesRecordBuilder {
-	rb.v.SegmentsFixedBitsetMemory = &segmentsfixedbitsetmemory
-	return rb
-}
-
-// SegmentsIndexWriterMemory memory used by index writer
-
-func (rb *IndicesRecordBuilder) SegmentsIndexWriterMemory(segmentsindexwritermemory string) *IndicesRecordBuilder {
-	rb.v.SegmentsIndexWriterMemory = &segmentsindexwritermemory
-	return rb
-}
-
-// SegmentsMemory memory used by segments
-
-func (rb *IndicesRecordBuilder) SegmentsMemory(segmentsmemory string) *IndicesRecordBuilder {
-	rb.v.SegmentsMemory = &segmentsmemory
-	return rb
-}
-
-// SegmentsVersionMapMemory memory used by version map
-
-func (rb *IndicesRecordBuilder) SegmentsVersionMapMemory(segmentsversionmapmemory string) *IndicesRecordBuilder {
-	rb.v.SegmentsVersionMapMemory = &segmentsversionmapmemory
-	return rb
-}
-
-// Status open/close status
-
-func (rb *IndicesRecordBuilder) Status(status string) *IndicesRecordBuilder {
-	rb.v.Status = &status
-	return rb
-}
-
-// StoreSize store size of primaries & replicas
-
-func (rb *IndicesRecordBuilder) StoreSize(storesize string) *IndicesRecordBuilder {
-	rb.v.StoreSize = storesize
-	return rb
-}
-
-// SuggestCurrent number of current suggest ops
-
-func (rb *IndicesRecordBuilder) SuggestCurrent(suggestcurrent string) *IndicesRecordBuilder {
-	rb.v.SuggestCurrent = &suggestcurrent
-	return rb
-}
-
-// SuggestTime time spend in suggest
-
-func (rb *IndicesRecordBuilder) SuggestTime(suggesttime string) *IndicesRecordBuilder {
-	rb.v.SuggestTime = &suggesttime
-	return rb
-}
-
-// SuggestTotal number of suggest ops
-
-func (rb *IndicesRecordBuilder) SuggestTotal(suggesttotal string) *IndicesRecordBuilder {
-	rb.v.SuggestTotal = &suggesttotal
-	return rb
-}
-
-// Uuid index uuid
-
-func (rb *IndicesRecordBuilder) Uuid(uuid string) *IndicesRecordBuilder {
-	rb.v.Uuid = &uuid
-	return rb
-}
-
-// WarmerCurrent current warmer ops
-
-func (rb *IndicesRecordBuilder) WarmerCurrent(warmercurrent string) *IndicesRecordBuilder {
-	rb.v.WarmerCurrent = &warmercurrent
-	return rb
-}
-
-// WarmerTotal total warmer ops
-
-func (rb *IndicesRecordBuilder) WarmerTotal(warmertotal string) *IndicesRecordBuilder {
-	rb.v.WarmerTotal = &warmertotal
-	return rb
+	return nil
 }
 
-// WarmerTotalTime time spent in warmers
+// NewIndicesRecord returns a IndicesRecord.
+func NewIndicesRecord() *IndicesRecord {
+	r := &IndicesRecord{}
 
-func (rb *IndicesRecordBuilder) WarmerTotalTime(warmertotaltime string) *IndicesRecordBuilder {
-	rb.v.WarmerTotalTime = &warmertotaltime
-	return rb
+	return r
 }

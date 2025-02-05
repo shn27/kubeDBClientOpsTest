@@ -15,58 +15,28 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // Hop type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/graph/_types/Hop.ts#L23-L27
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/graph/_types/Hop.ts#L23-L36
 type Hop struct {
-	Connections *Hop               `json:"connections,omitempty"`
-	Query       QueryContainer     `json:"query"`
-	Vertices    []VertexDefinition `json:"vertices"`
+	// Connections Specifies one or more fields from which you want to extract terms that are
+	// associated with the specified vertices.
+	Connections *Hop `json:"connections,omitempty"`
+	// Query An optional guiding query that constrains the Graph API as it explores
+	// connected terms.
+	Query Query `json:"query"`
+	// Vertices Contains the fields you are interested in.
+	Vertices []VertexDefinition `json:"vertices"`
 }
 
-// HopBuilder holds Hop struct and provides a builder API.
-type HopBuilder struct {
-	v *Hop
-}
+// NewHop returns a Hop.
+func NewHop() *Hop {
+	r := &Hop{}
 
-// NewHop provides a builder for the Hop struct.
-func NewHopBuilder() *HopBuilder {
-	r := HopBuilder{
-		&Hop{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the Hop struct
-func (rb *HopBuilder) Build() Hop {
-	return *rb.v
-}
-
-func (rb *HopBuilder) Connections(connections *HopBuilder) *HopBuilder {
-	v := connections.Build()
-	rb.v.Connections = &v
-	return rb
-}
-
-func (rb *HopBuilder) Query(query *QueryContainerBuilder) *HopBuilder {
-	v := query.Build()
-	rb.v.Query = v
-	return rb
-}
-
-func (rb *HopBuilder) Vertices(vertices []VertexDefinitionBuilder) *HopBuilder {
-	tmp := make([]VertexDefinition, len(vertices))
-	for _, value := range vertices {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Vertices = tmp
-	return rb
+	return r
 }

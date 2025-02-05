@@ -15,52 +15,88 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // LoggingAction type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Actions.ts#L281-L285
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Actions.ts#L281-L285
 type LoggingAction struct {
 	Category *string `json:"category,omitempty"`
 	Level    *string `json:"level,omitempty"`
 	Text     string  `json:"text"`
 }
 
-// LoggingActionBuilder holds LoggingAction struct and provides a builder API.
-type LoggingActionBuilder struct {
-	v *LoggingAction
-}
+func (s *LoggingAction) UnmarshalJSON(data []byte) error {
 
-// NewLoggingAction provides a builder for the LoggingAction struct.
-func NewLoggingActionBuilder() *LoggingActionBuilder {
-	r := LoggingActionBuilder{
-		&LoggingAction{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "category":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Category", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Category = &o
+
+		case "level":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Level", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Level = &o
+
+		case "text":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Text", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Text = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the LoggingAction struct
-func (rb *LoggingActionBuilder) Build() LoggingAction {
-	return *rb.v
-}
+// NewLoggingAction returns a LoggingAction.
+func NewLoggingAction() *LoggingAction {
+	r := &LoggingAction{}
 
-func (rb *LoggingActionBuilder) Category(category string) *LoggingActionBuilder {
-	rb.v.Category = &category
-	return rb
-}
-
-func (rb *LoggingActionBuilder) Level(level string) *LoggingActionBuilder {
-	rb.v.Level = &level
-	return rb
-}
-
-func (rb *LoggingActionBuilder) Text(text string) *LoggingActionBuilder {
-	rb.v.Text = text
-	return rb
+	return r
 }

@@ -15,46 +15,82 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // FileCountSnapshotStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/snapshot/_types/FileCountSnapshotStats.ts#L22-L25
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/snapshot/_types/FileCountSnapshotStats.ts#L22-L25
 type FileCountSnapshotStats struct {
 	FileCount   int   `json:"file_count"`
 	SizeInBytes int64 `json:"size_in_bytes"`
 }
 
-// FileCountSnapshotStatsBuilder holds FileCountSnapshotStats struct and provides a builder API.
-type FileCountSnapshotStatsBuilder struct {
-	v *FileCountSnapshotStats
-}
+func (s *FileCountSnapshotStats) UnmarshalJSON(data []byte) error {
 
-// NewFileCountSnapshotStats provides a builder for the FileCountSnapshotStats struct.
-func NewFileCountSnapshotStatsBuilder() *FileCountSnapshotStatsBuilder {
-	r := FileCountSnapshotStatsBuilder{
-		&FileCountSnapshotStats{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "file_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "FileCount", err)
+				}
+				s.FileCount = value
+			case float64:
+				f := int(v)
+				s.FileCount = f
+			}
+
+		case "size_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "SizeInBytes", err)
+				}
+				s.SizeInBytes = value
+			case float64:
+				f := int64(v)
+				s.SizeInBytes = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the FileCountSnapshotStats struct
-func (rb *FileCountSnapshotStatsBuilder) Build() FileCountSnapshotStats {
-	return *rb.v
-}
+// NewFileCountSnapshotStats returns a FileCountSnapshotStats.
+func NewFileCountSnapshotStats() *FileCountSnapshotStats {
+	r := &FileCountSnapshotStats{}
 
-func (rb *FileCountSnapshotStatsBuilder) FileCount(filecount int) *FileCountSnapshotStatsBuilder {
-	rb.v.FileCount = filecount
-	return rb
-}
-
-func (rb *FileCountSnapshotStatsBuilder) SizeInBytes(sizeinbytes int64) *FileCountSnapshotStatsBuilder {
-	rb.v.SizeInBytes = sizeinbytes
-	return rb
+	return r
 }

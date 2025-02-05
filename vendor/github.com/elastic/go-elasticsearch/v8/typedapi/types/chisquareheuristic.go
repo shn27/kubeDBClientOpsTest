@@ -15,46 +15,83 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ChiSquareHeuristic type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/bucket.ts#L318-L321
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/bucket.ts#L782-L791
 type ChiSquareHeuristic struct {
+	// BackgroundIsSuperset Set to `false` if you defined a custom background filter that represents a
+	// different set of documents that you want to compare to.
 	BackgroundIsSuperset bool `json:"background_is_superset"`
-	IncludeNegatives     bool `json:"include_negatives"`
+	// IncludeNegatives Set to `false` to filter out the terms that appear less often in the subset
+	// than in documents outside the subset.
+	IncludeNegatives bool `json:"include_negatives"`
 }
 
-// ChiSquareHeuristicBuilder holds ChiSquareHeuristic struct and provides a builder API.
-type ChiSquareHeuristicBuilder struct {
-	v *ChiSquareHeuristic
-}
+func (s *ChiSquareHeuristic) UnmarshalJSON(data []byte) error {
 
-// NewChiSquareHeuristic provides a builder for the ChiSquareHeuristic struct.
-func NewChiSquareHeuristicBuilder() *ChiSquareHeuristicBuilder {
-	r := ChiSquareHeuristicBuilder{
-		&ChiSquareHeuristic{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "background_is_superset":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "BackgroundIsSuperset", err)
+				}
+				s.BackgroundIsSuperset = value
+			case bool:
+				s.BackgroundIsSuperset = v
+			}
+
+		case "include_negatives":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IncludeNegatives", err)
+				}
+				s.IncludeNegatives = value
+			case bool:
+				s.IncludeNegatives = v
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ChiSquareHeuristic struct
-func (rb *ChiSquareHeuristicBuilder) Build() ChiSquareHeuristic {
-	return *rb.v
-}
+// NewChiSquareHeuristic returns a ChiSquareHeuristic.
+func NewChiSquareHeuristic() *ChiSquareHeuristic {
+	r := &ChiSquareHeuristic{}
 
-func (rb *ChiSquareHeuristicBuilder) BackgroundIsSuperset(backgroundissuperset bool) *ChiSquareHeuristicBuilder {
-	rb.v.BackgroundIsSuperset = backgroundissuperset
-	return rb
-}
-
-func (rb *ChiSquareHeuristicBuilder) IncludeNegatives(includenegatives bool) *ChiSquareHeuristicBuilder {
-	rb.v.IncludeNegatives = includenegatives
-	return rb
+	return r
 }

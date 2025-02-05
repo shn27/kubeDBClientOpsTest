@@ -15,68 +15,123 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // Term type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/termvectors/types.ts#L34-L40
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/termvectors/types.ts#L34-L40
 type Term struct {
-	DocFreq  *int     `json:"doc_freq,omitempty"`
-	Score    *float64 `json:"score,omitempty"`
-	TermFreq int      `json:"term_freq"`
-	Tokens   []Token  `json:"tokens,omitempty"`
-	Ttf      *int     `json:"ttf,omitempty"`
+	DocFreq  *int               `json:"doc_freq,omitempty"`
+	Score    *Float64           `json:"score,omitempty"`
+	TermFreq int                `json:"term_freq"`
+	Tokens   []TermVectorsToken `json:"tokens,omitempty"`
+	Ttf      *int               `json:"ttf,omitempty"`
 }
 
-// TermBuilder holds Term struct and provides a builder API.
-type TermBuilder struct {
-	v *Term
-}
+func (s *Term) UnmarshalJSON(data []byte) error {
 
-// NewTerm provides a builder for the Term struct.
-func NewTermBuilder() *TermBuilder {
-	r := TermBuilder{
-		&Term{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "doc_freq":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DocFreq", err)
+				}
+				s.DocFreq = &value
+			case float64:
+				f := int(v)
+				s.DocFreq = &f
+			}
+
+		case "score":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Score", err)
+				}
+				f := Float64(value)
+				s.Score = &f
+			case float64:
+				f := Float64(v)
+				s.Score = &f
+			}
+
+		case "term_freq":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TermFreq", err)
+				}
+				s.TermFreq = value
+			case float64:
+				f := int(v)
+				s.TermFreq = f
+			}
+
+		case "tokens":
+			if err := dec.Decode(&s.Tokens); err != nil {
+				return fmt.Errorf("%s | %w", "Tokens", err)
+			}
+
+		case "ttf":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Ttf", err)
+				}
+				s.Ttf = &value
+			case float64:
+				f := int(v)
+				s.Ttf = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the Term struct
-func (rb *TermBuilder) Build() Term {
-	return *rb.v
-}
+// NewTerm returns a Term.
+func NewTerm() *Term {
+	r := &Term{}
 
-func (rb *TermBuilder) DocFreq(docfreq int) *TermBuilder {
-	rb.v.DocFreq = &docfreq
-	return rb
-}
-
-func (rb *TermBuilder) Score(score float64) *TermBuilder {
-	rb.v.Score = &score
-	return rb
-}
-
-func (rb *TermBuilder) TermFreq(termfreq int) *TermBuilder {
-	rb.v.TermFreq = termfreq
-	return rb
-}
-
-func (rb *TermBuilder) Tokens(tokens []TokenBuilder) *TermBuilder {
-	tmp := make([]Token, len(tokens))
-	for _, value := range tokens {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Tokens = tmp
-	return rb
-}
-
-func (rb *TermBuilder) Ttf(ttf int) *TermBuilder {
-	rb.v.Ttf = &ttf
-	return rb
+	return r
 }

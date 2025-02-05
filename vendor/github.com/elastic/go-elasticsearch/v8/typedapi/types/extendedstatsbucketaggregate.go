@@ -15,169 +15,277 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ExtendedStatsBucketAggregate type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L285-L286
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L322-L323
 type ExtendedStatsBucketAggregate struct {
-	Avg                        float64                          `json:"avg,omitempty"`
+	Avg                        *Float64                         `json:"avg,omitempty"`
 	AvgAsString                *string                          `json:"avg_as_string,omitempty"`
 	Count                      int64                            `json:"count"`
-	Max                        float64                          `json:"max,omitempty"`
+	Max                        *Float64                         `json:"max,omitempty"`
 	MaxAsString                *string                          `json:"max_as_string,omitempty"`
-	Meta                       *Metadata                        `json:"meta,omitempty"`
-	Min                        float64                          `json:"min,omitempty"`
+	Meta                       Metadata                         `json:"meta,omitempty"`
+	Min                        *Float64                         `json:"min,omitempty"`
 	MinAsString                *string                          `json:"min_as_string,omitempty"`
-	StdDeviation               float64                          `json:"std_deviation,omitempty"`
+	StdDeviation               *Float64                         `json:"std_deviation,omitempty"`
 	StdDeviationAsString       *string                          `json:"std_deviation_as_string,omitempty"`
 	StdDeviationBounds         *StandardDeviationBounds         `json:"std_deviation_bounds,omitempty"`
 	StdDeviationBoundsAsString *StandardDeviationBoundsAsString `json:"std_deviation_bounds_as_string,omitempty"`
-	Sum                        float64                          `json:"sum"`
+	StdDeviationPopulation     *Float64                         `json:"std_deviation_population,omitempty"`
+	StdDeviationSampling       *Float64                         `json:"std_deviation_sampling,omitempty"`
+	Sum                        Float64                          `json:"sum"`
 	SumAsString                *string                          `json:"sum_as_string,omitempty"`
-	SumOfSquares               float64                          `json:"sum_of_squares,omitempty"`
+	SumOfSquares               *Float64                         `json:"sum_of_squares,omitempty"`
 	SumOfSquaresAsString       *string                          `json:"sum_of_squares_as_string,omitempty"`
-	Variance                   float64                          `json:"variance,omitempty"`
+	Variance                   *Float64                         `json:"variance,omitempty"`
 	VarianceAsString           *string                          `json:"variance_as_string,omitempty"`
-	VariancePopulation         float64                          `json:"variance_population,omitempty"`
+	VariancePopulation         *Float64                         `json:"variance_population,omitempty"`
 	VariancePopulationAsString *string                          `json:"variance_population_as_string,omitempty"`
-	VarianceSampling           float64                          `json:"variance_sampling,omitempty"`
+	VarianceSampling           *Float64                         `json:"variance_sampling,omitempty"`
 	VarianceSamplingAsString   *string                          `json:"variance_sampling_as_string,omitempty"`
 }
 
-// ExtendedStatsBucketAggregateBuilder holds ExtendedStatsBucketAggregate struct and provides a builder API.
-type ExtendedStatsBucketAggregateBuilder struct {
-	v *ExtendedStatsBucketAggregate
-}
+func (s *ExtendedStatsBucketAggregate) UnmarshalJSON(data []byte) error {
 
-// NewExtendedStatsBucketAggregate provides a builder for the ExtendedStatsBucketAggregate struct.
-func NewExtendedStatsBucketAggregateBuilder() *ExtendedStatsBucketAggregateBuilder {
-	r := ExtendedStatsBucketAggregateBuilder{
-		&ExtendedStatsBucketAggregate{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "avg":
+			if err := dec.Decode(&s.Avg); err != nil {
+				return fmt.Errorf("%s | %w", "Avg", err)
+			}
+
+		case "avg_as_string":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "AvgAsString", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.AvgAsString = &o
+
+		case "count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Count", err)
+				}
+				s.Count = value
+			case float64:
+				f := int64(v)
+				s.Count = f
+			}
+
+		case "max":
+			if err := dec.Decode(&s.Max); err != nil {
+				return fmt.Errorf("%s | %w", "Max", err)
+			}
+
+		case "max_as_string":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "MaxAsString", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.MaxAsString = &o
+
+		case "meta":
+			if err := dec.Decode(&s.Meta); err != nil {
+				return fmt.Errorf("%s | %w", "Meta", err)
+			}
+
+		case "min":
+			if err := dec.Decode(&s.Min); err != nil {
+				return fmt.Errorf("%s | %w", "Min", err)
+			}
+
+		case "min_as_string":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "MinAsString", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.MinAsString = &o
+
+		case "std_deviation":
+			if err := dec.Decode(&s.StdDeviation); err != nil {
+				return fmt.Errorf("%s | %w", "StdDeviation", err)
+			}
+
+		case "std_deviation_as_string":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "StdDeviationAsString", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.StdDeviationAsString = &o
+
+		case "std_deviation_bounds":
+			if err := dec.Decode(&s.StdDeviationBounds); err != nil {
+				return fmt.Errorf("%s | %w", "StdDeviationBounds", err)
+			}
+
+		case "std_deviation_bounds_as_string":
+			if err := dec.Decode(&s.StdDeviationBoundsAsString); err != nil {
+				return fmt.Errorf("%s | %w", "StdDeviationBoundsAsString", err)
+			}
+
+		case "std_deviation_population":
+			if err := dec.Decode(&s.StdDeviationPopulation); err != nil {
+				return fmt.Errorf("%s | %w", "StdDeviationPopulation", err)
+			}
+
+		case "std_deviation_sampling":
+			if err := dec.Decode(&s.StdDeviationSampling); err != nil {
+				return fmt.Errorf("%s | %w", "StdDeviationSampling", err)
+			}
+
+		case "sum":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Sum", err)
+				}
+				f := Float64(value)
+				s.Sum = f
+			case float64:
+				f := Float64(v)
+				s.Sum = f
+			}
+
+		case "sum_as_string":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SumAsString", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SumAsString = &o
+
+		case "sum_of_squares":
+			if err := dec.Decode(&s.SumOfSquares); err != nil {
+				return fmt.Errorf("%s | %w", "SumOfSquares", err)
+			}
+
+		case "sum_of_squares_as_string":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SumOfSquaresAsString", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SumOfSquaresAsString = &o
+
+		case "variance":
+			if err := dec.Decode(&s.Variance); err != nil {
+				return fmt.Errorf("%s | %w", "Variance", err)
+			}
+
+		case "variance_as_string":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "VarianceAsString", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.VarianceAsString = &o
+
+		case "variance_population":
+			if err := dec.Decode(&s.VariancePopulation); err != nil {
+				return fmt.Errorf("%s | %w", "VariancePopulation", err)
+			}
+
+		case "variance_population_as_string":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "VariancePopulationAsString", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.VariancePopulationAsString = &o
+
+		case "variance_sampling":
+			if err := dec.Decode(&s.VarianceSampling); err != nil {
+				return fmt.Errorf("%s | %w", "VarianceSampling", err)
+			}
+
+		case "variance_sampling_as_string":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "VarianceSamplingAsString", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.VarianceSamplingAsString = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ExtendedStatsBucketAggregate struct
-func (rb *ExtendedStatsBucketAggregateBuilder) Build() ExtendedStatsBucketAggregate {
-	return *rb.v
-}
+// NewExtendedStatsBucketAggregate returns a ExtendedStatsBucketAggregate.
+func NewExtendedStatsBucketAggregate() *ExtendedStatsBucketAggregate {
+	r := &ExtendedStatsBucketAggregate{}
 
-func (rb *ExtendedStatsBucketAggregateBuilder) Avg(avg float64) *ExtendedStatsBucketAggregateBuilder {
-	rb.v.Avg = avg
-	return rb
-}
-
-func (rb *ExtendedStatsBucketAggregateBuilder) AvgAsString(avgasstring string) *ExtendedStatsBucketAggregateBuilder {
-	rb.v.AvgAsString = &avgasstring
-	return rb
-}
-
-func (rb *ExtendedStatsBucketAggregateBuilder) Count(count int64) *ExtendedStatsBucketAggregateBuilder {
-	rb.v.Count = count
-	return rb
-}
-
-func (rb *ExtendedStatsBucketAggregateBuilder) Max(max float64) *ExtendedStatsBucketAggregateBuilder {
-	rb.v.Max = max
-	return rb
-}
-
-func (rb *ExtendedStatsBucketAggregateBuilder) MaxAsString(maxasstring string) *ExtendedStatsBucketAggregateBuilder {
-	rb.v.MaxAsString = &maxasstring
-	return rb
-}
-
-func (rb *ExtendedStatsBucketAggregateBuilder) Meta(meta *MetadataBuilder) *ExtendedStatsBucketAggregateBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *ExtendedStatsBucketAggregateBuilder) Min(min float64) *ExtendedStatsBucketAggregateBuilder {
-	rb.v.Min = min
-	return rb
-}
-
-func (rb *ExtendedStatsBucketAggregateBuilder) MinAsString(minasstring string) *ExtendedStatsBucketAggregateBuilder {
-	rb.v.MinAsString = &minasstring
-	return rb
-}
-
-func (rb *ExtendedStatsBucketAggregateBuilder) StdDeviation(stddeviation float64) *ExtendedStatsBucketAggregateBuilder {
-	rb.v.StdDeviation = stddeviation
-	return rb
-}
-
-func (rb *ExtendedStatsBucketAggregateBuilder) StdDeviationAsString(stddeviationasstring string) *ExtendedStatsBucketAggregateBuilder {
-	rb.v.StdDeviationAsString = &stddeviationasstring
-	return rb
-}
-
-func (rb *ExtendedStatsBucketAggregateBuilder) StdDeviationBounds(stddeviationbounds *StandardDeviationBoundsBuilder) *ExtendedStatsBucketAggregateBuilder {
-	v := stddeviationbounds.Build()
-	rb.v.StdDeviationBounds = &v
-	return rb
-}
-
-func (rb *ExtendedStatsBucketAggregateBuilder) StdDeviationBoundsAsString(stddeviationboundsasstring *StandardDeviationBoundsAsStringBuilder) *ExtendedStatsBucketAggregateBuilder {
-	v := stddeviationboundsasstring.Build()
-	rb.v.StdDeviationBoundsAsString = &v
-	return rb
-}
-
-func (rb *ExtendedStatsBucketAggregateBuilder) Sum(sum float64) *ExtendedStatsBucketAggregateBuilder {
-	rb.v.Sum = sum
-	return rb
-}
-
-func (rb *ExtendedStatsBucketAggregateBuilder) SumAsString(sumasstring string) *ExtendedStatsBucketAggregateBuilder {
-	rb.v.SumAsString = &sumasstring
-	return rb
-}
-
-func (rb *ExtendedStatsBucketAggregateBuilder) SumOfSquares(sumofsquares float64) *ExtendedStatsBucketAggregateBuilder {
-	rb.v.SumOfSquares = sumofsquares
-	return rb
-}
-
-func (rb *ExtendedStatsBucketAggregateBuilder) SumOfSquaresAsString(sumofsquaresasstring string) *ExtendedStatsBucketAggregateBuilder {
-	rb.v.SumOfSquaresAsString = &sumofsquaresasstring
-	return rb
-}
-
-func (rb *ExtendedStatsBucketAggregateBuilder) Variance(variance float64) *ExtendedStatsBucketAggregateBuilder {
-	rb.v.Variance = variance
-	return rb
-}
-
-func (rb *ExtendedStatsBucketAggregateBuilder) VarianceAsString(varianceasstring string) *ExtendedStatsBucketAggregateBuilder {
-	rb.v.VarianceAsString = &varianceasstring
-	return rb
-}
-
-func (rb *ExtendedStatsBucketAggregateBuilder) VariancePopulation(variancepopulation float64) *ExtendedStatsBucketAggregateBuilder {
-	rb.v.VariancePopulation = variancepopulation
-	return rb
-}
-
-func (rb *ExtendedStatsBucketAggregateBuilder) VariancePopulationAsString(variancepopulationasstring string) *ExtendedStatsBucketAggregateBuilder {
-	rb.v.VariancePopulationAsString = &variancepopulationasstring
-	return rb
-}
-
-func (rb *ExtendedStatsBucketAggregateBuilder) VarianceSampling(variancesampling float64) *ExtendedStatsBucketAggregateBuilder {
-	rb.v.VarianceSampling = variancesampling
-	return rb
-}
-
-func (rb *ExtendedStatsBucketAggregateBuilder) VarianceSamplingAsString(variancesamplingasstring string) *ExtendedStatsBucketAggregateBuilder {
-	rb.v.VarianceSamplingAsString = &variancesamplingasstring
-	return rb
+	return r
 }

@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // JobForecastStatistics type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/Job.ts#L120-L127
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/Job.ts#L343-L350
 type JobForecastStatistics struct {
 	ForecastedJobs   int              `json:"forecasted_jobs"`
 	MemoryBytes      *JobStatistics   `json:"memory_bytes,omitempty"`
@@ -34,56 +41,85 @@ type JobForecastStatistics struct {
 	Total            int64            `json:"total"`
 }
 
-// JobForecastStatisticsBuilder holds JobForecastStatistics struct and provides a builder API.
-type JobForecastStatisticsBuilder struct {
-	v *JobForecastStatistics
+func (s *JobForecastStatistics) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "forecasted_jobs":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ForecastedJobs", err)
+				}
+				s.ForecastedJobs = value
+			case float64:
+				f := int(v)
+				s.ForecastedJobs = f
+			}
+
+		case "memory_bytes":
+			if err := dec.Decode(&s.MemoryBytes); err != nil {
+				return fmt.Errorf("%s | %w", "MemoryBytes", err)
+			}
+
+		case "processing_time_ms":
+			if err := dec.Decode(&s.ProcessingTimeMs); err != nil {
+				return fmt.Errorf("%s | %w", "ProcessingTimeMs", err)
+			}
+
+		case "records":
+			if err := dec.Decode(&s.Records); err != nil {
+				return fmt.Errorf("%s | %w", "Records", err)
+			}
+
+		case "status":
+			if s.Status == nil {
+				s.Status = make(map[string]int64, 0)
+			}
+			if err := dec.Decode(&s.Status); err != nil {
+				return fmt.Errorf("%s | %w", "Status", err)
+			}
+
+		case "total":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Total", err)
+				}
+				s.Total = value
+			case float64:
+				f := int64(v)
+				s.Total = f
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewJobForecastStatistics provides a builder for the JobForecastStatistics struct.
-func NewJobForecastStatisticsBuilder() *JobForecastStatisticsBuilder {
-	r := JobForecastStatisticsBuilder{
-		&JobForecastStatistics{
-			Status: make(map[string]int64, 0),
-		},
+// NewJobForecastStatistics returns a JobForecastStatistics.
+func NewJobForecastStatistics() *JobForecastStatistics {
+	r := &JobForecastStatistics{
+		Status: make(map[string]int64, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the JobForecastStatistics struct
-func (rb *JobForecastStatisticsBuilder) Build() JobForecastStatistics {
-	return *rb.v
-}
-
-func (rb *JobForecastStatisticsBuilder) ForecastedJobs(forecastedjobs int) *JobForecastStatisticsBuilder {
-	rb.v.ForecastedJobs = forecastedjobs
-	return rb
-}
-
-func (rb *JobForecastStatisticsBuilder) MemoryBytes(memorybytes *JobStatisticsBuilder) *JobForecastStatisticsBuilder {
-	v := memorybytes.Build()
-	rb.v.MemoryBytes = &v
-	return rb
-}
-
-func (rb *JobForecastStatisticsBuilder) ProcessingTimeMs(processingtimems *JobStatisticsBuilder) *JobForecastStatisticsBuilder {
-	v := processingtimems.Build()
-	rb.v.ProcessingTimeMs = &v
-	return rb
-}
-
-func (rb *JobForecastStatisticsBuilder) Records(records *JobStatisticsBuilder) *JobForecastStatisticsBuilder {
-	v := records.Build()
-	rb.v.Records = &v
-	return rb
-}
-
-func (rb *JobForecastStatisticsBuilder) Status(value map[string]int64) *JobForecastStatisticsBuilder {
-	rb.v.Status = value
-	return rb
-}
-
-func (rb *JobForecastStatisticsBuilder) Total(total int64) *JobForecastStatisticsBuilder {
-	rb.v.Total = total
-	return rb
+	return r
 }

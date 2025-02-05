@@ -15,60 +15,99 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // RollupCapabilitySummary type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/rollup/get_rollup_caps/types.ts#L28-L33
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/rollup/get_rollup_caps/types.ts#L28-L33
 type RollupCapabilitySummary struct {
-	Fields       map[Field]map[string]interface{} `json:"fields"`
-	IndexPattern string                           `json:"index_pattern"`
-	JobId        string                           `json:"job_id"`
-	RollupIndex  string                           `json:"rollup_index"`
+	Fields       map[string][]RollupFieldSummary `json:"fields"`
+	IndexPattern string                          `json:"index_pattern"`
+	JobId        string                          `json:"job_id"`
+	RollupIndex  string                          `json:"rollup_index"`
 }
 
-// RollupCapabilitySummaryBuilder holds RollupCapabilitySummary struct and provides a builder API.
-type RollupCapabilitySummaryBuilder struct {
-	v *RollupCapabilitySummary
+func (s *RollupCapabilitySummary) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "fields":
+			if s.Fields == nil {
+				s.Fields = make(map[string][]RollupFieldSummary, 0)
+			}
+			if err := dec.Decode(&s.Fields); err != nil {
+				return fmt.Errorf("%s | %w", "Fields", err)
+			}
+
+		case "index_pattern":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "IndexPattern", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.IndexPattern = o
+
+		case "job_id":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "JobId", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.JobId = o
+
+		case "rollup_index":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "RollupIndex", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.RollupIndex = o
+
+		}
+	}
+	return nil
 }
 
-// NewRollupCapabilitySummary provides a builder for the RollupCapabilitySummary struct.
-func NewRollupCapabilitySummaryBuilder() *RollupCapabilitySummaryBuilder {
-	r := RollupCapabilitySummaryBuilder{
-		&RollupCapabilitySummary{
-			Fields: make(map[Field]map[string]interface{}, 0),
-		},
+// NewRollupCapabilitySummary returns a RollupCapabilitySummary.
+func NewRollupCapabilitySummary() *RollupCapabilitySummary {
+	r := &RollupCapabilitySummary{
+		Fields: make(map[string][]RollupFieldSummary, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the RollupCapabilitySummary struct
-func (rb *RollupCapabilitySummaryBuilder) Build() RollupCapabilitySummary {
-	return *rb.v
-}
-
-func (rb *RollupCapabilitySummaryBuilder) Fields(value map[Field]map[string]interface{}) *RollupCapabilitySummaryBuilder {
-	rb.v.Fields = value
-	return rb
-}
-
-func (rb *RollupCapabilitySummaryBuilder) IndexPattern(indexpattern string) *RollupCapabilitySummaryBuilder {
-	rb.v.IndexPattern = indexpattern
-	return rb
-}
-
-func (rb *RollupCapabilitySummaryBuilder) JobId(jobid string) *RollupCapabilitySummaryBuilder {
-	rb.v.JobId = jobid
-	return rb
-}
-
-func (rb *RollupCapabilitySummaryBuilder) RollupIndex(rollupindex string) *RollupCapabilitySummaryBuilder {
-	rb.v.RollupIndex = rollupindex
-	return rb
+	return r
 }

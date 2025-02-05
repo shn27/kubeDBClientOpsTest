@@ -15,52 +15,88 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // IntervalsWildcard type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/fulltext.ts#L127-L131
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/fulltext.ts#L268-L283
 type IntervalsWildcard struct {
+	// Analyzer Analyzer used to analyze the `pattern`.
+	// Defaults to the top-level field's analyzer.
 	Analyzer *string `json:"analyzer,omitempty"`
-	Pattern  string  `json:"pattern"`
-	UseField *Field  `json:"use_field,omitempty"`
+	// Pattern Wildcard pattern used to find matching terms.
+	Pattern string `json:"pattern"`
+	// UseField If specified, match intervals from this field rather than the top-level
+	// field.
+	// The `pattern` is normalized using the search analyzer from this field, unless
+	// `analyzer` is specified separately.
+	UseField *string `json:"use_field,omitempty"`
 }
 
-// IntervalsWildcardBuilder holds IntervalsWildcard struct and provides a builder API.
-type IntervalsWildcardBuilder struct {
-	v *IntervalsWildcard
-}
+func (s *IntervalsWildcard) UnmarshalJSON(data []byte) error {
 
-// NewIntervalsWildcard provides a builder for the IntervalsWildcard struct.
-func NewIntervalsWildcardBuilder() *IntervalsWildcardBuilder {
-	r := IntervalsWildcardBuilder{
-		&IntervalsWildcard{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "analyzer":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Analyzer", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Analyzer = &o
+
+		case "pattern":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Pattern", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Pattern = o
+
+		case "use_field":
+			if err := dec.Decode(&s.UseField); err != nil {
+				return fmt.Errorf("%s | %w", "UseField", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the IntervalsWildcard struct
-func (rb *IntervalsWildcardBuilder) Build() IntervalsWildcard {
-	return *rb.v
-}
+// NewIntervalsWildcard returns a IntervalsWildcard.
+func NewIntervalsWildcard() *IntervalsWildcard {
+	r := &IntervalsWildcard{}
 
-func (rb *IntervalsWildcardBuilder) Analyzer(analyzer string) *IntervalsWildcardBuilder {
-	rb.v.Analyzer = &analyzer
-	return rb
-}
-
-func (rb *IntervalsWildcardBuilder) Pattern(pattern string) *IntervalsWildcardBuilder {
-	rb.v.Pattern = pattern
-	return rb
-}
-
-func (rb *IntervalsWildcardBuilder) UseField(usefield Field) *IntervalsWildcardBuilder {
-	rb.v.UseField = &usefield
-	return rb
+	return r
 }

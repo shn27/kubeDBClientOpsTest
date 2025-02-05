@@ -15,19 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package missingorder
 package missingorder
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/AggregationContainer.ts#L210-L214
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/AggregationContainer.ts#L536-L540
 type MissingOrder struct {
-	name string
+	Name string
 }
 
 var (
@@ -43,7 +41,7 @@ func (m MissingOrder) MarshalText() (text []byte, err error) {
 }
 
 func (m *MissingOrder) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
 	case "first":
 		*m = First
@@ -59,5 +57,5 @@ func (m *MissingOrder) UnmarshalText(text []byte) error {
 }
 
 func (m MissingOrder) String() string {
-	return m.name
+	return m.Name
 }

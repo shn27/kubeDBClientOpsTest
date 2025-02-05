@@ -15,41 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // Queries type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/IndexSettings.ts#L394-L396
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/IndexSettings.ts#L403-L405
 type Queries struct {
 	Cache *CacheQueries `json:"cache,omitempty"`
 }
 
-// QueriesBuilder holds Queries struct and provides a builder API.
-type QueriesBuilder struct {
-	v *Queries
-}
+// NewQueries returns a Queries.
+func NewQueries() *Queries {
+	r := &Queries{}
 
-// NewQueries provides a builder for the Queries struct.
-func NewQueriesBuilder() *QueriesBuilder {
-	r := QueriesBuilder{
-		&Queries{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the Queries struct
-func (rb *QueriesBuilder) Build() Queries {
-	return *rb.v
-}
-
-func (rb *QueriesBuilder) Cache(cache *CacheQueriesBuilder) *QueriesBuilder {
-	v := cache.Build()
-	rb.v.Cache = &v
-	return rb
+	return r
 }

@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // AnalyzeDetail type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/analyze/types.ts#L24-L30
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/analyze/types.ts#L24-L30
 type AnalyzeDetail struct {
 	Analyzer       *AnalyzerDetail    `json:"analyzer,omitempty"`
 	Charfilters    []CharFilterDetail `json:"charfilters,omitempty"`
@@ -33,56 +40,63 @@ type AnalyzeDetail struct {
 	Tokenizer      *TokenDetail       `json:"tokenizer,omitempty"`
 }
 
-// AnalyzeDetailBuilder holds AnalyzeDetail struct and provides a builder API.
-type AnalyzeDetailBuilder struct {
-	v *AnalyzeDetail
-}
+func (s *AnalyzeDetail) UnmarshalJSON(data []byte) error {
 
-// NewAnalyzeDetail provides a builder for the AnalyzeDetail struct.
-func NewAnalyzeDetailBuilder() *AnalyzeDetailBuilder {
-	r := AnalyzeDetailBuilder{
-		&AnalyzeDetail{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "analyzer":
+			if err := dec.Decode(&s.Analyzer); err != nil {
+				return fmt.Errorf("%s | %w", "Analyzer", err)
+			}
+
+		case "charfilters":
+			if err := dec.Decode(&s.Charfilters); err != nil {
+				return fmt.Errorf("%s | %w", "Charfilters", err)
+			}
+
+		case "custom_analyzer":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CustomAnalyzer", err)
+				}
+				s.CustomAnalyzer = value
+			case bool:
+				s.CustomAnalyzer = v
+			}
+
+		case "tokenfilters":
+			if err := dec.Decode(&s.Tokenfilters); err != nil {
+				return fmt.Errorf("%s | %w", "Tokenfilters", err)
+			}
+
+		case "tokenizer":
+			if err := dec.Decode(&s.Tokenizer); err != nil {
+				return fmt.Errorf("%s | %w", "Tokenizer", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the AnalyzeDetail struct
-func (rb *AnalyzeDetailBuilder) Build() AnalyzeDetail {
-	return *rb.v
-}
+// NewAnalyzeDetail returns a AnalyzeDetail.
+func NewAnalyzeDetail() *AnalyzeDetail {
+	r := &AnalyzeDetail{}
 
-func (rb *AnalyzeDetailBuilder) Analyzer(analyzer *AnalyzerDetailBuilder) *AnalyzeDetailBuilder {
-	v := analyzer.Build()
-	rb.v.Analyzer = &v
-	return rb
-}
-
-func (rb *AnalyzeDetailBuilder) Charfilters(charfilters []CharFilterDetailBuilder) *AnalyzeDetailBuilder {
-	tmp := make([]CharFilterDetail, len(charfilters))
-	for _, value := range charfilters {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Charfilters = tmp
-	return rb
-}
-
-func (rb *AnalyzeDetailBuilder) CustomAnalyzer(customanalyzer bool) *AnalyzeDetailBuilder {
-	rb.v.CustomAnalyzer = customanalyzer
-	return rb
-}
-
-func (rb *AnalyzeDetailBuilder) Tokenfilters(tokenfilters []TokenDetailBuilder) *AnalyzeDetailBuilder {
-	tmp := make([]TokenDetail, len(tokenfilters))
-	for _, value := range tokenfilters {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Tokenfilters = tmp
-	return rb
-}
-
-func (rb *AnalyzeDetailBuilder) Tokenizer(tokenizer *TokenDetailBuilder) *AnalyzeDetailBuilder {
-	v := tokenizer.Build()
-	rb.v.Tokenizer = &v
-	return rb
+	return r
 }

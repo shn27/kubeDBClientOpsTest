@@ -15,102 +15,184 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // AddAction type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/update_aliases/types.ts#L30-L44
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/update_aliases/types.ts#L41-L95
 type AddAction struct {
-	Alias         *IndexAlias     `json:"alias,omitempty"`
-	Aliases       []IndexAlias    `json:"aliases,omitempty"`
-	Filter        *QueryContainer `json:"filter,omitempty"`
-	Index         *IndexName      `json:"index,omitempty"`
-	IndexRouting  *Routing        `json:"index_routing,omitempty"`
-	Indices       *Indices        `json:"indices,omitempty"`
-	IsHidden      *bool           `json:"is_hidden,omitempty"`
-	IsWriteIndex  *bool           `json:"is_write_index,omitempty"`
-	MustExist     *bool           `json:"must_exist,omitempty"`
-	Routing       *Routing        `json:"routing,omitempty"`
-	SearchRouting *Routing        `json:"search_routing,omitempty"`
+	// Alias Alias for the action.
+	// Index alias names support date math.
+	Alias *string `json:"alias,omitempty"`
+	// Aliases Aliases for the action.
+	// Index alias names support date math.
+	Aliases []string `json:"aliases,omitempty"`
+	// Filter Query used to limit documents the alias can access.
+	Filter *Query `json:"filter,omitempty"`
+	// Index Data stream or index for the action.
+	// Supports wildcards (`*`).
+	Index *string `json:"index,omitempty"`
+	// IndexRouting Value used to route indexing operations to a specific shard.
+	// If specified, this overwrites the `routing` value for indexing operations.
+	// Data stream aliases don’t support this parameter.
+	IndexRouting *string `json:"index_routing,omitempty"`
+	// Indices Data streams or indices for the action.
+	// Supports wildcards (`*`).
+	Indices []string `json:"indices,omitempty"`
+	// IsHidden If `true`, the alias is hidden.
+	IsHidden *bool `json:"is_hidden,omitempty"`
+	// IsWriteIndex If `true`, sets the write index or data stream for the alias.
+	IsWriteIndex *bool `json:"is_write_index,omitempty"`
+	// MustExist If `true`, the alias must exist to perform the action.
+	MustExist *bool `json:"must_exist,omitempty"`
+	// Routing Value used to route indexing and search operations to a specific shard.
+	// Data stream aliases don’t support this parameter.
+	Routing *string `json:"routing,omitempty"`
+	// SearchRouting Value used to route search operations to a specific shard.
+	// If specified, this overwrites the `routing` value for search operations.
+	// Data stream aliases don’t support this parameter.
+	SearchRouting *string `json:"search_routing,omitempty"`
 }
 
-// AddActionBuilder holds AddAction struct and provides a builder API.
-type AddActionBuilder struct {
-	v *AddAction
-}
+func (s *AddAction) UnmarshalJSON(data []byte) error {
 
-// NewAddAction provides a builder for the AddAction struct.
-func NewAddActionBuilder() *AddActionBuilder {
-	r := AddActionBuilder{
-		&AddAction{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "alias":
+			if err := dec.Decode(&s.Alias); err != nil {
+				return fmt.Errorf("%s | %w", "Alias", err)
+			}
+
+		case "aliases":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Aliases", err)
+				}
+
+				s.Aliases = append(s.Aliases, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Aliases); err != nil {
+					return fmt.Errorf("%s | %w", "Aliases", err)
+				}
+			}
+
+		case "filter":
+			if err := dec.Decode(&s.Filter); err != nil {
+				return fmt.Errorf("%s | %w", "Filter", err)
+			}
+
+		case "index":
+			if err := dec.Decode(&s.Index); err != nil {
+				return fmt.Errorf("%s | %w", "Index", err)
+			}
+
+		case "index_routing":
+			if err := dec.Decode(&s.IndexRouting); err != nil {
+				return fmt.Errorf("%s | %w", "IndexRouting", err)
+			}
+
+		case "indices":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Indices", err)
+				}
+
+				s.Indices = append(s.Indices, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Indices); err != nil {
+					return fmt.Errorf("%s | %w", "Indices", err)
+				}
+			}
+
+		case "is_hidden":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IsHidden", err)
+				}
+				s.IsHidden = &value
+			case bool:
+				s.IsHidden = &v
+			}
+
+		case "is_write_index":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IsWriteIndex", err)
+				}
+				s.IsWriteIndex = &value
+			case bool:
+				s.IsWriteIndex = &v
+			}
+
+		case "must_exist":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MustExist", err)
+				}
+				s.MustExist = &value
+			case bool:
+				s.MustExist = &v
+			}
+
+		case "routing":
+			if err := dec.Decode(&s.Routing); err != nil {
+				return fmt.Errorf("%s | %w", "Routing", err)
+			}
+
+		case "search_routing":
+			if err := dec.Decode(&s.SearchRouting); err != nil {
+				return fmt.Errorf("%s | %w", "SearchRouting", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the AddAction struct
-func (rb *AddActionBuilder) Build() AddAction {
-	return *rb.v
-}
+// NewAddAction returns a AddAction.
+func NewAddAction() *AddAction {
+	r := &AddAction{}
 
-func (rb *AddActionBuilder) Alias(alias IndexAlias) *AddActionBuilder {
-	rb.v.Alias = &alias
-	return rb
-}
-
-func (rb *AddActionBuilder) Aliases(arg []IndexAlias) *AddActionBuilder {
-	rb.v.Aliases = arg
-	return rb
-}
-
-func (rb *AddActionBuilder) Filter(filter *QueryContainerBuilder) *AddActionBuilder {
-	v := filter.Build()
-	rb.v.Filter = &v
-	return rb
-}
-
-func (rb *AddActionBuilder) Index(index IndexName) *AddActionBuilder {
-	rb.v.Index = &index
-	return rb
-}
-
-func (rb *AddActionBuilder) IndexRouting(indexrouting Routing) *AddActionBuilder {
-	rb.v.IndexRouting = &indexrouting
-	return rb
-}
-
-func (rb *AddActionBuilder) Indices(indices *IndicesBuilder) *AddActionBuilder {
-	v := indices.Build()
-	rb.v.Indices = &v
-	return rb
-}
-
-func (rb *AddActionBuilder) IsHidden(ishidden bool) *AddActionBuilder {
-	rb.v.IsHidden = &ishidden
-	return rb
-}
-
-func (rb *AddActionBuilder) IsWriteIndex(iswriteindex bool) *AddActionBuilder {
-	rb.v.IsWriteIndex = &iswriteindex
-	return rb
-}
-
-func (rb *AddActionBuilder) MustExist(mustexist bool) *AddActionBuilder {
-	rb.v.MustExist = &mustexist
-	return rb
-}
-
-func (rb *AddActionBuilder) Routing(routing Routing) *AddActionBuilder {
-	rb.v.Routing = &routing
-	return rb
-}
-
-func (rb *AddActionBuilder) SearchRouting(searchrouting Routing) *AddActionBuilder {
-	rb.v.SearchRouting = &searchrouting
-	return rb
+	return r
 }

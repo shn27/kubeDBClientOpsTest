@@ -15,66 +15,117 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // CompletionContext type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/suggester.ts#L152-L159
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/suggester.ts#L235-L264
 type CompletionContext struct {
-	Boost      *float64           `json:"boost,omitempty"`
-	Context    Context            `json:"context"`
+	// Boost The factor by which the score of the suggestion should be boosted.
+	// The score is computed by multiplying the boost with the suggestion weight.
+	Boost *Float64 `json:"boost,omitempty"`
+	// Context The value of the category to filter/boost on.
+	Context Context `json:"context"`
+	// Neighbours An array of precision values at which neighboring geohashes should be taken
+	// into account.
+	// Precision value can be a distance value (`5m`, `10km`, etc.) or a raw geohash
+	// precision (`1`..`12`).
+	// Defaults to generating neighbors for index time precision level.
 	Neighbours []GeoHashPrecision `json:"neighbours,omitempty"`
-	Precision  *GeoHashPrecision  `json:"precision,omitempty"`
-	Prefix     *bool              `json:"prefix,omitempty"`
+	// Precision The precision of the geohash to encode the query geo point.
+	// Can be specified as a distance value (`5m`, `10km`, etc.), or as a raw
+	// geohash precision (`1`..`12`).
+	// Defaults to index time precision level.
+	Precision GeoHashPrecision `json:"precision,omitempty"`
+	// Prefix Whether the category value should be treated as a prefix or not.
+	Prefix *bool `json:"prefix,omitempty"`
 }
 
-// CompletionContextBuilder holds CompletionContext struct and provides a builder API.
-type CompletionContextBuilder struct {
-	v *CompletionContext
-}
+func (s *CompletionContext) UnmarshalJSON(data []byte) error {
 
-// NewCompletionContext provides a builder for the CompletionContext struct.
-func NewCompletionContextBuilder() *CompletionContextBuilder {
-	r := CompletionContextBuilder{
-		&CompletionContext{},
+	if !bytes.HasPrefix(data, []byte(`{`)) {
+		err := json.NewDecoder(bytes.NewReader(data)).Decode(&s.Context)
+		return err
 	}
 
-	return &r
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "boost":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Boost", err)
+				}
+				f := Float64(value)
+				s.Boost = &f
+			case float64:
+				f := Float64(v)
+				s.Boost = &f
+			}
+
+		case "context":
+			if err := dec.Decode(&s.Context); err != nil {
+				return fmt.Errorf("%s | %w", "Context", err)
+			}
+
+		case "neighbours":
+			if err := dec.Decode(&s.Neighbours); err != nil {
+				return fmt.Errorf("%s | %w", "Neighbours", err)
+			}
+
+		case "precision":
+			if err := dec.Decode(&s.Precision); err != nil {
+				return fmt.Errorf("%s | %w", "Precision", err)
+			}
+
+		case "prefix":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Prefix", err)
+				}
+				s.Prefix = &value
+			case bool:
+				s.Prefix = &v
+			}
+
+		}
+	}
+	return nil
 }
 
-// Build finalize the chain and returns the CompletionContext struct
-func (rb *CompletionContextBuilder) Build() CompletionContext {
-	return *rb.v
-}
+// NewCompletionContext returns a CompletionContext.
+func NewCompletionContext() *CompletionContext {
+	r := &CompletionContext{}
 
-func (rb *CompletionContextBuilder) Boost(boost float64) *CompletionContextBuilder {
-	rb.v.Boost = &boost
-	return rb
-}
-
-func (rb *CompletionContextBuilder) Context(context *ContextBuilder) *CompletionContextBuilder {
-	v := context.Build()
-	rb.v.Context = v
-	return rb
-}
-
-func (rb *CompletionContextBuilder) Neighbours(neighbours ...GeoHashPrecision) *CompletionContextBuilder {
-	rb.v.Neighbours = neighbours
-	return rb
-}
-
-func (rb *CompletionContextBuilder) Precision(precision *GeoHashPrecisionBuilder) *CompletionContextBuilder {
-	v := precision.Build()
-	rb.v.Precision = &v
-	return rb
-}
-
-func (rb *CompletionContextBuilder) Prefix(prefix bool) *CompletionContextBuilder {
-	rb.v.Prefix = &prefix
-	return rb
+	return r
 }

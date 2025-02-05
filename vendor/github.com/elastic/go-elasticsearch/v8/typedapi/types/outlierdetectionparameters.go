@@ -15,70 +15,166 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // OutlierDetectionParameters type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/DataframeAnalytics.ts#L412-L419
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/DataframeAnalytics.ts#L528-L562
 type OutlierDetectionParameters struct {
-	ComputeFeatureInfluence   *bool    `json:"compute_feature_influence,omitempty"`
-	FeatureInfluenceThreshold *float64 `json:"feature_influence_threshold,omitempty"`
-	Method                    *string  `json:"method,omitempty"`
-	NNeighbors                *int     `json:"n_neighbors,omitempty"`
-	OutlierFraction           *float64 `json:"outlier_fraction,omitempty"`
-	StandardizationEnabled    *bool    `json:"standardization_enabled,omitempty"`
+	// ComputeFeatureInfluence Specifies whether the feature influence calculation is enabled.
+	ComputeFeatureInfluence *bool `json:"compute_feature_influence,omitempty"`
+	// FeatureInfluenceThreshold The minimum outlier score that a document needs to have in order to calculate
+	// its feature influence score.
+	// Value range: 0-1
+	FeatureInfluenceThreshold *Float64 `json:"feature_influence_threshold,omitempty"`
+	// Method The method that outlier detection uses.
+	// Available methods are `lof`, `ldof`, `distance_kth_nn`, `distance_knn`, and
+	// `ensemble`.
+	// The default value is ensemble, which means that outlier detection uses an
+	// ensemble of different methods and normalises and combines their individual
+	// outlier scores to obtain the overall outlier score.
+	Method *string `json:"method,omitempty"`
+	// NNeighbors Defines the value for how many nearest neighbors each method of outlier
+	// detection uses to calculate its outlier score.
+	// When the value is not set, different values are used for different ensemble
+	// members.
+	// This default behavior helps improve the diversity in the ensemble; only
+	// override it if you are confident that the value you choose is appropriate for
+	// the data set.
+	NNeighbors *int `json:"n_neighbors,omitempty"`
+	// OutlierFraction The proportion of the data set that is assumed to be outlying prior to
+	// outlier detection.
+	// For example, 0.05 means it is assumed that 5% of values are real outliers and
+	// 95% are inliers.
+	OutlierFraction *Float64 `json:"outlier_fraction,omitempty"`
+	// StandardizationEnabled If `true`, the following operation is performed on the columns before
+	// computing outlier scores: (x_i - mean(x_i)) / sd(x_i).
+	StandardizationEnabled *bool `json:"standardization_enabled,omitempty"`
 }
 
-// OutlierDetectionParametersBuilder holds OutlierDetectionParameters struct and provides a builder API.
-type OutlierDetectionParametersBuilder struct {
-	v *OutlierDetectionParameters
-}
+func (s *OutlierDetectionParameters) UnmarshalJSON(data []byte) error {
 
-// NewOutlierDetectionParameters provides a builder for the OutlierDetectionParameters struct.
-func NewOutlierDetectionParametersBuilder() *OutlierDetectionParametersBuilder {
-	r := OutlierDetectionParametersBuilder{
-		&OutlierDetectionParameters{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "compute_feature_influence":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ComputeFeatureInfluence", err)
+				}
+				s.ComputeFeatureInfluence = &value
+			case bool:
+				s.ComputeFeatureInfluence = &v
+			}
+
+		case "feature_influence_threshold":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "FeatureInfluenceThreshold", err)
+				}
+				f := Float64(value)
+				s.FeatureInfluenceThreshold = &f
+			case float64:
+				f := Float64(v)
+				s.FeatureInfluenceThreshold = &f
+			}
+
+		case "method":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Method", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Method = &o
+
+		case "n_neighbors":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NNeighbors", err)
+				}
+				s.NNeighbors = &value
+			case float64:
+				f := int(v)
+				s.NNeighbors = &f
+			}
+
+		case "outlier_fraction":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "OutlierFraction", err)
+				}
+				f := Float64(value)
+				s.OutlierFraction = &f
+			case float64:
+				f := Float64(v)
+				s.OutlierFraction = &f
+			}
+
+		case "standardization_enabled":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "StandardizationEnabled", err)
+				}
+				s.StandardizationEnabled = &value
+			case bool:
+				s.StandardizationEnabled = &v
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the OutlierDetectionParameters struct
-func (rb *OutlierDetectionParametersBuilder) Build() OutlierDetectionParameters {
-	return *rb.v
-}
+// NewOutlierDetectionParameters returns a OutlierDetectionParameters.
+func NewOutlierDetectionParameters() *OutlierDetectionParameters {
+	r := &OutlierDetectionParameters{}
 
-func (rb *OutlierDetectionParametersBuilder) ComputeFeatureInfluence(computefeatureinfluence bool) *OutlierDetectionParametersBuilder {
-	rb.v.ComputeFeatureInfluence = &computefeatureinfluence
-	return rb
-}
-
-func (rb *OutlierDetectionParametersBuilder) FeatureInfluenceThreshold(featureinfluencethreshold float64) *OutlierDetectionParametersBuilder {
-	rb.v.FeatureInfluenceThreshold = &featureinfluencethreshold
-	return rb
-}
-
-func (rb *OutlierDetectionParametersBuilder) Method(method string) *OutlierDetectionParametersBuilder {
-	rb.v.Method = &method
-	return rb
-}
-
-func (rb *OutlierDetectionParametersBuilder) NNeighbors(nneighbors int) *OutlierDetectionParametersBuilder {
-	rb.v.NNeighbors = &nneighbors
-	return rb
-}
-
-func (rb *OutlierDetectionParametersBuilder) OutlierFraction(outlierfraction float64) *OutlierDetectionParametersBuilder {
-	rb.v.OutlierFraction = &outlierfraction
-	return rb
-}
-
-func (rb *OutlierDetectionParametersBuilder) StandardizationEnabled(standardizationenabled bool) *OutlierDetectionParametersBuilder {
-	rb.v.StandardizationEnabled = &standardizationenabled
-	return rb
+	return r
 }

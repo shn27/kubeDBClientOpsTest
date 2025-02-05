@@ -15,54 +15,68 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // TestPopulation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/metric.ts#L159-L163
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/metric.ts#L319-L329
 type TestPopulation struct {
-	Field  Field           `json:"field"`
-	Filter *QueryContainer `json:"filter,omitempty"`
-	Script *Script         `json:"script,omitempty"`
+	// Field The field to aggregate.
+	Field string `json:"field"`
+	// Filter A filter used to define a set of records to run unpaired t-test on.
+	Filter *Query  `json:"filter,omitempty"`
+	Script *Script `json:"script,omitempty"`
 }
 
-// TestPopulationBuilder holds TestPopulation struct and provides a builder API.
-type TestPopulationBuilder struct {
-	v *TestPopulation
-}
+func (s *TestPopulation) UnmarshalJSON(data []byte) error {
 
-// NewTestPopulation provides a builder for the TestPopulation struct.
-func NewTestPopulationBuilder() *TestPopulationBuilder {
-	r := TestPopulationBuilder{
-		&TestPopulation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "filter":
+			if err := dec.Decode(&s.Filter); err != nil {
+				return fmt.Errorf("%s | %w", "Filter", err)
+			}
+
+		case "script":
+			if err := dec.Decode(&s.Script); err != nil {
+				return fmt.Errorf("%s | %w", "Script", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TestPopulation struct
-func (rb *TestPopulationBuilder) Build() TestPopulation {
-	return *rb.v
-}
+// NewTestPopulation returns a TestPopulation.
+func NewTestPopulation() *TestPopulation {
+	r := &TestPopulation{}
 
-func (rb *TestPopulationBuilder) Field(field Field) *TestPopulationBuilder {
-	rb.v.Field = field
-	return rb
-}
-
-func (rb *TestPopulationBuilder) Filter(filter *QueryContainerBuilder) *TestPopulationBuilder {
-	v := filter.Build()
-	rb.v.Filter = &v
-	return rb
-}
-
-func (rb *TestPopulationBuilder) Script(script *ScriptBuilder) *TestPopulationBuilder {
-	v := script.Build()
-	rb.v.Script = &v
-	return rb
+	return r
 }

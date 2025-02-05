@@ -15,52 +15,78 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // SlicedScroll type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/SlicedScroll.ts#L23-L27
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/SlicedScroll.ts#L23-L27
 type SlicedScroll struct {
-	Field *Field `json:"field,omitempty"`
-	Id    int    `json:"id"`
-	Max   int    `json:"max"`
+	Field *string `json:"field,omitempty"`
+	Id    string  `json:"id"`
+	Max   int     `json:"max"`
 }
 
-// SlicedScrollBuilder holds SlicedScroll struct and provides a builder API.
-type SlicedScrollBuilder struct {
-	v *SlicedScroll
-}
+func (s *SlicedScroll) UnmarshalJSON(data []byte) error {
 
-// NewSlicedScroll provides a builder for the SlicedScroll struct.
-func NewSlicedScrollBuilder() *SlicedScrollBuilder {
-	r := SlicedScrollBuilder{
-		&SlicedScroll{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "id":
+			if err := dec.Decode(&s.Id); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
+
+		case "max":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Max", err)
+				}
+				s.Max = value
+			case float64:
+				f := int(v)
+				s.Max = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SlicedScroll struct
-func (rb *SlicedScrollBuilder) Build() SlicedScroll {
-	return *rb.v
-}
+// NewSlicedScroll returns a SlicedScroll.
+func NewSlicedScroll() *SlicedScroll {
+	r := &SlicedScroll{}
 
-func (rb *SlicedScrollBuilder) Field(field Field) *SlicedScrollBuilder {
-	rb.v.Field = &field
-	return rb
-}
-
-func (rb *SlicedScrollBuilder) Id(id int) *SlicedScrollBuilder {
-	rb.v.Id = id
-	return rb
-}
-
-func (rb *SlicedScrollBuilder) Max(max int) *SlicedScrollBuilder {
-	rb.v.Max = max
-	return rb
+	return r
 }

@@ -15,58 +15,65 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/metric"
 )
 
 // FieldMetric type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/rollup/_types/Metric.ts#L30-L35
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/rollup/_types/Metric.ts#L30-L35
 type FieldMetric struct {
 	// Field The field to collect metrics for. This must be a numeric of some kind.
-	Field Field `json:"field"`
+	Field string `json:"field"`
 	// Metrics An array of metrics to collect for the field. At least one metric must be
 	// configured.
 	Metrics []metric.Metric `json:"metrics"`
 }
 
-// FieldMetricBuilder holds FieldMetric struct and provides a builder API.
-type FieldMetricBuilder struct {
-	v *FieldMetric
-}
+func (s *FieldMetric) UnmarshalJSON(data []byte) error {
 
-// NewFieldMetric provides a builder for the FieldMetric struct.
-func NewFieldMetricBuilder() *FieldMetricBuilder {
-	r := FieldMetricBuilder{
-		&FieldMetric{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "metrics":
+			if err := dec.Decode(&s.Metrics); err != nil {
+				return fmt.Errorf("%s | %w", "Metrics", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the FieldMetric struct
-func (rb *FieldMetricBuilder) Build() FieldMetric {
-	return *rb.v
-}
+// NewFieldMetric returns a FieldMetric.
+func NewFieldMetric() *FieldMetric {
+	r := &FieldMetric{}
 
-// Field The field to collect metrics for. This must be a numeric of some kind.
-
-func (rb *FieldMetricBuilder) Field(field Field) *FieldMetricBuilder {
-	rb.v.Field = field
-	return rb
-}
-
-// Metrics An array of metrics to collect for the field. At least one metric must be
-// configured.
-
-func (rb *FieldMetricBuilder) Metrics(metrics ...metric.Metric) *FieldMetricBuilder {
-	rb.v.Metrics = metrics
-	return rb
+	return r
 }

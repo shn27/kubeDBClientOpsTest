@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // Ensemble type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/put_trained_model/types.ts#L93-L99
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/put_trained_model/types.ts#L93-L99
 type Ensemble struct {
 	AggregateOutput      *AggregateOutput `json:"aggregate_output,omitempty"`
 	ClassificationLabels []string         `json:"classification_labels,omitempty"`
@@ -33,51 +40,61 @@ type Ensemble struct {
 	TrainedModels        []TrainedModel   `json:"trained_models"`
 }
 
-// EnsembleBuilder holds Ensemble struct and provides a builder API.
-type EnsembleBuilder struct {
-	v *Ensemble
-}
+func (s *Ensemble) UnmarshalJSON(data []byte) error {
 
-// NewEnsemble provides a builder for the Ensemble struct.
-func NewEnsembleBuilder() *EnsembleBuilder {
-	r := EnsembleBuilder{
-		&Ensemble{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "aggregate_output":
+			if err := dec.Decode(&s.AggregateOutput); err != nil {
+				return fmt.Errorf("%s | %w", "AggregateOutput", err)
+			}
+
+		case "classification_labels":
+			if err := dec.Decode(&s.ClassificationLabels); err != nil {
+				return fmt.Errorf("%s | %w", "ClassificationLabels", err)
+			}
+
+		case "feature_names":
+			if err := dec.Decode(&s.FeatureNames); err != nil {
+				return fmt.Errorf("%s | %w", "FeatureNames", err)
+			}
+
+		case "target_type":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "TargetType", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.TargetType = &o
+
+		case "trained_models":
+			if err := dec.Decode(&s.TrainedModels); err != nil {
+				return fmt.Errorf("%s | %w", "TrainedModels", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the Ensemble struct
-func (rb *EnsembleBuilder) Build() Ensemble {
-	return *rb.v
-}
+// NewEnsemble returns a Ensemble.
+func NewEnsemble() *Ensemble {
+	r := &Ensemble{}
 
-func (rb *EnsembleBuilder) AggregateOutput(aggregateoutput *AggregateOutputBuilder) *EnsembleBuilder {
-	v := aggregateoutput.Build()
-	rb.v.AggregateOutput = &v
-	return rb
-}
-
-func (rb *EnsembleBuilder) ClassificationLabels(classification_labels ...string) *EnsembleBuilder {
-	rb.v.ClassificationLabels = classification_labels
-	return rb
-}
-
-func (rb *EnsembleBuilder) FeatureNames(feature_names ...string) *EnsembleBuilder {
-	rb.v.FeatureNames = feature_names
-	return rb
-}
-
-func (rb *EnsembleBuilder) TargetType(targettype string) *EnsembleBuilder {
-	rb.v.TargetType = &targettype
-	return rb
-}
-
-func (rb *EnsembleBuilder) TrainedModels(trained_models []TrainedModelBuilder) *EnsembleBuilder {
-	tmp := make([]TrainedModel, len(trained_models))
-	for _, value := range trained_models {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.TrainedModels = tmp
-	return rb
+	return r
 }

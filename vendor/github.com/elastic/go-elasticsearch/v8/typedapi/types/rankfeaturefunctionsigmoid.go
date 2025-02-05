@@ -15,46 +15,85 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // RankFeatureFunctionSigmoid type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/specialized.ts#L149-L152
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/specialized.ts#L298-L307
 type RankFeatureFunctionSigmoid struct {
+	// Exponent Configurable Exponent.
 	Exponent float32 `json:"exponent"`
-	Pivot    float32 `json:"pivot"`
+	// Pivot Configurable pivot value so that the result will be less than 0.5.
+	Pivot float32 `json:"pivot"`
 }
 
-// RankFeatureFunctionSigmoidBuilder holds RankFeatureFunctionSigmoid struct and provides a builder API.
-type RankFeatureFunctionSigmoidBuilder struct {
-	v *RankFeatureFunctionSigmoid
-}
+func (s *RankFeatureFunctionSigmoid) UnmarshalJSON(data []byte) error {
 
-// NewRankFeatureFunctionSigmoid provides a builder for the RankFeatureFunctionSigmoid struct.
-func NewRankFeatureFunctionSigmoidBuilder() *RankFeatureFunctionSigmoidBuilder {
-	r := RankFeatureFunctionSigmoidBuilder{
-		&RankFeatureFunctionSigmoid{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "exponent":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Exponent", err)
+				}
+				f := float32(value)
+				s.Exponent = f
+			case float64:
+				f := float32(v)
+				s.Exponent = f
+			}
+
+		case "pivot":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Pivot", err)
+				}
+				f := float32(value)
+				s.Pivot = f
+			case float64:
+				f := float32(v)
+				s.Pivot = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RankFeatureFunctionSigmoid struct
-func (rb *RankFeatureFunctionSigmoidBuilder) Build() RankFeatureFunctionSigmoid {
-	return *rb.v
-}
+// NewRankFeatureFunctionSigmoid returns a RankFeatureFunctionSigmoid.
+func NewRankFeatureFunctionSigmoid() *RankFeatureFunctionSigmoid {
+	r := &RankFeatureFunctionSigmoid{}
 
-func (rb *RankFeatureFunctionSigmoidBuilder) Exponent(exponent float32) *RankFeatureFunctionSigmoidBuilder {
-	rb.v.Exponent = exponent
-	return rb
-}
-
-func (rb *RankFeatureFunctionSigmoidBuilder) Pivot(pivot float32) *RankFeatureFunctionSigmoidBuilder {
-	rb.v.Pivot = pivot
-	return rb
+	return r
 }

@@ -15,102 +15,107 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // Watch type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Watch.ts#L37-L47
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Watch.ts#L37-L47
 type Watch struct {
-	Actions                map[IndexName]Action     `json:"actions"`
-	Condition              ConditionContainer       `json:"condition"`
-	Input                  InputContainer           `json:"input"`
-	Metadata               *Metadata                `json:"metadata,omitempty"`
+	Actions                map[string]WatcherAction `json:"actions"`
+	Condition              WatcherCondition         `json:"condition"`
+	Input                  WatcherInput             `json:"input"`
+	Metadata               Metadata                 `json:"metadata,omitempty"`
 	Status                 *WatchStatus             `json:"status,omitempty"`
-	ThrottlePeriod         *Duration                `json:"throttle_period,omitempty"`
-	ThrottlePeriodInMillis *DurationValueUnitMillis `json:"throttle_period_in_millis,omitempty"`
+	ThrottlePeriod         Duration                 `json:"throttle_period,omitempty"`
+	ThrottlePeriodInMillis *int64                   `json:"throttle_period_in_millis,omitempty"`
 	Transform              *TransformContainer      `json:"transform,omitempty"`
 	Trigger                TriggerContainer         `json:"trigger"`
 }
 
-// WatchBuilder holds Watch struct and provides a builder API.
-type WatchBuilder struct {
-	v *Watch
+func (s *Watch) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "actions":
+			if s.Actions == nil {
+				s.Actions = make(map[string]WatcherAction, 0)
+			}
+			if err := dec.Decode(&s.Actions); err != nil {
+				return fmt.Errorf("%s | %w", "Actions", err)
+			}
+
+		case "condition":
+			if err := dec.Decode(&s.Condition); err != nil {
+				return fmt.Errorf("%s | %w", "Condition", err)
+			}
+
+		case "input":
+			if err := dec.Decode(&s.Input); err != nil {
+				return fmt.Errorf("%s | %w", "Input", err)
+			}
+
+		case "metadata":
+			if err := dec.Decode(&s.Metadata); err != nil {
+				return fmt.Errorf("%s | %w", "Metadata", err)
+			}
+
+		case "status":
+			if err := dec.Decode(&s.Status); err != nil {
+				return fmt.Errorf("%s | %w", "Status", err)
+			}
+
+		case "throttle_period":
+			if err := dec.Decode(&s.ThrottlePeriod); err != nil {
+				return fmt.Errorf("%s | %w", "ThrottlePeriod", err)
+			}
+
+		case "throttle_period_in_millis":
+			if err := dec.Decode(&s.ThrottlePeriodInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "ThrottlePeriodInMillis", err)
+			}
+
+		case "transform":
+			if err := dec.Decode(&s.Transform); err != nil {
+				return fmt.Errorf("%s | %w", "Transform", err)
+			}
+
+		case "trigger":
+			if err := dec.Decode(&s.Trigger); err != nil {
+				return fmt.Errorf("%s | %w", "Trigger", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewWatch provides a builder for the Watch struct.
-func NewWatchBuilder() *WatchBuilder {
-	r := WatchBuilder{
-		&Watch{
-			Actions: make(map[IndexName]Action, 0),
-		},
+// NewWatch returns a Watch.
+func NewWatch() *Watch {
+	r := &Watch{
+		Actions: make(map[string]WatcherAction, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the Watch struct
-func (rb *WatchBuilder) Build() Watch {
-	return *rb.v
-}
-
-func (rb *WatchBuilder) Actions(values map[IndexName]*ActionBuilder) *WatchBuilder {
-	tmp := make(map[IndexName]Action, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Actions = tmp
-	return rb
-}
-
-func (rb *WatchBuilder) Condition(condition *ConditionContainerBuilder) *WatchBuilder {
-	v := condition.Build()
-	rb.v.Condition = v
-	return rb
-}
-
-func (rb *WatchBuilder) Input(input *InputContainerBuilder) *WatchBuilder {
-	v := input.Build()
-	rb.v.Input = v
-	return rb
-}
-
-func (rb *WatchBuilder) Metadata(metadata *MetadataBuilder) *WatchBuilder {
-	v := metadata.Build()
-	rb.v.Metadata = &v
-	return rb
-}
-
-func (rb *WatchBuilder) Status(status *WatchStatusBuilder) *WatchBuilder {
-	v := status.Build()
-	rb.v.Status = &v
-	return rb
-}
-
-func (rb *WatchBuilder) ThrottlePeriod(throttleperiod *DurationBuilder) *WatchBuilder {
-	v := throttleperiod.Build()
-	rb.v.ThrottlePeriod = &v
-	return rb
-}
-
-func (rb *WatchBuilder) ThrottlePeriodInMillis(throttleperiodinmillis *DurationValueUnitMillisBuilder) *WatchBuilder {
-	v := throttleperiodinmillis.Build()
-	rb.v.ThrottlePeriodInMillis = &v
-	return rb
-}
-
-func (rb *WatchBuilder) Transform(transform *TransformContainerBuilder) *WatchBuilder {
-	v := transform.Build()
-	rb.v.Transform = &v
-	return rb
-}
-
-func (rb *WatchBuilder) Trigger(trigger *TriggerContainerBuilder) *WatchBuilder {
-	v := trigger.Build()
-	rb.v.Trigger = v
-	return rb
+	return r
 }

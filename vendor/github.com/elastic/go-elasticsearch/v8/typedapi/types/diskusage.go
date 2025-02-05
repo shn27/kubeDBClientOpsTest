@@ -15,70 +15,144 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DiskUsage type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/allocation_explain/types.ts#L62-L69
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/allocation_explain/types.ts#L63-L70
 type DiskUsage struct {
 	FreeBytes       int64   `json:"free_bytes"`
-	FreeDiskPercent float64 `json:"free_disk_percent"`
+	FreeDiskPercent Float64 `json:"free_disk_percent"`
 	Path            string  `json:"path"`
 	TotalBytes      int64   `json:"total_bytes"`
 	UsedBytes       int64   `json:"used_bytes"`
-	UsedDiskPercent float64 `json:"used_disk_percent"`
+	UsedDiskPercent Float64 `json:"used_disk_percent"`
 }
 
-// DiskUsageBuilder holds DiskUsage struct and provides a builder API.
-type DiskUsageBuilder struct {
-	v *DiskUsage
-}
+func (s *DiskUsage) UnmarshalJSON(data []byte) error {
 
-// NewDiskUsage provides a builder for the DiskUsage struct.
-func NewDiskUsageBuilder() *DiskUsageBuilder {
-	r := DiskUsageBuilder{
-		&DiskUsage{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "free_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "FreeBytes", err)
+				}
+				s.FreeBytes = value
+			case float64:
+				f := int64(v)
+				s.FreeBytes = f
+			}
+
+		case "free_disk_percent":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "FreeDiskPercent", err)
+				}
+				f := Float64(value)
+				s.FreeDiskPercent = f
+			case float64:
+				f := Float64(v)
+				s.FreeDiskPercent = f
+			}
+
+		case "path":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Path", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Path = o
+
+		case "total_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TotalBytes", err)
+				}
+				s.TotalBytes = value
+			case float64:
+				f := int64(v)
+				s.TotalBytes = f
+			}
+
+		case "used_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "UsedBytes", err)
+				}
+				s.UsedBytes = value
+			case float64:
+				f := int64(v)
+				s.UsedBytes = f
+			}
+
+		case "used_disk_percent":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "UsedDiskPercent", err)
+				}
+				f := Float64(value)
+				s.UsedDiskPercent = f
+			case float64:
+				f := Float64(v)
+				s.UsedDiskPercent = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DiskUsage struct
-func (rb *DiskUsageBuilder) Build() DiskUsage {
-	return *rb.v
-}
+// NewDiskUsage returns a DiskUsage.
+func NewDiskUsage() *DiskUsage {
+	r := &DiskUsage{}
 
-func (rb *DiskUsageBuilder) FreeBytes(freebytes int64) *DiskUsageBuilder {
-	rb.v.FreeBytes = freebytes
-	return rb
-}
-
-func (rb *DiskUsageBuilder) FreeDiskPercent(freediskpercent float64) *DiskUsageBuilder {
-	rb.v.FreeDiskPercent = freediskpercent
-	return rb
-}
-
-func (rb *DiskUsageBuilder) Path(path string) *DiskUsageBuilder {
-	rb.v.Path = path
-	return rb
-}
-
-func (rb *DiskUsageBuilder) TotalBytes(totalbytes int64) *DiskUsageBuilder {
-	rb.v.TotalBytes = totalbytes
-	return rb
-}
-
-func (rb *DiskUsageBuilder) UsedBytes(usedbytes int64) *DiskUsageBuilder {
-	rb.v.UsedBytes = usedbytes
-	return rb
-}
-
-func (rb *DiskUsageBuilder) UsedDiskPercent(useddiskpercent float64) *DiskUsageBuilder {
-	rb.v.UsedDiskPercent = useddiskpercent
-	return rb
+	return r
 }

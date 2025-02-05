@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
@@ -27,31 +25,5 @@ package types
 //	bool
 //	SourceFilter
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/SourceFilter.ts#L33-L37
-type SourceConfig interface{}
-
-// SourceConfigBuilder holds SourceConfig struct and provides a builder API.
-type SourceConfigBuilder struct {
-	v SourceConfig
-}
-
-// NewSourceConfig provides a builder for the SourceConfig struct.
-func NewSourceConfigBuilder() *SourceConfigBuilder {
-	return &SourceConfigBuilder{}
-}
-
-// Build finalize the chain and returns the SourceConfig struct
-func (u *SourceConfigBuilder) Build() SourceConfig {
-	return u.v
-}
-
-func (u *SourceConfigBuilder) Bool(bool bool) *SourceConfigBuilder {
-	u.v = &bool
-	return u
-}
-
-func (u *SourceConfigBuilder) SourceFilter(sourcefilter *SourceFilterBuilder) *SourceConfigBuilder {
-	v := sourcefilter.Build()
-	u.v = &v
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/SourceFilter.ts#L33-L37
+type SourceConfig any

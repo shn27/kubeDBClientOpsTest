@@ -15,55 +15,106 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // KuromojiIterationMarkCharFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/kuromoji-plugin.ts#L31-L35
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/kuromoji-plugin.ts#L31-L35
 type KuromojiIterationMarkCharFilter struct {
-	NormalizeKana  bool           `json:"normalize_kana"`
-	NormalizeKanji bool           `json:"normalize_kanji"`
-	Type           string         `json:"type,omitempty"`
-	Version        *VersionString `json:"version,omitempty"`
+	NormalizeKana  bool    `json:"normalize_kana"`
+	NormalizeKanji bool    `json:"normalize_kanji"`
+	Type           string  `json:"type,omitempty"`
+	Version        *string `json:"version,omitempty"`
 }
 
-// KuromojiIterationMarkCharFilterBuilder holds KuromojiIterationMarkCharFilter struct and provides a builder API.
-type KuromojiIterationMarkCharFilterBuilder struct {
-	v *KuromojiIterationMarkCharFilter
+func (s *KuromojiIterationMarkCharFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "normalize_kana":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NormalizeKana", err)
+				}
+				s.NormalizeKana = value
+			case bool:
+				s.NormalizeKana = v
+			}
+
+		case "normalize_kanji":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NormalizeKanji", err)
+				}
+				s.NormalizeKanji = value
+			case bool:
+				s.NormalizeKanji = v
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewKuromojiIterationMarkCharFilter provides a builder for the KuromojiIterationMarkCharFilter struct.
-func NewKuromojiIterationMarkCharFilterBuilder() *KuromojiIterationMarkCharFilterBuilder {
-	r := KuromojiIterationMarkCharFilterBuilder{
-		&KuromojiIterationMarkCharFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s KuromojiIterationMarkCharFilter) MarshalJSON() ([]byte, error) {
+	type innerKuromojiIterationMarkCharFilter KuromojiIterationMarkCharFilter
+	tmp := innerKuromojiIterationMarkCharFilter{
+		NormalizeKana:  s.NormalizeKana,
+		NormalizeKanji: s.NormalizeKanji,
+		Type:           s.Type,
+		Version:        s.Version,
 	}
 
-	r.v.Type = "kuromoji_iteration_mark"
+	tmp.Type = "kuromoji_iteration_mark"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the KuromojiIterationMarkCharFilter struct
-func (rb *KuromojiIterationMarkCharFilterBuilder) Build() KuromojiIterationMarkCharFilter {
-	return *rb.v
-}
+// NewKuromojiIterationMarkCharFilter returns a KuromojiIterationMarkCharFilter.
+func NewKuromojiIterationMarkCharFilter() *KuromojiIterationMarkCharFilter {
+	r := &KuromojiIterationMarkCharFilter{}
 
-func (rb *KuromojiIterationMarkCharFilterBuilder) NormalizeKana(normalizekana bool) *KuromojiIterationMarkCharFilterBuilder {
-	rb.v.NormalizeKana = normalizekana
-	return rb
-}
-
-func (rb *KuromojiIterationMarkCharFilterBuilder) NormalizeKanji(normalizekanji bool) *KuromojiIterationMarkCharFilterBuilder {
-	rb.v.NormalizeKanji = normalizekanji
-	return rb
-}
-
-func (rb *KuromojiIterationMarkCharFilterBuilder) Version(version VersionString) *KuromojiIterationMarkCharFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

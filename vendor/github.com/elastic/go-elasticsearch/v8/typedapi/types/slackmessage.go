@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // SlackMessage type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Actions.ts#L130-L137
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Actions.ts#L130-L137
 type SlackMessage struct {
 	Attachments        []SlackAttachment       `json:"attachments"`
 	DynamicAttachments *SlackDynamicAttachment `json:"dynamic_attachments,omitempty"`
@@ -34,56 +41,80 @@ type SlackMessage struct {
 	To                 []string                `json:"to"`
 }
 
-// SlackMessageBuilder holds SlackMessage struct and provides a builder API.
-type SlackMessageBuilder struct {
-	v *SlackMessage
-}
+func (s *SlackMessage) UnmarshalJSON(data []byte) error {
 
-// NewSlackMessage provides a builder for the SlackMessage struct.
-func NewSlackMessageBuilder() *SlackMessageBuilder {
-	r := SlackMessageBuilder{
-		&SlackMessage{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "attachments":
+			if err := dec.Decode(&s.Attachments); err != nil {
+				return fmt.Errorf("%s | %w", "Attachments", err)
+			}
+
+		case "dynamic_attachments":
+			if err := dec.Decode(&s.DynamicAttachments); err != nil {
+				return fmt.Errorf("%s | %w", "DynamicAttachments", err)
+			}
+
+		case "from":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "From", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.From = o
+
+		case "icon":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Icon", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Icon = &o
+
+		case "text":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Text", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Text = o
+
+		case "to":
+			if err := dec.Decode(&s.To); err != nil {
+				return fmt.Errorf("%s | %w", "To", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SlackMessage struct
-func (rb *SlackMessageBuilder) Build() SlackMessage {
-	return *rb.v
-}
+// NewSlackMessage returns a SlackMessage.
+func NewSlackMessage() *SlackMessage {
+	r := &SlackMessage{}
 
-func (rb *SlackMessageBuilder) Attachments(attachments []SlackAttachmentBuilder) *SlackMessageBuilder {
-	tmp := make([]SlackAttachment, len(attachments))
-	for _, value := range attachments {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Attachments = tmp
-	return rb
-}
-
-func (rb *SlackMessageBuilder) DynamicAttachments(dynamicattachments *SlackDynamicAttachmentBuilder) *SlackMessageBuilder {
-	v := dynamicattachments.Build()
-	rb.v.DynamicAttachments = &v
-	return rb
-}
-
-func (rb *SlackMessageBuilder) From(from string) *SlackMessageBuilder {
-	rb.v.From = from
-	return rb
-}
-
-func (rb *SlackMessageBuilder) Icon(icon string) *SlackMessageBuilder {
-	rb.v.Icon = &icon
-	return rb
-}
-
-func (rb *SlackMessageBuilder) Text(text string) *SlackMessageBuilder {
-	rb.v.Text = text
-	return rb
-}
-
-func (rb *SlackMessageBuilder) To(to ...string) *SlackMessageBuilder {
-	rb.v.To = to
-	return rb
+	return r
 }

@@ -15,58 +15,124 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DecayPlacementdoubledouble type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/compound.ts#L77-L82
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/compound.ts#L170-L189
 type DecayPlacementdoubledouble struct {
-	Decay  *float64 `json:"decay,omitempty"`
-	Offset *float64 `json:"offset,omitempty"`
-	Origin *float64 `json:"origin,omitempty"`
-	Scale  *float64 `json:"scale,omitempty"`
+	// Decay Defines how documents are scored at the distance given at scale.
+	Decay *Float64 `json:"decay,omitempty"`
+	// Offset If defined, the decay function will only compute the decay function for
+	// documents with a distance greater than the defined `offset`.
+	Offset *Float64 `json:"offset,omitempty"`
+	// Origin The point of origin used for calculating distance. Must be given as a number
+	// for numeric field, date for date fields and geo point for geo fields.
+	Origin *Float64 `json:"origin,omitempty"`
+	// Scale Defines the distance from origin + offset at which the computed score will
+	// equal `decay` parameter.
+	Scale *Float64 `json:"scale,omitempty"`
 }
 
-// DecayPlacementdoubledoubleBuilder holds DecayPlacementdoubledouble struct and provides a builder API.
-type DecayPlacementdoubledoubleBuilder struct {
-	v *DecayPlacementdoubledouble
-}
+func (s *DecayPlacementdoubledouble) UnmarshalJSON(data []byte) error {
 
-// NewDecayPlacementdoubledouble provides a builder for the DecayPlacementdoubledouble struct.
-func NewDecayPlacementdoubledoubleBuilder() *DecayPlacementdoubledoubleBuilder {
-	r := DecayPlacementdoubledoubleBuilder{
-		&DecayPlacementdoubledouble{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "decay":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Decay", err)
+				}
+				f := Float64(value)
+				s.Decay = &f
+			case float64:
+				f := Float64(v)
+				s.Decay = &f
+			}
+
+		case "offset":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Offset", err)
+				}
+				f := Float64(value)
+				s.Offset = &f
+			case float64:
+				f := Float64(v)
+				s.Offset = &f
+			}
+
+		case "origin":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Origin", err)
+				}
+				f := Float64(value)
+				s.Origin = &f
+			case float64:
+				f := Float64(v)
+				s.Origin = &f
+			}
+
+		case "scale":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Scale", err)
+				}
+				f := Float64(value)
+				s.Scale = &f
+			case float64:
+				f := Float64(v)
+				s.Scale = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DecayPlacementdoubledouble struct
-func (rb *DecayPlacementdoubledoubleBuilder) Build() DecayPlacementdoubledouble {
-	return *rb.v
-}
+// NewDecayPlacementdoubledouble returns a DecayPlacementdoubledouble.
+func NewDecayPlacementdoubledouble() *DecayPlacementdoubledouble {
+	r := &DecayPlacementdoubledouble{}
 
-func (rb *DecayPlacementdoubledoubleBuilder) Decay(decay float64) *DecayPlacementdoubledoubleBuilder {
-	rb.v.Decay = &decay
-	return rb
-}
-
-func (rb *DecayPlacementdoubledoubleBuilder) Offset(offset float64) *DecayPlacementdoubledoubleBuilder {
-	rb.v.Offset = &offset
-	return rb
-}
-
-func (rb *DecayPlacementdoubledoubleBuilder) Origin(origin float64) *DecayPlacementdoubledoubleBuilder {
-	rb.v.Origin = &origin
-	return rb
-}
-
-func (rb *DecayPlacementdoubledoubleBuilder) Scale(scale float64) *DecayPlacementdoubledoubleBuilder {
-	rb.v.Scale = &scale
-	return rb
+	return r
 }

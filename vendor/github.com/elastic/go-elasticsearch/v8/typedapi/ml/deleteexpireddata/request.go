@@ -15,48 +15,43 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package deleteexpireddata
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"strconv"
 
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 )
 
 // Request holds the request body struct for the package deleteexpireddata
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/delete_expired_data/MlDeleteExpiredDataRequest.ts#L25-L72
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/delete_expired_data/MlDeleteExpiredDataRequest.ts#L25-L73
 type Request struct {
 
 	// RequestsPerSecond The desired requests per second for the deletion processes. The default
 	// behavior is no throttling.
 	RequestsPerSecond *float32 `json:"requests_per_second,omitempty"`
-
 	// Timeout How long can the underlying delete processes run until they are canceled.
-	Timeout *types.Duration `json:"timeout,omitempty"`
+	Timeout types.Duration `json:"timeout,omitempty"`
 }
 
-// RequestBuilder is the builder API for the deleteexpireddata.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -67,18 +62,42 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) RequestsPerSecond(requestspersecond float32) *RequestBuilder {
-	rb.v.RequestsPerSecond = &requestspersecond
-	return rb
-}
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
 
-func (rb *RequestBuilder) Timeout(timeout *types.DurationBuilder) *RequestBuilder {
-	v := timeout.Build()
-	rb.v.Timeout = &v
-	return rb
+		switch t {
+
+		case "requests_per_second":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "RequestsPerSecond", err)
+				}
+				f := float32(value)
+				s.RequestsPerSecond = &f
+			case float64:
+				f := float32(v)
+				s.RequestsPerSecond = &f
+			}
+
+		case "timeout":
+			if err := dec.Decode(&s.Timeout); err != nil {
+				return fmt.Errorf("%s | %w", "Timeout", err)
+			}
+
+		}
+	}
+	return nil
 }

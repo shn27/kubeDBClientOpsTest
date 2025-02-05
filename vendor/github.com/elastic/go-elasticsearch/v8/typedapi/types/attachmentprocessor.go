@@ -15,104 +15,214 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // AttachmentProcessor type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ingest/_types/Processors.ts#L95-L103
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ingest/_types/Processors.ts#L345-L386
 type AttachmentProcessor struct {
-	Field             Field                `json:"field"`
-	If                *string              `json:"if,omitempty"`
-	IgnoreFailure     *bool                `json:"ignore_failure,omitempty"`
-	IgnoreMissing     *bool                `json:"ignore_missing,omitempty"`
-	IndexedChars      *int64               `json:"indexed_chars,omitempty"`
-	IndexedCharsField *Field               `json:"indexed_chars_field,omitempty"`
-	OnFailure         []ProcessorContainer `json:"on_failure,omitempty"`
-	Properties        []string             `json:"properties,omitempty"`
-	ResourceName      *string              `json:"resource_name,omitempty"`
-	Tag               *string              `json:"tag,omitempty"`
-	TargetField       *Field               `json:"target_field,omitempty"`
+	// Description Description of the processor.
+	// Useful for describing the purpose of the processor or its configuration.
+	Description *string `json:"description,omitempty"`
+	// Field The field to get the base64 encoded field from.
+	Field string `json:"field"`
+	// If Conditionally execute the processor.
+	If *string `json:"if,omitempty"`
+	// IgnoreFailure Ignore failures for the processor.
+	IgnoreFailure *bool `json:"ignore_failure,omitempty"`
+	// IgnoreMissing If `true` and field does not exist, the processor quietly exits without
+	// modifying the document.
+	IgnoreMissing *bool `json:"ignore_missing,omitempty"`
+	// IndexedChars The number of chars being used for extraction to prevent huge fields.
+	// Use `-1` for no limit.
+	IndexedChars *int64 `json:"indexed_chars,omitempty"`
+	// IndexedCharsField Field name from which you can overwrite the number of chars being used for
+	// extraction.
+	IndexedCharsField *string `json:"indexed_chars_field,omitempty"`
+	// OnFailure Handle failures for the processor.
+	OnFailure []ProcessorContainer `json:"on_failure,omitempty"`
+	// Properties Array of properties to select to be stored.
+	// Can be `content`, `title`, `name`, `author`, `keywords`, `date`,
+	// `content_type`, `content_length`, `language`.
+	Properties []string `json:"properties,omitempty"`
+	// RemoveBinary If true, the binary field will be removed from the document
+	RemoveBinary *bool `json:"remove_binary,omitempty"`
+	// ResourceName Field containing the name of the resource to decode.
+	// If specified, the processor passes this resource name to the underlying Tika
+	// library to enable Resource Name Based Detection.
+	ResourceName *string `json:"resource_name,omitempty"`
+	// Tag Identifier for the processor.
+	// Useful for debugging and metrics.
+	Tag *string `json:"tag,omitempty"`
+	// TargetField The field that will hold the attachment information.
+	TargetField *string `json:"target_field,omitempty"`
 }
 
-// AttachmentProcessorBuilder holds AttachmentProcessor struct and provides a builder API.
-type AttachmentProcessorBuilder struct {
-	v *AttachmentProcessor
-}
+func (s *AttachmentProcessor) UnmarshalJSON(data []byte) error {
 
-// NewAttachmentProcessor provides a builder for the AttachmentProcessor struct.
-func NewAttachmentProcessorBuilder() *AttachmentProcessorBuilder {
-	r := AttachmentProcessorBuilder{
-		&AttachmentProcessor{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "description":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Description", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Description = &o
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "if":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "If", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.If = &o
+
+		case "ignore_failure":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IgnoreFailure", err)
+				}
+				s.IgnoreFailure = &value
+			case bool:
+				s.IgnoreFailure = &v
+			}
+
+		case "ignore_missing":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IgnoreMissing", err)
+				}
+				s.IgnoreMissing = &value
+			case bool:
+				s.IgnoreMissing = &v
+			}
+
+		case "indexed_chars":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IndexedChars", err)
+				}
+				s.IndexedChars = &value
+			case float64:
+				f := int64(v)
+				s.IndexedChars = &f
+			}
+
+		case "indexed_chars_field":
+			if err := dec.Decode(&s.IndexedCharsField); err != nil {
+				return fmt.Errorf("%s | %w", "IndexedCharsField", err)
+			}
+
+		case "on_failure":
+			if err := dec.Decode(&s.OnFailure); err != nil {
+				return fmt.Errorf("%s | %w", "OnFailure", err)
+			}
+
+		case "properties":
+			if err := dec.Decode(&s.Properties); err != nil {
+				return fmt.Errorf("%s | %w", "Properties", err)
+			}
+
+		case "remove_binary":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "RemoveBinary", err)
+				}
+				s.RemoveBinary = &value
+			case bool:
+				s.RemoveBinary = &v
+			}
+
+		case "resource_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ResourceName", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ResourceName = &o
+
+		case "tag":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Tag", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Tag = &o
+
+		case "target_field":
+			if err := dec.Decode(&s.TargetField); err != nil {
+				return fmt.Errorf("%s | %w", "TargetField", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the AttachmentProcessor struct
-func (rb *AttachmentProcessorBuilder) Build() AttachmentProcessor {
-	return *rb.v
-}
+// NewAttachmentProcessor returns a AttachmentProcessor.
+func NewAttachmentProcessor() *AttachmentProcessor {
+	r := &AttachmentProcessor{}
 
-func (rb *AttachmentProcessorBuilder) Field(field Field) *AttachmentProcessorBuilder {
-	rb.v.Field = field
-	return rb
-}
-
-func (rb *AttachmentProcessorBuilder) If_(if_ string) *AttachmentProcessorBuilder {
-	rb.v.If = &if_
-	return rb
-}
-
-func (rb *AttachmentProcessorBuilder) IgnoreFailure(ignorefailure bool) *AttachmentProcessorBuilder {
-	rb.v.IgnoreFailure = &ignorefailure
-	return rb
-}
-
-func (rb *AttachmentProcessorBuilder) IgnoreMissing(ignoremissing bool) *AttachmentProcessorBuilder {
-	rb.v.IgnoreMissing = &ignoremissing
-	return rb
-}
-
-func (rb *AttachmentProcessorBuilder) IndexedChars(indexedchars int64) *AttachmentProcessorBuilder {
-	rb.v.IndexedChars = &indexedchars
-	return rb
-}
-
-func (rb *AttachmentProcessorBuilder) IndexedCharsField(indexedcharsfield Field) *AttachmentProcessorBuilder {
-	rb.v.IndexedCharsField = &indexedcharsfield
-	return rb
-}
-
-func (rb *AttachmentProcessorBuilder) OnFailure(on_failure []ProcessorContainerBuilder) *AttachmentProcessorBuilder {
-	tmp := make([]ProcessorContainer, len(on_failure))
-	for _, value := range on_failure {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.OnFailure = tmp
-	return rb
-}
-
-func (rb *AttachmentProcessorBuilder) Properties(properties ...string) *AttachmentProcessorBuilder {
-	rb.v.Properties = properties
-	return rb
-}
-
-func (rb *AttachmentProcessorBuilder) ResourceName(resourcename string) *AttachmentProcessorBuilder {
-	rb.v.ResourceName = &resourcename
-	return rb
-}
-
-func (rb *AttachmentProcessorBuilder) Tag(tag string) *AttachmentProcessorBuilder {
-	rb.v.Tag = &tag
-	return rb
-}
-
-func (rb *AttachmentProcessorBuilder) TargetField(targetfield Field) *AttachmentProcessorBuilder {
-	rb.v.TargetField = &targetfield
-	return rb
+	return r
 }

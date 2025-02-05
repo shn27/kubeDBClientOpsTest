@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
@@ -28,43 +26,16 @@ import (
 
 // TimeOfYear type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Schedule.ts#L125-L129
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Schedule.ts#L120-L124
 type TimeOfYear struct {
 	At  []string      `json:"at"`
 	Int []month.Month `json:"int"`
 	On  []int         `json:"on"`
 }
 
-// TimeOfYearBuilder holds TimeOfYear struct and provides a builder API.
-type TimeOfYearBuilder struct {
-	v *TimeOfYear
-}
+// NewTimeOfYear returns a TimeOfYear.
+func NewTimeOfYear() *TimeOfYear {
+	r := &TimeOfYear{}
 
-// NewTimeOfYear provides a builder for the TimeOfYear struct.
-func NewTimeOfYearBuilder() *TimeOfYearBuilder {
-	r := TimeOfYearBuilder{
-		&TimeOfYear{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the TimeOfYear struct
-func (rb *TimeOfYearBuilder) Build() TimeOfYear {
-	return *rb.v
-}
-
-func (rb *TimeOfYearBuilder) At(at ...string) *TimeOfYearBuilder {
-	rb.v.At = at
-	return rb
-}
-
-func (rb *TimeOfYearBuilder) Int(int ...month.Month) *TimeOfYearBuilder {
-	rb.v.Int = int
-	return rb
-}
-
-func (rb *TimeOfYearBuilder) On(on ...int) *TimeOfYearBuilder {
-	rb.v.On = on
-	return rb
+	return r
 }

@@ -15,59 +15,131 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DecayPlacementGeoLocationDistance type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/compound.ts#L77-L82
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/compound.ts#L170-L189
 type DecayPlacementGeoLocationDistance struct {
-	Decay  *float64     `json:"decay,omitempty"`
-	Offset *Distance    `json:"offset,omitempty"`
-	Origin *GeoLocation `json:"origin,omitempty"`
-	Scale  *Distance    `json:"scale,omitempty"`
+	// Decay Defines how documents are scored at the distance given at scale.
+	Decay *Float64 `json:"decay,omitempty"`
+	// Offset If defined, the decay function will only compute the decay function for
+	// documents with a distance greater than the defined `offset`.
+	Offset *string `json:"offset,omitempty"`
+	// Origin The point of origin used for calculating distance. Must be given as a number
+	// for numeric field, date for date fields and geo point for geo fields.
+	Origin GeoLocation `json:"origin,omitempty"`
+	// Scale Defines the distance from origin + offset at which the computed score will
+	// equal `decay` parameter.
+	Scale *string `json:"scale,omitempty"`
 }
 
-// DecayPlacementGeoLocationDistanceBuilder holds DecayPlacementGeoLocationDistance struct and provides a builder API.
-type DecayPlacementGeoLocationDistanceBuilder struct {
-	v *DecayPlacementGeoLocationDistance
-}
+func (s *DecayPlacementGeoLocationDistance) UnmarshalJSON(data []byte) error {
 
-// NewDecayPlacementGeoLocationDistance provides a builder for the DecayPlacementGeoLocationDistance struct.
-func NewDecayPlacementGeoLocationDistanceBuilder() *DecayPlacementGeoLocationDistanceBuilder {
-	r := DecayPlacementGeoLocationDistanceBuilder{
-		&DecayPlacementGeoLocationDistance{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "decay":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Decay", err)
+				}
+				f := Float64(value)
+				s.Decay = &f
+			case float64:
+				f := Float64(v)
+				s.Decay = &f
+			}
+
+		case "offset":
+			if err := dec.Decode(&s.Offset); err != nil {
+				return fmt.Errorf("%s | %w", "Offset", err)
+			}
+
+		case "origin":
+			message := json.RawMessage{}
+			if err := dec.Decode(&message); err != nil {
+				return fmt.Errorf("%s | %w", "Origin", err)
+			}
+			keyDec := json.NewDecoder(bytes.NewReader(message))
+		origin_field:
+			for {
+				t, err := keyDec.Token()
+				if err != nil {
+					if errors.Is(err, io.EOF) {
+						break
+					}
+					return fmt.Errorf("%s | %w", "Origin", err)
+				}
+
+				switch t {
+
+				case "lat", "lon":
+					o := NewLatLonGeoLocation()
+					localDec := json.NewDecoder(bytes.NewReader(message))
+					if err := localDec.Decode(&o); err != nil {
+						return fmt.Errorf("%s | %w", "Origin", err)
+					}
+					s.Origin = o
+					break origin_field
+
+				case "geohash":
+					o := NewGeoHashLocation()
+					localDec := json.NewDecoder(bytes.NewReader(message))
+					if err := localDec.Decode(&o); err != nil {
+						return fmt.Errorf("%s | %w", "Origin", err)
+					}
+					s.Origin = o
+					break origin_field
+
+				}
+			}
+			if s.Origin == nil {
+				localDec := json.NewDecoder(bytes.NewReader(message))
+				if err := localDec.Decode(&s.Origin); err != nil {
+					return fmt.Errorf("%s | %w", "Origin", err)
+				}
+			}
+
+		case "scale":
+			if err := dec.Decode(&s.Scale); err != nil {
+				return fmt.Errorf("%s | %w", "Scale", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DecayPlacementGeoLocationDistance struct
-func (rb *DecayPlacementGeoLocationDistanceBuilder) Build() DecayPlacementGeoLocationDistance {
-	return *rb.v
-}
+// NewDecayPlacementGeoLocationDistance returns a DecayPlacementGeoLocationDistance.
+func NewDecayPlacementGeoLocationDistance() *DecayPlacementGeoLocationDistance {
+	r := &DecayPlacementGeoLocationDistance{}
 
-func (rb *DecayPlacementGeoLocationDistanceBuilder) Decay(decay float64) *DecayPlacementGeoLocationDistanceBuilder {
-	rb.v.Decay = &decay
-	return rb
-}
-
-func (rb *DecayPlacementGeoLocationDistanceBuilder) Offset(offset Distance) *DecayPlacementGeoLocationDistanceBuilder {
-	rb.v.Offset = &offset
-	return rb
-}
-
-func (rb *DecayPlacementGeoLocationDistanceBuilder) Origin(origin *GeoLocationBuilder) *DecayPlacementGeoLocationDistanceBuilder {
-	v := origin.Build()
-	rb.v.Origin = &v
-	return rb
-}
-
-func (rb *DecayPlacementGeoLocationDistanceBuilder) Scale(scale Distance) *DecayPlacementGeoLocationDistanceBuilder {
-	rb.v.Scale = &scale
-	return rb
+	return r
 }

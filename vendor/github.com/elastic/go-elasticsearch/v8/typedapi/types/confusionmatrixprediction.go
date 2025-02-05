@@ -15,46 +15,72 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ConfusionMatrixPrediction type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/evaluate_data_frame/types.ts#L91-L94
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/evaluate_data_frame/types.ts#L132-L135
 type ConfusionMatrixPrediction struct {
-	Count          int  `json:"count"`
-	PredictedClass Name `json:"predicted_class"`
+	Count          int    `json:"count"`
+	PredictedClass string `json:"predicted_class"`
 }
 
-// ConfusionMatrixPredictionBuilder holds ConfusionMatrixPrediction struct and provides a builder API.
-type ConfusionMatrixPredictionBuilder struct {
-	v *ConfusionMatrixPrediction
-}
+func (s *ConfusionMatrixPrediction) UnmarshalJSON(data []byte) error {
 
-// NewConfusionMatrixPrediction provides a builder for the ConfusionMatrixPrediction struct.
-func NewConfusionMatrixPredictionBuilder() *ConfusionMatrixPredictionBuilder {
-	r := ConfusionMatrixPredictionBuilder{
-		&ConfusionMatrixPrediction{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Count", err)
+				}
+				s.Count = value
+			case float64:
+				f := int(v)
+				s.Count = f
+			}
+
+		case "predicted_class":
+			if err := dec.Decode(&s.PredictedClass); err != nil {
+				return fmt.Errorf("%s | %w", "PredictedClass", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ConfusionMatrixPrediction struct
-func (rb *ConfusionMatrixPredictionBuilder) Build() ConfusionMatrixPrediction {
-	return *rb.v
-}
+// NewConfusionMatrixPrediction returns a ConfusionMatrixPrediction.
+func NewConfusionMatrixPrediction() *ConfusionMatrixPrediction {
+	r := &ConfusionMatrixPrediction{}
 
-func (rb *ConfusionMatrixPredictionBuilder) Count(count int) *ConfusionMatrixPredictionBuilder {
-	rb.v.Count = count
-	return rb
-}
-
-func (rb *ConfusionMatrixPredictionBuilder) PredictedClass(predictedclass Name) *ConfusionMatrixPredictionBuilder {
-	rb.v.PredictedClass = predictedclass
-	return rb
+	return r
 }

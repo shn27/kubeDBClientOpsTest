@@ -15,60 +15,83 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ValueCountAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/metric.ts#L196-L196
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/metric.ts#L434-L434
 type ValueCountAggregation struct {
-	Field   *Field   `json:"field,omitempty"`
-	Format  *string  `json:"format,omitempty"`
-	Missing *Missing `json:"missing,omitempty"`
-	Script  *Script  `json:"script,omitempty"`
+	// Field The field on which to run the aggregation.
+	Field  *string `json:"field,omitempty"`
+	Format *string `json:"format,omitempty"`
+	// Missing The value to apply to documents that do not have a value.
+	// By default, documents without a value are ignored.
+	Missing Missing `json:"missing,omitempty"`
+	Script  *Script `json:"script,omitempty"`
 }
 
-// ValueCountAggregationBuilder holds ValueCountAggregation struct and provides a builder API.
-type ValueCountAggregationBuilder struct {
-	v *ValueCountAggregation
-}
+func (s *ValueCountAggregation) UnmarshalJSON(data []byte) error {
 
-// NewValueCountAggregation provides a builder for the ValueCountAggregation struct.
-func NewValueCountAggregationBuilder() *ValueCountAggregationBuilder {
-	r := ValueCountAggregationBuilder{
-		&ValueCountAggregation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "format":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Format", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Format = &o
+
+		case "missing":
+			if err := dec.Decode(&s.Missing); err != nil {
+				return fmt.Errorf("%s | %w", "Missing", err)
+			}
+
+		case "script":
+			if err := dec.Decode(&s.Script); err != nil {
+				return fmt.Errorf("%s | %w", "Script", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ValueCountAggregation struct
-func (rb *ValueCountAggregationBuilder) Build() ValueCountAggregation {
-	return *rb.v
-}
+// NewValueCountAggregation returns a ValueCountAggregation.
+func NewValueCountAggregation() *ValueCountAggregation {
+	r := &ValueCountAggregation{}
 
-func (rb *ValueCountAggregationBuilder) Field(field Field) *ValueCountAggregationBuilder {
-	rb.v.Field = &field
-	return rb
-}
-
-func (rb *ValueCountAggregationBuilder) Format(format string) *ValueCountAggregationBuilder {
-	rb.v.Format = &format
-	return rb
-}
-
-func (rb *ValueCountAggregationBuilder) Missing(missing *MissingBuilder) *ValueCountAggregationBuilder {
-	v := missing.Build()
-	rb.v.Missing = &v
-	return rb
-}
-
-func (rb *ValueCountAggregationBuilder) Script(script *ScriptBuilder) *ValueCountAggregationBuilder {
-	v := script.Build()
-	rb.v.Script = &v
-	return rb
+	return r
 }

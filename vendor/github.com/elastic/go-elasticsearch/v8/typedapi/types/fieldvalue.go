@@ -15,54 +15,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // FieldValue holds the union for the following types:
 //
-//	bool
-//	float64
 //	int64
+//	Float64
 //	string
+//	bool
+//	nil
+//	json.RawMessage
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/common.ts#L25-L30
-type FieldValue interface{}
-
-// FieldValueBuilder holds FieldValue struct and provides a builder API.
-type FieldValueBuilder struct {
-	v FieldValue
-}
-
-// NewFieldValue provides a builder for the FieldValue struct.
-func NewFieldValueBuilder() *FieldValueBuilder {
-	return &FieldValueBuilder{}
-}
-
-// Build finalize the chain and returns the FieldValue struct
-func (u *FieldValueBuilder) Build() FieldValue {
-	return u.v
-}
-
-func (u *FieldValueBuilder) Bool(bool bool) *FieldValueBuilder {
-	u.v = &bool
-	return u
-}
-
-func (u *FieldValueBuilder) Float64(float64 float64) *FieldValueBuilder {
-	u.v = &float64
-	return u
-}
-
-func (u *FieldValueBuilder) Int64(int64 int64) *FieldValueBuilder {
-	u.v = &int64
-	return u
-}
-
-func (u *FieldValueBuilder) String(string string) *FieldValueBuilder {
-	u.v = &string
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/common.ts#L25-L37
+type FieldValue any

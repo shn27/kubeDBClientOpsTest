@@ -15,41 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // NodeInfoXpackLicense type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/info/types.ts#L265-L267
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/info/types.ts#L281-L283
 type NodeInfoXpackLicense struct {
 	SelfGenerated NodeInfoXpackLicenseType `json:"self_generated"`
 }
 
-// NodeInfoXpackLicenseBuilder holds NodeInfoXpackLicense struct and provides a builder API.
-type NodeInfoXpackLicenseBuilder struct {
-	v *NodeInfoXpackLicense
-}
+// NewNodeInfoXpackLicense returns a NodeInfoXpackLicense.
+func NewNodeInfoXpackLicense() *NodeInfoXpackLicense {
+	r := &NodeInfoXpackLicense{}
 
-// NewNodeInfoXpackLicense provides a builder for the NodeInfoXpackLicense struct.
-func NewNodeInfoXpackLicenseBuilder() *NodeInfoXpackLicenseBuilder {
-	r := NodeInfoXpackLicenseBuilder{
-		&NodeInfoXpackLicense{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the NodeInfoXpackLicense struct
-func (rb *NodeInfoXpackLicenseBuilder) Build() NodeInfoXpackLicense {
-	return *rb.v
-}
-
-func (rb *NodeInfoXpackLicenseBuilder) SelfGenerated(selfgenerated *NodeInfoXpackLicenseTypeBuilder) *NodeInfoXpackLicenseBuilder {
-	v := selfgenerated.Build()
-	rb.v.SelfGenerated = v
-	return rb
+	return r
 }

@@ -15,16 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
+	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/noderole"
+)
+
 // NodeInfo type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/info/types.ts#L30-L66
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/info/types.ts#L31-L67
 type NodeInfo struct {
 	Aggregations map[string]NodeInfoAggregation `json:"aggregations,omitempty"`
 	Attributes   map[string]string              `json:"attributes"`
@@ -33,20 +42,20 @@ type NodeInfo struct {
 	BuildHash string `json:"build_hash"`
 	BuildType string `json:"build_type"`
 	// Host The node’s host name.
-	Host   Host            `json:"host"`
+	Host   string          `json:"host"`
 	Http   *NodeInfoHttp   `json:"http,omitempty"`
 	Ingest *NodeInfoIngest `json:"ingest,omitempty"`
 	// Ip The node’s IP address.
-	Ip      Ip            `json:"ip"`
+	Ip      string        `json:"ip"`
 	Jvm     *NodeJvmInfo  `json:"jvm,omitempty"`
 	Modules []PluginStats `json:"modules,omitempty"`
 	// Name The node's name
-	Name       Name                          `json:"name"`
+	Name       string                        `json:"name"`
 	Network    *NodeInfoNetwork              `json:"network,omitempty"`
 	Os         *NodeOperatingSystemInfo      `json:"os,omitempty"`
 	Plugins    []PluginStats                 `json:"plugins,omitempty"`
 	Process    *NodeProcessInfo              `json:"process,omitempty"`
-	Roles      NodeRoles                     `json:"roles"`
+	Roles      []noderole.NodeRole           `json:"roles"`
 	Settings   *NodeInfoSettings             `json:"settings,omitempty"`
 	ThreadPool map[string]NodeThreadPoolInfo `json:"thread_pool,omitempty"`
 	// TotalIndexingBuffer Total heap allowed to be used to hold recently indexed documents before they
@@ -54,197 +63,201 @@ type NodeInfo struct {
 	// node, and is controlled by Indexing Buffer settings.
 	TotalIndexingBuffer *int64 `json:"total_indexing_buffer,omitempty"`
 	// TotalIndexingBufferInBytes Same as total_indexing_buffer, but expressed in bytes.
-	TotalIndexingBufferInBytes *ByteSize          `json:"total_indexing_buffer_in_bytes,omitempty"`
+	TotalIndexingBufferInBytes ByteSize           `json:"total_indexing_buffer_in_bytes,omitempty"`
 	Transport                  *NodeInfoTransport `json:"transport,omitempty"`
 	// TransportAddress Host and port where transport HTTP connections are accepted.
-	TransportAddress TransportAddress `json:"transport_address"`
+	TransportAddress string `json:"transport_address"`
 	// Version Elasticsearch version running on this node.
-	Version VersionString `json:"version"`
+	Version string `json:"version"`
 }
 
-// NodeInfoBuilder holds NodeInfo struct and provides a builder API.
-type NodeInfoBuilder struct {
-	v *NodeInfo
+func (s *NodeInfo) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "aggregations":
+			if s.Aggregations == nil {
+				s.Aggregations = make(map[string]NodeInfoAggregation, 0)
+			}
+			if err := dec.Decode(&s.Aggregations); err != nil {
+				return fmt.Errorf("%s | %w", "Aggregations", err)
+			}
+
+		case "attributes":
+			if s.Attributes == nil {
+				s.Attributes = make(map[string]string, 0)
+			}
+			if err := dec.Decode(&s.Attributes); err != nil {
+				return fmt.Errorf("%s | %w", "Attributes", err)
+			}
+
+		case "build_flavor":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "BuildFlavor", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.BuildFlavor = o
+
+		case "build_hash":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "BuildHash", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.BuildHash = o
+
+		case "build_type":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "BuildType", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.BuildType = o
+
+		case "host":
+			if err := dec.Decode(&s.Host); err != nil {
+				return fmt.Errorf("%s | %w", "Host", err)
+			}
+
+		case "http":
+			if err := dec.Decode(&s.Http); err != nil {
+				return fmt.Errorf("%s | %w", "Http", err)
+			}
+
+		case "ingest":
+			if err := dec.Decode(&s.Ingest); err != nil {
+				return fmt.Errorf("%s | %w", "Ingest", err)
+			}
+
+		case "ip":
+			if err := dec.Decode(&s.Ip); err != nil {
+				return fmt.Errorf("%s | %w", "Ip", err)
+			}
+
+		case "jvm":
+			if err := dec.Decode(&s.Jvm); err != nil {
+				return fmt.Errorf("%s | %w", "Jvm", err)
+			}
+
+		case "modules":
+			if err := dec.Decode(&s.Modules); err != nil {
+				return fmt.Errorf("%s | %w", "Modules", err)
+			}
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		case "network":
+			if err := dec.Decode(&s.Network); err != nil {
+				return fmt.Errorf("%s | %w", "Network", err)
+			}
+
+		case "os":
+			if err := dec.Decode(&s.Os); err != nil {
+				return fmt.Errorf("%s | %w", "Os", err)
+			}
+
+		case "plugins":
+			if err := dec.Decode(&s.Plugins); err != nil {
+				return fmt.Errorf("%s | %w", "Plugins", err)
+			}
+
+		case "process":
+			if err := dec.Decode(&s.Process); err != nil {
+				return fmt.Errorf("%s | %w", "Process", err)
+			}
+
+		case "roles":
+			if err := dec.Decode(&s.Roles); err != nil {
+				return fmt.Errorf("%s | %w", "Roles", err)
+			}
+
+		case "settings":
+			if err := dec.Decode(&s.Settings); err != nil {
+				return fmt.Errorf("%s | %w", "Settings", err)
+			}
+
+		case "thread_pool":
+			if s.ThreadPool == nil {
+				s.ThreadPool = make(map[string]NodeThreadPoolInfo, 0)
+			}
+			if err := dec.Decode(&s.ThreadPool); err != nil {
+				return fmt.Errorf("%s | %w", "ThreadPool", err)
+			}
+
+		case "total_indexing_buffer":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TotalIndexingBuffer", err)
+				}
+				s.TotalIndexingBuffer = &value
+			case float64:
+				f := int64(v)
+				s.TotalIndexingBuffer = &f
+			}
+
+		case "total_indexing_buffer_in_bytes":
+			if err := dec.Decode(&s.TotalIndexingBufferInBytes); err != nil {
+				return fmt.Errorf("%s | %w", "TotalIndexingBufferInBytes", err)
+			}
+
+		case "transport":
+			if err := dec.Decode(&s.Transport); err != nil {
+				return fmt.Errorf("%s | %w", "Transport", err)
+			}
+
+		case "transport_address":
+			if err := dec.Decode(&s.TransportAddress); err != nil {
+				return fmt.Errorf("%s | %w", "TransportAddress", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewNodeInfo provides a builder for the NodeInfo struct.
-func NewNodeInfoBuilder() *NodeInfoBuilder {
-	r := NodeInfoBuilder{
-		&NodeInfo{
-			Aggregations: make(map[string]NodeInfoAggregation, 0),
-			Attributes:   make(map[string]string, 0),
-			ThreadPool:   make(map[string]NodeThreadPoolInfo, 0),
-		},
+// NewNodeInfo returns a NodeInfo.
+func NewNodeInfo() *NodeInfo {
+	r := &NodeInfo{
+		Aggregations: make(map[string]NodeInfoAggregation, 0),
+		Attributes:   make(map[string]string, 0),
+		ThreadPool:   make(map[string]NodeThreadPoolInfo, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the NodeInfo struct
-func (rb *NodeInfoBuilder) Build() NodeInfo {
-	return *rb.v
-}
-
-func (rb *NodeInfoBuilder) Aggregations(values map[string]*NodeInfoAggregationBuilder) *NodeInfoBuilder {
-	tmp := make(map[string]NodeInfoAggregation, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Aggregations = tmp
-	return rb
-}
-
-func (rb *NodeInfoBuilder) Attributes(value map[string]string) *NodeInfoBuilder {
-	rb.v.Attributes = value
-	return rb
-}
-
-func (rb *NodeInfoBuilder) BuildFlavor(buildflavor string) *NodeInfoBuilder {
-	rb.v.BuildFlavor = buildflavor
-	return rb
-}
-
-// BuildHash Short hash of the last git commit in this release.
-
-func (rb *NodeInfoBuilder) BuildHash(buildhash string) *NodeInfoBuilder {
-	rb.v.BuildHash = buildhash
-	return rb
-}
-
-func (rb *NodeInfoBuilder) BuildType(buildtype string) *NodeInfoBuilder {
-	rb.v.BuildType = buildtype
-	return rb
-}
-
-// Host The node’s host name.
-
-func (rb *NodeInfoBuilder) Host(host Host) *NodeInfoBuilder {
-	rb.v.Host = host
-	return rb
-}
-
-func (rb *NodeInfoBuilder) Http(http *NodeInfoHttpBuilder) *NodeInfoBuilder {
-	v := http.Build()
-	rb.v.Http = &v
-	return rb
-}
-
-func (rb *NodeInfoBuilder) Ingest(ingest *NodeInfoIngestBuilder) *NodeInfoBuilder {
-	v := ingest.Build()
-	rb.v.Ingest = &v
-	return rb
-}
-
-// Ip The node’s IP address.
-
-func (rb *NodeInfoBuilder) Ip(ip Ip) *NodeInfoBuilder {
-	rb.v.Ip = ip
-	return rb
-}
-
-func (rb *NodeInfoBuilder) Jvm(jvm *NodeJvmInfoBuilder) *NodeInfoBuilder {
-	v := jvm.Build()
-	rb.v.Jvm = &v
-	return rb
-}
-
-func (rb *NodeInfoBuilder) Modules(modules []PluginStatsBuilder) *NodeInfoBuilder {
-	tmp := make([]PluginStats, len(modules))
-	for _, value := range modules {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Modules = tmp
-	return rb
-}
-
-// Name The node's name
-
-func (rb *NodeInfoBuilder) Name(name Name) *NodeInfoBuilder {
-	rb.v.Name = name
-	return rb
-}
-
-func (rb *NodeInfoBuilder) Network(network *NodeInfoNetworkBuilder) *NodeInfoBuilder {
-	v := network.Build()
-	rb.v.Network = &v
-	return rb
-}
-
-func (rb *NodeInfoBuilder) Os(os *NodeOperatingSystemInfoBuilder) *NodeInfoBuilder {
-	v := os.Build()
-	rb.v.Os = &v
-	return rb
-}
-
-func (rb *NodeInfoBuilder) Plugins(plugins []PluginStatsBuilder) *NodeInfoBuilder {
-	tmp := make([]PluginStats, len(plugins))
-	for _, value := range plugins {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Plugins = tmp
-	return rb
-}
-
-func (rb *NodeInfoBuilder) Process(process *NodeProcessInfoBuilder) *NodeInfoBuilder {
-	v := process.Build()
-	rb.v.Process = &v
-	return rb
-}
-
-func (rb *NodeInfoBuilder) Roles(roles *NodeRolesBuilder) *NodeInfoBuilder {
-	v := roles.Build()
-	rb.v.Roles = v
-	return rb
-}
-
-func (rb *NodeInfoBuilder) Settings(settings *NodeInfoSettingsBuilder) *NodeInfoBuilder {
-	v := settings.Build()
-	rb.v.Settings = &v
-	return rb
-}
-
-func (rb *NodeInfoBuilder) ThreadPool(values map[string]*NodeThreadPoolInfoBuilder) *NodeInfoBuilder {
-	tmp := make(map[string]NodeThreadPoolInfo, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.ThreadPool = tmp
-	return rb
-}
-
-// TotalIndexingBuffer Total heap allowed to be used to hold recently indexed documents before they
-// must be written to disk. This size is a shared pool across all shards on this
-// node, and is controlled by Indexing Buffer settings.
-
-func (rb *NodeInfoBuilder) TotalIndexingBuffer(totalindexingbuffer int64) *NodeInfoBuilder {
-	rb.v.TotalIndexingBuffer = &totalindexingbuffer
-	return rb
-}
-
-// TotalIndexingBufferInBytes Same as total_indexing_buffer, but expressed in bytes.
-
-func (rb *NodeInfoBuilder) TotalIndexingBufferInBytes(totalindexingbufferinbytes *ByteSizeBuilder) *NodeInfoBuilder {
-	v := totalindexingbufferinbytes.Build()
-	rb.v.TotalIndexingBufferInBytes = &v
-	return rb
-}
-
-func (rb *NodeInfoBuilder) Transport(transport *NodeInfoTransportBuilder) *NodeInfoBuilder {
-	v := transport.Build()
-	rb.v.Transport = &v
-	return rb
-}
-
-// TransportAddress Host and port where transport HTTP connections are accepted.
-
-func (rb *NodeInfoBuilder) TransportAddress(transportaddress TransportAddress) *NodeInfoBuilder {
-	rb.v.TransportAddress = transportaddress
-	return rb
-}
-
-// Version Elasticsearch version running on this node.
-
-func (rb *NodeInfoBuilder) Version(version VersionString) *NodeInfoBuilder {
-	rb.v.Version = version
-	return rb
+	return r
 }

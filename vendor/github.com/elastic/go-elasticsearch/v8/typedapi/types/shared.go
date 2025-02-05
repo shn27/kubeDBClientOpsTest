@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // Shared type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/searchable_snapshots/cache_stats/Response.ts#L34-L43
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/searchable_snapshots/cache_stats/Response.ts#L34-L43
 type Shared struct {
 	BytesReadInBytes    ByteSize `json:"bytes_read_in_bytes"`
 	BytesWrittenInBytes ByteSize `json:"bytes_written_in_bytes"`
@@ -36,65 +43,110 @@ type Shared struct {
 	Writes              int64    `json:"writes"`
 }
 
-// SharedBuilder holds Shared struct and provides a builder API.
-type SharedBuilder struct {
-	v *Shared
-}
+func (s *Shared) UnmarshalJSON(data []byte) error {
 
-// NewShared provides a builder for the Shared struct.
-func NewSharedBuilder() *SharedBuilder {
-	r := SharedBuilder{
-		&Shared{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "bytes_read_in_bytes":
+			if err := dec.Decode(&s.BytesReadInBytes); err != nil {
+				return fmt.Errorf("%s | %w", "BytesReadInBytes", err)
+			}
+
+		case "bytes_written_in_bytes":
+			if err := dec.Decode(&s.BytesWrittenInBytes); err != nil {
+				return fmt.Errorf("%s | %w", "BytesWrittenInBytes", err)
+			}
+
+		case "evictions":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Evictions", err)
+				}
+				s.Evictions = value
+			case float64:
+				f := int64(v)
+				s.Evictions = f
+			}
+
+		case "num_regions":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NumRegions", err)
+				}
+				s.NumRegions = value
+			case float64:
+				f := int(v)
+				s.NumRegions = f
+			}
+
+		case "reads":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Reads", err)
+				}
+				s.Reads = value
+			case float64:
+				f := int64(v)
+				s.Reads = f
+			}
+
+		case "region_size_in_bytes":
+			if err := dec.Decode(&s.RegionSizeInBytes); err != nil {
+				return fmt.Errorf("%s | %w", "RegionSizeInBytes", err)
+			}
+
+		case "size_in_bytes":
+			if err := dec.Decode(&s.SizeInBytes); err != nil {
+				return fmt.Errorf("%s | %w", "SizeInBytes", err)
+			}
+
+		case "writes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Writes", err)
+				}
+				s.Writes = value
+			case float64:
+				f := int64(v)
+				s.Writes = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the Shared struct
-func (rb *SharedBuilder) Build() Shared {
-	return *rb.v
-}
+// NewShared returns a Shared.
+func NewShared() *Shared {
+	r := &Shared{}
 
-func (rb *SharedBuilder) BytesReadInBytes(bytesreadinbytes *ByteSizeBuilder) *SharedBuilder {
-	v := bytesreadinbytes.Build()
-	rb.v.BytesReadInBytes = v
-	return rb
-}
-
-func (rb *SharedBuilder) BytesWrittenInBytes(byteswritteninbytes *ByteSizeBuilder) *SharedBuilder {
-	v := byteswritteninbytes.Build()
-	rb.v.BytesWrittenInBytes = v
-	return rb
-}
-
-func (rb *SharedBuilder) Evictions(evictions int64) *SharedBuilder {
-	rb.v.Evictions = evictions
-	return rb
-}
-
-func (rb *SharedBuilder) NumRegions(numregions int) *SharedBuilder {
-	rb.v.NumRegions = numregions
-	return rb
-}
-
-func (rb *SharedBuilder) Reads(reads int64) *SharedBuilder {
-	rb.v.Reads = reads
-	return rb
-}
-
-func (rb *SharedBuilder) RegionSizeInBytes(regionsizeinbytes *ByteSizeBuilder) *SharedBuilder {
-	v := regionsizeinbytes.Build()
-	rb.v.RegionSizeInBytes = v
-	return rb
-}
-
-func (rb *SharedBuilder) SizeInBytes(sizeinbytes *ByteSizeBuilder) *SharedBuilder {
-	v := sizeinbytes.Build()
-	rb.v.SizeInBytes = v
-	return rb
-}
-
-func (rb *SharedBuilder) Writes(writes int64) *SharedBuilder {
-	rb.v.Writes = writes
-	return rb
+	return r
 }

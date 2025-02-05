@@ -15,79 +15,123 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // ScheduleContainer type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Schedule.ts#L85-L96
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Schedule.ts#L80-L91
 type ScheduleContainer struct {
-	Cron     *CronExpression `json:"cron,omitempty"`
+	Cron     *string         `json:"cron,omitempty"`
 	Daily    *DailySchedule  `json:"daily,omitempty"`
 	Hourly   *HourlySchedule `json:"hourly,omitempty"`
-	Interval *Duration       `json:"interval,omitempty"`
+	Interval Duration        `json:"interval,omitempty"`
 	Monthly  []TimeOfMonth   `json:"monthly,omitempty"`
 	Weekly   []TimeOfWeek    `json:"weekly,omitempty"`
 	Yearly   []TimeOfYear    `json:"yearly,omitempty"`
 }
 
-// ScheduleContainerBuilder holds ScheduleContainer struct and provides a builder API.
-type ScheduleContainerBuilder struct {
-	v *ScheduleContainer
-}
+func (s *ScheduleContainer) UnmarshalJSON(data []byte) error {
 
-// NewScheduleContainer provides a builder for the ScheduleContainer struct.
-func NewScheduleContainerBuilder() *ScheduleContainerBuilder {
-	r := ScheduleContainerBuilder{
-		&ScheduleContainer{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "cron":
+			if err := dec.Decode(&s.Cron); err != nil {
+				return fmt.Errorf("%s | %w", "Cron", err)
+			}
+
+		case "daily":
+			if err := dec.Decode(&s.Daily); err != nil {
+				return fmt.Errorf("%s | %w", "Daily", err)
+			}
+
+		case "hourly":
+			if err := dec.Decode(&s.Hourly); err != nil {
+				return fmt.Errorf("%s | %w", "Hourly", err)
+			}
+
+		case "interval":
+			if err := dec.Decode(&s.Interval); err != nil {
+				return fmt.Errorf("%s | %w", "Interval", err)
+			}
+
+		case "monthly":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := NewTimeOfMonth()
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Monthly", err)
+				}
+
+				s.Monthly = append(s.Monthly, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Monthly); err != nil {
+					return fmt.Errorf("%s | %w", "Monthly", err)
+				}
+			}
+
+		case "weekly":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := NewTimeOfWeek()
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Weekly", err)
+				}
+
+				s.Weekly = append(s.Weekly, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Weekly); err != nil {
+					return fmt.Errorf("%s | %w", "Weekly", err)
+				}
+			}
+
+		case "yearly":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := NewTimeOfYear()
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Yearly", err)
+				}
+
+				s.Yearly = append(s.Yearly, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Yearly); err != nil {
+					return fmt.Errorf("%s | %w", "Yearly", err)
+				}
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ScheduleContainer struct
-func (rb *ScheduleContainerBuilder) Build() ScheduleContainer {
-	return *rb.v
-}
+// NewScheduleContainer returns a ScheduleContainer.
+func NewScheduleContainer() *ScheduleContainer {
+	r := &ScheduleContainer{}
 
-func (rb *ScheduleContainerBuilder) Cron(cron CronExpression) *ScheduleContainerBuilder {
-	rb.v.Cron = &cron
-	return rb
-}
-
-func (rb *ScheduleContainerBuilder) Daily(daily *DailyScheduleBuilder) *ScheduleContainerBuilder {
-	v := daily.Build()
-	rb.v.Daily = &v
-	return rb
-}
-
-func (rb *ScheduleContainerBuilder) Hourly(hourly *HourlyScheduleBuilder) *ScheduleContainerBuilder {
-	v := hourly.Build()
-	rb.v.Hourly = &v
-	return rb
-}
-
-func (rb *ScheduleContainerBuilder) Interval(interval *DurationBuilder) *ScheduleContainerBuilder {
-	v := interval.Build()
-	rb.v.Interval = &v
-	return rb
-}
-
-func (rb *ScheduleContainerBuilder) Monthly(arg []TimeOfMonth) *ScheduleContainerBuilder {
-	rb.v.Monthly = arg
-	return rb
-}
-
-func (rb *ScheduleContainerBuilder) Weekly(arg []TimeOfWeek) *ScheduleContainerBuilder {
-	rb.v.Weekly = arg
-	return rb
-}
-
-func (rb *ScheduleContainerBuilder) Yearly(arg []TimeOfYear) *ScheduleContainerBuilder {
-	rb.v.Yearly = arg
-	return rb
+	return r
 }

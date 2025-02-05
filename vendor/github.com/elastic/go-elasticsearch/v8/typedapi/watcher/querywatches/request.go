@@ -15,56 +15,48 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package querywatches
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"strconv"
 
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 )
 
 // Request holds the request body struct for the package querywatches
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/query_watches/WatcherQueryWatchesRequest.ts#L25-L49
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/query_watches/WatcherQueryWatchesRequest.ts#L25-L48
 type Request struct {
 
 	// From The offset from the first result to fetch. Needs to be non-negative.
 	From *int `json:"from,omitempty"`
-
 	// Query Optional, query filter watches to be returned.
-	Query *types.QueryContainer `json:"query,omitempty"`
-
+	Query *types.Query `json:"query,omitempty"`
 	// SearchAfter Optional search After to do pagination using last hit’s sort values.
-	SearchAfter *types.SortResults `json:"search_after,omitempty"`
-
+	SearchAfter []types.FieldValue `json:"search_after,omitempty"`
 	// Size The number of hits to return. Needs to be non-negative.
 	Size *int `json:"size,omitempty"`
-
 	// Sort Optional sort definition.
-	Sort *types.Sort `json:"sort,omitempty"`
+	Sort []types.SortCombinations `json:"sort,omitempty"`
 }
 
-// RequestBuilder is the builder API for the querywatches.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -75,35 +67,79 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) From(from int) *RequestBuilder {
-	rb.v.From = &from
-	return rb
-}
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
 
-func (rb *RequestBuilder) Query(query *types.QueryContainerBuilder) *RequestBuilder {
-	v := query.Build()
-	rb.v.Query = &v
-	return rb
-}
+		switch t {
 
-func (rb *RequestBuilder) SearchAfter(searchafter *types.SortResultsBuilder) *RequestBuilder {
-	v := searchafter.Build()
-	rb.v.SearchAfter = &v
-	return rb
-}
+		case "from":
 
-func (rb *RequestBuilder) Size(size int) *RequestBuilder {
-	rb.v.Size = &size
-	return rb
-}
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "From", err)
+				}
+				s.From = &value
+			case float64:
+				f := int(v)
+				s.From = &f
+			}
 
-func (rb *RequestBuilder) Sort(sort *types.SortBuilder) *RequestBuilder {
-	v := sort.Build()
-	rb.v.Sort = &v
-	return rb
+		case "query":
+			if err := dec.Decode(&s.Query); err != nil {
+				return fmt.Errorf("%s | %w", "Query", err)
+			}
+
+		case "search_after":
+			if err := dec.Decode(&s.SearchAfter); err != nil {
+				return fmt.Errorf("%s | %w", "SearchAfter", err)
+			}
+
+		case "size":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Size", err)
+				}
+				s.Size = &value
+			case float64:
+				f := int(v)
+				s.Size = &f
+			}
+
+		case "sort":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(types.SortCombinations)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Sort", err)
+				}
+
+				s.Sort = append(s.Sort, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Sort); err != nil {
+					return fmt.Errorf("%s | %w", "Sort", err)
+				}
+			}
+
+		}
+	}
+	return nil
 }

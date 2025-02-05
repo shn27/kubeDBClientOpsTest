@@ -15,52 +15,97 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // MlInferenceIngestProcessorCount type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/usage/types.ts#L223-L227
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/xpack/usage/types.ts#L236-L240
 type MlInferenceIngestProcessorCount struct {
 	Max int64 `json:"max"`
 	Min int64 `json:"min"`
 	Sum int64 `json:"sum"`
 }
 
-// MlInferenceIngestProcessorCountBuilder holds MlInferenceIngestProcessorCount struct and provides a builder API.
-type MlInferenceIngestProcessorCountBuilder struct {
-	v *MlInferenceIngestProcessorCount
-}
+func (s *MlInferenceIngestProcessorCount) UnmarshalJSON(data []byte) error {
 
-// NewMlInferenceIngestProcessorCount provides a builder for the MlInferenceIngestProcessorCount struct.
-func NewMlInferenceIngestProcessorCountBuilder() *MlInferenceIngestProcessorCountBuilder {
-	r := MlInferenceIngestProcessorCountBuilder{
-		&MlInferenceIngestProcessorCount{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "max":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Max", err)
+				}
+				s.Max = value
+			case float64:
+				f := int64(v)
+				s.Max = f
+			}
+
+		case "min":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Min", err)
+				}
+				s.Min = value
+			case float64:
+				f := int64(v)
+				s.Min = f
+			}
+
+		case "sum":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Sum", err)
+				}
+				s.Sum = value
+			case float64:
+				f := int64(v)
+				s.Sum = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the MlInferenceIngestProcessorCount struct
-func (rb *MlInferenceIngestProcessorCountBuilder) Build() MlInferenceIngestProcessorCount {
-	return *rb.v
-}
+// NewMlInferenceIngestProcessorCount returns a MlInferenceIngestProcessorCount.
+func NewMlInferenceIngestProcessorCount() *MlInferenceIngestProcessorCount {
+	r := &MlInferenceIngestProcessorCount{}
 
-func (rb *MlInferenceIngestProcessorCountBuilder) Max(max int64) *MlInferenceIngestProcessorCountBuilder {
-	rb.v.Max = max
-	return rb
-}
-
-func (rb *MlInferenceIngestProcessorCountBuilder) Min(min int64) *MlInferenceIngestProcessorCountBuilder {
-	rb.v.Min = min
-	return rb
-}
-
-func (rb *MlInferenceIngestProcessorCountBuilder) Sum(sum int64) *MlInferenceIngestProcessorCountBuilder {
-	rb.v.Sum = sum
-	return rb
+	return r
 }

@@ -15,59 +15,107 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // Processor type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/_types/Stats.ts#L156-L161
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/_types/Stats.ts#L420-L437
 type Processor struct {
-	Count        *int64                   `json:"count,omitempty"`
-	Current      *int64                   `json:"current,omitempty"`
-	Failed       *int64                   `json:"failed,omitempty"`
-	TimeInMillis *DurationValueUnitMillis `json:"time_in_millis,omitempty"`
+	// Count Number of documents transformed by the processor.
+	Count *int64 `json:"count,omitempty"`
+	// Current Number of documents currently being transformed by the processor.
+	Current *int64 `json:"current,omitempty"`
+	// Failed Number of failed operations for the processor.
+	Failed *int64 `json:"failed,omitempty"`
+	// TimeInMillis Time, in milliseconds, spent by the processor transforming documents.
+	TimeInMillis *int64 `json:"time_in_millis,omitempty"`
 }
 
-// ProcessorBuilder holds Processor struct and provides a builder API.
-type ProcessorBuilder struct {
-	v *Processor
-}
+func (s *Processor) UnmarshalJSON(data []byte) error {
 
-// NewProcessor provides a builder for the Processor struct.
-func NewProcessorBuilder() *ProcessorBuilder {
-	r := ProcessorBuilder{
-		&Processor{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Count", err)
+				}
+				s.Count = &value
+			case float64:
+				f := int64(v)
+				s.Count = &f
+			}
+
+		case "current":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Current", err)
+				}
+				s.Current = &value
+			case float64:
+				f := int64(v)
+				s.Current = &f
+			}
+
+		case "failed":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Failed", err)
+				}
+				s.Failed = &value
+			case float64:
+				f := int64(v)
+				s.Failed = &f
+			}
+
+		case "time_in_millis":
+			if err := dec.Decode(&s.TimeInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "TimeInMillis", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the Processor struct
-func (rb *ProcessorBuilder) Build() Processor {
-	return *rb.v
-}
+// NewProcessor returns a Processor.
+func NewProcessor() *Processor {
+	r := &Processor{}
 
-func (rb *ProcessorBuilder) Count(count int64) *ProcessorBuilder {
-	rb.v.Count = &count
-	return rb
-}
-
-func (rb *ProcessorBuilder) Current(current int64) *ProcessorBuilder {
-	rb.v.Current = &current
-	return rb
-}
-
-func (rb *ProcessorBuilder) Failed(failed int64) *ProcessorBuilder {
-	rb.v.Failed = &failed
-	return rb
-}
-
-func (rb *ProcessorBuilder) TimeInMillis(timeinmillis *DurationValueUnitMillisBuilder) *ProcessorBuilder {
-	v := timeinmillis.Build()
-	rb.v.TimeInMillis = &v
-	return rb
+	return r
 }

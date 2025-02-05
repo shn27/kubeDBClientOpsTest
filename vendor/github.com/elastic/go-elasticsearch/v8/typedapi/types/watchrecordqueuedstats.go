@@ -15,41 +15,54 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // WatchRecordQueuedStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/stats/types.ts#L50-L52
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/stats/types.ts#L50-L52
 type WatchRecordQueuedStats struct {
 	ExecutionTime DateTime `json:"execution_time"`
 }
 
-// WatchRecordQueuedStatsBuilder holds WatchRecordQueuedStats struct and provides a builder API.
-type WatchRecordQueuedStatsBuilder struct {
-	v *WatchRecordQueuedStats
-}
+func (s *WatchRecordQueuedStats) UnmarshalJSON(data []byte) error {
 
-// NewWatchRecordQueuedStats provides a builder for the WatchRecordQueuedStats struct.
-func NewWatchRecordQueuedStatsBuilder() *WatchRecordQueuedStatsBuilder {
-	r := WatchRecordQueuedStatsBuilder{
-		&WatchRecordQueuedStats{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "execution_time":
+			if err := dec.Decode(&s.ExecutionTime); err != nil {
+				return fmt.Errorf("%s | %w", "ExecutionTime", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the WatchRecordQueuedStats struct
-func (rb *WatchRecordQueuedStatsBuilder) Build() WatchRecordQueuedStats {
-	return *rb.v
-}
+// NewWatchRecordQueuedStats returns a WatchRecordQueuedStats.
+func NewWatchRecordQueuedStats() *WatchRecordQueuedStats {
+	r := &WatchRecordQueuedStats{}
 
-func (rb *WatchRecordQueuedStatsBuilder) ExecutionTime(executiontime *DateTimeBuilder) *WatchRecordQueuedStatsBuilder {
-	v := executiontime.Build()
-	rb.v.ExecutionTime = v
-	return rb
+	return r
 }

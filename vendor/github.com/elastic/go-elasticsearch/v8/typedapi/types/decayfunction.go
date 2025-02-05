@@ -15,51 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // DecayFunction holds the union for the following types:
 //
+//	UntypedDecayFunction
 //	DateDecayFunction
-//	GeoDecayFunction
 //	NumericDecayFunction
+//	GeoDecayFunction
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/compound.ts#L100-L105
-type DecayFunction interface{}
-
-// DecayFunctionBuilder holds DecayFunction struct and provides a builder API.
-type DecayFunctionBuilder struct {
-	v DecayFunction
-}
-
-// NewDecayFunction provides a builder for the DecayFunction struct.
-func NewDecayFunctionBuilder() *DecayFunctionBuilder {
-	return &DecayFunctionBuilder{}
-}
-
-// Build finalize the chain and returns the DecayFunction struct
-func (u *DecayFunctionBuilder) Build() DecayFunction {
-	return u.v
-}
-
-func (u *DecayFunctionBuilder) DateDecayFunction(datedecayfunction *DateDecayFunctionBuilder) *DecayFunctionBuilder {
-	v := datedecayfunction.Build()
-	u.v = &v
-	return u
-}
-
-func (u *DecayFunctionBuilder) GeoDecayFunction(geodecayfunction *GeoDecayFunctionBuilder) *DecayFunctionBuilder {
-	v := geodecayfunction.Build()
-	u.v = &v
-	return u
-}
-
-func (u *DecayFunctionBuilder) NumericDecayFunction(numericdecayfunction *NumericDecayFunctionBuilder) *DecayFunctionBuilder {
-	v := numericdecayfunction.Build()
-	u.v = &v
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/compound.ts#L215-L224
+type DecayFunction any

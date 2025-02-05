@@ -15,43 +15,73 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // WhitespaceAnalyzer type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/analyzers.ts#L108-L111
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/analyzers.ts#L354-L357
 type WhitespaceAnalyzer struct {
-	Type    string         `json:"type,omitempty"`
-	Version *VersionString `json:"version,omitempty"`
+	Type    string  `json:"type,omitempty"`
+	Version *string `json:"version,omitempty"`
 }
 
-// WhitespaceAnalyzerBuilder holds WhitespaceAnalyzer struct and provides a builder API.
-type WhitespaceAnalyzerBuilder struct {
-	v *WhitespaceAnalyzer
+func (s *WhitespaceAnalyzer) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewWhitespaceAnalyzer provides a builder for the WhitespaceAnalyzer struct.
-func NewWhitespaceAnalyzerBuilder() *WhitespaceAnalyzerBuilder {
-	r := WhitespaceAnalyzerBuilder{
-		&WhitespaceAnalyzer{},
+// MarshalJSON override marshalling to include literal value
+func (s WhitespaceAnalyzer) MarshalJSON() ([]byte, error) {
+	type innerWhitespaceAnalyzer WhitespaceAnalyzer
+	tmp := innerWhitespaceAnalyzer{
+		Type:    s.Type,
+		Version: s.Version,
 	}
 
-	r.v.Type = "whitespace"
+	tmp.Type = "whitespace"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the WhitespaceAnalyzer struct
-func (rb *WhitespaceAnalyzerBuilder) Build() WhitespaceAnalyzer {
-	return *rb.v
-}
+// NewWhitespaceAnalyzer returns a WhitespaceAnalyzer.
+func NewWhitespaceAnalyzer() *WhitespaceAnalyzer {
+	r := &WhitespaceAnalyzer{}
 
-func (rb *WhitespaceAnalyzerBuilder) Version(version VersionString) *WhitespaceAnalyzerBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

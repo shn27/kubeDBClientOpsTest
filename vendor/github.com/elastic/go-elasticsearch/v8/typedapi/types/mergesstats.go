@@ -15,136 +15,236 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // MergesStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Stats.ts#L118-L135
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Stats.ts#L161-L178
 type MergesStats struct {
-	Current                    int64                   `json:"current"`
-	CurrentDocs                int64                   `json:"current_docs"`
-	CurrentSize                *string                 `json:"current_size,omitempty"`
-	CurrentSizeInBytes         int64                   `json:"current_size_in_bytes"`
-	Total                      int64                   `json:"total"`
-	TotalAutoThrottle          *string                 `json:"total_auto_throttle,omitempty"`
-	TotalAutoThrottleInBytes   int64                   `json:"total_auto_throttle_in_bytes"`
-	TotalDocs                  int64                   `json:"total_docs"`
-	TotalSize                  *string                 `json:"total_size,omitempty"`
-	TotalSizeInBytes           int64                   `json:"total_size_in_bytes"`
-	TotalStoppedTime           *Duration               `json:"total_stopped_time,omitempty"`
-	TotalStoppedTimeInMillis   DurationValueUnitMillis `json:"total_stopped_time_in_millis"`
-	TotalThrottledTime         *Duration               `json:"total_throttled_time,omitempty"`
-	TotalThrottledTimeInMillis DurationValueUnitMillis `json:"total_throttled_time_in_millis"`
-	TotalTime                  *Duration               `json:"total_time,omitempty"`
-	TotalTimeInMillis          DurationValueUnitMillis `json:"total_time_in_millis"`
+	Current                    int64    `json:"current"`
+	CurrentDocs                int64    `json:"current_docs"`
+	CurrentSize                *string  `json:"current_size,omitempty"`
+	CurrentSizeInBytes         int64    `json:"current_size_in_bytes"`
+	Total                      int64    `json:"total"`
+	TotalAutoThrottle          *string  `json:"total_auto_throttle,omitempty"`
+	TotalAutoThrottleInBytes   int64    `json:"total_auto_throttle_in_bytes"`
+	TotalDocs                  int64    `json:"total_docs"`
+	TotalSize                  *string  `json:"total_size,omitempty"`
+	TotalSizeInBytes           int64    `json:"total_size_in_bytes"`
+	TotalStoppedTime           Duration `json:"total_stopped_time,omitempty"`
+	TotalStoppedTimeInMillis   int64    `json:"total_stopped_time_in_millis"`
+	TotalThrottledTime         Duration `json:"total_throttled_time,omitempty"`
+	TotalThrottledTimeInMillis int64    `json:"total_throttled_time_in_millis"`
+	TotalTime                  Duration `json:"total_time,omitempty"`
+	TotalTimeInMillis          int64    `json:"total_time_in_millis"`
 }
 
-// MergesStatsBuilder holds MergesStats struct and provides a builder API.
-type MergesStatsBuilder struct {
-	v *MergesStats
-}
+func (s *MergesStats) UnmarshalJSON(data []byte) error {
 
-// NewMergesStats provides a builder for the MergesStats struct.
-func NewMergesStatsBuilder() *MergesStatsBuilder {
-	r := MergesStatsBuilder{
-		&MergesStats{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "current":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Current", err)
+				}
+				s.Current = value
+			case float64:
+				f := int64(v)
+				s.Current = f
+			}
+
+		case "current_docs":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CurrentDocs", err)
+				}
+				s.CurrentDocs = value
+			case float64:
+				f := int64(v)
+				s.CurrentDocs = f
+			}
+
+		case "current_size":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "CurrentSize", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.CurrentSize = &o
+
+		case "current_size_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CurrentSizeInBytes", err)
+				}
+				s.CurrentSizeInBytes = value
+			case float64:
+				f := int64(v)
+				s.CurrentSizeInBytes = f
+			}
+
+		case "total":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Total", err)
+				}
+				s.Total = value
+			case float64:
+				f := int64(v)
+				s.Total = f
+			}
+
+		case "total_auto_throttle":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "TotalAutoThrottle", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.TotalAutoThrottle = &o
+
+		case "total_auto_throttle_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TotalAutoThrottleInBytes", err)
+				}
+				s.TotalAutoThrottleInBytes = value
+			case float64:
+				f := int64(v)
+				s.TotalAutoThrottleInBytes = f
+			}
+
+		case "total_docs":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TotalDocs", err)
+				}
+				s.TotalDocs = value
+			case float64:
+				f := int64(v)
+				s.TotalDocs = f
+			}
+
+		case "total_size":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "TotalSize", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.TotalSize = &o
+
+		case "total_size_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TotalSizeInBytes", err)
+				}
+				s.TotalSizeInBytes = value
+			case float64:
+				f := int64(v)
+				s.TotalSizeInBytes = f
+			}
+
+		case "total_stopped_time":
+			if err := dec.Decode(&s.TotalStoppedTime); err != nil {
+				return fmt.Errorf("%s | %w", "TotalStoppedTime", err)
+			}
+
+		case "total_stopped_time_in_millis":
+			if err := dec.Decode(&s.TotalStoppedTimeInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "TotalStoppedTimeInMillis", err)
+			}
+
+		case "total_throttled_time":
+			if err := dec.Decode(&s.TotalThrottledTime); err != nil {
+				return fmt.Errorf("%s | %w", "TotalThrottledTime", err)
+			}
+
+		case "total_throttled_time_in_millis":
+			if err := dec.Decode(&s.TotalThrottledTimeInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "TotalThrottledTimeInMillis", err)
+			}
+
+		case "total_time":
+			if err := dec.Decode(&s.TotalTime); err != nil {
+				return fmt.Errorf("%s | %w", "TotalTime", err)
+			}
+
+		case "total_time_in_millis":
+			if err := dec.Decode(&s.TotalTimeInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "TotalTimeInMillis", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the MergesStats struct
-func (rb *MergesStatsBuilder) Build() MergesStats {
-	return *rb.v
-}
+// NewMergesStats returns a MergesStats.
+func NewMergesStats() *MergesStats {
+	r := &MergesStats{}
 
-func (rb *MergesStatsBuilder) Current(current int64) *MergesStatsBuilder {
-	rb.v.Current = current
-	return rb
-}
-
-func (rb *MergesStatsBuilder) CurrentDocs(currentdocs int64) *MergesStatsBuilder {
-	rb.v.CurrentDocs = currentdocs
-	return rb
-}
-
-func (rb *MergesStatsBuilder) CurrentSize(currentsize string) *MergesStatsBuilder {
-	rb.v.CurrentSize = &currentsize
-	return rb
-}
-
-func (rb *MergesStatsBuilder) CurrentSizeInBytes(currentsizeinbytes int64) *MergesStatsBuilder {
-	rb.v.CurrentSizeInBytes = currentsizeinbytes
-	return rb
-}
-
-func (rb *MergesStatsBuilder) Total(total int64) *MergesStatsBuilder {
-	rb.v.Total = total
-	return rb
-}
-
-func (rb *MergesStatsBuilder) TotalAutoThrottle(totalautothrottle string) *MergesStatsBuilder {
-	rb.v.TotalAutoThrottle = &totalautothrottle
-	return rb
-}
-
-func (rb *MergesStatsBuilder) TotalAutoThrottleInBytes(totalautothrottleinbytes int64) *MergesStatsBuilder {
-	rb.v.TotalAutoThrottleInBytes = totalautothrottleinbytes
-	return rb
-}
-
-func (rb *MergesStatsBuilder) TotalDocs(totaldocs int64) *MergesStatsBuilder {
-	rb.v.TotalDocs = totaldocs
-	return rb
-}
-
-func (rb *MergesStatsBuilder) TotalSize(totalsize string) *MergesStatsBuilder {
-	rb.v.TotalSize = &totalsize
-	return rb
-}
-
-func (rb *MergesStatsBuilder) TotalSizeInBytes(totalsizeinbytes int64) *MergesStatsBuilder {
-	rb.v.TotalSizeInBytes = totalsizeinbytes
-	return rb
-}
-
-func (rb *MergesStatsBuilder) TotalStoppedTime(totalstoppedtime *DurationBuilder) *MergesStatsBuilder {
-	v := totalstoppedtime.Build()
-	rb.v.TotalStoppedTime = &v
-	return rb
-}
-
-func (rb *MergesStatsBuilder) TotalStoppedTimeInMillis(totalstoppedtimeinmillis *DurationValueUnitMillisBuilder) *MergesStatsBuilder {
-	v := totalstoppedtimeinmillis.Build()
-	rb.v.TotalStoppedTimeInMillis = v
-	return rb
-}
-
-func (rb *MergesStatsBuilder) TotalThrottledTime(totalthrottledtime *DurationBuilder) *MergesStatsBuilder {
-	v := totalthrottledtime.Build()
-	rb.v.TotalThrottledTime = &v
-	return rb
-}
-
-func (rb *MergesStatsBuilder) TotalThrottledTimeInMillis(totalthrottledtimeinmillis *DurationValueUnitMillisBuilder) *MergesStatsBuilder {
-	v := totalthrottledtimeinmillis.Build()
-	rb.v.TotalThrottledTimeInMillis = v
-	return rb
-}
-
-func (rb *MergesStatsBuilder) TotalTime(totaltime *DurationBuilder) *MergesStatsBuilder {
-	v := totaltime.Build()
-	rb.v.TotalTime = &v
-	return rb
-}
-
-func (rb *MergesStatsBuilder) TotalTimeInMillis(totaltimeinmillis *DurationValueUnitMillisBuilder) *MergesStatsBuilder {
-	v := totaltimeinmillis.Build()
-	rb.v.TotalTimeInMillis = v
-	return rb
+	return r
 }

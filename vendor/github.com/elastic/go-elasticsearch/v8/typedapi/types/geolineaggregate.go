@@ -15,54 +15,80 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // GeoLineAggregate type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L735-L739
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L902-L912
 type GeoLineAggregate struct {
-	Geometry GeoLine   `json:"geometry"`
-	Meta     *Metadata `json:"meta,omitempty"`
-	Type     string    `json:"type"`
+	Geometry   GeoLine         `json:"geometry"`
+	Meta       Metadata        `json:"meta,omitempty"`
+	Properties json.RawMessage `json:"properties,omitempty"`
+	Type       string          `json:"type"`
 }
 
-// GeoLineAggregateBuilder holds GeoLineAggregate struct and provides a builder API.
-type GeoLineAggregateBuilder struct {
-	v *GeoLineAggregate
-}
+func (s *GeoLineAggregate) UnmarshalJSON(data []byte) error {
 
-// NewGeoLineAggregate provides a builder for the GeoLineAggregate struct.
-func NewGeoLineAggregateBuilder() *GeoLineAggregateBuilder {
-	r := GeoLineAggregateBuilder{
-		&GeoLineAggregate{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "geometry":
+			if err := dec.Decode(&s.Geometry); err != nil {
+				return fmt.Errorf("%s | %w", "Geometry", err)
+			}
+
+		case "meta":
+			if err := dec.Decode(&s.Meta); err != nil {
+				return fmt.Errorf("%s | %w", "Meta", err)
+			}
+
+		case "properties":
+			if err := dec.Decode(&s.Properties); err != nil {
+				return fmt.Errorf("%s | %w", "Properties", err)
+			}
+
+		case "type":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Type = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the GeoLineAggregate struct
-func (rb *GeoLineAggregateBuilder) Build() GeoLineAggregate {
-	return *rb.v
-}
+// NewGeoLineAggregate returns a GeoLineAggregate.
+func NewGeoLineAggregate() *GeoLineAggregate {
+	r := &GeoLineAggregate{}
 
-func (rb *GeoLineAggregateBuilder) Geometry(geometry *GeoLineBuilder) *GeoLineAggregateBuilder {
-	v := geometry.Build()
-	rb.v.Geometry = v
-	return rb
-}
-
-func (rb *GeoLineAggregateBuilder) Meta(meta *MetadataBuilder) *GeoLineAggregateBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *GeoLineAggregateBuilder) Type_(type_ string) *GeoLineAggregateBuilder {
-	rb.v.Type = type_
-	return rb
+	return r
 }

@@ -15,95 +15,126 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // JvmStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/get_memory_stats/types.ts#L50-L63
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/get_memory_stats/types.ts#L50-L63
 type JvmStats struct {
 	// HeapMax Maximum amount of memory available for use by the heap.
-	HeapMax *ByteSize `json:"heap_max,omitempty"`
+	HeapMax ByteSize `json:"heap_max,omitempty"`
 	// HeapMaxInBytes Maximum amount of memory, in bytes, available for use by the heap.
 	HeapMaxInBytes int `json:"heap_max_in_bytes"`
 	// JavaInference Amount of Java heap currently being used for caching inference models.
-	JavaInference *ByteSize `json:"java_inference,omitempty"`
+	JavaInference ByteSize `json:"java_inference,omitempty"`
 	// JavaInferenceInBytes Amount of Java heap, in bytes, currently being used for caching inference
 	// models.
 	JavaInferenceInBytes int `json:"java_inference_in_bytes"`
 	// JavaInferenceMax Maximum amount of Java heap to be used for caching inference models.
-	JavaInferenceMax *ByteSize `json:"java_inference_max,omitempty"`
+	JavaInferenceMax ByteSize `json:"java_inference_max,omitempty"`
 	// JavaInferenceMaxInBytes Maximum amount of Java heap, in bytes, to be used for caching inference
 	// models.
 	JavaInferenceMaxInBytes int `json:"java_inference_max_in_bytes"`
 }
 
-// JvmStatsBuilder holds JvmStats struct and provides a builder API.
-type JvmStatsBuilder struct {
-	v *JvmStats
-}
+func (s *JvmStats) UnmarshalJSON(data []byte) error {
 
-// NewJvmStats provides a builder for the JvmStats struct.
-func NewJvmStatsBuilder() *JvmStatsBuilder {
-	r := JvmStatsBuilder{
-		&JvmStats{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "heap_max":
+			if err := dec.Decode(&s.HeapMax); err != nil {
+				return fmt.Errorf("%s | %w", "HeapMax", err)
+			}
+
+		case "heap_max_in_bytes":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "HeapMaxInBytes", err)
+				}
+				s.HeapMaxInBytes = value
+			case float64:
+				f := int(v)
+				s.HeapMaxInBytes = f
+			}
+
+		case "java_inference":
+			if err := dec.Decode(&s.JavaInference); err != nil {
+				return fmt.Errorf("%s | %w", "JavaInference", err)
+			}
+
+		case "java_inference_in_bytes":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "JavaInferenceInBytes", err)
+				}
+				s.JavaInferenceInBytes = value
+			case float64:
+				f := int(v)
+				s.JavaInferenceInBytes = f
+			}
+
+		case "java_inference_max":
+			if err := dec.Decode(&s.JavaInferenceMax); err != nil {
+				return fmt.Errorf("%s | %w", "JavaInferenceMax", err)
+			}
+
+		case "java_inference_max_in_bytes":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "JavaInferenceMaxInBytes", err)
+				}
+				s.JavaInferenceMaxInBytes = value
+			case float64:
+				f := int(v)
+				s.JavaInferenceMaxInBytes = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the JvmStats struct
-func (rb *JvmStatsBuilder) Build() JvmStats {
-	return *rb.v
-}
+// NewJvmStats returns a JvmStats.
+func NewJvmStats() *JvmStats {
+	r := &JvmStats{}
 
-// HeapMax Maximum amount of memory available for use by the heap.
-
-func (rb *JvmStatsBuilder) HeapMax(heapmax *ByteSizeBuilder) *JvmStatsBuilder {
-	v := heapmax.Build()
-	rb.v.HeapMax = &v
-	return rb
-}
-
-// HeapMaxInBytes Maximum amount of memory, in bytes, available for use by the heap.
-
-func (rb *JvmStatsBuilder) HeapMaxInBytes(heapmaxinbytes int) *JvmStatsBuilder {
-	rb.v.HeapMaxInBytes = heapmaxinbytes
-	return rb
-}
-
-// JavaInference Amount of Java heap currently being used for caching inference models.
-
-func (rb *JvmStatsBuilder) JavaInference(javainference *ByteSizeBuilder) *JvmStatsBuilder {
-	v := javainference.Build()
-	rb.v.JavaInference = &v
-	return rb
-}
-
-// JavaInferenceInBytes Amount of Java heap, in bytes, currently being used for caching inference
-// models.
-
-func (rb *JvmStatsBuilder) JavaInferenceInBytes(javainferenceinbytes int) *JvmStatsBuilder {
-	rb.v.JavaInferenceInBytes = javainferenceinbytes
-	return rb
-}
-
-// JavaInferenceMax Maximum amount of Java heap to be used for caching inference models.
-
-func (rb *JvmStatsBuilder) JavaInferenceMax(javainferencemax *ByteSizeBuilder) *JvmStatsBuilder {
-	v := javainferencemax.Build()
-	rb.v.JavaInferenceMax = &v
-	return rb
-}
-
-// JavaInferenceMaxInBytes Maximum amount of Java heap, in bytes, to be used for caching inference
-// models.
-
-func (rb *JvmStatsBuilder) JavaInferenceMaxInBytes(javainferencemaxinbytes int) *JvmStatsBuilder {
-	rb.v.JavaInferenceMaxInBytes = javainferencemaxinbytes
-	return rb
+	return r
 }

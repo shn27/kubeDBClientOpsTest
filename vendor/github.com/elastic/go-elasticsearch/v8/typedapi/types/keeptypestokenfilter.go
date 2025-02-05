@@ -15,59 +15,89 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/keeptypesmode"
 )
 
 // KeepTypesTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L217-L221
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L219-L223
 type KeepTypesTokenFilter struct {
 	Mode    *keeptypesmode.KeepTypesMode `json:"mode,omitempty"`
 	Type    string                       `json:"type,omitempty"`
 	Types   []string                     `json:"types,omitempty"`
-	Version *VersionString               `json:"version,omitempty"`
+	Version *string                      `json:"version,omitempty"`
 }
 
-// KeepTypesTokenFilterBuilder holds KeepTypesTokenFilter struct and provides a builder API.
-type KeepTypesTokenFilterBuilder struct {
-	v *KeepTypesTokenFilter
+func (s *KeepTypesTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "mode":
+			if err := dec.Decode(&s.Mode); err != nil {
+				return fmt.Errorf("%s | %w", "Mode", err)
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "types":
+			if err := dec.Decode(&s.Types); err != nil {
+				return fmt.Errorf("%s | %w", "Types", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewKeepTypesTokenFilter provides a builder for the KeepTypesTokenFilter struct.
-func NewKeepTypesTokenFilterBuilder() *KeepTypesTokenFilterBuilder {
-	r := KeepTypesTokenFilterBuilder{
-		&KeepTypesTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s KeepTypesTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerKeepTypesTokenFilter KeepTypesTokenFilter
+	tmp := innerKeepTypesTokenFilter{
+		Mode:    s.Mode,
+		Type:    s.Type,
+		Types:   s.Types,
+		Version: s.Version,
 	}
 
-	r.v.Type = "keep_types"
+	tmp.Type = "keep_types"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the KeepTypesTokenFilter struct
-func (rb *KeepTypesTokenFilterBuilder) Build() KeepTypesTokenFilter {
-	return *rb.v
-}
+// NewKeepTypesTokenFilter returns a KeepTypesTokenFilter.
+func NewKeepTypesTokenFilter() *KeepTypesTokenFilter {
+	r := &KeepTypesTokenFilter{}
 
-func (rb *KeepTypesTokenFilterBuilder) Mode(mode keeptypesmode.KeepTypesMode) *KeepTypesTokenFilterBuilder {
-	rb.v.Mode = &mode
-	return rb
-}
-
-func (rb *KeepTypesTokenFilterBuilder) Types(types ...string) *KeepTypesTokenFilterBuilder {
-	rb.v.Types = types
-	return rb
-}
-
-func (rb *KeepTypesTokenFilterBuilder) Version(version VersionString) *KeepTypesTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

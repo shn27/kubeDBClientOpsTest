@@ -15,48 +15,60 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // WatcherActionTotals type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/usage/types.ts#L401-L404
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/xpack/usage/types.ts#L410-L413
 type WatcherActionTotals struct {
-	Total         Duration                `json:"total"`
-	TotalTimeInMs DurationValueUnitMillis `json:"total_time_in_ms"`
+	Total         Duration `json:"total"`
+	TotalTimeInMs int64    `json:"total_time_in_ms"`
 }
 
-// WatcherActionTotalsBuilder holds WatcherActionTotals struct and provides a builder API.
-type WatcherActionTotalsBuilder struct {
-	v *WatcherActionTotals
-}
+func (s *WatcherActionTotals) UnmarshalJSON(data []byte) error {
 
-// NewWatcherActionTotals provides a builder for the WatcherActionTotals struct.
-func NewWatcherActionTotalsBuilder() *WatcherActionTotalsBuilder {
-	r := WatcherActionTotalsBuilder{
-		&WatcherActionTotals{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "total":
+			if err := dec.Decode(&s.Total); err != nil {
+				return fmt.Errorf("%s | %w", "Total", err)
+			}
+
+		case "total_time_in_ms":
+			if err := dec.Decode(&s.TotalTimeInMs); err != nil {
+				return fmt.Errorf("%s | %w", "TotalTimeInMs", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the WatcherActionTotals struct
-func (rb *WatcherActionTotalsBuilder) Build() WatcherActionTotals {
-	return *rb.v
-}
+// NewWatcherActionTotals returns a WatcherActionTotals.
+func NewWatcherActionTotals() *WatcherActionTotals {
+	r := &WatcherActionTotals{}
 
-func (rb *WatcherActionTotalsBuilder) Total(total *DurationBuilder) *WatcherActionTotalsBuilder {
-	v := total.Build()
-	rb.v.Total = v
-	return rb
-}
-
-func (rb *WatcherActionTotalsBuilder) TotalTimeInMs(totaltimeinms *DurationValueUnitMillisBuilder) *WatcherActionTotalsBuilder {
-	v := totaltimeinms.Build()
-	rb.v.TotalTimeInMs = v
-	return rb
+	return r
 }

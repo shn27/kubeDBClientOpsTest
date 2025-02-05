@@ -15,53 +15,74 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // AutoscalingDecider type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/autoscaling/get_autoscaling_capacity/GetAutoscalingCapacityResponse.ts#L52-L56
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/autoscaling/get_autoscaling_capacity/GetAutoscalingCapacityResponse.ts#L52-L56
 type AutoscalingDecider struct {
-	ReasonDetails    interface{}         `json:"reason_details,omitempty"`
+	ReasonDetails    json.RawMessage     `json:"reason_details,omitempty"`
 	ReasonSummary    *string             `json:"reason_summary,omitempty"`
 	RequiredCapacity AutoscalingCapacity `json:"required_capacity"`
 }
 
-// AutoscalingDeciderBuilder holds AutoscalingDecider struct and provides a builder API.
-type AutoscalingDeciderBuilder struct {
-	v *AutoscalingDecider
-}
+func (s *AutoscalingDecider) UnmarshalJSON(data []byte) error {
 
-// NewAutoscalingDecider provides a builder for the AutoscalingDecider struct.
-func NewAutoscalingDeciderBuilder() *AutoscalingDeciderBuilder {
-	r := AutoscalingDeciderBuilder{
-		&AutoscalingDecider{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "reason_details":
+			if err := dec.Decode(&s.ReasonDetails); err != nil {
+				return fmt.Errorf("%s | %w", "ReasonDetails", err)
+			}
+
+		case "reason_summary":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ReasonSummary", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ReasonSummary = &o
+
+		case "required_capacity":
+			if err := dec.Decode(&s.RequiredCapacity); err != nil {
+				return fmt.Errorf("%s | %w", "RequiredCapacity", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the AutoscalingDecider struct
-func (rb *AutoscalingDeciderBuilder) Build() AutoscalingDecider {
-	return *rb.v
-}
+// NewAutoscalingDecider returns a AutoscalingDecider.
+func NewAutoscalingDecider() *AutoscalingDecider {
+	r := &AutoscalingDecider{}
 
-func (rb *AutoscalingDeciderBuilder) ReasonDetails(reasondetails interface{}) *AutoscalingDeciderBuilder {
-	rb.v.ReasonDetails = reasondetails
-	return rb
-}
-
-func (rb *AutoscalingDeciderBuilder) ReasonSummary(reasonsummary string) *AutoscalingDeciderBuilder {
-	rb.v.ReasonSummary = &reasonsummary
-	return rb
-}
-
-func (rb *AutoscalingDeciderBuilder) RequiredCapacity(requiredcapacity *AutoscalingCapacityBuilder) *AutoscalingDeciderBuilder {
-	v := requiredcapacity.Build()
-	rb.v.RequiredCapacity = v
-	return rb
+	return r
 }

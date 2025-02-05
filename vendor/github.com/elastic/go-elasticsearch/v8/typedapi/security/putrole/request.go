@@ -15,16 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package putrole
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"strconv"
 
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/clusterprivilege"
@@ -32,57 +34,54 @@ import (
 
 // Request holds the request body struct for the package putrole
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/put_role/SecurityPutRoleRequest.ts#L31-L80
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/put_role/SecurityPutRoleRequest.ts#L32-L102
 type Request struct {
 
 	// Applications A list of application privilege entries.
 	Applications []types.ApplicationPrivileges `json:"applications,omitempty"`
-
 	// Cluster A list of cluster privileges. These privileges define the cluster-level
 	// actions for users with this role.
 	Cluster []clusterprivilege.ClusterPrivilege `json:"cluster,omitempty"`
-
+	// Description Optional description of the role descriptor
+	Description *string `json:"description,omitempty"`
 	// Global An object defining global privileges. A global privilege is a form of cluster
 	// privilege that is request-aware. Support for global privileges is currently
 	// limited to the management of application privileges.
-	Global map[string]interface{} `json:"global,omitempty"`
-
+	Global map[string]json.RawMessage `json:"global,omitempty"`
 	// Indices A list of indices permissions entries.
 	Indices []types.IndicesPrivileges `json:"indices,omitempty"`
-
 	// Metadata Optional metadata. Within the metadata object, keys that begin with an
 	// underscore (`_`) are reserved for system use.
-	Metadata *types.Metadata `json:"metadata,omitempty"`
-
-	// RunAs A list of users that the owners of this role can impersonate.
+	Metadata types.Metadata `json:"metadata,omitempty"`
+	// RemoteCluster A list of remote cluster permissions entries.
+	RemoteCluster []types.RemoteClusterPrivileges `json:"remote_cluster,omitempty"`
+	// RemoteIndices A list of remote indices permissions entries.
+	RemoteIndices []types.RemoteIndicesPrivileges `json:"remote_indices,omitempty"`
+	// RunAs A list of users that the owners of this role can impersonate. *Note*: in
+	// Serverless, the run-as feature is disabled. For API compatibility, you can
+	// still specify an empty `run_as` field, but a non-empty list will be rejected.
 	RunAs []string `json:"run_as,omitempty"`
-
 	// TransientMetadata Indicates roles that might be incompatible with the current cluster license,
 	// specifically roles with document and field level security. When the cluster
 	// license doesn’t allow certain features for a given role, this parameter is
 	// updated dynamically to list the incompatible features. If `enabled` is
 	// `false`, the role is ignored, but is still listed in the response from the
 	// authenticate API.
-	TransientMetadata *types.TransientMetadataConfig `json:"transient_metadata,omitempty"`
+	TransientMetadata map[string]json.RawMessage `json:"transient_metadata,omitempty"`
 }
 
-// RequestBuilder is the builder API for the putrole.Request
-type RequestBuilder struct {
-	v *Request
-}
-
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{
-			Global: make(map[string]interface{}, 0),
-		},
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{
+		Global:            make(map[string]json.RawMessage, 0),
+		TransientMetadata: make(map[string]json.RawMessage, 0),
 	}
-	return &r
+
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -93,52 +92,84 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) Applications(applications []types.ApplicationPrivilegesBuilder) *RequestBuilder {
-	tmp := make([]types.ApplicationPrivileges, len(applications))
-	for _, value := range applications {
-		tmp = append(tmp, value.Build())
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "applications":
+			if err := dec.Decode(&s.Applications); err != nil {
+				return fmt.Errorf("%s | %w", "Applications", err)
+			}
+
+		case "cluster":
+			if err := dec.Decode(&s.Cluster); err != nil {
+				return fmt.Errorf("%s | %w", "Cluster", err)
+			}
+
+		case "description":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Description", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Description = &o
+
+		case "global":
+			if s.Global == nil {
+				s.Global = make(map[string]json.RawMessage, 0)
+			}
+			if err := dec.Decode(&s.Global); err != nil {
+				return fmt.Errorf("%s | %w", "Global", err)
+			}
+
+		case "indices":
+			if err := dec.Decode(&s.Indices); err != nil {
+				return fmt.Errorf("%s | %w", "Indices", err)
+			}
+
+		case "metadata":
+			if err := dec.Decode(&s.Metadata); err != nil {
+				return fmt.Errorf("%s | %w", "Metadata", err)
+			}
+
+		case "remote_cluster":
+			if err := dec.Decode(&s.RemoteCluster); err != nil {
+				return fmt.Errorf("%s | %w", "RemoteCluster", err)
+			}
+
+		case "remote_indices":
+			if err := dec.Decode(&s.RemoteIndices); err != nil {
+				return fmt.Errorf("%s | %w", "RemoteIndices", err)
+			}
+
+		case "run_as":
+			if err := dec.Decode(&s.RunAs); err != nil {
+				return fmt.Errorf("%s | %w", "RunAs", err)
+			}
+
+		case "transient_metadata":
+			if s.TransientMetadata == nil {
+				s.TransientMetadata = make(map[string]json.RawMessage, 0)
+			}
+			if err := dec.Decode(&s.TransientMetadata); err != nil {
+				return fmt.Errorf("%s | %w", "TransientMetadata", err)
+			}
+
+		}
 	}
-	rb.v.Applications = tmp
-	return rb
-}
-
-func (rb *RequestBuilder) Cluster(cluster ...clusterprivilege.ClusterPrivilege) *RequestBuilder {
-	rb.v.Cluster = cluster
-	return rb
-}
-
-func (rb *RequestBuilder) Global(value map[string]interface{}) *RequestBuilder {
-	rb.v.Global = value
-	return rb
-}
-
-func (rb *RequestBuilder) Indices(indices []types.IndicesPrivilegesBuilder) *RequestBuilder {
-	tmp := make([]types.IndicesPrivileges, len(indices))
-	for _, value := range indices {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Indices = tmp
-	return rb
-}
-
-func (rb *RequestBuilder) Metadata(metadata *types.MetadataBuilder) *RequestBuilder {
-	v := metadata.Build()
-	rb.v.Metadata = &v
-	return rb
-}
-
-func (rb *RequestBuilder) RunAs(run_as ...string) *RequestBuilder {
-	rb.v.RunAs = run_as
-	return rb
-}
-
-func (rb *RequestBuilder) TransientMetadata(transientmetadata *types.TransientMetadataConfigBuilder) *RequestBuilder {
-	v := transientmetadata.Build()
-	rb.v.TransientMetadata = &v
-	return rb
+	return nil
 }

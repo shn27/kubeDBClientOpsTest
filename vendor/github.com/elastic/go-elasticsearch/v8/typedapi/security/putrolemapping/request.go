@@ -15,50 +15,43 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package putrolemapping
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"strconv"
 
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 )
 
 // Request holds the request body struct for the package putrolemapping
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/put_role_mapping/SecurityPutRoleMappingRequest.ts#L24-L43
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/put_role_mapping/SecurityPutRoleMappingRequest.ts#L25-L56
 type Request struct {
-	Enabled *bool `json:"enabled,omitempty"`
-
-	Metadata *types.Metadata `json:"metadata,omitempty"`
-
-	Roles []string `json:"roles,omitempty"`
-
-	Rules *types.RoleMappingRule `json:"rules,omitempty"`
-
-	RunAs []string `json:"run_as,omitempty"`
+	Enabled       *bool                  `json:"enabled,omitempty"`
+	Metadata      types.Metadata         `json:"metadata,omitempty"`
+	RoleTemplates []types.RoleTemplate   `json:"role_templates,omitempty"`
+	Roles         []string               `json:"roles,omitempty"`
+	Rules         *types.RoleMappingRule `json:"rules,omitempty"`
+	RunAs         []string               `json:"run_as,omitempty"`
 }
 
-// RequestBuilder is the builder API for the putrolemapping.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -69,34 +62,60 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) Enabled(enabled bool) *RequestBuilder {
-	rb.v.Enabled = &enabled
-	return rb
-}
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
 
-func (rb *RequestBuilder) Metadata(metadata *types.MetadataBuilder) *RequestBuilder {
-	v := metadata.Build()
-	rb.v.Metadata = &v
-	return rb
-}
+		switch t {
 
-func (rb *RequestBuilder) Roles(roles ...string) *RequestBuilder {
-	rb.v.Roles = roles
-	return rb
-}
+		case "enabled":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Enabled", err)
+				}
+				s.Enabled = &value
+			case bool:
+				s.Enabled = &v
+			}
 
-func (rb *RequestBuilder) Rules(rules *types.RoleMappingRuleBuilder) *RequestBuilder {
-	v := rules.Build()
-	rb.v.Rules = &v
-	return rb
-}
+		case "metadata":
+			if err := dec.Decode(&s.Metadata); err != nil {
+				return fmt.Errorf("%s | %w", "Metadata", err)
+			}
 
-func (rb *RequestBuilder) RunAs(run_as ...string) *RequestBuilder {
-	rb.v.RunAs = run_as
-	return rb
+		case "role_templates":
+			if err := dec.Decode(&s.RoleTemplates); err != nil {
+				return fmt.Errorf("%s | %w", "RoleTemplates", err)
+			}
+
+		case "roles":
+			if err := dec.Decode(&s.Roles); err != nil {
+				return fmt.Errorf("%s | %w", "Roles", err)
+			}
+
+		case "rules":
+			if err := dec.Decode(&s.Rules); err != nil {
+				return fmt.Errorf("%s | %w", "Rules", err)
+			}
+
+		case "run_as":
+			if err := dec.Decode(&s.RunAs); err != nil {
+				return fmt.Errorf("%s | %w", "RunAs", err)
+			}
+
+		}
+	}
+	return nil
 }

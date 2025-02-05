@@ -15,19 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package icutransformdirection
 package icutransformdirection
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/icu-plugin.ts#L72-L75
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/icu-plugin.ts#L73-L76
 type IcuTransformDirection struct {
-	name string
+	Name string
 }
 
 var (
@@ -41,7 +39,7 @@ func (i IcuTransformDirection) MarshalText() (text []byte, err error) {
 }
 
 func (i *IcuTransformDirection) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
 	case "forward":
 		*i = Forward
@@ -55,5 +53,5 @@ func (i *IcuTransformDirection) UnmarshalText(text []byte) error {
 }
 
 func (i IcuTransformDirection) String() string {
-	return i.name
+	return i.Name
 }

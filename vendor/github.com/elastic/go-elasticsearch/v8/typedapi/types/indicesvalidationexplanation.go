@@ -15,58 +15,96 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // IndicesValidationExplanation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/validate_query/IndicesValidateQueryResponse.ts#L32-L37
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/validate_query/IndicesValidateQueryResponse.ts#L32-L37
 type IndicesValidationExplanation struct {
-	Error       *string   `json:"error,omitempty"`
-	Explanation *string   `json:"explanation,omitempty"`
-	Index       IndexName `json:"index"`
-	Valid       bool      `json:"valid"`
+	Error       *string `json:"error,omitempty"`
+	Explanation *string `json:"explanation,omitempty"`
+	Index       string  `json:"index"`
+	Valid       bool    `json:"valid"`
 }
 
-// IndicesValidationExplanationBuilder holds IndicesValidationExplanation struct and provides a builder API.
-type IndicesValidationExplanationBuilder struct {
-	v *IndicesValidationExplanation
-}
+func (s *IndicesValidationExplanation) UnmarshalJSON(data []byte) error {
 
-// NewIndicesValidationExplanation provides a builder for the IndicesValidationExplanation struct.
-func NewIndicesValidationExplanationBuilder() *IndicesValidationExplanationBuilder {
-	r := IndicesValidationExplanationBuilder{
-		&IndicesValidationExplanation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "error":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Error", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Error = &o
+
+		case "explanation":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Explanation", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Explanation = &o
+
+		case "index":
+			if err := dec.Decode(&s.Index); err != nil {
+				return fmt.Errorf("%s | %w", "Index", err)
+			}
+
+		case "valid":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Valid", err)
+				}
+				s.Valid = value
+			case bool:
+				s.Valid = v
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the IndicesValidationExplanation struct
-func (rb *IndicesValidationExplanationBuilder) Build() IndicesValidationExplanation {
-	return *rb.v
-}
+// NewIndicesValidationExplanation returns a IndicesValidationExplanation.
+func NewIndicesValidationExplanation() *IndicesValidationExplanation {
+	r := &IndicesValidationExplanation{}
 
-func (rb *IndicesValidationExplanationBuilder) Error(error string) *IndicesValidationExplanationBuilder {
-	rb.v.Error = &error
-	return rb
-}
-
-func (rb *IndicesValidationExplanationBuilder) Explanation(explanation string) *IndicesValidationExplanationBuilder {
-	rb.v.Explanation = &explanation
-	return rb
-}
-
-func (rb *IndicesValidationExplanationBuilder) Index(index IndexName) *IndicesValidationExplanationBuilder {
-	rb.v.Index = index
-	return rb
-}
-
-func (rb *IndicesValidationExplanationBuilder) Valid(valid bool) *IndicesValidationExplanationBuilder {
-	rb.v.Valid = valid
-	return rb
+	return r
 }

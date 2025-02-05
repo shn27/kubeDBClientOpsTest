@@ -15,49 +15,90 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // KuromojiReadingFormTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/kuromoji-plugin.ts#L42-L45
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/kuromoji-plugin.ts#L42-L45
 type KuromojiReadingFormTokenFilter struct {
-	Type      string         `json:"type,omitempty"`
-	UseRomaji bool           `json:"use_romaji"`
-	Version   *VersionString `json:"version,omitempty"`
+	Type      string  `json:"type,omitempty"`
+	UseRomaji bool    `json:"use_romaji"`
+	Version   *string `json:"version,omitempty"`
 }
 
-// KuromojiReadingFormTokenFilterBuilder holds KuromojiReadingFormTokenFilter struct and provides a builder API.
-type KuromojiReadingFormTokenFilterBuilder struct {
-	v *KuromojiReadingFormTokenFilter
+func (s *KuromojiReadingFormTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "use_romaji":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "UseRomaji", err)
+				}
+				s.UseRomaji = value
+			case bool:
+				s.UseRomaji = v
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewKuromojiReadingFormTokenFilter provides a builder for the KuromojiReadingFormTokenFilter struct.
-func NewKuromojiReadingFormTokenFilterBuilder() *KuromojiReadingFormTokenFilterBuilder {
-	r := KuromojiReadingFormTokenFilterBuilder{
-		&KuromojiReadingFormTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s KuromojiReadingFormTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerKuromojiReadingFormTokenFilter KuromojiReadingFormTokenFilter
+	tmp := innerKuromojiReadingFormTokenFilter{
+		Type:      s.Type,
+		UseRomaji: s.UseRomaji,
+		Version:   s.Version,
 	}
 
-	r.v.Type = "kuromoji_readingform"
+	tmp.Type = "kuromoji_readingform"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the KuromojiReadingFormTokenFilter struct
-func (rb *KuromojiReadingFormTokenFilterBuilder) Build() KuromojiReadingFormTokenFilter {
-	return *rb.v
-}
+// NewKuromojiReadingFormTokenFilter returns a KuromojiReadingFormTokenFilter.
+func NewKuromojiReadingFormTokenFilter() *KuromojiReadingFormTokenFilter {
+	r := &KuromojiReadingFormTokenFilter{}
 
-func (rb *KuromojiReadingFormTokenFilterBuilder) UseRomaji(useromaji bool) *KuromojiReadingFormTokenFilterBuilder {
-	rb.v.UseRomaji = useromaji
-	return rb
-}
-
-func (rb *KuromojiReadingFormTokenFilterBuilder) Version(version VersionString) *KuromojiReadingFormTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

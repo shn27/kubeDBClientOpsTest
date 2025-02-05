@@ -15,112 +15,90 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package submit
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"strconv"
 
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 )
 
 // Request holds the request body struct for the package submit
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/async_search/submit/AsyncSearchSubmitRequest.ts#L54-L250
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/async_search/submit/AsyncSearchSubmitRequest.ts#L55-L280
 type Request struct {
-	Aggregations map[string]types.AggregationContainer `json:"aggregations,omitempty"`
-
-	Collapse *types.FieldCollapse `json:"collapse,omitempty"`
-
+	Aggregations map[string]types.Aggregations `json:"aggregations,omitempty"`
+	Collapse     *types.FieldCollapse          `json:"collapse,omitempty"`
 	// DocvalueFields Array of wildcard (*) patterns. The request returns doc values for field
 	// names matching these patterns in the hits.fields property of the response.
 	DocvalueFields []types.FieldAndFormat `json:"docvalue_fields,omitempty"`
-
 	// Explain If true, returns detailed information about score computation as part of a
 	// hit.
 	Explain *bool `json:"explain,omitempty"`
-
+	// Ext Configuration of search extensions defined by Elasticsearch plugins.
+	Ext map[string]json.RawMessage `json:"ext,omitempty"`
 	// Fields Array of wildcard (*) patterns. The request returns values for field names
 	// matching these patterns in the hits.fields property of the response.
 	Fields []types.FieldAndFormat `json:"fields,omitempty"`
-
 	// From Starting document offset. By default, you cannot page through more than
 	// 10,000
 	// hits using the from and size parameters. To page through more hits, use the
 	// search_after parameter.
-	From *int `json:"from,omitempty"`
-
+	From      *int             `json:"from,omitempty"`
 	Highlight *types.Highlight `json:"highlight,omitempty"`
-
 	// IndicesBoost Boosts the _score of documents from specified indices.
-	IndicesBoost []map[types.IndexName]float64 `json:"indices_boost,omitempty"`
-
+	IndicesBoost []map[string]types.Float64 `json:"indices_boost,omitempty"`
 	// Knn Defines the approximate kNN search to run.
-	Knn *types.KnnQuery `json:"knn,omitempty"`
-
+	Knn []types.KnnSearch `json:"knn,omitempty"`
 	// MinScore Minimum _score for matching documents. Documents with a lower _score are
 	// not included in the search results.
-	MinScore *float64 `json:"min_score,omitempty"`
-
+	MinScore *types.Float64 `json:"min_score,omitempty"`
 	// Pit Limits the search to a point in time (PIT). If you provide a PIT, you
 	// cannot specify an <index> in the request path.
-	Pit *types.PointInTimeReference `json:"pit,omitempty"`
-
-	PostFilter *types.QueryContainer `json:"post_filter,omitempty"`
-
-	Profile *bool `json:"profile,omitempty"`
-
+	Pit        *types.PointInTimeReference `json:"pit,omitempty"`
+	PostFilter *types.Query                `json:"post_filter,omitempty"`
+	Profile    *bool                       `json:"profile,omitempty"`
 	// Query Defines the search definition using the Query DSL.
-	Query *types.QueryContainer `json:"query,omitempty"`
-
+	Query   *types.Query    `json:"query,omitempty"`
 	Rescore []types.Rescore `json:"rescore,omitempty"`
-
 	// RuntimeMappings Defines one or more runtime fields in the search request. These fields take
 	// precedence over mapped fields with the same name.
-	RuntimeMappings *types.RuntimeFields `json:"runtime_mappings,omitempty"`
-
+	RuntimeMappings types.RuntimeFields `json:"runtime_mappings,omitempty"`
 	// ScriptFields Retrieve a script evaluation (based on different fields) for each hit.
 	ScriptFields map[string]types.ScriptField `json:"script_fields,omitempty"`
-
-	SearchAfter *types.SortResults `json:"search_after,omitempty"`
-
+	SearchAfter  []types.FieldValue           `json:"search_after,omitempty"`
 	// SeqNoPrimaryTerm If true, returns sequence number and primary term of the last modification
 	// of each hit. See Optimistic concurrency control.
 	SeqNoPrimaryTerm *bool `json:"seq_no_primary_term,omitempty"`
-
 	// Size The number of hits to return. By default, you cannot page through more
 	// than 10,000 hits using the from and size parameters. To page through more
 	// hits, use the search_after parameter.
-	Size *int `json:"size,omitempty"`
-
-	Slice *types.SlicedScroll `json:"slice,omitempty"`
-
-	Sort *types.Sort `json:"sort,omitempty"`
-
+	Size  *int                     `json:"size,omitempty"`
+	Slice *types.SlicedScroll      `json:"slice,omitempty"`
+	Sort  []types.SortCombinations `json:"sort,omitempty"`
 	// Source_ Indicates which source fields are returned for matching documents. These
 	// fields are returned in the hits._source property of the search response.
-	Source_ *types.SourceConfig `json:"_source,omitempty"`
-
+	Source_ types.SourceConfig `json:"_source,omitempty"`
 	// Stats Stats groups to associate with the search. Each group maintains a statistics
 	// aggregation for its associated searches. You can retrieve these stats using
 	// the indices stats API.
 	Stats []string `json:"stats,omitempty"`
-
 	// StoredFields List of stored fields to return as part of a hit. If no fields are specified,
 	// no stored fields are included in the response. If this field is specified,
 	// the _source
 	// parameter defaults to false. You can pass _source: true to return both source
 	// fields
 	// and stored fields in the search response.
-	StoredFields *types.Fields `json:"stored_fields,omitempty"`
-
-	Suggest *types.Suggester `json:"suggest,omitempty"`
-
+	StoredFields []string         `json:"stored_fields,omitempty"`
+	Suggest      *types.Suggester `json:"suggest,omitempty"`
 	// TerminateAfter Maximum number of documents to collect for each shard. If a query reaches
 	// this
 	// limit, Elasticsearch terminates the query early. Elasticsearch collects
@@ -128,46 +106,37 @@ type Request struct {
 	// before sorting. Defaults to 0, which does not terminate query execution
 	// early.
 	TerminateAfter *int64 `json:"terminate_after,omitempty"`
-
 	// Timeout Specifies the period of time to wait for a response from each shard. If no
 	// response
 	// is received before the timeout expires, the request fails and returns an
 	// error.
 	// Defaults to no timeout.
 	Timeout *string `json:"timeout,omitempty"`
-
 	// TrackScores If true, calculate and return document scores, even if the scores are not
 	// used for sorting.
 	TrackScores *bool `json:"track_scores,omitempty"`
-
 	// TrackTotalHits Number of hits matching the query to count accurately. If true, the exact
 	// number of hits is returned at the cost of some performance. If false, the
 	// response does not include the total number of hits matching the query.
 	// Defaults to 10,000 hits.
-	TrackTotalHits *types.TrackHits `json:"track_total_hits,omitempty"`
-
+	TrackTotalHits types.TrackHits `json:"track_total_hits,omitempty"`
 	// Version If true, returns document version as part of a hit.
 	Version *bool `json:"version,omitempty"`
 }
 
-// RequestBuilder is the builder API for the submit.Request
-type RequestBuilder struct {
-	v *Request
-}
-
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{
-			Aggregations: make(map[string]types.AggregationContainer, 0),
-			ScriptFields: make(map[string]types.ScriptField, 0),
-		},
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{
+		Aggregations: make(map[string]types.Aggregations, 0),
+		Ext:          make(map[string]json.RawMessage, 0),
+		ScriptFields: make(map[string]types.ScriptField, 0),
 	}
-	return &r
+
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -178,192 +147,360 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) Aggregations(values map[string]*types.AggregationContainerBuilder) *RequestBuilder {
-	tmp := make(map[string]types.AggregationContainer, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "aggregations", "aggs":
+			if s.Aggregations == nil {
+				s.Aggregations = make(map[string]types.Aggregations, 0)
+			}
+			if err := dec.Decode(&s.Aggregations); err != nil {
+				return fmt.Errorf("%s | %w", "Aggregations", err)
+			}
+
+		case "collapse":
+			if err := dec.Decode(&s.Collapse); err != nil {
+				return fmt.Errorf("%s | %w", "Collapse", err)
+			}
+
+		case "docvalue_fields":
+			if err := dec.Decode(&s.DocvalueFields); err != nil {
+				return fmt.Errorf("%s | %w", "DocvalueFields", err)
+			}
+
+		case "explain":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Explain", err)
+				}
+				s.Explain = &value
+			case bool:
+				s.Explain = &v
+			}
+
+		case "ext":
+			if s.Ext == nil {
+				s.Ext = make(map[string]json.RawMessage, 0)
+			}
+			if err := dec.Decode(&s.Ext); err != nil {
+				return fmt.Errorf("%s | %w", "Ext", err)
+			}
+
+		case "fields":
+			if err := dec.Decode(&s.Fields); err != nil {
+				return fmt.Errorf("%s | %w", "Fields", err)
+			}
+
+		case "from":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "From", err)
+				}
+				s.From = &value
+			case float64:
+				f := int(v)
+				s.From = &f
+			}
+
+		case "highlight":
+			if err := dec.Decode(&s.Highlight); err != nil {
+				return fmt.Errorf("%s | %w", "Highlight", err)
+			}
+
+		case "indices_boost":
+			if err := dec.Decode(&s.IndicesBoost); err != nil {
+				return fmt.Errorf("%s | %w", "IndicesBoost", err)
+			}
+
+		case "knn":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := types.NewKnnSearch()
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Knn", err)
+				}
+
+				s.Knn = append(s.Knn, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Knn); err != nil {
+					return fmt.Errorf("%s | %w", "Knn", err)
+				}
+			}
+
+		case "min_score":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MinScore", err)
+				}
+				f := types.Float64(value)
+				s.MinScore = &f
+			case float64:
+				f := types.Float64(v)
+				s.MinScore = &f
+			}
+
+		case "pit":
+			if err := dec.Decode(&s.Pit); err != nil {
+				return fmt.Errorf("%s | %w", "Pit", err)
+			}
+
+		case "post_filter":
+			if err := dec.Decode(&s.PostFilter); err != nil {
+				return fmt.Errorf("%s | %w", "PostFilter", err)
+			}
+
+		case "profile":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Profile", err)
+				}
+				s.Profile = &value
+			case bool:
+				s.Profile = &v
+			}
+
+		case "query":
+			if err := dec.Decode(&s.Query); err != nil {
+				return fmt.Errorf("%s | %w", "Query", err)
+			}
+
+		case "rescore":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := types.NewRescore()
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Rescore", err)
+				}
+
+				s.Rescore = append(s.Rescore, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Rescore); err != nil {
+					return fmt.Errorf("%s | %w", "Rescore", err)
+				}
+			}
+
+		case "runtime_mappings":
+			if err := dec.Decode(&s.RuntimeMappings); err != nil {
+				return fmt.Errorf("%s | %w", "RuntimeMappings", err)
+			}
+
+		case "script_fields":
+			if s.ScriptFields == nil {
+				s.ScriptFields = make(map[string]types.ScriptField, 0)
+			}
+			if err := dec.Decode(&s.ScriptFields); err != nil {
+				return fmt.Errorf("%s | %w", "ScriptFields", err)
+			}
+
+		case "search_after":
+			if err := dec.Decode(&s.SearchAfter); err != nil {
+				return fmt.Errorf("%s | %w", "SearchAfter", err)
+			}
+
+		case "seq_no_primary_term":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "SeqNoPrimaryTerm", err)
+				}
+				s.SeqNoPrimaryTerm = &value
+			case bool:
+				s.SeqNoPrimaryTerm = &v
+			}
+
+		case "size":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Size", err)
+				}
+				s.Size = &value
+			case float64:
+				f := int(v)
+				s.Size = &f
+			}
+
+		case "slice":
+			if err := dec.Decode(&s.Slice); err != nil {
+				return fmt.Errorf("%s | %w", "Slice", err)
+			}
+
+		case "sort":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(types.SortCombinations)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Sort", err)
+				}
+
+				s.Sort = append(s.Sort, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Sort); err != nil {
+					return fmt.Errorf("%s | %w", "Sort", err)
+				}
+			}
+
+		case "_source":
+			message := json.RawMessage{}
+			if err := dec.Decode(&message); err != nil {
+				return fmt.Errorf("%s | %w", "Source_", err)
+			}
+			keyDec := json.NewDecoder(bytes.NewReader(message))
+		source__field:
+			for {
+				t, err := keyDec.Token()
+				if err != nil {
+					if errors.Is(err, io.EOF) {
+						break
+					}
+					return fmt.Errorf("%s | %w", "Source_", err)
+				}
+
+				switch t {
+
+				case "excludes", "includes":
+					o := types.NewSourceFilter()
+					localDec := json.NewDecoder(bytes.NewReader(message))
+					if err := localDec.Decode(&o); err != nil {
+						return fmt.Errorf("%s | %w", "Source_", err)
+					}
+					s.Source_ = o
+					break source__field
+
+				}
+			}
+			if s.Source_ == nil {
+				localDec := json.NewDecoder(bytes.NewReader(message))
+				if err := localDec.Decode(&s.Source_); err != nil {
+					return fmt.Errorf("%s | %w", "Source_", err)
+				}
+			}
+
+		case "stats":
+			if err := dec.Decode(&s.Stats); err != nil {
+				return fmt.Errorf("%s | %w", "Stats", err)
+			}
+
+		case "stored_fields":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "StoredFields", err)
+				}
+
+				s.StoredFields = append(s.StoredFields, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.StoredFields); err != nil {
+					return fmt.Errorf("%s | %w", "StoredFields", err)
+				}
+			}
+
+		case "suggest":
+			if err := dec.Decode(&s.Suggest); err != nil {
+				return fmt.Errorf("%s | %w", "Suggest", err)
+			}
+
+		case "terminate_after":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TerminateAfter", err)
+				}
+				s.TerminateAfter = &value
+			case float64:
+				f := int64(v)
+				s.TerminateAfter = &f
+			}
+
+		case "timeout":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Timeout", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Timeout = &o
+
+		case "track_scores":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TrackScores", err)
+				}
+				s.TrackScores = &value
+			case bool:
+				s.TrackScores = &v
+			}
+
+		case "track_total_hits":
+			if err := dec.Decode(&s.TrackTotalHits); err != nil {
+				return fmt.Errorf("%s | %w", "TrackTotalHits", err)
+			}
+
+		case "version":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Version", err)
+				}
+				s.Version = &value
+			case bool:
+				s.Version = &v
+			}
+
+		}
 	}
-	rb.v.Aggregations = tmp
-	return rb
-}
-
-func (rb *RequestBuilder) Collapse(collapse *types.FieldCollapseBuilder) *RequestBuilder {
-	v := collapse.Build()
-	rb.v.Collapse = &v
-	return rb
-}
-
-func (rb *RequestBuilder) DocvalueFields(docvalue_fields []types.FieldAndFormatBuilder) *RequestBuilder {
-	tmp := make([]types.FieldAndFormat, len(docvalue_fields))
-	for _, value := range docvalue_fields {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.DocvalueFields = tmp
-	return rb
-}
-
-func (rb *RequestBuilder) Explain(explain bool) *RequestBuilder {
-	rb.v.Explain = &explain
-	return rb
-}
-
-func (rb *RequestBuilder) Fields(fields []types.FieldAndFormatBuilder) *RequestBuilder {
-	tmp := make([]types.FieldAndFormat, len(fields))
-	for _, value := range fields {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Fields = tmp
-	return rb
-}
-
-func (rb *RequestBuilder) From(from int) *RequestBuilder {
-	rb.v.From = &from
-	return rb
-}
-
-func (rb *RequestBuilder) Highlight(highlight *types.HighlightBuilder) *RequestBuilder {
-	v := highlight.Build()
-	rb.v.Highlight = &v
-	return rb
-}
-
-func (rb *RequestBuilder) IndicesBoost(value ...map[types.IndexName]float64) *RequestBuilder {
-	rb.v.IndicesBoost = value
-	return rb
-}
-
-func (rb *RequestBuilder) Knn(knn *types.KnnQueryBuilder) *RequestBuilder {
-	v := knn.Build()
-	rb.v.Knn = &v
-	return rb
-}
-
-func (rb *RequestBuilder) MinScore(minscore float64) *RequestBuilder {
-	rb.v.MinScore = &minscore
-	return rb
-}
-
-func (rb *RequestBuilder) Pit(pit *types.PointInTimeReferenceBuilder) *RequestBuilder {
-	v := pit.Build()
-	rb.v.Pit = &v
-	return rb
-}
-
-func (rb *RequestBuilder) PostFilter(postfilter *types.QueryContainerBuilder) *RequestBuilder {
-	v := postfilter.Build()
-	rb.v.PostFilter = &v
-	return rb
-}
-
-func (rb *RequestBuilder) Profile(profile bool) *RequestBuilder {
-	rb.v.Profile = &profile
-	return rb
-}
-
-func (rb *RequestBuilder) Query(query *types.QueryContainerBuilder) *RequestBuilder {
-	v := query.Build()
-	rb.v.Query = &v
-	return rb
-}
-
-func (rb *RequestBuilder) Rescore(arg []types.Rescore) *RequestBuilder {
-	rb.v.Rescore = arg
-	return rb
-}
-
-func (rb *RequestBuilder) RuntimeMappings(runtimemappings *types.RuntimeFieldsBuilder) *RequestBuilder {
-	v := runtimemappings.Build()
-	rb.v.RuntimeMappings = &v
-	return rb
-}
-
-func (rb *RequestBuilder) ScriptFields(values map[string]*types.ScriptFieldBuilder) *RequestBuilder {
-	tmp := make(map[string]types.ScriptField, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.ScriptFields = tmp
-	return rb
-}
-
-func (rb *RequestBuilder) SearchAfter(searchafter *types.SortResultsBuilder) *RequestBuilder {
-	v := searchafter.Build()
-	rb.v.SearchAfter = &v
-	return rb
-}
-
-func (rb *RequestBuilder) SeqNoPrimaryTerm(seqnoprimaryterm bool) *RequestBuilder {
-	rb.v.SeqNoPrimaryTerm = &seqnoprimaryterm
-	return rb
-}
-
-func (rb *RequestBuilder) Size(size int) *RequestBuilder {
-	rb.v.Size = &size
-	return rb
-}
-
-func (rb *RequestBuilder) Slice(slice *types.SlicedScrollBuilder) *RequestBuilder {
-	v := slice.Build()
-	rb.v.Slice = &v
-	return rb
-}
-
-func (rb *RequestBuilder) Sort(sort *types.SortBuilder) *RequestBuilder {
-	v := sort.Build()
-	rb.v.Sort = &v
-	return rb
-}
-
-func (rb *RequestBuilder) Source_(source_ *types.SourceConfigBuilder) *RequestBuilder {
-	v := source_.Build()
-	rb.v.Source_ = &v
-	return rb
-}
-
-func (rb *RequestBuilder) Stats(stats ...string) *RequestBuilder {
-	rb.v.Stats = stats
-	return rb
-}
-
-func (rb *RequestBuilder) StoredFields(storedfields *types.FieldsBuilder) *RequestBuilder {
-	v := storedfields.Build()
-	rb.v.StoredFields = &v
-	return rb
-}
-
-func (rb *RequestBuilder) Suggest(suggest *types.SuggesterBuilder) *RequestBuilder {
-	v := suggest.Build()
-	rb.v.Suggest = &v
-	return rb
-}
-
-func (rb *RequestBuilder) TerminateAfter(terminateafter int64) *RequestBuilder {
-	rb.v.TerminateAfter = &terminateafter
-	return rb
-}
-
-func (rb *RequestBuilder) Timeout(timeout string) *RequestBuilder {
-	rb.v.Timeout = &timeout
-	return rb
-}
-
-func (rb *RequestBuilder) TrackScores(trackscores bool) *RequestBuilder {
-	rb.v.TrackScores = &trackscores
-	return rb
-}
-
-func (rb *RequestBuilder) TrackTotalHits(tracktotalhits *types.TrackHitsBuilder) *RequestBuilder {
-	v := tracktotalhits.Build()
-	rb.v.TrackTotalHits = &v
-	return rb
-}
-
-func (rb *RequestBuilder) Version(version bool) *RequestBuilder {
-	rb.v.Version = &version
-	return rb
+	return nil
 }

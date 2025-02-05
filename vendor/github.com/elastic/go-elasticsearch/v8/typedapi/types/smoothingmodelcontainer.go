@@ -15,55 +15,30 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // SmoothingModelContainer type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/suggester.ts#L221-L228
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/suggester.ts#L445-L461
 type SmoothingModelContainer struct {
-	Laplace             *LaplaceSmoothingModel             `json:"laplace,omitempty"`
+	// Laplace A smoothing model that uses an additive smoothing where a constant (typically
+	// `1.0` or smaller) is added to all counts to balance weights.
+	Laplace *LaplaceSmoothingModel `json:"laplace,omitempty"`
+	// LinearInterpolation A smoothing model that takes the weighted mean of the unigrams, bigrams, and
+	// trigrams based on user supplied weights (lambdas).
 	LinearInterpolation *LinearInterpolationSmoothingModel `json:"linear_interpolation,omitempty"`
-	StupidBackoff       *StupidBackoffSmoothingModel       `json:"stupid_backoff,omitempty"`
+	// StupidBackoff A simple backoff model that backs off to lower order n-gram models if the
+	// higher order count is `0` and discounts the lower order n-gram model by a
+	// constant factor.
+	StupidBackoff *StupidBackoffSmoothingModel `json:"stupid_backoff,omitempty"`
 }
 
-// SmoothingModelContainerBuilder holds SmoothingModelContainer struct and provides a builder API.
-type SmoothingModelContainerBuilder struct {
-	v *SmoothingModelContainer
-}
+// NewSmoothingModelContainer returns a SmoothingModelContainer.
+func NewSmoothingModelContainer() *SmoothingModelContainer {
+	r := &SmoothingModelContainer{}
 
-// NewSmoothingModelContainer provides a builder for the SmoothingModelContainer struct.
-func NewSmoothingModelContainerBuilder() *SmoothingModelContainerBuilder {
-	r := SmoothingModelContainerBuilder{
-		&SmoothingModelContainer{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the SmoothingModelContainer struct
-func (rb *SmoothingModelContainerBuilder) Build() SmoothingModelContainer {
-	return *rb.v
-}
-
-func (rb *SmoothingModelContainerBuilder) Laplace(laplace *LaplaceSmoothingModelBuilder) *SmoothingModelContainerBuilder {
-	v := laplace.Build()
-	rb.v.Laplace = &v
-	return rb
-}
-
-func (rb *SmoothingModelContainerBuilder) LinearInterpolation(linearinterpolation *LinearInterpolationSmoothingModelBuilder) *SmoothingModelContainerBuilder {
-	v := linearinterpolation.Build()
-	rb.v.LinearInterpolation = &v
-	return rb
-}
-
-func (rb *SmoothingModelContainerBuilder) StupidBackoff(stupidbackoff *StupidBackoffSmoothingModelBuilder) *SmoothingModelContainerBuilder {
-	v := stupidbackoff.Build()
-	rb.v.StupidBackoff = &v
-	return rb
+	return r
 }

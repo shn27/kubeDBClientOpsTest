@@ -15,23 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package putjob
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"strconv"
 
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 )
 
 // Request holds the request body struct for the package putjob
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/rollup/put_job/CreateRollupJobRequest.ts#L27-L89
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/rollup/put_job/CreateRollupJobRequest.ts#L27-L89
 type Request struct {
 
 	// Cron A cron string which defines the intervals when the rollup job should be
@@ -44,7 +46,6 @@ type Request struct {
 	// defined by the cron. The
 	// cron pattern is defined just like a Watcher cron schedule.
 	Cron string `json:"cron"`
-
 	// Groups Defines the grouping fields and aggregations that are defined for this rollup
 	// job. These fields will then be
 	// available later for aggregating into buckets. These aggs and fields can be
@@ -55,15 +56,12 @@ type Request struct {
 	// aggregations might be used. Rollups provide
 	// enough flexibility that you simply need to determine which fields are needed,
 	// not in what order they are needed.
-	Groups types.Groupings `json:"groups"`
-
-	Headers *types.HttpHeaders `json:"headers,omitempty"`
-
+	Groups  types.Groupings   `json:"groups"`
+	Headers types.HttpHeaders `json:"headers,omitempty"`
 	// IndexPattern The index or index pattern to roll up. Supports wildcard-style patterns
 	// (`logstash-*`). The job attempts to
 	// rollup the entire index or index-pattern.
 	IndexPattern string `json:"index_pattern"`
-
 	// Metrics Defines the metrics to collect for each grouping tuple. By default, only the
 	// doc_counts are collected for each
 	// group. To make rollup useful, you will often add metrics like averages, mins,
@@ -71,7 +69,6 @@ type Request struct {
 	// on a per-field basis and for each field you configure which metric should be
 	// collected.
 	Metrics []types.FieldMetric `json:"metrics,omitempty"`
-
 	// PageSize The number of bucket results that are processed on each iteration of the
 	// rollup indexer. A larger value tends
 	// to execute faster, but requires more memory during processing. This value has
@@ -79,31 +76,23 @@ type Request struct {
 	// rolled up; it is merely used for tweaking the speed or memory cost of the
 	// indexer.
 	PageSize int `json:"page_size"`
-
 	// RollupIndex The index that contains the rollup results. The index can be shared with
 	// other rollup jobs. The data is stored so that it doesn’t interfere with
 	// unrelated jobs.
-	RollupIndex types.IndexName `json:"rollup_index"`
-
+	RollupIndex string `json:"rollup_index"`
 	// Timeout Time to wait for the request to complete.
-	Timeout *types.Duration `json:"timeout,omitempty"`
+	Timeout types.Duration `json:"timeout,omitempty"`
 }
 
-// RequestBuilder is the builder API for the putjob.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -114,54 +103,86 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) Cron(cron string) *RequestBuilder {
-	rb.v.Cron = cron
-	return rb
-}
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
 
-func (rb *RequestBuilder) Groups(groups *types.GroupingsBuilder) *RequestBuilder {
-	v := groups.Build()
-	rb.v.Groups = v
-	return rb
-}
+		switch t {
 
-func (rb *RequestBuilder) Headers(headers *types.HttpHeadersBuilder) *RequestBuilder {
-	v := headers.Build()
-	rb.v.Headers = &v
-	return rb
-}
+		case "cron":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Cron", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Cron = o
 
-func (rb *RequestBuilder) IndexPattern(indexpattern string) *RequestBuilder {
-	rb.v.IndexPattern = indexpattern
-	return rb
-}
+		case "groups":
+			if err := dec.Decode(&s.Groups); err != nil {
+				return fmt.Errorf("%s | %w", "Groups", err)
+			}
 
-func (rb *RequestBuilder) Metrics(metrics []types.FieldMetricBuilder) *RequestBuilder {
-	tmp := make([]types.FieldMetric, len(metrics))
-	for _, value := range metrics {
-		tmp = append(tmp, value.Build())
+		case "headers":
+			if err := dec.Decode(&s.Headers); err != nil {
+				return fmt.Errorf("%s | %w", "Headers", err)
+			}
+
+		case "index_pattern":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "IndexPattern", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.IndexPattern = o
+
+		case "metrics":
+			if err := dec.Decode(&s.Metrics); err != nil {
+				return fmt.Errorf("%s | %w", "Metrics", err)
+			}
+
+		case "page_size":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PageSize", err)
+				}
+				s.PageSize = value
+			case float64:
+				f := int(v)
+				s.PageSize = f
+			}
+
+		case "rollup_index":
+			if err := dec.Decode(&s.RollupIndex); err != nil {
+				return fmt.Errorf("%s | %w", "RollupIndex", err)
+			}
+
+		case "timeout":
+			if err := dec.Decode(&s.Timeout); err != nil {
+				return fmt.Errorf("%s | %w", "Timeout", err)
+			}
+
+		}
 	}
-	rb.v.Metrics = tmp
-	return rb
-}
-
-func (rb *RequestBuilder) PageSize(pagesize int) *RequestBuilder {
-	rb.v.PageSize = pagesize
-	return rb
-}
-
-func (rb *RequestBuilder) RollupIndex(rollupindex types.IndexName) *RequestBuilder {
-	rb.v.RollupIndex = rollupindex
-	return rb
-}
-
-func (rb *RequestBuilder) Timeout(timeout *types.DurationBuilder) *RequestBuilder {
-	v := timeout.Build()
-	rb.v.Timeout = &v
-	return rb
+	return nil
 }

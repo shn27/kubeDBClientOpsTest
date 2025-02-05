@@ -15,52 +15,109 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // AggregationProfileDelegateDebugFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/profile.ts#L69-L73
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/profile.ts#L78-L83
 type AggregationProfileDelegateDebugFilter struct {
-	Query               *string `json:"query,omitempty"`
-	ResultsFromMetadata *int    `json:"results_from_metadata,omitempty"`
-	SpecializedFor      *string `json:"specialized_for,omitempty"`
+	Query                         *string `json:"query,omitempty"`
+	ResultsFromMetadata           *int    `json:"results_from_metadata,omitempty"`
+	SegmentsCountedInConstantTime *int    `json:"segments_counted_in_constant_time,omitempty"`
+	SpecializedFor                *string `json:"specialized_for,omitempty"`
 }
 
-// AggregationProfileDelegateDebugFilterBuilder holds AggregationProfileDelegateDebugFilter struct and provides a builder API.
-type AggregationProfileDelegateDebugFilterBuilder struct {
-	v *AggregationProfileDelegateDebugFilter
-}
+func (s *AggregationProfileDelegateDebugFilter) UnmarshalJSON(data []byte) error {
 
-// NewAggregationProfileDelegateDebugFilter provides a builder for the AggregationProfileDelegateDebugFilter struct.
-func NewAggregationProfileDelegateDebugFilterBuilder() *AggregationProfileDelegateDebugFilterBuilder {
-	r := AggregationProfileDelegateDebugFilterBuilder{
-		&AggregationProfileDelegateDebugFilter{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "query":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Query", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Query = &o
+
+		case "results_from_metadata":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ResultsFromMetadata", err)
+				}
+				s.ResultsFromMetadata = &value
+			case float64:
+				f := int(v)
+				s.ResultsFromMetadata = &f
+			}
+
+		case "segments_counted_in_constant_time":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "SegmentsCountedInConstantTime", err)
+				}
+				s.SegmentsCountedInConstantTime = &value
+			case float64:
+				f := int(v)
+				s.SegmentsCountedInConstantTime = &f
+			}
+
+		case "specialized_for":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SpecializedFor", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SpecializedFor = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the AggregationProfileDelegateDebugFilter struct
-func (rb *AggregationProfileDelegateDebugFilterBuilder) Build() AggregationProfileDelegateDebugFilter {
-	return *rb.v
-}
+// NewAggregationProfileDelegateDebugFilter returns a AggregationProfileDelegateDebugFilter.
+func NewAggregationProfileDelegateDebugFilter() *AggregationProfileDelegateDebugFilter {
+	r := &AggregationProfileDelegateDebugFilter{}
 
-func (rb *AggregationProfileDelegateDebugFilterBuilder) Query(query string) *AggregationProfileDelegateDebugFilterBuilder {
-	rb.v.Query = &query
-	return rb
-}
-
-func (rb *AggregationProfileDelegateDebugFilterBuilder) ResultsFromMetadata(resultsfrommetadata int) *AggregationProfileDelegateDebugFilterBuilder {
-	rb.v.ResultsFromMetadata = &resultsfrommetadata
-	return rb
-}
-
-func (rb *AggregationProfileDelegateDebugFilterBuilder) SpecializedFor(specializedfor string) *AggregationProfileDelegateDebugFilterBuilder {
-	rb.v.SpecializedFor = &specializedfor
-	return rb
+	return r
 }

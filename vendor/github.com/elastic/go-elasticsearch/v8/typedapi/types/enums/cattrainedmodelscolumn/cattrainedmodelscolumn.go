@@ -15,19 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package cattrainedmodelscolumn
 package cattrainedmodelscolumn
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cat/_types/CatBase.ts#L561-L635
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cat/_types/CatBase.ts#L561-L635
 type CatTrainedModelsColumn struct {
-	name string
+	Name string
 }
 
 var (
@@ -43,15 +41,15 @@ var (
 
 	Id = CatTrainedModelsColumn{"id"}
 
-	IngestCount = CatTrainedModelsColumn{"ingest.count"}
+	Ingestcount = CatTrainedModelsColumn{"ingest.count"}
 
-	IngestCurrent = CatTrainedModelsColumn{"ingest.current"}
+	Ingestcurrent = CatTrainedModelsColumn{"ingest.current"}
 
-	IngestFailed = CatTrainedModelsColumn{"ingest.failed"}
+	Ingestfailed = CatTrainedModelsColumn{"ingest.failed"}
 
-	IngestPipelines = CatTrainedModelsColumn{"ingest.pipelines"}
+	Ingestpipelines = CatTrainedModelsColumn{"ingest.pipelines"}
 
-	IngestTime = CatTrainedModelsColumn{"ingest.time"}
+	Ingesttime = CatTrainedModelsColumn{"ingest.time"}
 
 	License = CatTrainedModelsColumn{"license"}
 
@@ -65,7 +63,7 @@ func (c CatTrainedModelsColumn) MarshalText() (text []byte, err error) {
 }
 
 func (c *CatTrainedModelsColumn) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
 	case "create_time":
 		*c = Createtime
@@ -80,15 +78,15 @@ func (c *CatTrainedModelsColumn) UnmarshalText(text []byte) error {
 	case "id":
 		*c = Id
 	case "ingest.count":
-		*c = IngestCount
+		*c = Ingestcount
 	case "ingest.current":
-		*c = IngestCurrent
+		*c = Ingestcurrent
 	case "ingest.failed":
-		*c = IngestFailed
+		*c = Ingestfailed
 	case "ingest.pipelines":
-		*c = IngestPipelines
+		*c = Ingestpipelines
 	case "ingest.time":
-		*c = IngestTime
+		*c = Ingesttime
 	case "license":
 		*c = License
 	case "operations":
@@ -103,5 +101,5 @@ func (c *CatTrainedModelsColumn) UnmarshalText(text []byte) error {
 }
 
 func (c CatTrainedModelsColumn) String() string {
-	return c.name
+	return c.Name
 }

@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
@@ -28,38 +26,5 @@ package types
 //	PhraseSuggest
 //	TermSuggest
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/suggester.ts#L34-L40
-type Suggest interface{}
-
-// SuggestBuilder holds Suggest struct and provides a builder API.
-type SuggestBuilder struct {
-	v Suggest
-}
-
-// NewSuggest provides a builder for the Suggest struct.
-func NewSuggestBuilder() *SuggestBuilder {
-	return &SuggestBuilder{}
-}
-
-// Build finalize the chain and returns the Suggest struct
-func (u *SuggestBuilder) Build() Suggest {
-	return u.v
-}
-
-func (u *SuggestBuilder) CompletionSuggest(completionsuggest *CompletionSuggestBuilder) *SuggestBuilder {
-	v := completionsuggest.Build()
-	u.v = &v
-	return u
-}
-
-func (u *SuggestBuilder) PhraseSuggest(phrasesuggest *PhraseSuggestBuilder) *SuggestBuilder {
-	v := phrasesuggest.Build()
-	u.v = &v
-	return u
-}
-
-func (u *SuggestBuilder) TermSuggest(termsuggest *TermSuggestBuilder) *SuggestBuilder {
-	v := termsuggest.Build()
-	u.v = &v
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/suggester.ts#L34-L40
+type Suggest any

@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DataframeAnalyticsSummary type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/DataframeAnalytics.ts#L306-L322
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/DataframeAnalytics.ts#L306-L323
 type DataframeAnalyticsSummary struct {
 	AllowLazyStart *bool                            `json:"allow_lazy_start,omitempty"`
 	Analysis       DataframeAnalysisContainer       `json:"analysis"`
@@ -33,101 +40,139 @@ type DataframeAnalyticsSummary struct {
 	// Stack security features were disabled at the time of the most recent update
 	// to the job, this property is omitted.
 	Authorization    *DataframeAnalyticsAuthorization `json:"authorization,omitempty"`
-	CreateTime       *EpochTimeUnitMillis             `json:"create_time,omitempty"`
+	CreateTime       *int64                           `json:"create_time,omitempty"`
 	Description      *string                          `json:"description,omitempty"`
 	Dest             DataframeAnalyticsDestination    `json:"dest"`
-	Id               Id                               `json:"id"`
+	Id               string                           `json:"id"`
 	MaxNumThreads    *int                             `json:"max_num_threads,omitempty"`
+	Meta_            Metadata                         `json:"_meta,omitempty"`
 	ModelMemoryLimit *string                          `json:"model_memory_limit,omitempty"`
 	Source           DataframeAnalyticsSource         `json:"source"`
-	Version          *VersionString                   `json:"version,omitempty"`
+	Version          *string                          `json:"version,omitempty"`
 }
 
-// DataframeAnalyticsSummaryBuilder holds DataframeAnalyticsSummary struct and provides a builder API.
-type DataframeAnalyticsSummaryBuilder struct {
-	v *DataframeAnalyticsSummary
-}
+func (s *DataframeAnalyticsSummary) UnmarshalJSON(data []byte) error {
 
-// NewDataframeAnalyticsSummary provides a builder for the DataframeAnalyticsSummary struct.
-func NewDataframeAnalyticsSummaryBuilder() *DataframeAnalyticsSummaryBuilder {
-	r := DataframeAnalyticsSummaryBuilder{
-		&DataframeAnalyticsSummary{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "allow_lazy_start":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "AllowLazyStart", err)
+				}
+				s.AllowLazyStart = &value
+			case bool:
+				s.AllowLazyStart = &v
+			}
+
+		case "analysis":
+			if err := dec.Decode(&s.Analysis); err != nil {
+				return fmt.Errorf("%s | %w", "Analysis", err)
+			}
+
+		case "analyzed_fields":
+			if err := dec.Decode(&s.AnalyzedFields); err != nil {
+				return fmt.Errorf("%s | %w", "AnalyzedFields", err)
+			}
+
+		case "authorization":
+			if err := dec.Decode(&s.Authorization); err != nil {
+				return fmt.Errorf("%s | %w", "Authorization", err)
+			}
+
+		case "create_time":
+			if err := dec.Decode(&s.CreateTime); err != nil {
+				return fmt.Errorf("%s | %w", "CreateTime", err)
+			}
+
+		case "description":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Description", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Description = &o
+
+		case "dest":
+			if err := dec.Decode(&s.Dest); err != nil {
+				return fmt.Errorf("%s | %w", "Dest", err)
+			}
+
+		case "id":
+			if err := dec.Decode(&s.Id); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
+
+		case "max_num_threads":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxNumThreads", err)
+				}
+				s.MaxNumThreads = &value
+			case float64:
+				f := int(v)
+				s.MaxNumThreads = &f
+			}
+
+		case "_meta":
+			if err := dec.Decode(&s.Meta_); err != nil {
+				return fmt.Errorf("%s | %w", "Meta_", err)
+			}
+
+		case "model_memory_limit":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ModelMemoryLimit", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ModelMemoryLimit = &o
+
+		case "source":
+			if err := dec.Decode(&s.Source); err != nil {
+				return fmt.Errorf("%s | %w", "Source", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DataframeAnalyticsSummary struct
-func (rb *DataframeAnalyticsSummaryBuilder) Build() DataframeAnalyticsSummary {
-	return *rb.v
-}
+// NewDataframeAnalyticsSummary returns a DataframeAnalyticsSummary.
+func NewDataframeAnalyticsSummary() *DataframeAnalyticsSummary {
+	r := &DataframeAnalyticsSummary{}
 
-func (rb *DataframeAnalyticsSummaryBuilder) AllowLazyStart(allowlazystart bool) *DataframeAnalyticsSummaryBuilder {
-	rb.v.AllowLazyStart = &allowlazystart
-	return rb
-}
-
-func (rb *DataframeAnalyticsSummaryBuilder) Analysis(analysis *DataframeAnalysisContainerBuilder) *DataframeAnalyticsSummaryBuilder {
-	v := analysis.Build()
-	rb.v.Analysis = v
-	return rb
-}
-
-func (rb *DataframeAnalyticsSummaryBuilder) AnalyzedFields(analyzedfields *DataframeAnalysisAnalyzedFieldsBuilder) *DataframeAnalyticsSummaryBuilder {
-	v := analyzedfields.Build()
-	rb.v.AnalyzedFields = &v
-	return rb
-}
-
-// Authorization The security privileges that the job uses to run its queries. If Elastic
-// Stack security features were disabled at the time of the most recent update
-// to the job, this property is omitted.
-
-func (rb *DataframeAnalyticsSummaryBuilder) Authorization(authorization *DataframeAnalyticsAuthorizationBuilder) *DataframeAnalyticsSummaryBuilder {
-	v := authorization.Build()
-	rb.v.Authorization = &v
-	return rb
-}
-
-func (rb *DataframeAnalyticsSummaryBuilder) CreateTime(createtime *EpochTimeUnitMillisBuilder) *DataframeAnalyticsSummaryBuilder {
-	v := createtime.Build()
-	rb.v.CreateTime = &v
-	return rb
-}
-
-func (rb *DataframeAnalyticsSummaryBuilder) Description(description string) *DataframeAnalyticsSummaryBuilder {
-	rb.v.Description = &description
-	return rb
-}
-
-func (rb *DataframeAnalyticsSummaryBuilder) Dest(dest *DataframeAnalyticsDestinationBuilder) *DataframeAnalyticsSummaryBuilder {
-	v := dest.Build()
-	rb.v.Dest = v
-	return rb
-}
-
-func (rb *DataframeAnalyticsSummaryBuilder) Id(id Id) *DataframeAnalyticsSummaryBuilder {
-	rb.v.Id = id
-	return rb
-}
-
-func (rb *DataframeAnalyticsSummaryBuilder) MaxNumThreads(maxnumthreads int) *DataframeAnalyticsSummaryBuilder {
-	rb.v.MaxNumThreads = &maxnumthreads
-	return rb
-}
-
-func (rb *DataframeAnalyticsSummaryBuilder) ModelMemoryLimit(modelmemorylimit string) *DataframeAnalyticsSummaryBuilder {
-	rb.v.ModelMemoryLimit = &modelmemorylimit
-	return rb
-}
-
-func (rb *DataframeAnalyticsSummaryBuilder) Source(source *DataframeAnalyticsSourceBuilder) *DataframeAnalyticsSummaryBuilder {
-	v := source.Build()
-	rb.v.Source = v
-	return rb
-}
-
-func (rb *DataframeAnalyticsSummaryBuilder) Version(version VersionString) *DataframeAnalyticsSummaryBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

@@ -15,59 +15,90 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // NodeInfoHttp type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/info/types.ts#L295-L300
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/info/types.ts#L311-L316
 type NodeInfoHttp struct {
-	BoundAddress            []string  `json:"bound_address"`
-	MaxContentLength        *ByteSize `json:"max_content_length,omitempty"`
-	MaxContentLengthInBytes int64     `json:"max_content_length_in_bytes"`
-	PublishAddress          string    `json:"publish_address"`
+	BoundAddress            []string `json:"bound_address"`
+	MaxContentLength        ByteSize `json:"max_content_length,omitempty"`
+	MaxContentLengthInBytes int64    `json:"max_content_length_in_bytes"`
+	PublishAddress          string   `json:"publish_address"`
 }
 
-// NodeInfoHttpBuilder holds NodeInfoHttp struct and provides a builder API.
-type NodeInfoHttpBuilder struct {
-	v *NodeInfoHttp
-}
+func (s *NodeInfoHttp) UnmarshalJSON(data []byte) error {
 
-// NewNodeInfoHttp provides a builder for the NodeInfoHttp struct.
-func NewNodeInfoHttpBuilder() *NodeInfoHttpBuilder {
-	r := NodeInfoHttpBuilder{
-		&NodeInfoHttp{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "bound_address":
+			if err := dec.Decode(&s.BoundAddress); err != nil {
+				return fmt.Errorf("%s | %w", "BoundAddress", err)
+			}
+
+		case "max_content_length":
+			if err := dec.Decode(&s.MaxContentLength); err != nil {
+				return fmt.Errorf("%s | %w", "MaxContentLength", err)
+			}
+
+		case "max_content_length_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxContentLengthInBytes", err)
+				}
+				s.MaxContentLengthInBytes = value
+			case float64:
+				f := int64(v)
+				s.MaxContentLengthInBytes = f
+			}
+
+		case "publish_address":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PublishAddress", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PublishAddress = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the NodeInfoHttp struct
-func (rb *NodeInfoHttpBuilder) Build() NodeInfoHttp {
-	return *rb.v
-}
+// NewNodeInfoHttp returns a NodeInfoHttp.
+func NewNodeInfoHttp() *NodeInfoHttp {
+	r := &NodeInfoHttp{}
 
-func (rb *NodeInfoHttpBuilder) BoundAddress(bound_address ...string) *NodeInfoHttpBuilder {
-	rb.v.BoundAddress = bound_address
-	return rb
-}
-
-func (rb *NodeInfoHttpBuilder) MaxContentLength(maxcontentlength *ByteSizeBuilder) *NodeInfoHttpBuilder {
-	v := maxcontentlength.Build()
-	rb.v.MaxContentLength = &v
-	return rb
-}
-
-func (rb *NodeInfoHttpBuilder) MaxContentLengthInBytes(maxcontentlengthinbytes int64) *NodeInfoHttpBuilder {
-	rb.v.MaxContentLengthInBytes = maxcontentlengthinbytes
-	return rb
-}
-
-func (rb *NodeInfoHttpBuilder) PublishAddress(publishaddress string) *NodeInfoHttpBuilder {
-	rb.v.PublishAddress = publishaddress
-	return rb
+	return r
 }

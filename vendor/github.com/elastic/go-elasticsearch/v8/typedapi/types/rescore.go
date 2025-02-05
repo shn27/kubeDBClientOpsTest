@@ -15,47 +15,78 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // Rescore type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/rescoring.ts#L23-L26
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/rescoring.ts#L25-L38
 type Rescore struct {
-	Query      RescoreQuery `json:"query"`
-	WindowSize *int         `json:"window_size,omitempty"`
+	LearningToRank *LearningToRank `json:"learning_to_rank,omitempty"`
+	Query          *RescoreQuery   `json:"query,omitempty"`
+	WindowSize     *int            `json:"window_size,omitempty"`
 }
 
-// RescoreBuilder holds Rescore struct and provides a builder API.
-type RescoreBuilder struct {
-	v *Rescore
-}
+func (s *Rescore) UnmarshalJSON(data []byte) error {
 
-// NewRescore provides a builder for the Rescore struct.
-func NewRescoreBuilder() *RescoreBuilder {
-	r := RescoreBuilder{
-		&Rescore{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "learning_to_rank":
+			if err := dec.Decode(&s.LearningToRank); err != nil {
+				return fmt.Errorf("%s | %w", "LearningToRank", err)
+			}
+
+		case "query":
+			if err := dec.Decode(&s.Query); err != nil {
+				return fmt.Errorf("%s | %w", "Query", err)
+			}
+
+		case "window_size":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "WindowSize", err)
+				}
+				s.WindowSize = &value
+			case float64:
+				f := int(v)
+				s.WindowSize = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the Rescore struct
-func (rb *RescoreBuilder) Build() Rescore {
-	return *rb.v
-}
+// NewRescore returns a Rescore.
+func NewRescore() *Rescore {
+	r := &Rescore{}
 
-func (rb *RescoreBuilder) Query(query *RescoreQueryBuilder) *RescoreBuilder {
-	v := query.Build()
-	rb.v.Query = v
-	return rb
-}
-
-func (rb *RescoreBuilder) WindowSize(windowsize int) *RescoreBuilder {
-	rb.v.WindowSize = &windowsize
-	return rb
+	return r
 }

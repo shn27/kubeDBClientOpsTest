@@ -15,55 +15,71 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // DataframeAnalyticsStatsOutlierDetection type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/DataframeAnalytics.ts#L389-L393
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/DataframeAnalytics.ts#L405-L418
 type DataframeAnalyticsStatsOutlierDetection struct {
-	Parameters  OutlierDetectionParameters `json:"parameters"`
-	Timestamp   EpochTimeUnitMillis        `json:"timestamp"`
-	TimingStats TimingStats                `json:"timing_stats"`
+	// Parameters The list of job parameters specified by the user or determined by algorithmic
+	// heuristics.
+	Parameters OutlierDetectionParameters `json:"parameters"`
+	// Timestamp The timestamp when the statistics were reported in milliseconds since the
+	// epoch.
+	Timestamp int64 `json:"timestamp"`
+	// TimingStats An object containing time statistics about the data frame analytics job.
+	TimingStats TimingStats `json:"timing_stats"`
 }
 
-// DataframeAnalyticsStatsOutlierDetectionBuilder holds DataframeAnalyticsStatsOutlierDetection struct and provides a builder API.
-type DataframeAnalyticsStatsOutlierDetectionBuilder struct {
-	v *DataframeAnalyticsStatsOutlierDetection
-}
+func (s *DataframeAnalyticsStatsOutlierDetection) UnmarshalJSON(data []byte) error {
 
-// NewDataframeAnalyticsStatsOutlierDetection provides a builder for the DataframeAnalyticsStatsOutlierDetection struct.
-func NewDataframeAnalyticsStatsOutlierDetectionBuilder() *DataframeAnalyticsStatsOutlierDetectionBuilder {
-	r := DataframeAnalyticsStatsOutlierDetectionBuilder{
-		&DataframeAnalyticsStatsOutlierDetection{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "parameters":
+			if err := dec.Decode(&s.Parameters); err != nil {
+				return fmt.Errorf("%s | %w", "Parameters", err)
+			}
+
+		case "timestamp":
+			if err := dec.Decode(&s.Timestamp); err != nil {
+				return fmt.Errorf("%s | %w", "Timestamp", err)
+			}
+
+		case "timing_stats":
+			if err := dec.Decode(&s.TimingStats); err != nil {
+				return fmt.Errorf("%s | %w", "TimingStats", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DataframeAnalyticsStatsOutlierDetection struct
-func (rb *DataframeAnalyticsStatsOutlierDetectionBuilder) Build() DataframeAnalyticsStatsOutlierDetection {
-	return *rb.v
-}
+// NewDataframeAnalyticsStatsOutlierDetection returns a DataframeAnalyticsStatsOutlierDetection.
+func NewDataframeAnalyticsStatsOutlierDetection() *DataframeAnalyticsStatsOutlierDetection {
+	r := &DataframeAnalyticsStatsOutlierDetection{}
 
-func (rb *DataframeAnalyticsStatsOutlierDetectionBuilder) Parameters(parameters *OutlierDetectionParametersBuilder) *DataframeAnalyticsStatsOutlierDetectionBuilder {
-	v := parameters.Build()
-	rb.v.Parameters = v
-	return rb
-}
-
-func (rb *DataframeAnalyticsStatsOutlierDetectionBuilder) Timestamp(timestamp *EpochTimeUnitMillisBuilder) *DataframeAnalyticsStatsOutlierDetectionBuilder {
-	v := timestamp.Build()
-	rb.v.Timestamp = v
-	return rb
-}
-
-func (rb *DataframeAnalyticsStatsOutlierDetectionBuilder) TimingStats(timingstats *TimingStatsBuilder) *DataframeAnalyticsStatsOutlierDetectionBuilder {
-	v := timingstats.Build()
-	rb.v.TimingStats = v
-	return rb
+	return r
 }

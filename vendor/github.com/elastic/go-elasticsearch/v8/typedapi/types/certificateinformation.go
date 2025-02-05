@@ -15,77 +15,148 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // CertificateInformation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ssl/certificates/types.ts#L22-L30
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ssl/certificates/types.ts#L22-L31
 type CertificateInformation struct {
-	Alias         string   `json:"alias,omitempty"`
+	Alias         *string  `json:"alias,omitempty"`
 	Expiry        DateTime `json:"expiry"`
 	Format        string   `json:"format"`
 	HasPrivateKey bool     `json:"has_private_key"`
+	Issuer        *string  `json:"issuer,omitempty"`
 	Path          string   `json:"path"`
 	SerialNumber  string   `json:"serial_number"`
 	SubjectDn     string   `json:"subject_dn"`
 }
 
-// CertificateInformationBuilder holds CertificateInformation struct and provides a builder API.
-type CertificateInformationBuilder struct {
-	v *CertificateInformation
-}
+func (s *CertificateInformation) UnmarshalJSON(data []byte) error {
 
-// NewCertificateInformation provides a builder for the CertificateInformation struct.
-func NewCertificateInformationBuilder() *CertificateInformationBuilder {
-	r := CertificateInformationBuilder{
-		&CertificateInformation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "alias":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Alias", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Alias = &o
+
+		case "expiry":
+			if err := dec.Decode(&s.Expiry); err != nil {
+				return fmt.Errorf("%s | %w", "Expiry", err)
+			}
+
+		case "format":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Format", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Format = o
+
+		case "has_private_key":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "HasPrivateKey", err)
+				}
+				s.HasPrivateKey = value
+			case bool:
+				s.HasPrivateKey = v
+			}
+
+		case "issuer":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Issuer", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Issuer = &o
+
+		case "path":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Path", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Path = o
+
+		case "serial_number":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SerialNumber", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SerialNumber = o
+
+		case "subject_dn":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SubjectDn", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SubjectDn = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the CertificateInformation struct
-func (rb *CertificateInformationBuilder) Build() CertificateInformation {
-	return *rb.v
-}
+// NewCertificateInformation returns a CertificateInformation.
+func NewCertificateInformation() *CertificateInformation {
+	r := &CertificateInformation{}
 
-func (rb *CertificateInformationBuilder) Alias(alias string) *CertificateInformationBuilder {
-	rb.v.Alias = alias
-	return rb
-}
-
-func (rb *CertificateInformationBuilder) Expiry(expiry *DateTimeBuilder) *CertificateInformationBuilder {
-	v := expiry.Build()
-	rb.v.Expiry = v
-	return rb
-}
-
-func (rb *CertificateInformationBuilder) Format(format string) *CertificateInformationBuilder {
-	rb.v.Format = format
-	return rb
-}
-
-func (rb *CertificateInformationBuilder) HasPrivateKey(hasprivatekey bool) *CertificateInformationBuilder {
-	rb.v.HasPrivateKey = hasprivatekey
-	return rb
-}
-
-func (rb *CertificateInformationBuilder) Path(path string) *CertificateInformationBuilder {
-	rb.v.Path = path
-	return rb
-}
-
-func (rb *CertificateInformationBuilder) SerialNumber(serialnumber string) *CertificateInformationBuilder {
-	rb.v.SerialNumber = serialnumber
-	return rb
-}
-
-func (rb *CertificateInformationBuilder) SubjectDn(subjectdn string) *CertificateInformationBuilder {
-	rb.v.SubjectDn = subjectdn
-	return rb
+	return r
 }

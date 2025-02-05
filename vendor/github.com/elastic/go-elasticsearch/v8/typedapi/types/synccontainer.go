@@ -15,46 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // SyncContainer type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/transform/_types/Transform.ts#L157-L163
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/transform/_types/Transform.ts#L169-L175
 type SyncContainer struct {
 	// Time Specifies that the transform uses a time field to synchronize the source and
 	// destination indices.
 	Time *TimeSync `json:"time,omitempty"`
 }
 
-// SyncContainerBuilder holds SyncContainer struct and provides a builder API.
-type SyncContainerBuilder struct {
-	v *SyncContainer
-}
+// NewSyncContainer returns a SyncContainer.
+func NewSyncContainer() *SyncContainer {
+	r := &SyncContainer{}
 
-// NewSyncContainer provides a builder for the SyncContainer struct.
-func NewSyncContainerBuilder() *SyncContainerBuilder {
-	r := SyncContainerBuilder{
-		&SyncContainer{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the SyncContainer struct
-func (rb *SyncContainerBuilder) Build() SyncContainer {
-	return *rb.v
-}
-
-// Time Specifies that the transform uses a time field to synchronize the source and
-// destination indices.
-
-func (rb *SyncContainerBuilder) Time(time *TimeSyncBuilder) *SyncContainerBuilder {
-	v := time.Build()
-	rb.v.Time = &v
-	return rb
+	return r
 }

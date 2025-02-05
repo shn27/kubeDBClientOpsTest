@@ -15,50 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // BucketsGeoTileGridBucket holds the union for the following types:
 //
-//	[]GeoTileGridBucket
 //	map[string]GeoTileGridBucket
+//	[]GeoTileGridBucket
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L303-L312
-type BucketsGeoTileGridBucket interface{}
-
-// BucketsGeoTileGridBucketBuilder holds BucketsGeoTileGridBucket struct and provides a builder API.
-type BucketsGeoTileGridBucketBuilder struct {
-	v BucketsGeoTileGridBucket
-}
-
-// NewBucketsGeoTileGridBucket provides a builder for the BucketsGeoTileGridBucket struct.
-func NewBucketsGeoTileGridBucketBuilder() *BucketsGeoTileGridBucketBuilder {
-	return &BucketsGeoTileGridBucketBuilder{}
-}
-
-// Build finalize the chain and returns the BucketsGeoTileGridBucket struct
-func (u *BucketsGeoTileGridBucketBuilder) Build() BucketsGeoTileGridBucket {
-	return u.v
-}
-
-func (u *BucketsGeoTileGridBucketBuilder) GeoTileGridBuckets(geotilegridbuckets []GeoTileGridBucketBuilder) *BucketsGeoTileGridBucketBuilder {
-	tmp := make([]GeoTileGridBucket, len(geotilegridbuckets))
-	for _, value := range geotilegridbuckets {
-		tmp = append(tmp, value.Build())
-	}
-	u.v = tmp
-	return u
-}
-
-func (u *BucketsGeoTileGridBucketBuilder) Map(values map[string]*GeoTileGridBucketBuilder) *BucketsGeoTileGridBucketBuilder {
-	tmp := make(map[string]GeoTileGridBucket, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	u.v = tmp
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L346-L355
+type BucketsGeoTileGridBucket any

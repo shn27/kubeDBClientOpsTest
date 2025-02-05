@@ -15,50 +15,72 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DataframeClassificationSummaryRecall type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/evaluate_data_frame/types.ts#L65-L68
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/evaluate_data_frame/types.ts#L106-L109
 type DataframeClassificationSummaryRecall struct {
-	AvgRecall float64                    `json:"avg_recall"`
+	AvgRecall Float64                    `json:"avg_recall"`
 	Classes   []DataframeEvaluationClass `json:"classes"`
 }
 
-// DataframeClassificationSummaryRecallBuilder holds DataframeClassificationSummaryRecall struct and provides a builder API.
-type DataframeClassificationSummaryRecallBuilder struct {
-	v *DataframeClassificationSummaryRecall
-}
+func (s *DataframeClassificationSummaryRecall) UnmarshalJSON(data []byte) error {
 
-// NewDataframeClassificationSummaryRecall provides a builder for the DataframeClassificationSummaryRecall struct.
-func NewDataframeClassificationSummaryRecallBuilder() *DataframeClassificationSummaryRecallBuilder {
-	r := DataframeClassificationSummaryRecallBuilder{
-		&DataframeClassificationSummaryRecall{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "avg_recall":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "AvgRecall", err)
+				}
+				f := Float64(value)
+				s.AvgRecall = f
+			case float64:
+				f := Float64(v)
+				s.AvgRecall = f
+			}
+
+		case "classes":
+			if err := dec.Decode(&s.Classes); err != nil {
+				return fmt.Errorf("%s | %w", "Classes", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DataframeClassificationSummaryRecall struct
-func (rb *DataframeClassificationSummaryRecallBuilder) Build() DataframeClassificationSummaryRecall {
-	return *rb.v
-}
+// NewDataframeClassificationSummaryRecall returns a DataframeClassificationSummaryRecall.
+func NewDataframeClassificationSummaryRecall() *DataframeClassificationSummaryRecall {
+	r := &DataframeClassificationSummaryRecall{}
 
-func (rb *DataframeClassificationSummaryRecallBuilder) AvgRecall(avgrecall float64) *DataframeClassificationSummaryRecallBuilder {
-	rb.v.AvgRecall = avgrecall
-	return rb
-}
-
-func (rb *DataframeClassificationSummaryRecallBuilder) Classes(classes []DataframeEvaluationClassBuilder) *DataframeClassificationSummaryRecallBuilder {
-	tmp := make([]DataframeEvaluationClass, len(classes))
-	for _, value := range classes {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Classes = tmp
-	return rb
+	return r
 }

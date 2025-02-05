@@ -15,48 +15,24 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // ClusterProcess type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/stats/types.ts#L247-L250
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/stats/types.ts#L466-L475
 type ClusterProcess struct {
-	Cpu                 ClusterProcessCpu                 `json:"cpu"`
+	// Cpu Contains statistics about CPU used by selected nodes.
+	Cpu ClusterProcessCpu `json:"cpu"`
+	// OpenFileDescriptors Contains statistics about open file descriptors in selected nodes.
 	OpenFileDescriptors ClusterProcessOpenFileDescriptors `json:"open_file_descriptors"`
 }
 
-// ClusterProcessBuilder holds ClusterProcess struct and provides a builder API.
-type ClusterProcessBuilder struct {
-	v *ClusterProcess
-}
+// NewClusterProcess returns a ClusterProcess.
+func NewClusterProcess() *ClusterProcess {
+	r := &ClusterProcess{}
 
-// NewClusterProcess provides a builder for the ClusterProcess struct.
-func NewClusterProcessBuilder() *ClusterProcessBuilder {
-	r := ClusterProcessBuilder{
-		&ClusterProcess{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the ClusterProcess struct
-func (rb *ClusterProcessBuilder) Build() ClusterProcess {
-	return *rb.v
-}
-
-func (rb *ClusterProcessBuilder) Cpu(cpu *ClusterProcessCpuBuilder) *ClusterProcessBuilder {
-	v := cpu.Build()
-	rb.v.Cpu = v
-	return rb
-}
-
-func (rb *ClusterProcessBuilder) OpenFileDescriptors(openfiledescriptors *ClusterProcessOpenFileDescriptorsBuilder) *ClusterProcessBuilder {
-	v := openfiledescriptors.Build()
-	rb.v.OpenFileDescriptors = v
-	return rb
+	return r
 }

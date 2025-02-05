@@ -15,41 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // IndexResult type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Actions.ts#L267-L269
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Actions.ts#L267-L269
 type IndexResult struct {
 	Response IndexResultSummary `json:"response"`
 }
 
-// IndexResultBuilder holds IndexResult struct and provides a builder API.
-type IndexResultBuilder struct {
-	v *IndexResult
-}
+// NewIndexResult returns a IndexResult.
+func NewIndexResult() *IndexResult {
+	r := &IndexResult{}
 
-// NewIndexResult provides a builder for the IndexResult struct.
-func NewIndexResultBuilder() *IndexResultBuilder {
-	r := IndexResultBuilder{
-		&IndexResult{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the IndexResult struct
-func (rb *IndexResultBuilder) Build() IndexResult {
-	return *rb.v
-}
-
-func (rb *IndexResultBuilder) Response(response *IndexResultSummaryBuilder) *IndexResultBuilder {
-	v := response.Build()
-	rb.v.Response = v
-	return rb
+	return r
 }

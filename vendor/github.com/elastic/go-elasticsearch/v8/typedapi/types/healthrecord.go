@@ -15,23 +15,30 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // HealthRecord type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cat/health/types.ts#L23-L94
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cat/health/types.ts#L23-L99
 type HealthRecord struct {
 	// ActiveShardsPercent active number of shards in percent
 	ActiveShardsPercent *string `json:"active_shards_percent,omitempty"`
 	// Cluster cluster name
 	Cluster *string `json:"cluster,omitempty"`
 	// Epoch seconds since 1970-01-01 00:00:00
-	Epoch *StringifiedEpochTimeUnitSeconds `json:"epoch,omitempty"`
+	Epoch StringifiedEpochTimeUnitSeconds `json:"epoch,omitempty"`
 	// Init number of initializing nodes
 	Init *string `json:"init,omitempty"`
 	// MaxTaskWaitTime wait time of longest task pending
@@ -51,125 +58,202 @@ type HealthRecord struct {
 	// Status health status
 	Status *string `json:"status,omitempty"`
 	// Timestamp time in HH:MM:SS
-	Timestamp *TimeOfDay `json:"timestamp,omitempty"`
+	Timestamp *string `json:"timestamp,omitempty"`
 	// Unassign number of unassigned shards
 	Unassign *string `json:"unassign,omitempty"`
+	// UnassignPri number of unassigned primary shards
+	UnassignPri *string `json:"unassign.pri,omitempty"`
 }
 
-// HealthRecordBuilder holds HealthRecord struct and provides a builder API.
-type HealthRecordBuilder struct {
-	v *HealthRecord
-}
+func (s *HealthRecord) UnmarshalJSON(data []byte) error {
 
-// NewHealthRecord provides a builder for the HealthRecord struct.
-func NewHealthRecordBuilder() *HealthRecordBuilder {
-	r := HealthRecordBuilder{
-		&HealthRecord{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "active_shards_percent", "asp", "activeShardsPercent":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ActiveShardsPercent", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ActiveShardsPercent = &o
+
+		case "cluster", "cl":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Cluster", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Cluster = &o
+
+		case "epoch", "time":
+			if err := dec.Decode(&s.Epoch); err != nil {
+				return fmt.Errorf("%s | %w", "Epoch", err)
+			}
+
+		case "init", "i", "shards.initializing", "shardsInitializing":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Init", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Init = &o
+
+		case "max_task_wait_time", "mtwt", "maxTaskWaitTime":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "MaxTaskWaitTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.MaxTaskWaitTime = &o
+
+		case "node.data", "nd", "nodeData":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "NodeData", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.NodeData = &o
+
+		case "node.total", "nt", "nodeTotal":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "NodeTotal", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.NodeTotal = &o
+
+		case "pending_tasks", "pt", "pendingTasks":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PendingTasks", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PendingTasks = &o
+
+		case "pri", "p", "shards.primary", "shardsPrimary":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Pri", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Pri = &o
+
+		case "relo", "r", "shards.relocating", "shardsRelocating":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Relo", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Relo = &o
+
+		case "shards", "t", "sh", "shards.total", "shardsTotal":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Shards", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Shards = &o
+
+		case "status", "st":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Status", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Status = &o
+
+		case "timestamp", "ts", "hms", "hhmmss":
+			if err := dec.Decode(&s.Timestamp); err != nil {
+				return fmt.Errorf("%s | %w", "Timestamp", err)
+			}
+
+		case "unassign", "u", "shards.unassigned", "shardsUnassigned":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Unassign", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Unassign = &o
+
+		case "unassign.pri", "up", "shards.unassigned.primary", "shardsUnassignedPrimary":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "UnassignPri", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.UnassignPri = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the HealthRecord struct
-func (rb *HealthRecordBuilder) Build() HealthRecord {
-	return *rb.v
-}
+// NewHealthRecord returns a HealthRecord.
+func NewHealthRecord() *HealthRecord {
+	r := &HealthRecord{}
 
-// ActiveShardsPercent active number of shards in percent
-
-func (rb *HealthRecordBuilder) ActiveShardsPercent(activeshardspercent string) *HealthRecordBuilder {
-	rb.v.ActiveShardsPercent = &activeshardspercent
-	return rb
-}
-
-// Cluster cluster name
-
-func (rb *HealthRecordBuilder) Cluster(cluster string) *HealthRecordBuilder {
-	rb.v.Cluster = &cluster
-	return rb
-}
-
-// Epoch seconds since 1970-01-01 00:00:00
-
-func (rb *HealthRecordBuilder) Epoch(epoch *StringifiedEpochTimeUnitSecondsBuilder) *HealthRecordBuilder {
-	v := epoch.Build()
-	rb.v.Epoch = &v
-	return rb
-}
-
-// Init number of initializing nodes
-
-func (rb *HealthRecordBuilder) Init(init string) *HealthRecordBuilder {
-	rb.v.Init = &init
-	return rb
-}
-
-// MaxTaskWaitTime wait time of longest task pending
-
-func (rb *HealthRecordBuilder) MaxTaskWaitTime(maxtaskwaittime string) *HealthRecordBuilder {
-	rb.v.MaxTaskWaitTime = &maxtaskwaittime
-	return rb
-}
-
-// NodeData number of nodes that can store data
-
-func (rb *HealthRecordBuilder) NodeData(nodedata string) *HealthRecordBuilder {
-	rb.v.NodeData = &nodedata
-	return rb
-}
-
-// NodeTotal total number of nodes
-
-func (rb *HealthRecordBuilder) NodeTotal(nodetotal string) *HealthRecordBuilder {
-	rb.v.NodeTotal = &nodetotal
-	return rb
-}
-
-// PendingTasks number of pending tasks
-
-func (rb *HealthRecordBuilder) PendingTasks(pendingtasks string) *HealthRecordBuilder {
-	rb.v.PendingTasks = &pendingtasks
-	return rb
-}
-
-// Pri number of primary shards
-
-func (rb *HealthRecordBuilder) Pri(pri string) *HealthRecordBuilder {
-	rb.v.Pri = &pri
-	return rb
-}
-
-// Relo number of relocating nodes
-
-func (rb *HealthRecordBuilder) Relo(relo string) *HealthRecordBuilder {
-	rb.v.Relo = &relo
-	return rb
-}
-
-// Shards total number of shards
-
-func (rb *HealthRecordBuilder) Shards(shards string) *HealthRecordBuilder {
-	rb.v.Shards = &shards
-	return rb
-}
-
-// Status health status
-
-func (rb *HealthRecordBuilder) Status(status string) *HealthRecordBuilder {
-	rb.v.Status = &status
-	return rb
-}
-
-// Timestamp time in HH:MM:SS
-
-func (rb *HealthRecordBuilder) Timestamp(timestamp TimeOfDay) *HealthRecordBuilder {
-	rb.v.Timestamp = &timestamp
-	return rb
-}
-
-// Unassign number of unassigned shards
-
-func (rb *HealthRecordBuilder) Unassign(unassign string) *HealthRecordBuilder {
-	rb.v.Unassign = &unassign
-	return rb
+	return r
 }

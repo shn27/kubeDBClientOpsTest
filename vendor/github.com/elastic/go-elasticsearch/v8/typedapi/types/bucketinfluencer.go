@@ -15,156 +15,196 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // BucketInfluencer type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/Bucket.ts#L80-L128
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/Bucket.ts#L79-L127
 type BucketInfluencer struct {
 	// AnomalyScore A normalized score between 0-100, which is calculated for each bucket
 	// influencer. This score might be updated as
 	// newer data is analyzed.
-	AnomalyScore float64 `json:"anomaly_score"`
+	AnomalyScore Float64 `json:"anomaly_score"`
 	// BucketSpan The length of the bucket in seconds. This value matches the bucket span that
 	// is specified in the job.
-	BucketSpan DurationValueUnitSeconds `json:"bucket_span"`
+	BucketSpan int64 `json:"bucket_span"`
 	// InfluencerFieldName The field name of the influencer.
-	InfluencerFieldName Field `json:"influencer_field_name"`
+	InfluencerFieldName string `json:"influencer_field_name"`
 	// InitialAnomalyScore The score between 0-100 for each bucket influencer. This score is the initial
 	// value that was calculated at the
 	// time the bucket was processed.
-	InitialAnomalyScore float64 `json:"initial_anomaly_score"`
+	InitialAnomalyScore Float64 `json:"initial_anomaly_score"`
 	// IsInterim If true, this is an interim result. In other words, the results are
 	// calculated based on partial input data.
 	IsInterim bool `json:"is_interim"`
 	// JobId Identifier for the anomaly detection job.
-	JobId Id `json:"job_id"`
+	JobId string `json:"job_id"`
 	// Probability The probability that the bucket has this behavior, in the range 0 to 1. This
 	// value can be held to a high precision
 	// of over 300 decimal places, so the `anomaly_score` is provided as a
 	// human-readable and friendly interpretation of
 	// this.
-	Probability float64 `json:"probability"`
+	Probability Float64 `json:"probability"`
 	// RawAnomalyScore Internal.
-	RawAnomalyScore float64 `json:"raw_anomaly_score"`
+	RawAnomalyScore Float64 `json:"raw_anomaly_score"`
 	// ResultType Internal. This value is always set to `bucket_influencer`.
 	ResultType string `json:"result_type"`
 	// Timestamp The start time of the bucket for which these results were calculated.
-	Timestamp EpochTimeUnitMillis `json:"timestamp"`
+	Timestamp int64 `json:"timestamp"`
 	// TimestampString The start time of the bucket for which these results were calculated.
-	TimestampString *DateTime `json:"timestamp_string,omitempty"`
+	TimestampString DateTime `json:"timestamp_string,omitempty"`
 }
 
-// BucketInfluencerBuilder holds BucketInfluencer struct and provides a builder API.
-type BucketInfluencerBuilder struct {
-	v *BucketInfluencer
-}
+func (s *BucketInfluencer) UnmarshalJSON(data []byte) error {
 
-// NewBucketInfluencer provides a builder for the BucketInfluencer struct.
-func NewBucketInfluencerBuilder() *BucketInfluencerBuilder {
-	r := BucketInfluencerBuilder{
-		&BucketInfluencer{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "anomaly_score":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "AnomalyScore", err)
+				}
+				f := Float64(value)
+				s.AnomalyScore = f
+			case float64:
+				f := Float64(v)
+				s.AnomalyScore = f
+			}
+
+		case "bucket_span":
+			if err := dec.Decode(&s.BucketSpan); err != nil {
+				return fmt.Errorf("%s | %w", "BucketSpan", err)
+			}
+
+		case "influencer_field_name":
+			if err := dec.Decode(&s.InfluencerFieldName); err != nil {
+				return fmt.Errorf("%s | %w", "InfluencerFieldName", err)
+			}
+
+		case "initial_anomaly_score":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "InitialAnomalyScore", err)
+				}
+				f := Float64(value)
+				s.InitialAnomalyScore = f
+			case float64:
+				f := Float64(v)
+				s.InitialAnomalyScore = f
+			}
+
+		case "is_interim":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IsInterim", err)
+				}
+				s.IsInterim = value
+			case bool:
+				s.IsInterim = v
+			}
+
+		case "job_id":
+			if err := dec.Decode(&s.JobId); err != nil {
+				return fmt.Errorf("%s | %w", "JobId", err)
+			}
+
+		case "probability":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Probability", err)
+				}
+				f := Float64(value)
+				s.Probability = f
+			case float64:
+				f := Float64(v)
+				s.Probability = f
+			}
+
+		case "raw_anomaly_score":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "RawAnomalyScore", err)
+				}
+				f := Float64(value)
+				s.RawAnomalyScore = f
+			case float64:
+				f := Float64(v)
+				s.RawAnomalyScore = f
+			}
+
+		case "result_type":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ResultType", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ResultType = o
+
+		case "timestamp":
+			if err := dec.Decode(&s.Timestamp); err != nil {
+				return fmt.Errorf("%s | %w", "Timestamp", err)
+			}
+
+		case "timestamp_string":
+			if err := dec.Decode(&s.TimestampString); err != nil {
+				return fmt.Errorf("%s | %w", "TimestampString", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the BucketInfluencer struct
-func (rb *BucketInfluencerBuilder) Build() BucketInfluencer {
-	return *rb.v
-}
+// NewBucketInfluencer returns a BucketInfluencer.
+func NewBucketInfluencer() *BucketInfluencer {
+	r := &BucketInfluencer{}
 
-// AnomalyScore A normalized score between 0-100, which is calculated for each bucket
-// influencer. This score might be updated as
-// newer data is analyzed.
-
-func (rb *BucketInfluencerBuilder) AnomalyScore(anomalyscore float64) *BucketInfluencerBuilder {
-	rb.v.AnomalyScore = anomalyscore
-	return rb
-}
-
-// BucketSpan The length of the bucket in seconds. This value matches the bucket span that
-// is specified in the job.
-
-func (rb *BucketInfluencerBuilder) BucketSpan(bucketspan *DurationValueUnitSecondsBuilder) *BucketInfluencerBuilder {
-	v := bucketspan.Build()
-	rb.v.BucketSpan = v
-	return rb
-}
-
-// InfluencerFieldName The field name of the influencer.
-
-func (rb *BucketInfluencerBuilder) InfluencerFieldName(influencerfieldname Field) *BucketInfluencerBuilder {
-	rb.v.InfluencerFieldName = influencerfieldname
-	return rb
-}
-
-// InitialAnomalyScore The score between 0-100 for each bucket influencer. This score is the initial
-// value that was calculated at the
-// time the bucket was processed.
-
-func (rb *BucketInfluencerBuilder) InitialAnomalyScore(initialanomalyscore float64) *BucketInfluencerBuilder {
-	rb.v.InitialAnomalyScore = initialanomalyscore
-	return rb
-}
-
-// IsInterim If true, this is an interim result. In other words, the results are
-// calculated based on partial input data.
-
-func (rb *BucketInfluencerBuilder) IsInterim(isinterim bool) *BucketInfluencerBuilder {
-	rb.v.IsInterim = isinterim
-	return rb
-}
-
-// JobId Identifier for the anomaly detection job.
-
-func (rb *BucketInfluencerBuilder) JobId(jobid Id) *BucketInfluencerBuilder {
-	rb.v.JobId = jobid
-	return rb
-}
-
-// Probability The probability that the bucket has this behavior, in the range 0 to 1. This
-// value can be held to a high precision
-// of over 300 decimal places, so the `anomaly_score` is provided as a
-// human-readable and friendly interpretation of
-// this.
-
-func (rb *BucketInfluencerBuilder) Probability(probability float64) *BucketInfluencerBuilder {
-	rb.v.Probability = probability
-	return rb
-}
-
-// RawAnomalyScore Internal.
-
-func (rb *BucketInfluencerBuilder) RawAnomalyScore(rawanomalyscore float64) *BucketInfluencerBuilder {
-	rb.v.RawAnomalyScore = rawanomalyscore
-	return rb
-}
-
-// ResultType Internal. This value is always set to `bucket_influencer`.
-
-func (rb *BucketInfluencerBuilder) ResultType(resulttype string) *BucketInfluencerBuilder {
-	rb.v.ResultType = resulttype
-	return rb
-}
-
-// Timestamp The start time of the bucket for which these results were calculated.
-
-func (rb *BucketInfluencerBuilder) Timestamp(timestamp *EpochTimeUnitMillisBuilder) *BucketInfluencerBuilder {
-	v := timestamp.Build()
-	rb.v.Timestamp = v
-	return rb
-}
-
-// TimestampString The start time of the bucket for which these results were calculated.
-
-func (rb *BucketInfluencerBuilder) TimestampString(timestampstring *DateTimeBuilder) *BucketInfluencerBuilder {
-	v := timestampstring.Build()
-	rb.v.TimestampString = &v
-	return rb
+	return r
 }

@@ -15,52 +15,77 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // RepositoriesRecord type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cat/repositories/types.ts#L20-L31
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cat/repositories/types.ts#L20-L31
 type RepositoriesRecord struct {
-	// Id unique repository id
+	// Id The unique repository identifier.
 	Id *string `json:"id,omitempty"`
-	// Type repository type
+	// Type The repository type.
 	Type *string `json:"type,omitempty"`
 }
 
-// RepositoriesRecordBuilder holds RepositoriesRecord struct and provides a builder API.
-type RepositoriesRecordBuilder struct {
-	v *RepositoriesRecord
-}
+func (s *RepositoriesRecord) UnmarshalJSON(data []byte) error {
 
-// NewRepositoriesRecord provides a builder for the RepositoriesRecord struct.
-func NewRepositoriesRecordBuilder() *RepositoriesRecordBuilder {
-	r := RepositoriesRecordBuilder{
-		&RepositoriesRecord{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "id", "repoId":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Id = &o
+
+		case "type", "t":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Type = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RepositoriesRecord struct
-func (rb *RepositoriesRecordBuilder) Build() RepositoriesRecord {
-	return *rb.v
-}
+// NewRepositoriesRecord returns a RepositoriesRecord.
+func NewRepositoriesRecord() *RepositoriesRecord {
+	r := &RepositoriesRecord{}
 
-// Id unique repository id
-
-func (rb *RepositoriesRecordBuilder) Id(id string) *RepositoriesRecordBuilder {
-	rb.v.Id = &id
-	return rb
-}
-
-// Type repository type
-
-func (rb *RepositoriesRecordBuilder) Type_(type_ string) *RepositoriesRecordBuilder {
-	rb.v.Type = &type_
-	return rb
+	return r
 }

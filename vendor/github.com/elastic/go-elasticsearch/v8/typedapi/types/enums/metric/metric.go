@@ -15,19 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package metric
 package metric
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/rollup/_types/Metric.ts#L22-L28
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/rollup/_types/Metric.ts#L22-L28
 type Metric struct {
-	name string
+	Name string
 }
 
 var (
@@ -47,7 +45,7 @@ func (m Metric) MarshalText() (text []byte, err error) {
 }
 
 func (m *Metric) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
 	case "min":
 		*m = Min
@@ -67,5 +65,5 @@ func (m *Metric) UnmarshalText(text []byte) error {
 }
 
 func (m Metric) String() string {
-	return m.name
+	return m.Name
 }

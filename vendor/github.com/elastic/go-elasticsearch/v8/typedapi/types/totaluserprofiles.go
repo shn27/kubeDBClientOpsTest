@@ -15,46 +15,71 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // TotalUserProfiles type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/suggest_user_profiles/Response.ts#L24-L27
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/suggest_user_profiles/Response.ts#L24-L27
 type TotalUserProfiles struct {
-	Relation RelationName `json:"relation"`
-	Value    int64        `json:"value"`
+	Relation string `json:"relation"`
+	Value    int64  `json:"value"`
 }
 
-// TotalUserProfilesBuilder holds TotalUserProfiles struct and provides a builder API.
-type TotalUserProfilesBuilder struct {
-	v *TotalUserProfiles
-}
+func (s *TotalUserProfiles) UnmarshalJSON(data []byte) error {
 
-// NewTotalUserProfiles provides a builder for the TotalUserProfiles struct.
-func NewTotalUserProfilesBuilder() *TotalUserProfilesBuilder {
-	r := TotalUserProfilesBuilder{
-		&TotalUserProfiles{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "relation":
+			if err := dec.Decode(&s.Relation); err != nil {
+				return fmt.Errorf("%s | %w", "Relation", err)
+			}
+
+		case "value":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Value", err)
+				}
+				s.Value = value
+			case float64:
+				f := int64(v)
+				s.Value = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TotalUserProfiles struct
-func (rb *TotalUserProfilesBuilder) Build() TotalUserProfiles {
-	return *rb.v
-}
+// NewTotalUserProfiles returns a TotalUserProfiles.
+func NewTotalUserProfiles() *TotalUserProfiles {
+	r := &TotalUserProfiles{}
 
-func (rb *TotalUserProfilesBuilder) Relation(relation RelationName) *TotalUserProfilesBuilder {
-	rb.v.Relation = relation
-	return rb
-}
-
-func (rb *TotalUserProfilesBuilder) Value(value int64) *TotalUserProfilesBuilder {
-	rb.v.Value = value
-	return rb
+	return r
 }

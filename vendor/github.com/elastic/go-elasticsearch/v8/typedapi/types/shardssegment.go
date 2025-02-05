@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ShardsSegment type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/segments/types.ts#L47-L52
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/segments/types.ts#L46-L51
 type ShardsSegment struct {
 	NumCommittedSegments int                 `json:"num_committed_segments"`
 	NumSearchSegments    int                 `json:"num_search_segments"`
@@ -32,48 +39,76 @@ type ShardsSegment struct {
 	Segments             map[string]Segment  `json:"segments"`
 }
 
-// ShardsSegmentBuilder holds ShardsSegment struct and provides a builder API.
-type ShardsSegmentBuilder struct {
-	v *ShardsSegment
+func (s *ShardsSegment) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "num_committed_segments":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NumCommittedSegments", err)
+				}
+				s.NumCommittedSegments = value
+			case float64:
+				f := int(v)
+				s.NumCommittedSegments = f
+			}
+
+		case "num_search_segments":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NumSearchSegments", err)
+				}
+				s.NumSearchSegments = value
+			case float64:
+				f := int(v)
+				s.NumSearchSegments = f
+			}
+
+		case "routing":
+			if err := dec.Decode(&s.Routing); err != nil {
+				return fmt.Errorf("%s | %w", "Routing", err)
+			}
+
+		case "segments":
+			if s.Segments == nil {
+				s.Segments = make(map[string]Segment, 0)
+			}
+			if err := dec.Decode(&s.Segments); err != nil {
+				return fmt.Errorf("%s | %w", "Segments", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewShardsSegment provides a builder for the ShardsSegment struct.
-func NewShardsSegmentBuilder() *ShardsSegmentBuilder {
-	r := ShardsSegmentBuilder{
-		&ShardsSegment{
-			Segments: make(map[string]Segment, 0),
-		},
+// NewShardsSegment returns a ShardsSegment.
+func NewShardsSegment() *ShardsSegment {
+	r := &ShardsSegment{
+		Segments: make(map[string]Segment, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the ShardsSegment struct
-func (rb *ShardsSegmentBuilder) Build() ShardsSegment {
-	return *rb.v
-}
-
-func (rb *ShardsSegmentBuilder) NumCommittedSegments(numcommittedsegments int) *ShardsSegmentBuilder {
-	rb.v.NumCommittedSegments = numcommittedsegments
-	return rb
-}
-
-func (rb *ShardsSegmentBuilder) NumSearchSegments(numsearchsegments int) *ShardsSegmentBuilder {
-	rb.v.NumSearchSegments = numsearchsegments
-	return rb
-}
-
-func (rb *ShardsSegmentBuilder) Routing(routing *ShardSegmentRoutingBuilder) *ShardsSegmentBuilder {
-	v := routing.Build()
-	rb.v.Routing = v
-	return rb
-}
-
-func (rb *ShardsSegmentBuilder) Segments(values map[string]*SegmentBuilder) *ShardsSegmentBuilder {
-	tmp := make(map[string]Segment, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Segments = tmp
-	return rb
+	return r
 }

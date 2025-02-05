@@ -15,98 +15,138 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // AuthenticatedUser type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/get_token/types.ts#L40-L45
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/get_token/types.ts#L40-L45
 type AuthenticatedUser struct {
 	AuthenticationProvider *AuthenticationProvider `json:"authentication_provider,omitempty"`
 	AuthenticationRealm    UserRealm               `json:"authentication_realm"`
 	AuthenticationType     string                  `json:"authentication_type"`
-	Email                  string                  `json:"email,omitempty"`
+	Email                  *string                 `json:"email,omitempty"`
 	Enabled                bool                    `json:"enabled"`
-	FullName               Name                    `json:"full_name,omitempty"`
+	FullName               *string                 `json:"full_name,omitempty"`
 	LookupRealm            UserRealm               `json:"lookup_realm"`
 	Metadata               Metadata                `json:"metadata"`
+	ProfileUid             *string                 `json:"profile_uid,omitempty"`
 	Roles                  []string                `json:"roles"`
-	Username               Username                `json:"username"`
+	Username               string                  `json:"username"`
 }
 
-// AuthenticatedUserBuilder holds AuthenticatedUser struct and provides a builder API.
-type AuthenticatedUserBuilder struct {
-	v *AuthenticatedUser
-}
+func (s *AuthenticatedUser) UnmarshalJSON(data []byte) error {
 
-// NewAuthenticatedUser provides a builder for the AuthenticatedUser struct.
-func NewAuthenticatedUserBuilder() *AuthenticatedUserBuilder {
-	r := AuthenticatedUserBuilder{
-		&AuthenticatedUser{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "authentication_provider":
+			if err := dec.Decode(&s.AuthenticationProvider); err != nil {
+				return fmt.Errorf("%s | %w", "AuthenticationProvider", err)
+			}
+
+		case "authentication_realm":
+			if err := dec.Decode(&s.AuthenticationRealm); err != nil {
+				return fmt.Errorf("%s | %w", "AuthenticationRealm", err)
+			}
+
+		case "authentication_type":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "AuthenticationType", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.AuthenticationType = o
+
+		case "email":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Email", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Email = &o
+
+		case "enabled":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Enabled", err)
+				}
+				s.Enabled = value
+			case bool:
+				s.Enabled = v
+			}
+
+		case "full_name":
+			if err := dec.Decode(&s.FullName); err != nil {
+				return fmt.Errorf("%s | %w", "FullName", err)
+			}
+
+		case "lookup_realm":
+			if err := dec.Decode(&s.LookupRealm); err != nil {
+				return fmt.Errorf("%s | %w", "LookupRealm", err)
+			}
+
+		case "metadata":
+			if err := dec.Decode(&s.Metadata); err != nil {
+				return fmt.Errorf("%s | %w", "Metadata", err)
+			}
+
+		case "profile_uid":
+			if err := dec.Decode(&s.ProfileUid); err != nil {
+				return fmt.Errorf("%s | %w", "ProfileUid", err)
+			}
+
+		case "roles":
+			if err := dec.Decode(&s.Roles); err != nil {
+				return fmt.Errorf("%s | %w", "Roles", err)
+			}
+
+		case "username":
+			if err := dec.Decode(&s.Username); err != nil {
+				return fmt.Errorf("%s | %w", "Username", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the AuthenticatedUser struct
-func (rb *AuthenticatedUserBuilder) Build() AuthenticatedUser {
-	return *rb.v
-}
+// NewAuthenticatedUser returns a AuthenticatedUser.
+func NewAuthenticatedUser() *AuthenticatedUser {
+	r := &AuthenticatedUser{}
 
-func (rb *AuthenticatedUserBuilder) AuthenticationProvider(authenticationprovider *AuthenticationProviderBuilder) *AuthenticatedUserBuilder {
-	v := authenticationprovider.Build()
-	rb.v.AuthenticationProvider = &v
-	return rb
-}
-
-func (rb *AuthenticatedUserBuilder) AuthenticationRealm(authenticationrealm *UserRealmBuilder) *AuthenticatedUserBuilder {
-	v := authenticationrealm.Build()
-	rb.v.AuthenticationRealm = v
-	return rb
-}
-
-func (rb *AuthenticatedUserBuilder) AuthenticationType(authenticationtype string) *AuthenticatedUserBuilder {
-	rb.v.AuthenticationType = authenticationtype
-	return rb
-}
-
-func (rb *AuthenticatedUserBuilder) Email(email string) *AuthenticatedUserBuilder {
-	rb.v.Email = email
-	return rb
-}
-
-func (rb *AuthenticatedUserBuilder) Enabled(enabled bool) *AuthenticatedUserBuilder {
-	rb.v.Enabled = enabled
-	return rb
-}
-
-func (rb *AuthenticatedUserBuilder) FullName(fullname Name) *AuthenticatedUserBuilder {
-	rb.v.FullName = fullname
-	return rb
-}
-
-func (rb *AuthenticatedUserBuilder) LookupRealm(lookuprealm *UserRealmBuilder) *AuthenticatedUserBuilder {
-	v := lookuprealm.Build()
-	rb.v.LookupRealm = v
-	return rb
-}
-
-func (rb *AuthenticatedUserBuilder) Metadata(metadata *MetadataBuilder) *AuthenticatedUserBuilder {
-	v := metadata.Build()
-	rb.v.Metadata = v
-	return rb
-}
-
-func (rb *AuthenticatedUserBuilder) Roles(roles ...string) *AuthenticatedUserBuilder {
-	rb.v.Roles = roles
-	return rb
-}
-
-func (rb *AuthenticatedUserBuilder) Username(username Username) *AuthenticatedUserBuilder {
-	rb.v.Username = username
-	return rb
+	return r
 }

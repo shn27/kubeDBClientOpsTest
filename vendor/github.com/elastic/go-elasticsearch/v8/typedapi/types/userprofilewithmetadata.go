@@ -15,81 +15,119 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // UserProfileWithMetadata type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/_types/UserProfile.ts#L51-L54
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/_types/UserProfile.ts#L49-L52
 type UserProfileWithMetadata struct {
-	Data             map[string]interface{} `json:"data"`
-	Doc_             UserProfileHitMetadata `json:"_doc"`
-	Enabled          *bool                  `json:"enabled,omitempty"`
-	Labels           map[string]interface{} `json:"labels"`
-	LastSynchronized int64                  `json:"last_synchronized"`
-	Uid              UserProfileId          `json:"uid"`
-	User             UserProfileUser        `json:"user"`
+	Data             map[string]json.RawMessage `json:"data"`
+	Doc_             UserProfileHitMetadata     `json:"_doc"`
+	Enabled          *bool                      `json:"enabled,omitempty"`
+	Labels           map[string]json.RawMessage `json:"labels"`
+	LastSynchronized int64                      `json:"last_synchronized"`
+	Uid              string                     `json:"uid"`
+	User             UserProfileUser            `json:"user"`
 }
 
-// UserProfileWithMetadataBuilder holds UserProfileWithMetadata struct and provides a builder API.
-type UserProfileWithMetadataBuilder struct {
-	v *UserProfileWithMetadata
+func (s *UserProfileWithMetadata) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "data":
+			if s.Data == nil {
+				s.Data = make(map[string]json.RawMessage, 0)
+			}
+			if err := dec.Decode(&s.Data); err != nil {
+				return fmt.Errorf("%s | %w", "Data", err)
+			}
+
+		case "_doc":
+			if err := dec.Decode(&s.Doc_); err != nil {
+				return fmt.Errorf("%s | %w", "Doc_", err)
+			}
+
+		case "enabled":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Enabled", err)
+				}
+				s.Enabled = &value
+			case bool:
+				s.Enabled = &v
+			}
+
+		case "labels":
+			if s.Labels == nil {
+				s.Labels = make(map[string]json.RawMessage, 0)
+			}
+			if err := dec.Decode(&s.Labels); err != nil {
+				return fmt.Errorf("%s | %w", "Labels", err)
+			}
+
+		case "last_synchronized":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "LastSynchronized", err)
+				}
+				s.LastSynchronized = value
+			case float64:
+				f := int64(v)
+				s.LastSynchronized = f
+			}
+
+		case "uid":
+			if err := dec.Decode(&s.Uid); err != nil {
+				return fmt.Errorf("%s | %w", "Uid", err)
+			}
+
+		case "user":
+			if err := dec.Decode(&s.User); err != nil {
+				return fmt.Errorf("%s | %w", "User", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewUserProfileWithMetadata provides a builder for the UserProfileWithMetadata struct.
-func NewUserProfileWithMetadataBuilder() *UserProfileWithMetadataBuilder {
-	r := UserProfileWithMetadataBuilder{
-		&UserProfileWithMetadata{
-			Data:   make(map[string]interface{}, 0),
-			Labels: make(map[string]interface{}, 0),
-		},
+// NewUserProfileWithMetadata returns a UserProfileWithMetadata.
+func NewUserProfileWithMetadata() *UserProfileWithMetadata {
+	r := &UserProfileWithMetadata{
+		Data:   make(map[string]json.RawMessage, 0),
+		Labels: make(map[string]json.RawMessage, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the UserProfileWithMetadata struct
-func (rb *UserProfileWithMetadataBuilder) Build() UserProfileWithMetadata {
-	return *rb.v
-}
-
-func (rb *UserProfileWithMetadataBuilder) Data(value map[string]interface{}) *UserProfileWithMetadataBuilder {
-	rb.v.Data = value
-	return rb
-}
-
-func (rb *UserProfileWithMetadataBuilder) Doc_(doc_ *UserProfileHitMetadataBuilder) *UserProfileWithMetadataBuilder {
-	v := doc_.Build()
-	rb.v.Doc_ = v
-	return rb
-}
-
-func (rb *UserProfileWithMetadataBuilder) Enabled(enabled bool) *UserProfileWithMetadataBuilder {
-	rb.v.Enabled = &enabled
-	return rb
-}
-
-func (rb *UserProfileWithMetadataBuilder) Labels(value map[string]interface{}) *UserProfileWithMetadataBuilder {
-	rb.v.Labels = value
-	return rb
-}
-
-func (rb *UserProfileWithMetadataBuilder) LastSynchronized(lastsynchronized int64) *UserProfileWithMetadataBuilder {
-	rb.v.LastSynchronized = lastsynchronized
-	return rb
-}
-
-func (rb *UserProfileWithMetadataBuilder) Uid(uid UserProfileId) *UserProfileWithMetadataBuilder {
-	rb.v.Uid = uid
-	return rb
-}
-
-func (rb *UserProfileWithMetadataBuilder) User(user *UserProfileUserBuilder) *UserProfileWithMetadataBuilder {
-	v := user.Build()
-	rb.v.User = v
-	return rb
+	return r
 }

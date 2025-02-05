@@ -15,65 +15,105 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // TotalFeatureImportanceStatistics type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/TrainedModel.ts#L237-L244
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/TrainedModel.ts#L293-L300
 type TotalFeatureImportanceStatistics struct {
 	// Max The maximum importance value across all the training data for this feature.
 	Max int `json:"max"`
 	// MeanMagnitude The average magnitude of this feature across all the training data. This
 	// value is the average of the absolute values of the importance for this
 	// feature.
-	MeanMagnitude float64 `json:"mean_magnitude"`
+	MeanMagnitude Float64 `json:"mean_magnitude"`
 	// Min The minimum importance value across all the training data for this feature.
 	Min int `json:"min"`
 }
 
-// TotalFeatureImportanceStatisticsBuilder holds TotalFeatureImportanceStatistics struct and provides a builder API.
-type TotalFeatureImportanceStatisticsBuilder struct {
-	v *TotalFeatureImportanceStatistics
-}
+func (s *TotalFeatureImportanceStatistics) UnmarshalJSON(data []byte) error {
 
-// NewTotalFeatureImportanceStatistics provides a builder for the TotalFeatureImportanceStatistics struct.
-func NewTotalFeatureImportanceStatisticsBuilder() *TotalFeatureImportanceStatisticsBuilder {
-	r := TotalFeatureImportanceStatisticsBuilder{
-		&TotalFeatureImportanceStatistics{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "max":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Max", err)
+				}
+				s.Max = value
+			case float64:
+				f := int(v)
+				s.Max = f
+			}
+
+		case "mean_magnitude":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MeanMagnitude", err)
+				}
+				f := Float64(value)
+				s.MeanMagnitude = f
+			case float64:
+				f := Float64(v)
+				s.MeanMagnitude = f
+			}
+
+		case "min":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Min", err)
+				}
+				s.Min = value
+			case float64:
+				f := int(v)
+				s.Min = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TotalFeatureImportanceStatistics struct
-func (rb *TotalFeatureImportanceStatisticsBuilder) Build() TotalFeatureImportanceStatistics {
-	return *rb.v
-}
+// NewTotalFeatureImportanceStatistics returns a TotalFeatureImportanceStatistics.
+func NewTotalFeatureImportanceStatistics() *TotalFeatureImportanceStatistics {
+	r := &TotalFeatureImportanceStatistics{}
 
-// Max The maximum importance value across all the training data for this feature.
-
-func (rb *TotalFeatureImportanceStatisticsBuilder) Max(max int) *TotalFeatureImportanceStatisticsBuilder {
-	rb.v.Max = max
-	return rb
-}
-
-// MeanMagnitude The average magnitude of this feature across all the training data. This
-// value is the average of the absolute values of the importance for this
-// feature.
-
-func (rb *TotalFeatureImportanceStatisticsBuilder) MeanMagnitude(meanmagnitude float64) *TotalFeatureImportanceStatisticsBuilder {
-	rb.v.MeanMagnitude = meanmagnitude
-	return rb
-}
-
-// Min The minimum importance value across all the training data for this feature.
-
-func (rb *TotalFeatureImportanceStatisticsBuilder) Min(min int) *TotalFeatureImportanceStatisticsBuilder {
-	rb.v.Min = min
-	return rb
+	return r
 }

@@ -15,19 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package fieldtype
 package fieldtype
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/mapping/Property.ts#L156-L199
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/mapping/Property.ts#L166-L213
 type FieldType struct {
-	name string
+	Name string
 }
 
 var (
@@ -58,6 +56,8 @@ var (
 	Nested = FieldType{"nested"}
 
 	Object = FieldType{"object"}
+
+	Version = FieldType{"version"}
 
 	Murmur3 = FieldType{"murmur3"}
 
@@ -113,7 +113,13 @@ var (
 
 	Densevector = FieldType{"dense_vector"}
 
+	Semantictext = FieldType{"semantic_text"}
+
+	Sparsevector = FieldType{"sparse_vector"}
+
 	Matchonlytext = FieldType{"match_only_text"}
+
+	Icucollationkeyword = FieldType{"icu_collation_keyword"}
 )
 
 func (f FieldType) MarshalText() (text []byte, err error) {
@@ -121,7 +127,7 @@ func (f FieldType) MarshalText() (text []byte, err error) {
 }
 
 func (f *FieldType) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
 	case "none":
 		*f = None
@@ -151,6 +157,8 @@ func (f *FieldType) UnmarshalText(text []byte) error {
 		*f = Nested
 	case "object":
 		*f = Object
+	case "version":
+		*f = Version
 	case "murmur3":
 		*f = Murmur3
 	case "token_count":
@@ -205,8 +213,14 @@ func (f *FieldType) UnmarshalText(text []byte) error {
 		*f = Aggregatemetricdouble
 	case "dense_vector":
 		*f = Densevector
+	case "semantic_text":
+		*f = Semantictext
+	case "sparse_vector":
+		*f = Sparsevector
 	case "match_only_text":
 		*f = Matchonlytext
+	case "icu_collation_keyword":
+		*f = Icucollationkeyword
 	default:
 		*f = FieldType{string(text)}
 	}
@@ -215,5 +229,5 @@ func (f *FieldType) UnmarshalText(text []byte) error {
 }
 
 func (f FieldType) String() string {
-	return f.name
+	return f.Name
 }

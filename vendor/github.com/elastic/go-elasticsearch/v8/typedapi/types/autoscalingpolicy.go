@@ -15,51 +15,29 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"encoding/json"
+)
+
 // AutoscalingPolicy type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/autoscaling/_types/AutoscalingPolicy.ts#L23-L27
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/autoscaling/_types/AutoscalingPolicy.ts#L23-L30
 type AutoscalingPolicy struct {
-	// Deciders Decider settings
-	Deciders map[string]interface{} `json:"deciders"`
-	Roles    []string               `json:"roles"`
+	// Deciders Decider settings.
+	Deciders map[string]json.RawMessage `json:"deciders"`
+	Roles    []string                   `json:"roles"`
 }
 
-// AutoscalingPolicyBuilder holds AutoscalingPolicy struct and provides a builder API.
-type AutoscalingPolicyBuilder struct {
-	v *AutoscalingPolicy
-}
-
-// NewAutoscalingPolicy provides a builder for the AutoscalingPolicy struct.
-func NewAutoscalingPolicyBuilder() *AutoscalingPolicyBuilder {
-	r := AutoscalingPolicyBuilder{
-		&AutoscalingPolicy{
-			Deciders: make(map[string]interface{}, 0),
-		},
+// NewAutoscalingPolicy returns a AutoscalingPolicy.
+func NewAutoscalingPolicy() *AutoscalingPolicy {
+	r := &AutoscalingPolicy{
+		Deciders: make(map[string]json.RawMessage, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the AutoscalingPolicy struct
-func (rb *AutoscalingPolicyBuilder) Build() AutoscalingPolicy {
-	return *rb.v
-}
-
-// Deciders Decider settings
-
-func (rb *AutoscalingPolicyBuilder) Deciders(value map[string]interface{}) *AutoscalingPolicyBuilder {
-	rb.v.Deciders = value
-	return rb
-}
-
-func (rb *AutoscalingPolicyBuilder) Roles(roles ...string) *AutoscalingPolicyBuilder {
-	rb.v.Roles = roles
-	return rb
+	return r
 }

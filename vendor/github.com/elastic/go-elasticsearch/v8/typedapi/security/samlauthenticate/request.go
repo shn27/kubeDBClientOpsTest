@@ -15,53 +15,45 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package samlauthenticate
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
-
-	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
+	"io"
+	"strconv"
 )
 
 // Request holds the request body struct for the package samlauthenticate
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/saml_authenticate/Request.ts#L23-L38
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/saml_authenticate/Request.ts#L23-L40
 type Request struct {
 
 	// Content The SAML response as it was sent by the user’s browser, usually a Base64
 	// encoded XML document.
 	Content string `json:"content"`
-
 	// Ids A json array with all the valid SAML Request Ids that the caller of the API
 	// has for the current user.
-	Ids types.Ids `json:"ids"`
-
+	Ids []string `json:"ids"`
 	// Realm The name of the realm that should authenticate the SAML response. Useful in
 	// cases where many SAML realms are defined.
 	Realm *string `json:"realm,omitempty"`
 }
 
-// RequestBuilder is the builder API for the samlauthenticate.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -72,23 +64,61 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) Content(content string) *RequestBuilder {
-	rb.v.Content = content
-	return rb
-}
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
 
-func (rb *RequestBuilder) Ids(ids *types.IdsBuilder) *RequestBuilder {
-	v := ids.Build()
-	rb.v.Ids = v
-	return rb
-}
+		switch t {
 
-func (rb *RequestBuilder) Realm(realm string) *RequestBuilder {
-	rb.v.Realm = &realm
-	return rb
+		case "content":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Content", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Content = o
+
+		case "ids":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Ids", err)
+				}
+
+				s.Ids = append(s.Ids, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Ids); err != nil {
+					return fmt.Errorf("%s | %w", "Ids", err)
+				}
+			}
+
+		case "realm":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Realm", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Realm = &o
+
+		}
+	}
+	return nil
 }

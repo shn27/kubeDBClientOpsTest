@@ -15,19 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package catdfacolumn
 package catdfacolumn
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cat/_types/CatBase.ts#L472-L557
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cat/_types/CatBase.ts#L472-L557
 type CatDfaColumn struct {
-	name string
+	Name string
 }
 
 var (
@@ -45,13 +43,13 @@ var (
 
 	Modelmemorylimit = CatDfaColumn{"model_memory_limit"}
 
-	NodeAddress = CatDfaColumn{"node.address"}
+	Nodeaddress = CatDfaColumn{"node.address"}
 
-	NodeEphemeralid = CatDfaColumn{"node.ephemeral_id"}
+	Nodeephemeralid = CatDfaColumn{"node.ephemeral_id"}
 
-	NodeId = CatDfaColumn{"node.id"}
+	Nodeid = CatDfaColumn{"node.id"}
 
-	NodeName = CatDfaColumn{"node.name"}
+	Nodename = CatDfaColumn{"node.name"}
 
 	Progress = CatDfaColumn{"progress"}
 
@@ -69,7 +67,7 @@ func (c CatDfaColumn) MarshalText() (text []byte, err error) {
 }
 
 func (c *CatDfaColumn) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
 	case "assignment_explanation":
 		*c = Assignmentexplanation
@@ -86,13 +84,13 @@ func (c *CatDfaColumn) UnmarshalText(text []byte) error {
 	case "model_memory_limit":
 		*c = Modelmemorylimit
 	case "node.address":
-		*c = NodeAddress
+		*c = Nodeaddress
 	case "node.ephemeral_id":
-		*c = NodeEphemeralid
+		*c = Nodeephemeralid
 	case "node.id":
-		*c = NodeId
+		*c = Nodeid
 	case "node.name":
-		*c = NodeName
+		*c = Nodename
 	case "progress":
 		*c = Progress
 	case "source_index":
@@ -111,5 +109,5 @@ func (c *CatDfaColumn) UnmarshalText(text []byte) error {
 }
 
 func (c CatDfaColumn) String() string {
-	return c.name
+	return c.Name
 }

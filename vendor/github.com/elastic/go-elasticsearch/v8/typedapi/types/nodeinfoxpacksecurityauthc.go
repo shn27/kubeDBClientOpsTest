@@ -15,48 +15,22 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // NodeInfoXpackSecurityAuthc type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/info/types.ts#L245-L248
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/info/types.ts#L261-L264
 type NodeInfoXpackSecurityAuthc struct {
-	Realms NodeInfoXpackSecurityAuthcRealms `json:"realms"`
-	Token  NodeInfoXpackSecurityAuthcToken  `json:"token"`
+	Realms *NodeInfoXpackSecurityAuthcRealms `json:"realms,omitempty"`
+	Token  *NodeInfoXpackSecurityAuthcToken  `json:"token,omitempty"`
 }
 
-// NodeInfoXpackSecurityAuthcBuilder holds NodeInfoXpackSecurityAuthc struct and provides a builder API.
-type NodeInfoXpackSecurityAuthcBuilder struct {
-	v *NodeInfoXpackSecurityAuthc
-}
+// NewNodeInfoXpackSecurityAuthc returns a NodeInfoXpackSecurityAuthc.
+func NewNodeInfoXpackSecurityAuthc() *NodeInfoXpackSecurityAuthc {
+	r := &NodeInfoXpackSecurityAuthc{}
 
-// NewNodeInfoXpackSecurityAuthc provides a builder for the NodeInfoXpackSecurityAuthc struct.
-func NewNodeInfoXpackSecurityAuthcBuilder() *NodeInfoXpackSecurityAuthcBuilder {
-	r := NodeInfoXpackSecurityAuthcBuilder{
-		&NodeInfoXpackSecurityAuthc{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the NodeInfoXpackSecurityAuthc struct
-func (rb *NodeInfoXpackSecurityAuthcBuilder) Build() NodeInfoXpackSecurityAuthc {
-	return *rb.v
-}
-
-func (rb *NodeInfoXpackSecurityAuthcBuilder) Realms(realms *NodeInfoXpackSecurityAuthcRealmsBuilder) *NodeInfoXpackSecurityAuthcBuilder {
-	v := realms.Build()
-	rb.v.Realms = v
-	return rb
-}
-
-func (rb *NodeInfoXpackSecurityAuthcBuilder) Token(token *NodeInfoXpackSecurityAuthcTokenBuilder) *NodeInfoXpackSecurityAuthcBuilder {
-	v := token.Build()
-	rb.v.Token = v
-	return rb
+	return r
 }

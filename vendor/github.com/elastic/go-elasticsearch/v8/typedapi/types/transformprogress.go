@@ -15,64 +15,130 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // TransformProgress type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/transform/get_transform_stats/types.ts#L40-L46
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/transform/get_transform_stats/types.ts#L48-L54
 type TransformProgress struct {
-	DocsIndexed     int64   `json:"docs_indexed"`
-	DocsProcessed   int64   `json:"docs_processed"`
-	DocsRemaining   int64   `json:"docs_remaining"`
-	PercentComplete float64 `json:"percent_complete"`
-	TotalDocs       int64   `json:"total_docs"`
+	DocsIndexed     int64    `json:"docs_indexed"`
+	DocsProcessed   int64    `json:"docs_processed"`
+	DocsRemaining   *int64   `json:"docs_remaining,omitempty"`
+	PercentComplete *Float64 `json:"percent_complete,omitempty"`
+	TotalDocs       *int64   `json:"total_docs,omitempty"`
 }
 
-// TransformProgressBuilder holds TransformProgress struct and provides a builder API.
-type TransformProgressBuilder struct {
-	v *TransformProgress
-}
+func (s *TransformProgress) UnmarshalJSON(data []byte) error {
 
-// NewTransformProgress provides a builder for the TransformProgress struct.
-func NewTransformProgressBuilder() *TransformProgressBuilder {
-	r := TransformProgressBuilder{
-		&TransformProgress{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "docs_indexed":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DocsIndexed", err)
+				}
+				s.DocsIndexed = value
+			case float64:
+				f := int64(v)
+				s.DocsIndexed = f
+			}
+
+		case "docs_processed":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DocsProcessed", err)
+				}
+				s.DocsProcessed = value
+			case float64:
+				f := int64(v)
+				s.DocsProcessed = f
+			}
+
+		case "docs_remaining":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DocsRemaining", err)
+				}
+				s.DocsRemaining = &value
+			case float64:
+				f := int64(v)
+				s.DocsRemaining = &f
+			}
+
+		case "percent_complete":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PercentComplete", err)
+				}
+				f := Float64(value)
+				s.PercentComplete = &f
+			case float64:
+				f := Float64(v)
+				s.PercentComplete = &f
+			}
+
+		case "total_docs":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TotalDocs", err)
+				}
+				s.TotalDocs = &value
+			case float64:
+				f := int64(v)
+				s.TotalDocs = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TransformProgress struct
-func (rb *TransformProgressBuilder) Build() TransformProgress {
-	return *rb.v
-}
+// NewTransformProgress returns a TransformProgress.
+func NewTransformProgress() *TransformProgress {
+	r := &TransformProgress{}
 
-func (rb *TransformProgressBuilder) DocsIndexed(docsindexed int64) *TransformProgressBuilder {
-	rb.v.DocsIndexed = docsindexed
-	return rb
-}
-
-func (rb *TransformProgressBuilder) DocsProcessed(docsprocessed int64) *TransformProgressBuilder {
-	rb.v.DocsProcessed = docsprocessed
-	return rb
-}
-
-func (rb *TransformProgressBuilder) DocsRemaining(docsremaining int64) *TransformProgressBuilder {
-	rb.v.DocsRemaining = docsremaining
-	return rb
-}
-
-func (rb *TransformProgressBuilder) PercentComplete(percentcomplete float64) *TransformProgressBuilder {
-	rb.v.PercentComplete = percentcomplete
-	return rb
-}
-
-func (rb *TransformProgressBuilder) TotalDocs(totaldocs int64) *TransformProgressBuilder {
-	rb.v.TotalDocs = totaldocs
-	return rb
+	return r
 }

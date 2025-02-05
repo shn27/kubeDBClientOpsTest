@@ -15,14 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"encoding/json"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/ibdistribution"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/iblambda"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/normalization"
@@ -30,7 +30,7 @@ import (
 
 // SettingsSimilarityIb type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/IndexSettings.ts#L199-L204
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/IndexSettings.ts#L207-L212
 type SettingsSimilarityIb struct {
 	Distribution  ibdistribution.IBDistribution `json:"distribution"`
 	Lambda        iblambda.IBLambda             `json:"lambda"`
@@ -38,38 +38,24 @@ type SettingsSimilarityIb struct {
 	Type          string                        `json:"type,omitempty"`
 }
 
-// SettingsSimilarityIbBuilder holds SettingsSimilarityIb struct and provides a builder API.
-type SettingsSimilarityIbBuilder struct {
-	v *SettingsSimilarityIb
-}
-
-// NewSettingsSimilarityIb provides a builder for the SettingsSimilarityIb struct.
-func NewSettingsSimilarityIbBuilder() *SettingsSimilarityIbBuilder {
-	r := SettingsSimilarityIbBuilder{
-		&SettingsSimilarityIb{},
+// MarshalJSON override marshalling to include literal value
+func (s SettingsSimilarityIb) MarshalJSON() ([]byte, error) {
+	type innerSettingsSimilarityIb SettingsSimilarityIb
+	tmp := innerSettingsSimilarityIb{
+		Distribution:  s.Distribution,
+		Lambda:        s.Lambda,
+		Normalization: s.Normalization,
+		Type:          s.Type,
 	}
 
-	r.v.Type = "IB"
+	tmp.Type = "IB"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the SettingsSimilarityIb struct
-func (rb *SettingsSimilarityIbBuilder) Build() SettingsSimilarityIb {
-	return *rb.v
-}
+// NewSettingsSimilarityIb returns a SettingsSimilarityIb.
+func NewSettingsSimilarityIb() *SettingsSimilarityIb {
+	r := &SettingsSimilarityIb{}
 
-func (rb *SettingsSimilarityIbBuilder) Distribution(distribution ibdistribution.IBDistribution) *SettingsSimilarityIbBuilder {
-	rb.v.Distribution = distribution
-	return rb
-}
-
-func (rb *SettingsSimilarityIbBuilder) Lambda(lambda iblambda.IBLambda) *SettingsSimilarityIbBuilder {
-	rb.v.Lambda = lambda
-	return rb
-}
-
-func (rb *SettingsSimilarityIbBuilder) Normalization(normalization normalization.Normalization) *SettingsSimilarityIbBuilder {
-	rb.v.Normalization = normalization
-	return rb
+	return r
 }

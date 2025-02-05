@@ -15,60 +15,36 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // IndexTemplateSummary type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/IndexTemplate.ts#L52-L56
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/IndexTemplate.ts#L96-L118
 type IndexTemplateSummary struct {
-	Aliases  map[IndexName]Alias `json:"aliases,omitempty"`
-	Mappings *TypeMapping        `json:"mappings,omitempty"`
-	Settings *IndexSettings      `json:"settings,omitempty"`
+	// Aliases Aliases to add.
+	// If the index template includes a `data_stream` object, these are data stream
+	// aliases.
+	// Otherwise, these are index aliases.
+	// Data stream aliases ignore the `index_routing`, `routing`, and
+	// `search_routing` options.
+	Aliases   map[string]Alias                 `json:"aliases,omitempty"`
+	Lifecycle *DataStreamLifecycleWithRollover `json:"lifecycle,omitempty"`
+	// Mappings Mapping for fields in the index.
+	// If specified, this mapping can include field names, field data types, and
+	// mapping parameters.
+	Mappings *TypeMapping `json:"mappings,omitempty"`
+	// Settings Configuration options for the index.
+	Settings *IndexSettings `json:"settings,omitempty"`
 }
 
-// IndexTemplateSummaryBuilder holds IndexTemplateSummary struct and provides a builder API.
-type IndexTemplateSummaryBuilder struct {
-	v *IndexTemplateSummary
-}
-
-// NewIndexTemplateSummary provides a builder for the IndexTemplateSummary struct.
-func NewIndexTemplateSummaryBuilder() *IndexTemplateSummaryBuilder {
-	r := IndexTemplateSummaryBuilder{
-		&IndexTemplateSummary{
-			Aliases: make(map[IndexName]Alias, 0),
-		},
+// NewIndexTemplateSummary returns a IndexTemplateSummary.
+func NewIndexTemplateSummary() *IndexTemplateSummary {
+	r := &IndexTemplateSummary{
+		Aliases: make(map[string]Alias, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the IndexTemplateSummary struct
-func (rb *IndexTemplateSummaryBuilder) Build() IndexTemplateSummary {
-	return *rb.v
-}
-
-func (rb *IndexTemplateSummaryBuilder) Aliases(values map[IndexName]*AliasBuilder) *IndexTemplateSummaryBuilder {
-	tmp := make(map[IndexName]Alias, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Aliases = tmp
-	return rb
-}
-
-func (rb *IndexTemplateSummaryBuilder) Mappings(mappings *TypeMappingBuilder) *IndexTemplateSummaryBuilder {
-	v := mappings.Build()
-	rb.v.Mappings = &v
-	return rb
-}
-
-func (rb *IndexTemplateSummaryBuilder) Settings(settings *IndexSettingsBuilder) *IndexTemplateSummaryBuilder {
-	v := settings.Build()
-	rb.v.Settings = &v
-	return rb
+	return r
 }

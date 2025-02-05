@@ -15,42 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // Fuzziness holds the union for the following types:
 //
-//	int
 //	string
+//	int
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/common.ts#L107-L107
-type Fuzziness interface{}
-
-// FuzzinessBuilder holds Fuzziness struct and provides a builder API.
-type FuzzinessBuilder struct {
-	v Fuzziness
-}
-
-// NewFuzziness provides a builder for the Fuzziness struct.
-func NewFuzzinessBuilder() *FuzzinessBuilder {
-	return &FuzzinessBuilder{}
-}
-
-// Build finalize the chain and returns the Fuzziness struct
-func (u *FuzzinessBuilder) Build() Fuzziness {
-	return u.v
-}
-
-func (u *FuzzinessBuilder) Int(int int) *FuzzinessBuilder {
-	u.v = &int
-	return u
-}
-
-func (u *FuzzinessBuilder) String(string string) *FuzzinessBuilder {
-	u.v = &string
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/common.ts#L134-L135
+type Fuzziness any

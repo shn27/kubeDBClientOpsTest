@@ -15,52 +15,78 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // RankEvalHit type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/rank_eval/types.ts#L141-L145
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/rank_eval/types.ts#L144-L148
 type RankEvalHit struct {
-	Id_    Id        `json:"_id"`
-	Index_ IndexName `json:"_index"`
-	Score_ float64   `json:"_score"`
+	Id_    string  `json:"_id"`
+	Index_ string  `json:"_index"`
+	Score_ Float64 `json:"_score"`
 }
 
-// RankEvalHitBuilder holds RankEvalHit struct and provides a builder API.
-type RankEvalHitBuilder struct {
-	v *RankEvalHit
-}
+func (s *RankEvalHit) UnmarshalJSON(data []byte) error {
 
-// NewRankEvalHit provides a builder for the RankEvalHit struct.
-func NewRankEvalHitBuilder() *RankEvalHitBuilder {
-	r := RankEvalHitBuilder{
-		&RankEvalHit{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "_id":
+			if err := dec.Decode(&s.Id_); err != nil {
+				return fmt.Errorf("%s | %w", "Id_", err)
+			}
+
+		case "_index":
+			if err := dec.Decode(&s.Index_); err != nil {
+				return fmt.Errorf("%s | %w", "Index_", err)
+			}
+
+		case "_score":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Score_", err)
+				}
+				f := Float64(value)
+				s.Score_ = f
+			case float64:
+				f := Float64(v)
+				s.Score_ = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RankEvalHit struct
-func (rb *RankEvalHitBuilder) Build() RankEvalHit {
-	return *rb.v
-}
+// NewRankEvalHit returns a RankEvalHit.
+func NewRankEvalHit() *RankEvalHit {
+	r := &RankEvalHit{}
 
-func (rb *RankEvalHitBuilder) Id_(id_ Id) *RankEvalHitBuilder {
-	rb.v.Id_ = id_
-	return rb
-}
-
-func (rb *RankEvalHitBuilder) Index_(index_ IndexName) *RankEvalHitBuilder {
-	rb.v.Index_ = index_
-	return rb
-}
-
-func (rb *RankEvalHitBuilder) Score_(score_ float64) *RankEvalHitBuilder {
-	rb.v.Score_ = score_
-	return rb
+	return r
 }

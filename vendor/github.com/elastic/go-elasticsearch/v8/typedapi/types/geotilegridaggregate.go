@@ -15,48 +15,76 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // GeoTileGridAggregate type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L501-L503
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L574-L579
 type GeoTileGridAggregate struct {
 	Buckets BucketsGeoTileGridBucket `json:"buckets"`
-	Meta    *Metadata                `json:"meta,omitempty"`
+	Meta    Metadata                 `json:"meta,omitempty"`
 }
 
-// GeoTileGridAggregateBuilder holds GeoTileGridAggregate struct and provides a builder API.
-type GeoTileGridAggregateBuilder struct {
-	v *GeoTileGridAggregate
-}
+func (s *GeoTileGridAggregate) UnmarshalJSON(data []byte) error {
 
-// NewGeoTileGridAggregate provides a builder for the GeoTileGridAggregate struct.
-func NewGeoTileGridAggregateBuilder() *GeoTileGridAggregateBuilder {
-	r := GeoTileGridAggregateBuilder{
-		&GeoTileGridAggregate{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "buckets":
+
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			source := bytes.NewReader(rawMsg)
+			localDec := json.NewDecoder(source)
+			switch rawMsg[0] {
+			case '{':
+				o := make(map[string]GeoTileGridBucket, 0)
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Buckets", err)
+				}
+				s.Buckets = o
+			case '[':
+				o := []GeoTileGridBucket{}
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Buckets", err)
+				}
+				s.Buckets = o
+			}
+
+		case "meta":
+			if err := dec.Decode(&s.Meta); err != nil {
+				return fmt.Errorf("%s | %w", "Meta", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the GeoTileGridAggregate struct
-func (rb *GeoTileGridAggregateBuilder) Build() GeoTileGridAggregate {
-	return *rb.v
-}
+// NewGeoTileGridAggregate returns a GeoTileGridAggregate.
+func NewGeoTileGridAggregate() *GeoTileGridAggregate {
+	r := &GeoTileGridAggregate{}
 
-func (rb *GeoTileGridAggregateBuilder) Buckets(buckets *BucketsGeoTileGridBucketBuilder) *GeoTileGridAggregateBuilder {
-	v := buckets.Build()
-	rb.v.Buckets = v
-	return rb
-}
-
-func (rb *GeoTileGridAggregateBuilder) Meta(meta *MetadataBuilder) *GeoTileGridAggregateBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
+	return r
 }

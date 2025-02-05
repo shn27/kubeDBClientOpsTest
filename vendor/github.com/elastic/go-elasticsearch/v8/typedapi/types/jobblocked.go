@@ -15,51 +15,62 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/jobblockedreason"
 )
 
 // JobBlocked type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/Job.ts#L169-L172
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/Job.ts#L392-L395
 type JobBlocked struct {
 	Reason jobblockedreason.JobBlockedReason `json:"reason"`
-	TaskId *TaskId                           `json:"task_id,omitempty"`
+	TaskId TaskId                            `json:"task_id,omitempty"`
 }
 
-// JobBlockedBuilder holds JobBlocked struct and provides a builder API.
-type JobBlockedBuilder struct {
-	v *JobBlocked
-}
+func (s *JobBlocked) UnmarshalJSON(data []byte) error {
 
-// NewJobBlocked provides a builder for the JobBlocked struct.
-func NewJobBlockedBuilder() *JobBlockedBuilder {
-	r := JobBlockedBuilder{
-		&JobBlocked{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "reason":
+			if err := dec.Decode(&s.Reason); err != nil {
+				return fmt.Errorf("%s | %w", "Reason", err)
+			}
+
+		case "task_id":
+			if err := dec.Decode(&s.TaskId); err != nil {
+				return fmt.Errorf("%s | %w", "TaskId", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the JobBlocked struct
-func (rb *JobBlockedBuilder) Build() JobBlocked {
-	return *rb.v
-}
+// NewJobBlocked returns a JobBlocked.
+func NewJobBlocked() *JobBlocked {
+	r := &JobBlocked{}
 
-func (rb *JobBlockedBuilder) Reason(reason jobblockedreason.JobBlockedReason) *JobBlockedBuilder {
-	rb.v.Reason = reason
-	return rb
-}
-
-func (rb *JobBlockedBuilder) TaskId(taskid *TaskIdBuilder) *JobBlockedBuilder {
-	v := taskid.Build()
-	rb.v.TaskId = &v
-	return rb
+	return r
 }

@@ -15,85 +15,179 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // HyphenationDecompounderTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L57-L59
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L57-L59
 type HyphenationDecompounderTokenFilter struct {
-	HyphenationPatternsPath *string        `json:"hyphenation_patterns_path,omitempty"`
-	MaxSubwordSize          *int           `json:"max_subword_size,omitempty"`
-	MinSubwordSize          *int           `json:"min_subword_size,omitempty"`
-	MinWordSize             *int           `json:"min_word_size,omitempty"`
-	OnlyLongestMatch        *bool          `json:"only_longest_match,omitempty"`
-	Type                    string         `json:"type,omitempty"`
-	Version                 *VersionString `json:"version,omitempty"`
-	WordList                []string       `json:"word_list,omitempty"`
-	WordListPath            *string        `json:"word_list_path,omitempty"`
+	HyphenationPatternsPath *string  `json:"hyphenation_patterns_path,omitempty"`
+	MaxSubwordSize          *int     `json:"max_subword_size,omitempty"`
+	MinSubwordSize          *int     `json:"min_subword_size,omitempty"`
+	MinWordSize             *int     `json:"min_word_size,omitempty"`
+	OnlyLongestMatch        *bool    `json:"only_longest_match,omitempty"`
+	Type                    string   `json:"type,omitempty"`
+	Version                 *string  `json:"version,omitempty"`
+	WordList                []string `json:"word_list,omitempty"`
+	WordListPath            *string  `json:"word_list_path,omitempty"`
 }
 
-// HyphenationDecompounderTokenFilterBuilder holds HyphenationDecompounderTokenFilter struct and provides a builder API.
-type HyphenationDecompounderTokenFilterBuilder struct {
-	v *HyphenationDecompounderTokenFilter
+func (s *HyphenationDecompounderTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "hyphenation_patterns_path":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "HyphenationPatternsPath", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.HyphenationPatternsPath = &o
+
+		case "max_subword_size":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxSubwordSize", err)
+				}
+				s.MaxSubwordSize = &value
+			case float64:
+				f := int(v)
+				s.MaxSubwordSize = &f
+			}
+
+		case "min_subword_size":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MinSubwordSize", err)
+				}
+				s.MinSubwordSize = &value
+			case float64:
+				f := int(v)
+				s.MinSubwordSize = &f
+			}
+
+		case "min_word_size":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MinWordSize", err)
+				}
+				s.MinWordSize = &value
+			case float64:
+				f := int(v)
+				s.MinWordSize = &f
+			}
+
+		case "only_longest_match":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "OnlyLongestMatch", err)
+				}
+				s.OnlyLongestMatch = &value
+			case bool:
+				s.OnlyLongestMatch = &v
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		case "word_list":
+			if err := dec.Decode(&s.WordList); err != nil {
+				return fmt.Errorf("%s | %w", "WordList", err)
+			}
+
+		case "word_list_path":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "WordListPath", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.WordListPath = &o
+
+		}
+	}
+	return nil
 }
 
-// NewHyphenationDecompounderTokenFilter provides a builder for the HyphenationDecompounderTokenFilter struct.
-func NewHyphenationDecompounderTokenFilterBuilder() *HyphenationDecompounderTokenFilterBuilder {
-	r := HyphenationDecompounderTokenFilterBuilder{
-		&HyphenationDecompounderTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s HyphenationDecompounderTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerHyphenationDecompounderTokenFilter HyphenationDecompounderTokenFilter
+	tmp := innerHyphenationDecompounderTokenFilter{
+		HyphenationPatternsPath: s.HyphenationPatternsPath,
+		MaxSubwordSize:          s.MaxSubwordSize,
+		MinSubwordSize:          s.MinSubwordSize,
+		MinWordSize:             s.MinWordSize,
+		OnlyLongestMatch:        s.OnlyLongestMatch,
+		Type:                    s.Type,
+		Version:                 s.Version,
+		WordList:                s.WordList,
+		WordListPath:            s.WordListPath,
 	}
 
-	r.v.Type = "hyphenation_decompounder"
+	tmp.Type = "hyphenation_decompounder"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the HyphenationDecompounderTokenFilter struct
-func (rb *HyphenationDecompounderTokenFilterBuilder) Build() HyphenationDecompounderTokenFilter {
-	return *rb.v
-}
+// NewHyphenationDecompounderTokenFilter returns a HyphenationDecompounderTokenFilter.
+func NewHyphenationDecompounderTokenFilter() *HyphenationDecompounderTokenFilter {
+	r := &HyphenationDecompounderTokenFilter{}
 
-func (rb *HyphenationDecompounderTokenFilterBuilder) HyphenationPatternsPath(hyphenationpatternspath string) *HyphenationDecompounderTokenFilterBuilder {
-	rb.v.HyphenationPatternsPath = &hyphenationpatternspath
-	return rb
-}
-
-func (rb *HyphenationDecompounderTokenFilterBuilder) MaxSubwordSize(maxsubwordsize int) *HyphenationDecompounderTokenFilterBuilder {
-	rb.v.MaxSubwordSize = &maxsubwordsize
-	return rb
-}
-
-func (rb *HyphenationDecompounderTokenFilterBuilder) MinSubwordSize(minsubwordsize int) *HyphenationDecompounderTokenFilterBuilder {
-	rb.v.MinSubwordSize = &minsubwordsize
-	return rb
-}
-
-func (rb *HyphenationDecompounderTokenFilterBuilder) MinWordSize(minwordsize int) *HyphenationDecompounderTokenFilterBuilder {
-	rb.v.MinWordSize = &minwordsize
-	return rb
-}
-
-func (rb *HyphenationDecompounderTokenFilterBuilder) OnlyLongestMatch(onlylongestmatch bool) *HyphenationDecompounderTokenFilterBuilder {
-	rb.v.OnlyLongestMatch = &onlylongestmatch
-	return rb
-}
-
-func (rb *HyphenationDecompounderTokenFilterBuilder) Version(version VersionString) *HyphenationDecompounderTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
-}
-
-func (rb *HyphenationDecompounderTokenFilterBuilder) WordList(word_list ...string) *HyphenationDecompounderTokenFilterBuilder {
-	rb.v.WordList = word_list
-	return rb
-}
-
-func (rb *HyphenationDecompounderTokenFilterBuilder) WordListPath(wordlistpath string) *HyphenationDecompounderTokenFilterBuilder {
-	rb.v.WordListPath = &wordlistpath
-	return rb
+	return r
 }

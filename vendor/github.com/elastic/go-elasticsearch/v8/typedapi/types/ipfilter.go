@@ -15,46 +15,79 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // IpFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/usage/types.ts#L158-L161
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/xpack/usage/types.ts#L165-L168
 type IpFilter struct {
 	Http      bool `json:"http"`
 	Transport bool `json:"transport"`
 }
 
-// IpFilterBuilder holds IpFilter struct and provides a builder API.
-type IpFilterBuilder struct {
-	v *IpFilter
-}
+func (s *IpFilter) UnmarshalJSON(data []byte) error {
 
-// NewIpFilter provides a builder for the IpFilter struct.
-func NewIpFilterBuilder() *IpFilterBuilder {
-	r := IpFilterBuilder{
-		&IpFilter{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "http":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Http", err)
+				}
+				s.Http = value
+			case bool:
+				s.Http = v
+			}
+
+		case "transport":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Transport", err)
+				}
+				s.Transport = value
+			case bool:
+				s.Transport = v
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the IpFilter struct
-func (rb *IpFilterBuilder) Build() IpFilter {
-	return *rb.v
-}
+// NewIpFilter returns a IpFilter.
+func NewIpFilter() *IpFilter {
+	r := &IpFilter{}
 
-func (rb *IpFilterBuilder) Http(http bool) *IpFilterBuilder {
-	rb.v.Http = http
-	return rb
-}
-
-func (rb *IpFilterBuilder) Transport(transport bool) *IpFilterBuilder {
-	rb.v.Transport = transport
-	return rb
+	return r
 }

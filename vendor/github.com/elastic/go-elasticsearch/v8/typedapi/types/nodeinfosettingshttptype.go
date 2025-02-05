@@ -15,40 +15,74 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // NodeInfoSettingsHttpType type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/info/types.ts#L188-L191
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/info/types.ts#L199-L202
 type NodeInfoSettingsHttpType struct {
 	Default string `json:"default"`
 }
 
-// NodeInfoSettingsHttpTypeBuilder holds NodeInfoSettingsHttpType struct and provides a builder API.
-type NodeInfoSettingsHttpTypeBuilder struct {
-	v *NodeInfoSettingsHttpType
-}
+func (s *NodeInfoSettingsHttpType) UnmarshalJSON(data []byte) error {
 
-// NewNodeInfoSettingsHttpType provides a builder for the NodeInfoSettingsHttpType struct.
-func NewNodeInfoSettingsHttpTypeBuilder() *NodeInfoSettingsHttpTypeBuilder {
-	r := NodeInfoSettingsHttpTypeBuilder{
-		&NodeInfoSettingsHttpType{},
+	if !bytes.HasPrefix(data, []byte(`{`)) {
+		if !bytes.HasPrefix(data, []byte(`"`)) {
+			data = append([]byte{'"'}, data...)
+			data = append(data, []byte{'"'}...)
+		}
+		err := json.NewDecoder(bytes.NewReader(data)).Decode(&s.Default)
+		if err != nil {
+			return err
+		}
+		return nil
 	}
 
-	return &r
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "default":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Default", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Default = o
+
+		}
+	}
+	return nil
 }
 
-// Build finalize the chain and returns the NodeInfoSettingsHttpType struct
-func (rb *NodeInfoSettingsHttpTypeBuilder) Build() NodeInfoSettingsHttpType {
-	return *rb.v
-}
+// NewNodeInfoSettingsHttpType returns a NodeInfoSettingsHttpType.
+func NewNodeInfoSettingsHttpType() *NodeInfoSettingsHttpType {
+	r := &NodeInfoSettingsHttpType{}
 
-func (rb *NodeInfoSettingsHttpTypeBuilder) Default_(default_ string) *NodeInfoSettingsHttpTypeBuilder {
-	rb.v.Default = default_
-	return rb
+	return r
 }

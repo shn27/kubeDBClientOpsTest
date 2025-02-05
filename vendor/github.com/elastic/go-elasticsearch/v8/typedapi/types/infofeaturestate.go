@@ -15,47 +15,79 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // InfoFeatureState type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/snapshot/_types/SnapshotInfoFeatureState.ts#L22-L25
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/snapshot/_types/SnapshotInfoFeatureState.ts#L22-L25
 type InfoFeatureState struct {
-	FeatureName string  `json:"feature_name"`
-	Indices     Indices `json:"indices"`
+	FeatureName string   `json:"feature_name"`
+	Indices     []string `json:"indices"`
 }
 
-// InfoFeatureStateBuilder holds InfoFeatureState struct and provides a builder API.
-type InfoFeatureStateBuilder struct {
-	v *InfoFeatureState
-}
+func (s *InfoFeatureState) UnmarshalJSON(data []byte) error {
 
-// NewInfoFeatureState provides a builder for the InfoFeatureState struct.
-func NewInfoFeatureStateBuilder() *InfoFeatureStateBuilder {
-	r := InfoFeatureStateBuilder{
-		&InfoFeatureState{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "feature_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "FeatureName", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.FeatureName = o
+
+		case "indices":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Indices", err)
+				}
+
+				s.Indices = append(s.Indices, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Indices); err != nil {
+					return fmt.Errorf("%s | %w", "Indices", err)
+				}
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the InfoFeatureState struct
-func (rb *InfoFeatureStateBuilder) Build() InfoFeatureState {
-	return *rb.v
-}
+// NewInfoFeatureState returns a InfoFeatureState.
+func NewInfoFeatureState() *InfoFeatureState {
+	r := &InfoFeatureState{}
 
-func (rb *InfoFeatureStateBuilder) FeatureName(featurename string) *InfoFeatureStateBuilder {
-	rb.v.FeatureName = featurename
-	return rb
-}
-
-func (rb *InfoFeatureStateBuilder) Indices(indices *IndicesBuilder) *InfoFeatureStateBuilder {
-	v := indices.Build()
-	rb.v.Indices = v
-	return rb
+	return r
 }

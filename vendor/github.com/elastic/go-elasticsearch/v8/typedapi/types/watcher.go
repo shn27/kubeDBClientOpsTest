@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // Watcher type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/usage/types.ts#L449-L453
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/xpack/usage/types.ts#L458-L462
 type Watcher struct {
 	Available bool           `json:"available"`
 	Count     Counter        `json:"count"`
@@ -33,49 +40,72 @@ type Watcher struct {
 	Watch     WatcherWatch   `json:"watch"`
 }
 
-// WatcherBuilder holds Watcher struct and provides a builder API.
-type WatcherBuilder struct {
-	v *Watcher
-}
+func (s *Watcher) UnmarshalJSON(data []byte) error {
 
-// NewWatcher provides a builder for the Watcher struct.
-func NewWatcherBuilder() *WatcherBuilder {
-	r := WatcherBuilder{
-		&Watcher{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "available":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Available", err)
+				}
+				s.Available = value
+			case bool:
+				s.Available = v
+			}
+
+		case "count":
+			if err := dec.Decode(&s.Count); err != nil {
+				return fmt.Errorf("%s | %w", "Count", err)
+			}
+
+		case "enabled":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Enabled", err)
+				}
+				s.Enabled = value
+			case bool:
+				s.Enabled = v
+			}
+
+		case "execution":
+			if err := dec.Decode(&s.Execution); err != nil {
+				return fmt.Errorf("%s | %w", "Execution", err)
+			}
+
+		case "watch":
+			if err := dec.Decode(&s.Watch); err != nil {
+				return fmt.Errorf("%s | %w", "Watch", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the Watcher struct
-func (rb *WatcherBuilder) Build() Watcher {
-	return *rb.v
-}
+// NewWatcher returns a Watcher.
+func NewWatcher() *Watcher {
+	r := &Watcher{}
 
-func (rb *WatcherBuilder) Available(available bool) *WatcherBuilder {
-	rb.v.Available = available
-	return rb
-}
-
-func (rb *WatcherBuilder) Count(count *CounterBuilder) *WatcherBuilder {
-	v := count.Build()
-	rb.v.Count = v
-	return rb
-}
-
-func (rb *WatcherBuilder) Enabled(enabled bool) *WatcherBuilder {
-	rb.v.Enabled = enabled
-	return rb
-}
-
-func (rb *WatcherBuilder) Execution(execution *WatcherActionsBuilder) *WatcherBuilder {
-	v := execution.Build()
-	rb.v.Execution = v
-	return rb
-}
-
-func (rb *WatcherBuilder) Watch(watch *WatcherWatchBuilder) *WatcherBuilder {
-	v := watch.Build()
-	rb.v.Watch = v
-	return rb
+	return r
 }

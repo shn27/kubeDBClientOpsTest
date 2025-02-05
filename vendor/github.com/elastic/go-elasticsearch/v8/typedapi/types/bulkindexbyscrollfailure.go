@@ -15,65 +15,97 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // BulkIndexByScrollFailure type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Errors.ts#L58-L64
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Errors.ts#L60-L66
 type BulkIndexByScrollFailure struct {
 	Cause  ErrorCause `json:"cause"`
-	Id     Id         `json:"id"`
-	Index  IndexName  `json:"index"`
+	Id     string     `json:"id"`
+	Index  string     `json:"index"`
 	Status int        `json:"status"`
 	Type   string     `json:"type"`
 }
 
-// BulkIndexByScrollFailureBuilder holds BulkIndexByScrollFailure struct and provides a builder API.
-type BulkIndexByScrollFailureBuilder struct {
-	v *BulkIndexByScrollFailure
-}
+func (s *BulkIndexByScrollFailure) UnmarshalJSON(data []byte) error {
 
-// NewBulkIndexByScrollFailure provides a builder for the BulkIndexByScrollFailure struct.
-func NewBulkIndexByScrollFailureBuilder() *BulkIndexByScrollFailureBuilder {
-	r := BulkIndexByScrollFailureBuilder{
-		&BulkIndexByScrollFailure{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "cause":
+			if err := dec.Decode(&s.Cause); err != nil {
+				return fmt.Errorf("%s | %w", "Cause", err)
+			}
+
+		case "id":
+			if err := dec.Decode(&s.Id); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
+
+		case "index":
+			if err := dec.Decode(&s.Index); err != nil {
+				return fmt.Errorf("%s | %w", "Index", err)
+			}
+
+		case "status":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Status", err)
+				}
+				s.Status = value
+			case float64:
+				f := int(v)
+				s.Status = f
+			}
+
+		case "type":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Type = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the BulkIndexByScrollFailure struct
-func (rb *BulkIndexByScrollFailureBuilder) Build() BulkIndexByScrollFailure {
-	return *rb.v
-}
+// NewBulkIndexByScrollFailure returns a BulkIndexByScrollFailure.
+func NewBulkIndexByScrollFailure() *BulkIndexByScrollFailure {
+	r := &BulkIndexByScrollFailure{}
 
-func (rb *BulkIndexByScrollFailureBuilder) Cause(cause *ErrorCauseBuilder) *BulkIndexByScrollFailureBuilder {
-	v := cause.Build()
-	rb.v.Cause = v
-	return rb
-}
-
-func (rb *BulkIndexByScrollFailureBuilder) Id(id Id) *BulkIndexByScrollFailureBuilder {
-	rb.v.Id = id
-	return rb
-}
-
-func (rb *BulkIndexByScrollFailureBuilder) Index(index IndexName) *BulkIndexByScrollFailureBuilder {
-	rb.v.Index = index
-	return rb
-}
-
-func (rb *BulkIndexByScrollFailureBuilder) Status(status int) *BulkIndexByScrollFailureBuilder {
-	rb.v.Status = status
-	return rb
-}
-
-func (rb *BulkIndexByScrollFailureBuilder) Type_(type_ string) *BulkIndexByScrollFailureBuilder {
-	rb.v.Type = type_
-	return rb
+	return r
 }

@@ -15,130 +15,775 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+	"strings"
+)
+
 // ResponseBody type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/SearchResponse.ts#L38-L54
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/SearchResponse.ts#L38-L54
 type ResponseBody struct {
-	Aggregations    map[AggregateName]Aggregate  `json:"aggregations,omitempty"`
-	Clusters_       *ClusterStatistics           `json:"_clusters,omitempty"`
-	Fields          map[string]interface{}       `json:"fields,omitempty"`
-	Hits            HitsMetadata                 `json:"hits"`
-	MaxScore        *float64                     `json:"max_score,omitempty"`
-	NumReducePhases *int64                       `json:"num_reduce_phases,omitempty"`
-	PitId           *Id                          `json:"pit_id,omitempty"`
-	Profile         *Profile                     `json:"profile,omitempty"`
-	ScrollId_       *ScrollId                    `json:"_scroll_id,omitempty"`
-	Shards_         ShardStatistics              `json:"_shards"`
-	Suggest         map[SuggestionName][]Suggest `json:"suggest,omitempty"`
-	TerminatedEarly *bool                        `json:"terminated_early,omitempty"`
-	TimedOut        bool                         `json:"timed_out"`
-	Took            int64                        `json:"took"`
+	Aggregations    map[string]Aggregate       `json:"aggregations,omitempty"`
+	Clusters_       *ClusterStatistics         `json:"_clusters,omitempty"`
+	Fields          map[string]json.RawMessage `json:"fields,omitempty"`
+	Hits            HitsMetadata               `json:"hits"`
+	MaxScore        *Float64                   `json:"max_score,omitempty"`
+	NumReducePhases *int64                     `json:"num_reduce_phases,omitempty"`
+	PitId           *string                    `json:"pit_id,omitempty"`
+	Profile         *Profile                   `json:"profile,omitempty"`
+	ScrollId_       *string                    `json:"_scroll_id,omitempty"`
+	Shards_         ShardStatistics            `json:"_shards"`
+	Suggest         map[string][]Suggest       `json:"suggest,omitempty"`
+	TerminatedEarly *bool                      `json:"terminated_early,omitempty"`
+	TimedOut        bool                       `json:"timed_out"`
+	Took            int64                      `json:"took"`
 }
 
-// ResponseBodyBuilder holds ResponseBody struct and provides a builder API.
-type ResponseBodyBuilder struct {
-	v *ResponseBody
+func (s *ResponseBody) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "aggregations":
+			if s.Aggregations == nil {
+				s.Aggregations = make(map[string]Aggregate, 0)
+			}
+
+			for dec.More() {
+				tt, err := dec.Token()
+				if err != nil {
+					if errors.Is(err, io.EOF) {
+						break
+					}
+					return err
+				}
+				if value, ok := tt.(string); ok {
+					if strings.Contains(value, "#") {
+						elems := strings.Split(value, "#")
+						if len(elems) == 2 {
+							if s.Aggregations == nil {
+								s.Aggregations = make(map[string]Aggregate, 0)
+							}
+							switch elems[0] {
+
+							case "cardinality":
+								o := NewCardinalityAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "hdr_percentiles":
+								o := NewHdrPercentilesAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "hdr_percentile_ranks":
+								o := NewHdrPercentileRanksAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "tdigest_percentiles":
+								o := NewTDigestPercentilesAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "tdigest_percentile_ranks":
+								o := NewTDigestPercentileRanksAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "percentiles_bucket":
+								o := NewPercentilesBucketAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "median_absolute_deviation":
+								o := NewMedianAbsoluteDeviationAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "min":
+								o := NewMinAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "max":
+								o := NewMaxAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "sum":
+								o := NewSumAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "avg":
+								o := NewAvgAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "weighted_avg":
+								o := NewWeightedAvgAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "value_count":
+								o := NewValueCountAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "simple_value":
+								o := NewSimpleValueAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "derivative":
+								o := NewDerivativeAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "bucket_metric_value":
+								o := NewBucketMetricValueAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "stats":
+								o := NewStatsAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "stats_bucket":
+								o := NewStatsBucketAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "extended_stats":
+								o := NewExtendedStatsAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "extended_stats_bucket":
+								o := NewExtendedStatsBucketAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "geo_bounds":
+								o := NewGeoBoundsAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "geo_centroid":
+								o := NewGeoCentroidAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "histogram":
+								o := NewHistogramAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "date_histogram":
+								o := NewDateHistogramAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "auto_date_histogram":
+								o := NewAutoDateHistogramAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "variable_width_histogram":
+								o := NewVariableWidthHistogramAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "sterms":
+								o := NewStringTermsAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "lterms":
+								o := NewLongTermsAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "dterms":
+								o := NewDoubleTermsAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "umterms":
+								o := NewUnmappedTermsAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "lrareterms":
+								o := NewLongRareTermsAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "srareterms":
+								o := NewStringRareTermsAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "umrareterms":
+								o := NewUnmappedRareTermsAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "multi_terms":
+								o := NewMultiTermsAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "missing":
+								o := NewMissingAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "nested":
+								o := NewNestedAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "reverse_nested":
+								o := NewReverseNestedAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "global":
+								o := NewGlobalAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "filter":
+								o := NewFilterAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "children":
+								o := NewChildrenAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "parent":
+								o := NewParentAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "sampler":
+								o := NewSamplerAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "unmapped_sampler":
+								o := NewUnmappedSamplerAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "geohash_grid":
+								o := NewGeoHashGridAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "geotile_grid":
+								o := NewGeoTileGridAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "geohex_grid":
+								o := NewGeoHexGridAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "range":
+								o := NewRangeAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "date_range":
+								o := NewDateRangeAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "geo_distance":
+								o := NewGeoDistanceAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "ip_range":
+								o := NewIpRangeAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "ip_prefix":
+								o := NewIpPrefixAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "filters":
+								o := NewFiltersAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "adjacency_matrix":
+								o := NewAdjacencyMatrixAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "siglterms":
+								o := NewSignificantLongTermsAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "sigsterms":
+								o := NewSignificantStringTermsAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "umsigterms":
+								o := NewUnmappedSignificantTermsAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "composite":
+								o := NewCompositeAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "frequent_item_sets":
+								o := NewFrequentItemSetsAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "time_series":
+								o := NewTimeSeriesAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "scripted_metric":
+								o := NewScriptedMetricAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "top_hits":
+								o := NewTopHitsAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "inference":
+								o := NewInferenceAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "string_stats":
+								o := NewStringStatsAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "boxplot":
+								o := NewBoxPlotAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "top_metrics":
+								o := NewTopMetricsAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "t_test":
+								o := NewTTestAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "rate":
+								o := NewRateAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "simple_long_value":
+								o := NewCumulativeCardinalityAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "matrix_stats":
+								o := NewMatrixStatsAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							case "geo_line":
+								o := NewGeoLineAggregate()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+
+							default:
+								o := make(map[string]any, 0)
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Aggregations", err)
+								}
+								s.Aggregations[elems[1]] = o
+							}
+						} else {
+							return errors.New("cannot decode JSON for field Aggregations")
+						}
+					} else {
+						o := make(map[string]any, 0)
+						if err := dec.Decode(&o); err != nil {
+							return fmt.Errorf("%s | %w", "Aggregations", err)
+						}
+						s.Aggregations[value] = o
+					}
+				}
+			}
+
+		case "_clusters":
+			if err := dec.Decode(&s.Clusters_); err != nil {
+				return fmt.Errorf("%s | %w", "Clusters_", err)
+			}
+
+		case "fields":
+			if s.Fields == nil {
+				s.Fields = make(map[string]json.RawMessage, 0)
+			}
+			if err := dec.Decode(&s.Fields); err != nil {
+				return fmt.Errorf("%s | %w", "Fields", err)
+			}
+
+		case "hits":
+			if err := dec.Decode(&s.Hits); err != nil {
+				return fmt.Errorf("%s | %w", "Hits", err)
+			}
+
+		case "max_score":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxScore", err)
+				}
+				f := Float64(value)
+				s.MaxScore = &f
+			case float64:
+				f := Float64(v)
+				s.MaxScore = &f
+			}
+
+		case "num_reduce_phases":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NumReducePhases", err)
+				}
+				s.NumReducePhases = &value
+			case float64:
+				f := int64(v)
+				s.NumReducePhases = &f
+			}
+
+		case "pit_id":
+			if err := dec.Decode(&s.PitId); err != nil {
+				return fmt.Errorf("%s | %w", "PitId", err)
+			}
+
+		case "profile":
+			if err := dec.Decode(&s.Profile); err != nil {
+				return fmt.Errorf("%s | %w", "Profile", err)
+			}
+
+		case "_scroll_id":
+			if err := dec.Decode(&s.ScrollId_); err != nil {
+				return fmt.Errorf("%s | %w", "ScrollId_", err)
+			}
+
+		case "_shards":
+			if err := dec.Decode(&s.Shards_); err != nil {
+				return fmt.Errorf("%s | %w", "Shards_", err)
+			}
+
+		case "suggest":
+			if s.Suggest == nil {
+				s.Suggest = make(map[string][]Suggest, 0)
+			}
+
+			for dec.More() {
+				tt, err := dec.Token()
+				if err != nil {
+					if errors.Is(err, io.EOF) {
+						break
+					}
+					return err
+				}
+				if value, ok := tt.(string); ok {
+					if strings.Contains(value, "#") {
+						elems := strings.Split(value, "#")
+						if len(elems) == 2 {
+							if s.Suggest == nil {
+								s.Suggest = make(map[string][]Suggest, 0)
+							}
+							switch elems[0] {
+
+							case "completion":
+								o := NewCompletionSuggest()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Suggest", err)
+								}
+								s.Suggest[elems[1]] = append(s.Suggest[elems[1]], o)
+
+							case "phrase":
+								o := NewPhraseSuggest()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Suggest", err)
+								}
+								s.Suggest[elems[1]] = append(s.Suggest[elems[1]], o)
+
+							case "term":
+								o := NewTermSuggest()
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Suggest", err)
+								}
+								s.Suggest[elems[1]] = append(s.Suggest[elems[1]], o)
+
+							default:
+								o := make(map[string]any, 0)
+								if err := dec.Decode(&o); err != nil {
+									return fmt.Errorf("%s | %w", "Suggest", err)
+								}
+								s.Suggest[elems[1]] = append(s.Suggest[elems[1]], o)
+							}
+						} else {
+							return errors.New("cannot decode JSON for field Suggest")
+						}
+					} else {
+						o := make(map[string]any, 0)
+						if err := dec.Decode(&o); err != nil {
+							return fmt.Errorf("%s | %w", "Suggest", err)
+						}
+						s.Suggest[value] = append(s.Suggest[value], o)
+					}
+				}
+			}
+
+		case "terminated_early":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TerminatedEarly", err)
+				}
+				s.TerminatedEarly = &value
+			case bool:
+				s.TerminatedEarly = &v
+			}
+
+		case "timed_out":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TimedOut", err)
+				}
+				s.TimedOut = value
+			case bool:
+				s.TimedOut = v
+			}
+
+		case "took":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Took", err)
+				}
+				s.Took = value
+			case float64:
+				f := int64(v)
+				s.Took = f
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewResponseBody provides a builder for the ResponseBody struct.
-func NewResponseBodyBuilder() *ResponseBodyBuilder {
-	r := ResponseBodyBuilder{
-		&ResponseBody{
-			Aggregations: make(map[AggregateName]Aggregate, 0),
-			Fields:       make(map[string]interface{}, 0),
-			Suggest:      make(map[SuggestionName][]Suggest, 0),
-		},
+// NewResponseBody returns a ResponseBody.
+func NewResponseBody() *ResponseBody {
+	r := &ResponseBody{
+		Aggregations: make(map[string]Aggregate, 0),
+		Fields:       make(map[string]json.RawMessage, 0),
+		Suggest:      make(map[string][]Suggest, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the ResponseBody struct
-func (rb *ResponseBodyBuilder) Build() ResponseBody {
-	return *rb.v
-}
-
-func (rb *ResponseBodyBuilder) Aggregations(values map[AggregateName]*AggregateBuilder) *ResponseBodyBuilder {
-	tmp := make(map[AggregateName]Aggregate, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Aggregations = tmp
-	return rb
-}
-
-func (rb *ResponseBodyBuilder) Clusters_(clusters_ *ClusterStatisticsBuilder) *ResponseBodyBuilder {
-	v := clusters_.Build()
-	rb.v.Clusters_ = &v
-	return rb
-}
-
-func (rb *ResponseBodyBuilder) Fields(value map[string]interface{}) *ResponseBodyBuilder {
-	rb.v.Fields = value
-	return rb
-}
-
-func (rb *ResponseBodyBuilder) Hits(hits *HitsMetadataBuilder) *ResponseBodyBuilder {
-	v := hits.Build()
-	rb.v.Hits = v
-	return rb
-}
-
-func (rb *ResponseBodyBuilder) MaxScore(maxscore float64) *ResponseBodyBuilder {
-	rb.v.MaxScore = &maxscore
-	return rb
-}
-
-func (rb *ResponseBodyBuilder) NumReducePhases(numreducephases int64) *ResponseBodyBuilder {
-	rb.v.NumReducePhases = &numreducephases
-	return rb
-}
-
-func (rb *ResponseBodyBuilder) PitId(pitid Id) *ResponseBodyBuilder {
-	rb.v.PitId = &pitid
-	return rb
-}
-
-func (rb *ResponseBodyBuilder) Profile(profile *ProfileBuilder) *ResponseBodyBuilder {
-	v := profile.Build()
-	rb.v.Profile = &v
-	return rb
-}
-
-func (rb *ResponseBodyBuilder) ScrollId_(scrollid_ ScrollId) *ResponseBodyBuilder {
-	rb.v.ScrollId_ = &scrollid_
-	return rb
-}
-
-func (rb *ResponseBodyBuilder) Shards_(shards_ *ShardStatisticsBuilder) *ResponseBodyBuilder {
-	v := shards_.Build()
-	rb.v.Shards_ = v
-	return rb
-}
-
-func (rb *ResponseBodyBuilder) Suggest(value map[SuggestionName][]Suggest) *ResponseBodyBuilder {
-	rb.v.Suggest = value
-	return rb
-}
-
-func (rb *ResponseBodyBuilder) TerminatedEarly(terminatedearly bool) *ResponseBodyBuilder {
-	rb.v.TerminatedEarly = &terminatedearly
-	return rb
-}
-
-func (rb *ResponseBodyBuilder) TimedOut(timedout bool) *ResponseBodyBuilder {
-	rb.v.TimedOut = timedout
-	return rb
-}
-
-func (rb *ResponseBodyBuilder) Took(took int64) *ResponseBodyBuilder {
-	rb.v.Took = took
-	return rb
+	return r
 }

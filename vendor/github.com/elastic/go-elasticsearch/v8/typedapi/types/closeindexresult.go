@@ -15,52 +15,75 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // CloseIndexResult type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/close/CloseIndexResponse.ts#L32-L35
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/close/CloseIndexResponse.ts#L32-L35
 type CloseIndexResult struct {
 	Closed bool                        `json:"closed"`
 	Shards map[string]CloseShardResult `json:"shards,omitempty"`
 }
 
-// CloseIndexResultBuilder holds CloseIndexResult struct and provides a builder API.
-type CloseIndexResultBuilder struct {
-	v *CloseIndexResult
+func (s *CloseIndexResult) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "closed":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Closed", err)
+				}
+				s.Closed = value
+			case bool:
+				s.Closed = v
+			}
+
+		case "shards":
+			if s.Shards == nil {
+				s.Shards = make(map[string]CloseShardResult, 0)
+			}
+			if err := dec.Decode(&s.Shards); err != nil {
+				return fmt.Errorf("%s | %w", "Shards", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewCloseIndexResult provides a builder for the CloseIndexResult struct.
-func NewCloseIndexResultBuilder() *CloseIndexResultBuilder {
-	r := CloseIndexResultBuilder{
-		&CloseIndexResult{
-			Shards: make(map[string]CloseShardResult, 0),
-		},
+// NewCloseIndexResult returns a CloseIndexResult.
+func NewCloseIndexResult() *CloseIndexResult {
+	r := &CloseIndexResult{
+		Shards: make(map[string]CloseShardResult, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the CloseIndexResult struct
-func (rb *CloseIndexResultBuilder) Build() CloseIndexResult {
-	return *rb.v
-}
-
-func (rb *CloseIndexResultBuilder) Closed(closed bool) *CloseIndexResultBuilder {
-	rb.v.Closed = closed
-	return rb
-}
-
-func (rb *CloseIndexResultBuilder) Shards(values map[string]*CloseShardResultBuilder) *CloseIndexResultBuilder {
-	tmp := make(map[string]CloseShardResult, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Shards = tmp
-	return rb
+	return r
 }

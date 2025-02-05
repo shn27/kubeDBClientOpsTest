@@ -15,60 +15,90 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // BoxplotAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/metric.ts#L50-L52
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/metric.ts#L57-L62
 type BoxplotAggregation struct {
-	Compression *float64 `json:"compression,omitempty"`
-	Field       *Field   `json:"field,omitempty"`
-	Missing     *Missing `json:"missing,omitempty"`
-	Script      *Script  `json:"script,omitempty"`
+	// Compression Limits the maximum number of nodes used by the underlying TDigest algorithm
+	// to `20 * compression`, enabling control of memory usage and approximation
+	// error.
+	Compression *Float64 `json:"compression,omitempty"`
+	// Field The field on which to run the aggregation.
+	Field *string `json:"field,omitempty"`
+	// Missing The value to apply to documents that do not have a value.
+	// By default, documents without a value are ignored.
+	Missing Missing `json:"missing,omitempty"`
+	Script  *Script `json:"script,omitempty"`
 }
 
-// BoxplotAggregationBuilder holds BoxplotAggregation struct and provides a builder API.
-type BoxplotAggregationBuilder struct {
-	v *BoxplotAggregation
-}
+func (s *BoxplotAggregation) UnmarshalJSON(data []byte) error {
 
-// NewBoxplotAggregation provides a builder for the BoxplotAggregation struct.
-func NewBoxplotAggregationBuilder() *BoxplotAggregationBuilder {
-	r := BoxplotAggregationBuilder{
-		&BoxplotAggregation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "compression":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Compression", err)
+				}
+				f := Float64(value)
+				s.Compression = &f
+			case float64:
+				f := Float64(v)
+				s.Compression = &f
+			}
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "missing":
+			if err := dec.Decode(&s.Missing); err != nil {
+				return fmt.Errorf("%s | %w", "Missing", err)
+			}
+
+		case "script":
+			if err := dec.Decode(&s.Script); err != nil {
+				return fmt.Errorf("%s | %w", "Script", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the BoxplotAggregation struct
-func (rb *BoxplotAggregationBuilder) Build() BoxplotAggregation {
-	return *rb.v
-}
+// NewBoxplotAggregation returns a BoxplotAggregation.
+func NewBoxplotAggregation() *BoxplotAggregation {
+	r := &BoxplotAggregation{}
 
-func (rb *BoxplotAggregationBuilder) Compression(compression float64) *BoxplotAggregationBuilder {
-	rb.v.Compression = &compression
-	return rb
-}
-
-func (rb *BoxplotAggregationBuilder) Field(field Field) *BoxplotAggregationBuilder {
-	rb.v.Field = &field
-	return rb
-}
-
-func (rb *BoxplotAggregationBuilder) Missing(missing *MissingBuilder) *BoxplotAggregationBuilder {
-	v := missing.Build()
-	rb.v.Missing = &v
-	return rb
-}
-
-func (rb *BoxplotAggregationBuilder) Script(script *ScriptBuilder) *BoxplotAggregationBuilder {
-	v := script.Build()
-	rb.v.Script = &v
-	return rb
+	return r
 }

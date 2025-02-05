@@ -15,40 +15,66 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // EwmaModelSettings type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/pipeline.ts#L215-L217
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/pipeline.ts#L293-L295
 type EwmaModelSettings struct {
 	Alpha *float32 `json:"alpha,omitempty"`
 }
 
-// EwmaModelSettingsBuilder holds EwmaModelSettings struct and provides a builder API.
-type EwmaModelSettingsBuilder struct {
-	v *EwmaModelSettings
-}
+func (s *EwmaModelSettings) UnmarshalJSON(data []byte) error {
 
-// NewEwmaModelSettings provides a builder for the EwmaModelSettings struct.
-func NewEwmaModelSettingsBuilder() *EwmaModelSettingsBuilder {
-	r := EwmaModelSettingsBuilder{
-		&EwmaModelSettings{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "alpha":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Alpha", err)
+				}
+				f := float32(value)
+				s.Alpha = &f
+			case float64:
+				f := float32(v)
+				s.Alpha = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the EwmaModelSettings struct
-func (rb *EwmaModelSettingsBuilder) Build() EwmaModelSettings {
-	return *rb.v
-}
+// NewEwmaModelSettings returns a EwmaModelSettings.
+func NewEwmaModelSettings() *EwmaModelSettings {
+	r := &EwmaModelSettings{}
 
-func (rb *EwmaModelSettingsBuilder) Alpha(alpha float32) *EwmaModelSettingsBuilder {
-	rb.v.Alpha = &alpha
-	return rb
+	return r
 }

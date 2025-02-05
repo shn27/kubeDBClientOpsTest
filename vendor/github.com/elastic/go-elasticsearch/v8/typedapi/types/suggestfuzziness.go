@@ -15,65 +15,126 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // SuggestFuzziness type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/suggester.ts#L135-L141
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/suggester.ts#L196-L224
 type SuggestFuzziness struct {
-	Fuzziness      *Fuzziness `json:"fuzziness,omitempty"`
-	MinLength      *int       `json:"min_length,omitempty"`
-	PrefixLength   *int       `json:"prefix_length,omitempty"`
-	Transpositions *bool      `json:"transpositions,omitempty"`
-	UnicodeAware   *bool      `json:"unicode_aware,omitempty"`
+	// Fuzziness The fuzziness factor.
+	Fuzziness Fuzziness `json:"fuzziness,omitempty"`
+	// MinLength Minimum length of the input before fuzzy suggestions are returned.
+	MinLength *int `json:"min_length,omitempty"`
+	// PrefixLength Minimum length of the input, which is not checked for fuzzy alternatives.
+	PrefixLength *int `json:"prefix_length,omitempty"`
+	// Transpositions If set to `true`, transpositions are counted as one change instead of two.
+	Transpositions *bool `json:"transpositions,omitempty"`
+	// UnicodeAware If `true`, all measurements (like fuzzy edit distance, transpositions, and
+	// lengths) are measured in Unicode code points instead of in bytes.
+	// This is slightly slower than raw bytes.
+	UnicodeAware *bool `json:"unicode_aware,omitempty"`
 }
 
-// SuggestFuzzinessBuilder holds SuggestFuzziness struct and provides a builder API.
-type SuggestFuzzinessBuilder struct {
-	v *SuggestFuzziness
-}
+func (s *SuggestFuzziness) UnmarshalJSON(data []byte) error {
 
-// NewSuggestFuzziness provides a builder for the SuggestFuzziness struct.
-func NewSuggestFuzzinessBuilder() *SuggestFuzzinessBuilder {
-	r := SuggestFuzzinessBuilder{
-		&SuggestFuzziness{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "fuzziness":
+			if err := dec.Decode(&s.Fuzziness); err != nil {
+				return fmt.Errorf("%s | %w", "Fuzziness", err)
+			}
+
+		case "min_length":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MinLength", err)
+				}
+				s.MinLength = &value
+			case float64:
+				f := int(v)
+				s.MinLength = &f
+			}
+
+		case "prefix_length":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PrefixLength", err)
+				}
+				s.PrefixLength = &value
+			case float64:
+				f := int(v)
+				s.PrefixLength = &f
+			}
+
+		case "transpositions":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Transpositions", err)
+				}
+				s.Transpositions = &value
+			case bool:
+				s.Transpositions = &v
+			}
+
+		case "unicode_aware":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "UnicodeAware", err)
+				}
+				s.UnicodeAware = &value
+			case bool:
+				s.UnicodeAware = &v
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SuggestFuzziness struct
-func (rb *SuggestFuzzinessBuilder) Build() SuggestFuzziness {
-	return *rb.v
-}
+// NewSuggestFuzziness returns a SuggestFuzziness.
+func NewSuggestFuzziness() *SuggestFuzziness {
+	r := &SuggestFuzziness{}
 
-func (rb *SuggestFuzzinessBuilder) Fuzziness(fuzziness *FuzzinessBuilder) *SuggestFuzzinessBuilder {
-	v := fuzziness.Build()
-	rb.v.Fuzziness = &v
-	return rb
-}
-
-func (rb *SuggestFuzzinessBuilder) MinLength(minlength int) *SuggestFuzzinessBuilder {
-	rb.v.MinLength = &minlength
-	return rb
-}
-
-func (rb *SuggestFuzzinessBuilder) PrefixLength(prefixlength int) *SuggestFuzzinessBuilder {
-	rb.v.PrefixLength = &prefixlength
-	return rb
-}
-
-func (rb *SuggestFuzzinessBuilder) Transpositions(transpositions bool) *SuggestFuzzinessBuilder {
-	rb.v.Transpositions = &transpositions
-	return rb
-}
-
-func (rb *SuggestFuzzinessBuilder) UnicodeAware(unicodeaware bool) *SuggestFuzzinessBuilder {
-	rb.v.UnicodeAware = &unicodeaware
-	return rb
+	return r
 }

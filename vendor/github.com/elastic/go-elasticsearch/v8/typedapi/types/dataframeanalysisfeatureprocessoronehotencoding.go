@@ -15,52 +15,70 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DataframeAnalysisFeatureProcessorOneHotEncoding type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/DataframeAnalytics.ts#L288-L293
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/DataframeAnalytics.ts#L288-L293
 type DataframeAnalysisFeatureProcessorOneHotEncoding struct {
 	// Field The name of the field to encode.
-	Field Field `json:"field"`
+	Field string `json:"field"`
 	// HotMap The one hot map mapping the field value with the column name.
 	HotMap string `json:"hot_map"`
 }
 
-// DataframeAnalysisFeatureProcessorOneHotEncodingBuilder holds DataframeAnalysisFeatureProcessorOneHotEncoding struct and provides a builder API.
-type DataframeAnalysisFeatureProcessorOneHotEncodingBuilder struct {
-	v *DataframeAnalysisFeatureProcessorOneHotEncoding
-}
+func (s *DataframeAnalysisFeatureProcessorOneHotEncoding) UnmarshalJSON(data []byte) error {
 
-// NewDataframeAnalysisFeatureProcessorOneHotEncoding provides a builder for the DataframeAnalysisFeatureProcessorOneHotEncoding struct.
-func NewDataframeAnalysisFeatureProcessorOneHotEncodingBuilder() *DataframeAnalysisFeatureProcessorOneHotEncodingBuilder {
-	r := DataframeAnalysisFeatureProcessorOneHotEncodingBuilder{
-		&DataframeAnalysisFeatureProcessorOneHotEncoding{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "hot_map":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "HotMap", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.HotMap = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DataframeAnalysisFeatureProcessorOneHotEncoding struct
-func (rb *DataframeAnalysisFeatureProcessorOneHotEncodingBuilder) Build() DataframeAnalysisFeatureProcessorOneHotEncoding {
-	return *rb.v
-}
+// NewDataframeAnalysisFeatureProcessorOneHotEncoding returns a DataframeAnalysisFeatureProcessorOneHotEncoding.
+func NewDataframeAnalysisFeatureProcessorOneHotEncoding() *DataframeAnalysisFeatureProcessorOneHotEncoding {
+	r := &DataframeAnalysisFeatureProcessorOneHotEncoding{}
 
-// Field The name of the field to encode.
-
-func (rb *DataframeAnalysisFeatureProcessorOneHotEncodingBuilder) Field(field Field) *DataframeAnalysisFeatureProcessorOneHotEncodingBuilder {
-	rb.v.Field = field
-	return rb
-}
-
-// HotMap The one hot map mapping the field value with the column name.
-
-func (rb *DataframeAnalysisFeatureProcessorOneHotEncodingBuilder) HotMap(hotmap string) *DataframeAnalysisFeatureProcessorOneHotEncodingBuilder {
-	rb.v.HotMap = hotmap
-	return rb
+	return r
 }

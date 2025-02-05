@@ -15,116 +15,138 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/licensestatus"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/licensetype"
 )
 
 // LicenseInformation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/license/get/types.ts#L25-L38
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/license/get/types.ts#L25-L38
 type LicenseInformation struct {
-	ExpiryDate         *DateTime                   `json:"expiry_date,omitempty"`
-	ExpiryDateInMillis *EpochTimeUnitMillis        `json:"expiry_date_in_millis,omitempty"`
+	ExpiryDate         DateTime                    `json:"expiry_date,omitempty"`
+	ExpiryDateInMillis *int64                      `json:"expiry_date_in_millis,omitempty"`
 	IssueDate          DateTime                    `json:"issue_date"`
-	IssueDateInMillis  EpochTimeUnitMillis         `json:"issue_date_in_millis"`
+	IssueDateInMillis  int64                       `json:"issue_date_in_millis"`
 	IssuedTo           string                      `json:"issued_to"`
 	Issuer             string                      `json:"issuer"`
-	MaxNodes           int64                       `json:"max_nodes,omitempty"`
-	MaxResourceUnits   int                         `json:"max_resource_units,omitempty"`
-	StartDateInMillis  EpochTimeUnitMillis         `json:"start_date_in_millis"`
+	MaxNodes           *int64                      `json:"max_nodes,omitempty"`
+	MaxResourceUnits   *int                        `json:"max_resource_units,omitempty"`
+	StartDateInMillis  int64                       `json:"start_date_in_millis"`
 	Status             licensestatus.LicenseStatus `json:"status"`
 	Type               licensetype.LicenseType     `json:"type"`
-	Uid                Uuid                        `json:"uid"`
+	Uid                string                      `json:"uid"`
 }
 
-// LicenseInformationBuilder holds LicenseInformation struct and provides a builder API.
-type LicenseInformationBuilder struct {
-	v *LicenseInformation
-}
+func (s *LicenseInformation) UnmarshalJSON(data []byte) error {
 
-// NewLicenseInformation provides a builder for the LicenseInformation struct.
-func NewLicenseInformationBuilder() *LicenseInformationBuilder {
-	r := LicenseInformationBuilder{
-		&LicenseInformation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "expiry_date":
+			if err := dec.Decode(&s.ExpiryDate); err != nil {
+				return fmt.Errorf("%s | %w", "ExpiryDate", err)
+			}
+
+		case "expiry_date_in_millis":
+			if err := dec.Decode(&s.ExpiryDateInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "ExpiryDateInMillis", err)
+			}
+
+		case "issue_date":
+			if err := dec.Decode(&s.IssueDate); err != nil {
+				return fmt.Errorf("%s | %w", "IssueDate", err)
+			}
+
+		case "issue_date_in_millis":
+			if err := dec.Decode(&s.IssueDateInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "IssueDateInMillis", err)
+			}
+
+		case "issued_to":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "IssuedTo", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.IssuedTo = o
+
+		case "issuer":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Issuer", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Issuer = o
+
+		case "max_nodes":
+			if err := dec.Decode(&s.MaxNodes); err != nil {
+				return fmt.Errorf("%s | %w", "MaxNodes", err)
+			}
+
+		case "max_resource_units":
+			if err := dec.Decode(&s.MaxResourceUnits); err != nil {
+				return fmt.Errorf("%s | %w", "MaxResourceUnits", err)
+			}
+
+		case "start_date_in_millis":
+			if err := dec.Decode(&s.StartDateInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "StartDateInMillis", err)
+			}
+
+		case "status":
+			if err := dec.Decode(&s.Status); err != nil {
+				return fmt.Errorf("%s | %w", "Status", err)
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "uid":
+			if err := dec.Decode(&s.Uid); err != nil {
+				return fmt.Errorf("%s | %w", "Uid", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the LicenseInformation struct
-func (rb *LicenseInformationBuilder) Build() LicenseInformation {
-	return *rb.v
-}
+// NewLicenseInformation returns a LicenseInformation.
+func NewLicenseInformation() *LicenseInformation {
+	r := &LicenseInformation{}
 
-func (rb *LicenseInformationBuilder) ExpiryDate(expirydate *DateTimeBuilder) *LicenseInformationBuilder {
-	v := expirydate.Build()
-	rb.v.ExpiryDate = &v
-	return rb
-}
-
-func (rb *LicenseInformationBuilder) ExpiryDateInMillis(expirydateinmillis *EpochTimeUnitMillisBuilder) *LicenseInformationBuilder {
-	v := expirydateinmillis.Build()
-	rb.v.ExpiryDateInMillis = &v
-	return rb
-}
-
-func (rb *LicenseInformationBuilder) IssueDate(issuedate *DateTimeBuilder) *LicenseInformationBuilder {
-	v := issuedate.Build()
-	rb.v.IssueDate = v
-	return rb
-}
-
-func (rb *LicenseInformationBuilder) IssueDateInMillis(issuedateinmillis *EpochTimeUnitMillisBuilder) *LicenseInformationBuilder {
-	v := issuedateinmillis.Build()
-	rb.v.IssueDateInMillis = v
-	return rb
-}
-
-func (rb *LicenseInformationBuilder) IssuedTo(issuedto string) *LicenseInformationBuilder {
-	rb.v.IssuedTo = issuedto
-	return rb
-}
-
-func (rb *LicenseInformationBuilder) Issuer(issuer string) *LicenseInformationBuilder {
-	rb.v.Issuer = issuer
-	return rb
-}
-
-func (rb *LicenseInformationBuilder) MaxNodes(maxnodes int64) *LicenseInformationBuilder {
-	rb.v.MaxNodes = maxnodes
-	return rb
-}
-
-func (rb *LicenseInformationBuilder) MaxResourceUnits(maxresourceunits int) *LicenseInformationBuilder {
-	rb.v.MaxResourceUnits = maxresourceunits
-	return rb
-}
-
-func (rb *LicenseInformationBuilder) StartDateInMillis(startdateinmillis *EpochTimeUnitMillisBuilder) *LicenseInformationBuilder {
-	v := startdateinmillis.Build()
-	rb.v.StartDateInMillis = v
-	return rb
-}
-
-func (rb *LicenseInformationBuilder) Status(status licensestatus.LicenseStatus) *LicenseInformationBuilder {
-	rb.v.Status = status
-	return rb
-}
-
-func (rb *LicenseInformationBuilder) Type_(type_ licensetype.LicenseType) *LicenseInformationBuilder {
-	rb.v.Type = type_
-	return rb
-}
-
-func (rb *LicenseInformationBuilder) Uid(uid Uuid) *LicenseInformationBuilder {
-	rb.v.Uid = uid
-	return rb
+	return r
 }

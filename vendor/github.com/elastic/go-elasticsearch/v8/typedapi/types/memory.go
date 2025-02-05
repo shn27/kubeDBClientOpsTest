@@ -15,97 +15,101 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // Memory type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/get_memory_stats/types.ts#L25-L48
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/get_memory_stats/types.ts#L25-L48
 type Memory struct {
 	Attributes  map[string]string `json:"attributes"`
-	EphemeralId Id                `json:"ephemeral_id"`
+	EphemeralId string            `json:"ephemeral_id"`
 	// Jvm Contains Java Virtual Machine (JVM) statistics for the node.
 	Jvm JvmStats `json:"jvm"`
 	// Mem Contains statistics about memory usage for the node.
 	Mem MemStats `json:"mem"`
 	// Name Human-readable identifier for the node. Based on the Node name setting
 	// setting.
-	Name Name `json:"name"`
+	Name string `json:"name"`
 	// Roles Roles assigned to the node.
 	Roles []string `json:"roles"`
 	// TransportAddress The host and port where transport HTTP connections are accepted.
-	TransportAddress TransportAddress `json:"transport_address"`
+	TransportAddress string `json:"transport_address"`
 }
 
-// MemoryBuilder holds Memory struct and provides a builder API.
-type MemoryBuilder struct {
-	v *Memory
+func (s *Memory) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "attributes":
+			if s.Attributes == nil {
+				s.Attributes = make(map[string]string, 0)
+			}
+			if err := dec.Decode(&s.Attributes); err != nil {
+				return fmt.Errorf("%s | %w", "Attributes", err)
+			}
+
+		case "ephemeral_id":
+			if err := dec.Decode(&s.EphemeralId); err != nil {
+				return fmt.Errorf("%s | %w", "EphemeralId", err)
+			}
+
+		case "jvm":
+			if err := dec.Decode(&s.Jvm); err != nil {
+				return fmt.Errorf("%s | %w", "Jvm", err)
+			}
+
+		case "mem":
+			if err := dec.Decode(&s.Mem); err != nil {
+				return fmt.Errorf("%s | %w", "Mem", err)
+			}
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		case "roles":
+			if err := dec.Decode(&s.Roles); err != nil {
+				return fmt.Errorf("%s | %w", "Roles", err)
+			}
+
+		case "transport_address":
+			if err := dec.Decode(&s.TransportAddress); err != nil {
+				return fmt.Errorf("%s | %w", "TransportAddress", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewMemory provides a builder for the Memory struct.
-func NewMemoryBuilder() *MemoryBuilder {
-	r := MemoryBuilder{
-		&Memory{
-			Attributes: make(map[string]string, 0),
-		},
+// NewMemory returns a Memory.
+func NewMemory() *Memory {
+	r := &Memory{
+		Attributes: make(map[string]string, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the Memory struct
-func (rb *MemoryBuilder) Build() Memory {
-	return *rb.v
-}
-
-func (rb *MemoryBuilder) Attributes(value map[string]string) *MemoryBuilder {
-	rb.v.Attributes = value
-	return rb
-}
-
-func (rb *MemoryBuilder) EphemeralId(ephemeralid Id) *MemoryBuilder {
-	rb.v.EphemeralId = ephemeralid
-	return rb
-}
-
-// Jvm Contains Java Virtual Machine (JVM) statistics for the node.
-
-func (rb *MemoryBuilder) Jvm(jvm *JvmStatsBuilder) *MemoryBuilder {
-	v := jvm.Build()
-	rb.v.Jvm = v
-	return rb
-}
-
-// Mem Contains statistics about memory usage for the node.
-
-func (rb *MemoryBuilder) Mem(mem *MemStatsBuilder) *MemoryBuilder {
-	v := mem.Build()
-	rb.v.Mem = v
-	return rb
-}
-
-// Name Human-readable identifier for the node. Based on the Node name setting
-// setting.
-
-func (rb *MemoryBuilder) Name(name Name) *MemoryBuilder {
-	rb.v.Name = name
-	return rb
-}
-
-// Roles Roles assigned to the node.
-
-func (rb *MemoryBuilder) Roles(roles ...string) *MemoryBuilder {
-	rb.v.Roles = roles
-	return rb
-}
-
-// TransportAddress The host and port where transport HTTP connections are accepted.
-
-func (rb *MemoryBuilder) TransportAddress(transportaddress TransportAddress) *MemoryBuilder {
-	rb.v.TransportAddress = transportaddress
-	return rb
+	return r
 }

@@ -15,109 +15,211 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // RollupJobStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/rollup/get_jobs/types.ts#L45-L58
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/rollup/get_jobs/types.ts#L45-L58
 type RollupJobStats struct {
-	DocumentsProcessed int64                   `json:"documents_processed"`
-	IndexFailures      int64                   `json:"index_failures"`
-	IndexTimeInMs      DurationValueUnitMillis `json:"index_time_in_ms"`
-	IndexTotal         int64                   `json:"index_total"`
-	PagesProcessed     int64                   `json:"pages_processed"`
-	ProcessingTimeInMs DurationValueUnitMillis `json:"processing_time_in_ms"`
-	ProcessingTotal    int64                   `json:"processing_total"`
-	RollupsIndexed     int64                   `json:"rollups_indexed"`
-	SearchFailures     int64                   `json:"search_failures"`
-	SearchTimeInMs     DurationValueUnitMillis `json:"search_time_in_ms"`
-	SearchTotal        int64                   `json:"search_total"`
-	TriggerCount       int64                   `json:"trigger_count"`
+	DocumentsProcessed int64 `json:"documents_processed"`
+	IndexFailures      int64 `json:"index_failures"`
+	IndexTimeInMs      int64 `json:"index_time_in_ms"`
+	IndexTotal         int64 `json:"index_total"`
+	PagesProcessed     int64 `json:"pages_processed"`
+	ProcessingTimeInMs int64 `json:"processing_time_in_ms"`
+	ProcessingTotal    int64 `json:"processing_total"`
+	RollupsIndexed     int64 `json:"rollups_indexed"`
+	SearchFailures     int64 `json:"search_failures"`
+	SearchTimeInMs     int64 `json:"search_time_in_ms"`
+	SearchTotal        int64 `json:"search_total"`
+	TriggerCount       int64 `json:"trigger_count"`
 }
 
-// RollupJobStatsBuilder holds RollupJobStats struct and provides a builder API.
-type RollupJobStatsBuilder struct {
-	v *RollupJobStats
-}
+func (s *RollupJobStats) UnmarshalJSON(data []byte) error {
 
-// NewRollupJobStats provides a builder for the RollupJobStats struct.
-func NewRollupJobStatsBuilder() *RollupJobStatsBuilder {
-	r := RollupJobStatsBuilder{
-		&RollupJobStats{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "documents_processed":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DocumentsProcessed", err)
+				}
+				s.DocumentsProcessed = value
+			case float64:
+				f := int64(v)
+				s.DocumentsProcessed = f
+			}
+
+		case "index_failures":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IndexFailures", err)
+				}
+				s.IndexFailures = value
+			case float64:
+				f := int64(v)
+				s.IndexFailures = f
+			}
+
+		case "index_time_in_ms":
+			if err := dec.Decode(&s.IndexTimeInMs); err != nil {
+				return fmt.Errorf("%s | %w", "IndexTimeInMs", err)
+			}
+
+		case "index_total":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IndexTotal", err)
+				}
+				s.IndexTotal = value
+			case float64:
+				f := int64(v)
+				s.IndexTotal = f
+			}
+
+		case "pages_processed":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PagesProcessed", err)
+				}
+				s.PagesProcessed = value
+			case float64:
+				f := int64(v)
+				s.PagesProcessed = f
+			}
+
+		case "processing_time_in_ms":
+			if err := dec.Decode(&s.ProcessingTimeInMs); err != nil {
+				return fmt.Errorf("%s | %w", "ProcessingTimeInMs", err)
+			}
+
+		case "processing_total":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ProcessingTotal", err)
+				}
+				s.ProcessingTotal = value
+			case float64:
+				f := int64(v)
+				s.ProcessingTotal = f
+			}
+
+		case "rollups_indexed":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "RollupsIndexed", err)
+				}
+				s.RollupsIndexed = value
+			case float64:
+				f := int64(v)
+				s.RollupsIndexed = f
+			}
+
+		case "search_failures":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "SearchFailures", err)
+				}
+				s.SearchFailures = value
+			case float64:
+				f := int64(v)
+				s.SearchFailures = f
+			}
+
+		case "search_time_in_ms":
+			if err := dec.Decode(&s.SearchTimeInMs); err != nil {
+				return fmt.Errorf("%s | %w", "SearchTimeInMs", err)
+			}
+
+		case "search_total":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "SearchTotal", err)
+				}
+				s.SearchTotal = value
+			case float64:
+				f := int64(v)
+				s.SearchTotal = f
+			}
+
+		case "trigger_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TriggerCount", err)
+				}
+				s.TriggerCount = value
+			case float64:
+				f := int64(v)
+				s.TriggerCount = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RollupJobStats struct
-func (rb *RollupJobStatsBuilder) Build() RollupJobStats {
-	return *rb.v
-}
+// NewRollupJobStats returns a RollupJobStats.
+func NewRollupJobStats() *RollupJobStats {
+	r := &RollupJobStats{}
 
-func (rb *RollupJobStatsBuilder) DocumentsProcessed(documentsprocessed int64) *RollupJobStatsBuilder {
-	rb.v.DocumentsProcessed = documentsprocessed
-	return rb
-}
-
-func (rb *RollupJobStatsBuilder) IndexFailures(indexfailures int64) *RollupJobStatsBuilder {
-	rb.v.IndexFailures = indexfailures
-	return rb
-}
-
-func (rb *RollupJobStatsBuilder) IndexTimeInMs(indextimeinms *DurationValueUnitMillisBuilder) *RollupJobStatsBuilder {
-	v := indextimeinms.Build()
-	rb.v.IndexTimeInMs = v
-	return rb
-}
-
-func (rb *RollupJobStatsBuilder) IndexTotal(indextotal int64) *RollupJobStatsBuilder {
-	rb.v.IndexTotal = indextotal
-	return rb
-}
-
-func (rb *RollupJobStatsBuilder) PagesProcessed(pagesprocessed int64) *RollupJobStatsBuilder {
-	rb.v.PagesProcessed = pagesprocessed
-	return rb
-}
-
-func (rb *RollupJobStatsBuilder) ProcessingTimeInMs(processingtimeinms *DurationValueUnitMillisBuilder) *RollupJobStatsBuilder {
-	v := processingtimeinms.Build()
-	rb.v.ProcessingTimeInMs = v
-	return rb
-}
-
-func (rb *RollupJobStatsBuilder) ProcessingTotal(processingtotal int64) *RollupJobStatsBuilder {
-	rb.v.ProcessingTotal = processingtotal
-	return rb
-}
-
-func (rb *RollupJobStatsBuilder) RollupsIndexed(rollupsindexed int64) *RollupJobStatsBuilder {
-	rb.v.RollupsIndexed = rollupsindexed
-	return rb
-}
-
-func (rb *RollupJobStatsBuilder) SearchFailures(searchfailures int64) *RollupJobStatsBuilder {
-	rb.v.SearchFailures = searchfailures
-	return rb
-}
-
-func (rb *RollupJobStatsBuilder) SearchTimeInMs(searchtimeinms *DurationValueUnitMillisBuilder) *RollupJobStatsBuilder {
-	v := searchtimeinms.Build()
-	rb.v.SearchTimeInMs = v
-	return rb
-}
-
-func (rb *RollupJobStatsBuilder) SearchTotal(searchtotal int64) *RollupJobStatsBuilder {
-	rb.v.SearchTotal = searchtotal
-	return rb
-}
-
-func (rb *RollupJobStatsBuilder) TriggerCount(triggercount int64) *RollupJobStatsBuilder {
-	rb.v.TriggerCount = triggercount
-	return rb
+	return r
 }

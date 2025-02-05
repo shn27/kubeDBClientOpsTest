@@ -15,54 +15,117 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // GeoCentroidAggregate type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L295-L299
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L335-L342
 type GeoCentroidAggregate struct {
-	Count    int64        `json:"count"`
-	Location *GeoLocation `json:"location,omitempty"`
-	Meta     *Metadata    `json:"meta,omitempty"`
+	Count    int64       `json:"count"`
+	Location GeoLocation `json:"location,omitempty"`
+	Meta     Metadata    `json:"meta,omitempty"`
 }
 
-// GeoCentroidAggregateBuilder holds GeoCentroidAggregate struct and provides a builder API.
-type GeoCentroidAggregateBuilder struct {
-	v *GeoCentroidAggregate
-}
+func (s *GeoCentroidAggregate) UnmarshalJSON(data []byte) error {
 
-// NewGeoCentroidAggregate provides a builder for the GeoCentroidAggregate struct.
-func NewGeoCentroidAggregateBuilder() *GeoCentroidAggregateBuilder {
-	r := GeoCentroidAggregateBuilder{
-		&GeoCentroidAggregate{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Count", err)
+				}
+				s.Count = value
+			case float64:
+				f := int64(v)
+				s.Count = f
+			}
+
+		case "location":
+			message := json.RawMessage{}
+			if err := dec.Decode(&message); err != nil {
+				return fmt.Errorf("%s | %w", "Location", err)
+			}
+			keyDec := json.NewDecoder(bytes.NewReader(message))
+		location_field:
+			for {
+				t, err := keyDec.Token()
+				if err != nil {
+					if errors.Is(err, io.EOF) {
+						break
+					}
+					return fmt.Errorf("%s | %w", "Location", err)
+				}
+
+				switch t {
+
+				case "lat", "lon":
+					o := NewLatLonGeoLocation()
+					localDec := json.NewDecoder(bytes.NewReader(message))
+					if err := localDec.Decode(&o); err != nil {
+						return fmt.Errorf("%s | %w", "Location", err)
+					}
+					s.Location = o
+					break location_field
+
+				case "geohash":
+					o := NewGeoHashLocation()
+					localDec := json.NewDecoder(bytes.NewReader(message))
+					if err := localDec.Decode(&o); err != nil {
+						return fmt.Errorf("%s | %w", "Location", err)
+					}
+					s.Location = o
+					break location_field
+
+				}
+			}
+			if s.Location == nil {
+				localDec := json.NewDecoder(bytes.NewReader(message))
+				if err := localDec.Decode(&s.Location); err != nil {
+					return fmt.Errorf("%s | %w", "Location", err)
+				}
+			}
+
+		case "meta":
+			if err := dec.Decode(&s.Meta); err != nil {
+				return fmt.Errorf("%s | %w", "Meta", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the GeoCentroidAggregate struct
-func (rb *GeoCentroidAggregateBuilder) Build() GeoCentroidAggregate {
-	return *rb.v
-}
+// NewGeoCentroidAggregate returns a GeoCentroidAggregate.
+func NewGeoCentroidAggregate() *GeoCentroidAggregate {
+	r := &GeoCentroidAggregate{}
 
-func (rb *GeoCentroidAggregateBuilder) Count(count int64) *GeoCentroidAggregateBuilder {
-	rb.v.Count = count
-	return rb
-}
-
-func (rb *GeoCentroidAggregateBuilder) Location(location *GeoLocationBuilder) *GeoCentroidAggregateBuilder {
-	v := location.Build()
-	rb.v.Location = &v
-	return rb
-}
-
-func (rb *GeoCentroidAggregateBuilder) Meta(meta *MetadataBuilder) *GeoCentroidAggregateBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
+	return r
 }

@@ -15,122 +15,193 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // AnomalyCause type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/Anomaly.ts#L49-L64
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/Anomaly.ts#L123-L138
 type AnomalyCause struct {
-	Actual                 []float64   `json:"actual"`
-	ByFieldName            Name        `json:"by_field_name"`
+	Actual                 []Float64   `json:"actual"`
+	ByFieldName            string      `json:"by_field_name"`
 	ByFieldValue           string      `json:"by_field_value"`
 	CorrelatedByFieldValue string      `json:"correlated_by_field_value"`
-	FieldName              Field       `json:"field_name"`
+	FieldName              string      `json:"field_name"`
 	Function               string      `json:"function"`
 	FunctionDescription    string      `json:"function_description"`
 	Influencers            []Influence `json:"influencers"`
-	OverFieldName          Name        `json:"over_field_name"`
+	OverFieldName          string      `json:"over_field_name"`
 	OverFieldValue         string      `json:"over_field_value"`
 	PartitionFieldName     string      `json:"partition_field_name"`
 	PartitionFieldValue    string      `json:"partition_field_value"`
-	Probability            float64     `json:"probability"`
-	Typical                []float64   `json:"typical"`
+	Probability            Float64     `json:"probability"`
+	Typical                []Float64   `json:"typical"`
 }
 
-// AnomalyCauseBuilder holds AnomalyCause struct and provides a builder API.
-type AnomalyCauseBuilder struct {
-	v *AnomalyCause
-}
+func (s *AnomalyCause) UnmarshalJSON(data []byte) error {
 
-// NewAnomalyCause provides a builder for the AnomalyCause struct.
-func NewAnomalyCauseBuilder() *AnomalyCauseBuilder {
-	r := AnomalyCauseBuilder{
-		&AnomalyCause{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "actual":
+			if err := dec.Decode(&s.Actual); err != nil {
+				return fmt.Errorf("%s | %w", "Actual", err)
+			}
+
+		case "by_field_name":
+			if err := dec.Decode(&s.ByFieldName); err != nil {
+				return fmt.Errorf("%s | %w", "ByFieldName", err)
+			}
+
+		case "by_field_value":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ByFieldValue", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ByFieldValue = o
+
+		case "correlated_by_field_value":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "CorrelatedByFieldValue", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.CorrelatedByFieldValue = o
+
+		case "field_name":
+			if err := dec.Decode(&s.FieldName); err != nil {
+				return fmt.Errorf("%s | %w", "FieldName", err)
+			}
+
+		case "function":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Function", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Function = o
+
+		case "function_description":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "FunctionDescription", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.FunctionDescription = o
+
+		case "influencers":
+			if err := dec.Decode(&s.Influencers); err != nil {
+				return fmt.Errorf("%s | %w", "Influencers", err)
+			}
+
+		case "over_field_name":
+			if err := dec.Decode(&s.OverFieldName); err != nil {
+				return fmt.Errorf("%s | %w", "OverFieldName", err)
+			}
+
+		case "over_field_value":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "OverFieldValue", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.OverFieldValue = o
+
+		case "partition_field_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PartitionFieldName", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PartitionFieldName = o
+
+		case "partition_field_value":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PartitionFieldValue", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PartitionFieldValue = o
+
+		case "probability":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Probability", err)
+				}
+				f := Float64(value)
+				s.Probability = f
+			case float64:
+				f := Float64(v)
+				s.Probability = f
+			}
+
+		case "typical":
+			if err := dec.Decode(&s.Typical); err != nil {
+				return fmt.Errorf("%s | %w", "Typical", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the AnomalyCause struct
-func (rb *AnomalyCauseBuilder) Build() AnomalyCause {
-	return *rb.v
-}
+// NewAnomalyCause returns a AnomalyCause.
+func NewAnomalyCause() *AnomalyCause {
+	r := &AnomalyCause{}
 
-func (rb *AnomalyCauseBuilder) Actual(actual ...float64) *AnomalyCauseBuilder {
-	rb.v.Actual = actual
-	return rb
-}
-
-func (rb *AnomalyCauseBuilder) ByFieldName(byfieldname Name) *AnomalyCauseBuilder {
-	rb.v.ByFieldName = byfieldname
-	return rb
-}
-
-func (rb *AnomalyCauseBuilder) ByFieldValue(byfieldvalue string) *AnomalyCauseBuilder {
-	rb.v.ByFieldValue = byfieldvalue
-	return rb
-}
-
-func (rb *AnomalyCauseBuilder) CorrelatedByFieldValue(correlatedbyfieldvalue string) *AnomalyCauseBuilder {
-	rb.v.CorrelatedByFieldValue = correlatedbyfieldvalue
-	return rb
-}
-
-func (rb *AnomalyCauseBuilder) FieldName(fieldname Field) *AnomalyCauseBuilder {
-	rb.v.FieldName = fieldname
-	return rb
-}
-
-func (rb *AnomalyCauseBuilder) Function(function string) *AnomalyCauseBuilder {
-	rb.v.Function = function
-	return rb
-}
-
-func (rb *AnomalyCauseBuilder) FunctionDescription(functiondescription string) *AnomalyCauseBuilder {
-	rb.v.FunctionDescription = functiondescription
-	return rb
-}
-
-func (rb *AnomalyCauseBuilder) Influencers(influencers []InfluenceBuilder) *AnomalyCauseBuilder {
-	tmp := make([]Influence, len(influencers))
-	for _, value := range influencers {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Influencers = tmp
-	return rb
-}
-
-func (rb *AnomalyCauseBuilder) OverFieldName(overfieldname Name) *AnomalyCauseBuilder {
-	rb.v.OverFieldName = overfieldname
-	return rb
-}
-
-func (rb *AnomalyCauseBuilder) OverFieldValue(overfieldvalue string) *AnomalyCauseBuilder {
-	rb.v.OverFieldValue = overfieldvalue
-	return rb
-}
-
-func (rb *AnomalyCauseBuilder) PartitionFieldName(partitionfieldname string) *AnomalyCauseBuilder {
-	rb.v.PartitionFieldName = partitionfieldname
-	return rb
-}
-
-func (rb *AnomalyCauseBuilder) PartitionFieldValue(partitionfieldvalue string) *AnomalyCauseBuilder {
-	rb.v.PartitionFieldValue = partitionfieldvalue
-	return rb
-}
-
-func (rb *AnomalyCauseBuilder) Probability(probability float64) *AnomalyCauseBuilder {
-	rb.v.Probability = probability
-	return rb
-}
-
-func (rb *AnomalyCauseBuilder) Typical(typical ...float64) *AnomalyCauseBuilder {
-	rb.v.Typical = typical
-	return rb
+	return r
 }

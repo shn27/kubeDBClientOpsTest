@@ -15,58 +15,83 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/scriptlanguage"
 )
 
 // StoredScript type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Scripting.ts#L35-L39
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Scripting.ts#L47-L57
 type StoredScript struct {
+	// Lang Specifies the language the script is written in.
 	Lang    scriptlanguage.ScriptLanguage `json:"lang"`
 	Options map[string]string             `json:"options,omitempty"`
-	Source  string                        `json:"source"`
+	// Source The script source.
+	Source string `json:"source"`
 }
 
-// StoredScriptBuilder holds StoredScript struct and provides a builder API.
-type StoredScriptBuilder struct {
-	v *StoredScript
+func (s *StoredScript) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "lang":
+			if err := dec.Decode(&s.Lang); err != nil {
+				return fmt.Errorf("%s | %w", "Lang", err)
+			}
+
+		case "options":
+			if s.Options == nil {
+				s.Options = make(map[string]string, 0)
+			}
+			if err := dec.Decode(&s.Options); err != nil {
+				return fmt.Errorf("%s | %w", "Options", err)
+			}
+
+		case "source":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Source", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Source = o
+
+		}
+	}
+	return nil
 }
 
-// NewStoredScript provides a builder for the StoredScript struct.
-func NewStoredScriptBuilder() *StoredScriptBuilder {
-	r := StoredScriptBuilder{
-		&StoredScript{
-			Options: make(map[string]string, 0),
-		},
+// NewStoredScript returns a StoredScript.
+func NewStoredScript() *StoredScript {
+	r := &StoredScript{
+		Options: make(map[string]string, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the StoredScript struct
-func (rb *StoredScriptBuilder) Build() StoredScript {
-	return *rb.v
-}
-
-func (rb *StoredScriptBuilder) Lang(lang scriptlanguage.ScriptLanguage) *StoredScriptBuilder {
-	rb.v.Lang = lang
-	return rb
-}
-
-func (rb *StoredScriptBuilder) Options(value map[string]string) *StoredScriptBuilder {
-	rb.v.Options = value
-	return rb
-}
-
-func (rb *StoredScriptBuilder) Source(source string) *StoredScriptBuilder {
-	rb.v.Source = source
-	return rb
+	return r
 }

@@ -15,14 +15,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/operator"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/textquerytype"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/zerotermsquery"
@@ -30,142 +35,302 @@ import (
 
 // MultiMatchQuery type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/fulltext.ts#L191-L217
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/fulltext.ts#L471-L557
 type MultiMatchQuery struct {
-	Analyzer                        *string                        `json:"analyzer,omitempty"`
-	AutoGenerateSynonymsPhraseQuery *bool                          `json:"auto_generate_synonyms_phrase_query,omitempty"`
-	Boost                           *float32                       `json:"boost,omitempty"`
-	CutoffFrequency                 *float64                       `json:"cutoff_frequency,omitempty"`
-	Fields                          *Fields                        `json:"fields,omitempty"`
-	Fuzziness                       *Fuzziness                     `json:"fuzziness,omitempty"`
-	FuzzyRewrite                    *MultiTermQueryRewrite         `json:"fuzzy_rewrite,omitempty"`
-	FuzzyTranspositions             *bool                          `json:"fuzzy_transpositions,omitempty"`
-	Lenient                         *bool                          `json:"lenient,omitempty"`
-	MaxExpansions                   *int                           `json:"max_expansions,omitempty"`
-	MinimumShouldMatch              *MinimumShouldMatch            `json:"minimum_should_match,omitempty"`
-	Operator                        *operator.Operator             `json:"operator,omitempty"`
-	PrefixLength                    *int                           `json:"prefix_length,omitempty"`
-	Query                           string                         `json:"query"`
-	QueryName_                      *string                        `json:"_name,omitempty"`
-	Slop                            *int                           `json:"slop,omitempty"`
-	TieBreaker                      *float64                       `json:"tie_breaker,omitempty"`
-	Type                            *textquerytype.TextQueryType   `json:"type,omitempty"`
-	ZeroTermsQuery                  *zerotermsquery.ZeroTermsQuery `json:"zero_terms_query,omitempty"`
+	// Analyzer Analyzer used to convert the text in the query value into tokens.
+	Analyzer *string `json:"analyzer,omitempty"`
+	// AutoGenerateSynonymsPhraseQuery If `true`, match phrase queries are automatically created for multi-term
+	// synonyms.
+	AutoGenerateSynonymsPhraseQuery *bool `json:"auto_generate_synonyms_phrase_query,omitempty"`
+	// Boost Floating point number used to decrease or increase the relevance scores of
+	// the query.
+	// Boost values are relative to the default value of 1.0.
+	// A boost value between 0 and 1.0 decreases the relevance score.
+	// A value greater than 1.0 increases the relevance score.
+	Boost           *float32 `json:"boost,omitempty"`
+	CutoffFrequency *Float64 `json:"cutoff_frequency,omitempty"`
+	// Fields The fields to be queried.
+	// Defaults to the `index.query.default_field` index settings, which in turn
+	// defaults to `*`.
+	Fields []string `json:"fields,omitempty"`
+	// Fuzziness Maximum edit distance allowed for matching.
+	Fuzziness Fuzziness `json:"fuzziness,omitempty"`
+	// FuzzyRewrite Method used to rewrite the query.
+	FuzzyRewrite *string `json:"fuzzy_rewrite,omitempty"`
+	// FuzzyTranspositions If `true`, edits for fuzzy matching include transpositions of two adjacent
+	// characters (for example, `ab` to `ba`).
+	// Can be applied to the term subqueries constructed for all terms but the final
+	// term.
+	FuzzyTranspositions *bool `json:"fuzzy_transpositions,omitempty"`
+	// Lenient If `true`, format-based errors, such as providing a text query value for a
+	// numeric field, are ignored.
+	Lenient *bool `json:"lenient,omitempty"`
+	// MaxExpansions Maximum number of terms to which the query will expand.
+	MaxExpansions *int `json:"max_expansions,omitempty"`
+	// MinimumShouldMatch Minimum number of clauses that must match for a document to be returned.
+	MinimumShouldMatch MinimumShouldMatch `json:"minimum_should_match,omitempty"`
+	// Operator Boolean logic used to interpret text in the query value.
+	Operator *operator.Operator `json:"operator,omitempty"`
+	// PrefixLength Number of beginning characters left unchanged for fuzzy matching.
+	PrefixLength *int `json:"prefix_length,omitempty"`
+	// Query Text, number, boolean value or date you wish to find in the provided field.
+	Query      string  `json:"query"`
+	QueryName_ *string `json:"_name,omitempty"`
+	// Slop Maximum number of positions allowed between matching tokens.
+	Slop *int `json:"slop,omitempty"`
+	// TieBreaker Determines how scores for each per-term blended query and scores across
+	// groups are combined.
+	TieBreaker *Float64 `json:"tie_breaker,omitempty"`
+	// Type How `the` multi_match query is executed internally.
+	Type *textquerytype.TextQueryType `json:"type,omitempty"`
+	// ZeroTermsQuery Indicates whether no documents are returned if the `analyzer` removes all
+	// tokens, such as when using a `stop` filter.
+	ZeroTermsQuery *zerotermsquery.ZeroTermsQuery `json:"zero_terms_query,omitempty"`
 }
 
-// MultiMatchQueryBuilder holds MultiMatchQuery struct and provides a builder API.
-type MultiMatchQueryBuilder struct {
-	v *MultiMatchQuery
-}
+func (s *MultiMatchQuery) UnmarshalJSON(data []byte) error {
 
-// NewMultiMatchQuery provides a builder for the MultiMatchQuery struct.
-func NewMultiMatchQueryBuilder() *MultiMatchQueryBuilder {
-	r := MultiMatchQueryBuilder{
-		&MultiMatchQuery{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "analyzer":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Analyzer", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Analyzer = &o
+
+		case "auto_generate_synonyms_phrase_query":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "AutoGenerateSynonymsPhraseQuery", err)
+				}
+				s.AutoGenerateSynonymsPhraseQuery = &value
+			case bool:
+				s.AutoGenerateSynonymsPhraseQuery = &v
+			}
+
+		case "boost":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Boost", err)
+				}
+				f := float32(value)
+				s.Boost = &f
+			case float64:
+				f := float32(v)
+				s.Boost = &f
+			}
+
+		case "cutoff_frequency":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CutoffFrequency", err)
+				}
+				f := Float64(value)
+				s.CutoffFrequency = &f
+			case float64:
+				f := Float64(v)
+				s.CutoffFrequency = &f
+			}
+
+		case "fields":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Fields", err)
+				}
+
+				s.Fields = append(s.Fields, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Fields); err != nil {
+					return fmt.Errorf("%s | %w", "Fields", err)
+				}
+			}
+
+		case "fuzziness":
+			if err := dec.Decode(&s.Fuzziness); err != nil {
+				return fmt.Errorf("%s | %w", "Fuzziness", err)
+			}
+
+		case "fuzzy_rewrite":
+			if err := dec.Decode(&s.FuzzyRewrite); err != nil {
+				return fmt.Errorf("%s | %w", "FuzzyRewrite", err)
+			}
+
+		case "fuzzy_transpositions":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "FuzzyTranspositions", err)
+				}
+				s.FuzzyTranspositions = &value
+			case bool:
+				s.FuzzyTranspositions = &v
+			}
+
+		case "lenient":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Lenient", err)
+				}
+				s.Lenient = &value
+			case bool:
+				s.Lenient = &v
+			}
+
+		case "max_expansions":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxExpansions", err)
+				}
+				s.MaxExpansions = &value
+			case float64:
+				f := int(v)
+				s.MaxExpansions = &f
+			}
+
+		case "minimum_should_match":
+			if err := dec.Decode(&s.MinimumShouldMatch); err != nil {
+				return fmt.Errorf("%s | %w", "MinimumShouldMatch", err)
+			}
+
+		case "operator":
+			if err := dec.Decode(&s.Operator); err != nil {
+				return fmt.Errorf("%s | %w", "Operator", err)
+			}
+
+		case "prefix_length":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PrefixLength", err)
+				}
+				s.PrefixLength = &value
+			case float64:
+				f := int(v)
+				s.PrefixLength = &f
+			}
+
+		case "query":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Query", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Query = o
+
+		case "_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "QueryName_", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.QueryName_ = &o
+
+		case "slop":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Slop", err)
+				}
+				s.Slop = &value
+			case float64:
+				f := int(v)
+				s.Slop = &f
+			}
+
+		case "tie_breaker":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TieBreaker", err)
+				}
+				f := Float64(value)
+				s.TieBreaker = &f
+			case float64:
+				f := Float64(v)
+				s.TieBreaker = &f
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "zero_terms_query":
+			if err := dec.Decode(&s.ZeroTermsQuery); err != nil {
+				return fmt.Errorf("%s | %w", "ZeroTermsQuery", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the MultiMatchQuery struct
-func (rb *MultiMatchQueryBuilder) Build() MultiMatchQuery {
-	return *rb.v
-}
+// NewMultiMatchQuery returns a MultiMatchQuery.
+func NewMultiMatchQuery() *MultiMatchQuery {
+	r := &MultiMatchQuery{}
 
-func (rb *MultiMatchQueryBuilder) Analyzer(analyzer string) *MultiMatchQueryBuilder {
-	rb.v.Analyzer = &analyzer
-	return rb
-}
-
-func (rb *MultiMatchQueryBuilder) AutoGenerateSynonymsPhraseQuery(autogeneratesynonymsphrasequery bool) *MultiMatchQueryBuilder {
-	rb.v.AutoGenerateSynonymsPhraseQuery = &autogeneratesynonymsphrasequery
-	return rb
-}
-
-func (rb *MultiMatchQueryBuilder) Boost(boost float32) *MultiMatchQueryBuilder {
-	rb.v.Boost = &boost
-	return rb
-}
-
-func (rb *MultiMatchQueryBuilder) CutoffFrequency(cutofffrequency float64) *MultiMatchQueryBuilder {
-	rb.v.CutoffFrequency = &cutofffrequency
-	return rb
-}
-
-func (rb *MultiMatchQueryBuilder) Fields(fields *FieldsBuilder) *MultiMatchQueryBuilder {
-	v := fields.Build()
-	rb.v.Fields = &v
-	return rb
-}
-
-func (rb *MultiMatchQueryBuilder) Fuzziness(fuzziness *FuzzinessBuilder) *MultiMatchQueryBuilder {
-	v := fuzziness.Build()
-	rb.v.Fuzziness = &v
-	return rb
-}
-
-func (rb *MultiMatchQueryBuilder) FuzzyRewrite(fuzzyrewrite MultiTermQueryRewrite) *MultiMatchQueryBuilder {
-	rb.v.FuzzyRewrite = &fuzzyrewrite
-	return rb
-}
-
-func (rb *MultiMatchQueryBuilder) FuzzyTranspositions(fuzzytranspositions bool) *MultiMatchQueryBuilder {
-	rb.v.FuzzyTranspositions = &fuzzytranspositions
-	return rb
-}
-
-func (rb *MultiMatchQueryBuilder) Lenient(lenient bool) *MultiMatchQueryBuilder {
-	rb.v.Lenient = &lenient
-	return rb
-}
-
-func (rb *MultiMatchQueryBuilder) MaxExpansions(maxexpansions int) *MultiMatchQueryBuilder {
-	rb.v.MaxExpansions = &maxexpansions
-	return rb
-}
-
-func (rb *MultiMatchQueryBuilder) MinimumShouldMatch(minimumshouldmatch *MinimumShouldMatchBuilder) *MultiMatchQueryBuilder {
-	v := minimumshouldmatch.Build()
-	rb.v.MinimumShouldMatch = &v
-	return rb
-}
-
-func (rb *MultiMatchQueryBuilder) Operator(operator operator.Operator) *MultiMatchQueryBuilder {
-	rb.v.Operator = &operator
-	return rb
-}
-
-func (rb *MultiMatchQueryBuilder) PrefixLength(prefixlength int) *MultiMatchQueryBuilder {
-	rb.v.PrefixLength = &prefixlength
-	return rb
-}
-
-func (rb *MultiMatchQueryBuilder) Query(query string) *MultiMatchQueryBuilder {
-	rb.v.Query = query
-	return rb
-}
-
-func (rb *MultiMatchQueryBuilder) QueryName_(queryname_ string) *MultiMatchQueryBuilder {
-	rb.v.QueryName_ = &queryname_
-	return rb
-}
-
-func (rb *MultiMatchQueryBuilder) Slop(slop int) *MultiMatchQueryBuilder {
-	rb.v.Slop = &slop
-	return rb
-}
-
-func (rb *MultiMatchQueryBuilder) TieBreaker(tiebreaker float64) *MultiMatchQueryBuilder {
-	rb.v.TieBreaker = &tiebreaker
-	return rb
-}
-
-func (rb *MultiMatchQueryBuilder) Type_(type_ textquerytype.TextQueryType) *MultiMatchQueryBuilder {
-	rb.v.Type = &type_
-	return rb
-}
-
-func (rb *MultiMatchQueryBuilder) ZeroTermsQuery(zerotermsquery zerotermsquery.ZeroTermsQuery) *MultiMatchQueryBuilder {
-	rb.v.ZeroTermsQuery = &zerotermsquery
-	return rb
+	return r
 }

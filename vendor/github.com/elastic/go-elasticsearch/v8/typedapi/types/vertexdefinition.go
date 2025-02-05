@@ -15,74 +15,126 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // VertexDefinition type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/graph/_types/Vertex.ts#L30-L37
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/graph/_types/Vertex.ts#L30-L59
 type VertexDefinition struct {
-	Exclude          []string        `json:"exclude,omitempty"`
-	Field            Field           `json:"field"`
-	Include          []VertexInclude `json:"include,omitempty"`
-	MinDocCount      *int64          `json:"min_doc_count,omitempty"`
-	ShardMinDocCount *int64          `json:"shard_min_doc_count,omitempty"`
-	Size             *int            `json:"size,omitempty"`
+	// Exclude Prevents the specified terms from being included in the results.
+	Exclude []string `json:"exclude,omitempty"`
+	// Field Identifies a field in the documents of interest.
+	Field string `json:"field"`
+	// Include Identifies the terms of interest that form the starting points from which you
+	// want to spider out.
+	Include []VertexInclude `json:"include,omitempty"`
+	// MinDocCount Specifies how many documents must contain a pair of terms before it is
+	// considered to be a useful connection.
+	// This setting acts as a certainty threshold.
+	MinDocCount *int64 `json:"min_doc_count,omitempty"`
+	// ShardMinDocCount Controls how many documents on a particular shard have to contain a pair of
+	// terms before the connection is returned for global consideration.
+	ShardMinDocCount *int64 `json:"shard_min_doc_count,omitempty"`
+	// Size Specifies the maximum number of vertex terms returned for each field.
+	Size *int `json:"size,omitempty"`
 }
 
-// VertexDefinitionBuilder holds VertexDefinition struct and provides a builder API.
-type VertexDefinitionBuilder struct {
-	v *VertexDefinition
-}
+func (s *VertexDefinition) UnmarshalJSON(data []byte) error {
 
-// NewVertexDefinition provides a builder for the VertexDefinition struct.
-func NewVertexDefinitionBuilder() *VertexDefinitionBuilder {
-	r := VertexDefinitionBuilder{
-		&VertexDefinition{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "exclude":
+			if err := dec.Decode(&s.Exclude); err != nil {
+				return fmt.Errorf("%s | %w", "Exclude", err)
+			}
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "include":
+			if err := dec.Decode(&s.Include); err != nil {
+				return fmt.Errorf("%s | %w", "Include", err)
+			}
+
+		case "min_doc_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MinDocCount", err)
+				}
+				s.MinDocCount = &value
+			case float64:
+				f := int64(v)
+				s.MinDocCount = &f
+			}
+
+		case "shard_min_doc_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ShardMinDocCount", err)
+				}
+				s.ShardMinDocCount = &value
+			case float64:
+				f := int64(v)
+				s.ShardMinDocCount = &f
+			}
+
+		case "size":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Size", err)
+				}
+				s.Size = &value
+			case float64:
+				f := int(v)
+				s.Size = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the VertexDefinition struct
-func (rb *VertexDefinitionBuilder) Build() VertexDefinition {
-	return *rb.v
-}
+// NewVertexDefinition returns a VertexDefinition.
+func NewVertexDefinition() *VertexDefinition {
+	r := &VertexDefinition{}
 
-func (rb *VertexDefinitionBuilder) Exclude(exclude ...string) *VertexDefinitionBuilder {
-	rb.v.Exclude = exclude
-	return rb
-}
-
-func (rb *VertexDefinitionBuilder) Field(field Field) *VertexDefinitionBuilder {
-	rb.v.Field = field
-	return rb
-}
-
-func (rb *VertexDefinitionBuilder) Include(include []VertexIncludeBuilder) *VertexDefinitionBuilder {
-	tmp := make([]VertexInclude, len(include))
-	for _, value := range include {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Include = tmp
-	return rb
-}
-
-func (rb *VertexDefinitionBuilder) MinDocCount(mindoccount int64) *VertexDefinitionBuilder {
-	rb.v.MinDocCount = &mindoccount
-	return rb
-}
-
-func (rb *VertexDefinitionBuilder) ShardMinDocCount(shardmindoccount int64) *VertexDefinitionBuilder {
-	rb.v.ShardMinDocCount = &shardmindoccount
-	return rb
-}
-
-func (rb *VertexDefinitionBuilder) Size(size int) *VertexDefinitionBuilder {
-	rb.v.Size = &size
-	return rb
+	return r
 }

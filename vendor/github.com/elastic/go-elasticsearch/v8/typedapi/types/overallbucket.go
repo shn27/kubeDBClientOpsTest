@@ -15,108 +15,127 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // OverallBucket type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/Bucket.ts#L130-L145
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/Bucket.ts#L129-L144
 type OverallBucket struct {
 	// BucketSpan The length of the bucket in seconds. Matches the job with the longest
 	// bucket_span value.
-	BucketSpan DurationValueUnitSeconds `json:"bucket_span"`
+	BucketSpan int64 `json:"bucket_span"`
 	// IsInterim If true, this is an interim result. In other words, the results are
 	// calculated based on partial input data.
 	IsInterim bool `json:"is_interim"`
 	// Jobs An array of objects that contain the max_anomaly_score per job_id.
 	Jobs []OverallBucketJob `json:"jobs"`
 	// OverallScore The top_n average of the maximum bucket anomaly_score per job.
-	OverallScore float64 `json:"overall_score"`
+	OverallScore Float64 `json:"overall_score"`
 	// ResultType Internal. This is always set to overall_bucket.
 	ResultType string `json:"result_type"`
 	// Timestamp The start time of the bucket for which these results were calculated.
-	Timestamp EpochTimeUnitMillis `json:"timestamp"`
+	Timestamp int64 `json:"timestamp"`
 	// TimestampString The start time of the bucket for which these results were calculated.
-	TimestampString DateTime `json:"timestamp_string"`
+	TimestampString DateTime `json:"timestamp_string,omitempty"`
 }
 
-// OverallBucketBuilder holds OverallBucket struct and provides a builder API.
-type OverallBucketBuilder struct {
-	v *OverallBucket
-}
+func (s *OverallBucket) UnmarshalJSON(data []byte) error {
 
-// NewOverallBucket provides a builder for the OverallBucket struct.
-func NewOverallBucketBuilder() *OverallBucketBuilder {
-	r := OverallBucketBuilder{
-		&OverallBucket{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "bucket_span":
+			if err := dec.Decode(&s.BucketSpan); err != nil {
+				return fmt.Errorf("%s | %w", "BucketSpan", err)
+			}
+
+		case "is_interim":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IsInterim", err)
+				}
+				s.IsInterim = value
+			case bool:
+				s.IsInterim = v
+			}
+
+		case "jobs":
+			if err := dec.Decode(&s.Jobs); err != nil {
+				return fmt.Errorf("%s | %w", "Jobs", err)
+			}
+
+		case "overall_score":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "OverallScore", err)
+				}
+				f := Float64(value)
+				s.OverallScore = f
+			case float64:
+				f := Float64(v)
+				s.OverallScore = f
+			}
+
+		case "result_type":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ResultType", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ResultType = o
+
+		case "timestamp":
+			if err := dec.Decode(&s.Timestamp); err != nil {
+				return fmt.Errorf("%s | %w", "Timestamp", err)
+			}
+
+		case "timestamp_string":
+			if err := dec.Decode(&s.TimestampString); err != nil {
+				return fmt.Errorf("%s | %w", "TimestampString", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the OverallBucket struct
-func (rb *OverallBucketBuilder) Build() OverallBucket {
-	return *rb.v
-}
+// NewOverallBucket returns a OverallBucket.
+func NewOverallBucket() *OverallBucket {
+	r := &OverallBucket{}
 
-// BucketSpan The length of the bucket in seconds. Matches the job with the longest
-// bucket_span value.
-
-func (rb *OverallBucketBuilder) BucketSpan(bucketspan *DurationValueUnitSecondsBuilder) *OverallBucketBuilder {
-	v := bucketspan.Build()
-	rb.v.BucketSpan = v
-	return rb
-}
-
-// IsInterim If true, this is an interim result. In other words, the results are
-// calculated based on partial input data.
-
-func (rb *OverallBucketBuilder) IsInterim(isinterim bool) *OverallBucketBuilder {
-	rb.v.IsInterim = isinterim
-	return rb
-}
-
-// Jobs An array of objects that contain the max_anomaly_score per job_id.
-
-func (rb *OverallBucketBuilder) Jobs(jobs []OverallBucketJobBuilder) *OverallBucketBuilder {
-	tmp := make([]OverallBucketJob, len(jobs))
-	for _, value := range jobs {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Jobs = tmp
-	return rb
-}
-
-// OverallScore The top_n average of the maximum bucket anomaly_score per job.
-
-func (rb *OverallBucketBuilder) OverallScore(overallscore float64) *OverallBucketBuilder {
-	rb.v.OverallScore = overallscore
-	return rb
-}
-
-// ResultType Internal. This is always set to overall_bucket.
-
-func (rb *OverallBucketBuilder) ResultType(resulttype string) *OverallBucketBuilder {
-	rb.v.ResultType = resulttype
-	return rb
-}
-
-// Timestamp The start time of the bucket for which these results were calculated.
-
-func (rb *OverallBucketBuilder) Timestamp(timestamp *EpochTimeUnitMillisBuilder) *OverallBucketBuilder {
-	v := timestamp.Build()
-	rb.v.Timestamp = v
-	return rb
-}
-
-// TimestampString The start time of the bucket for which these results were calculated.
-
-func (rb *OverallBucketBuilder) TimestampString(timestampstring *DateTimeBuilder) *OverallBucketBuilder {
-	v := timestampstring.Build()
-	rb.v.TimestampString = v
-	return rb
+	return r
 }

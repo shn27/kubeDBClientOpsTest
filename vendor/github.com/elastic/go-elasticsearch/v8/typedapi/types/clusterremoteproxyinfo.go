@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ClusterRemoteProxyInfo type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/remote_info/ClusterRemoteInfoResponse.ts#L41-L50
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/remote_info/ClusterRemoteInfoResponse.ts#L42-L51
 type ClusterRemoteProxyInfo struct {
 	Connected                 bool     `json:"connected"`
 	InitialConnectTimeout     Duration `json:"initial_connect_timeout"`
@@ -36,59 +43,142 @@ type ClusterRemoteProxyInfo struct {
 	SkipUnavailable           bool     `json:"skip_unavailable"`
 }
 
-// ClusterRemoteProxyInfoBuilder holds ClusterRemoteProxyInfo struct and provides a builder API.
-type ClusterRemoteProxyInfoBuilder struct {
-	v *ClusterRemoteProxyInfo
+func (s *ClusterRemoteProxyInfo) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "connected":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Connected", err)
+				}
+				s.Connected = value
+			case bool:
+				s.Connected = v
+			}
+
+		case "initial_connect_timeout":
+			if err := dec.Decode(&s.InitialConnectTimeout); err != nil {
+				return fmt.Errorf("%s | %w", "InitialConnectTimeout", err)
+			}
+
+		case "max_proxy_socket_connections":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxProxySocketConnections", err)
+				}
+				s.MaxProxySocketConnections = value
+			case float64:
+				f := int(v)
+				s.MaxProxySocketConnections = f
+			}
+
+		case "mode":
+			if err := dec.Decode(&s.Mode); err != nil {
+				return fmt.Errorf("%s | %w", "Mode", err)
+			}
+
+		case "num_proxy_sockets_connected":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NumProxySocketsConnected", err)
+				}
+				s.NumProxySocketsConnected = value
+			case float64:
+				f := int(v)
+				s.NumProxySocketsConnected = f
+			}
+
+		case "proxy_address":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ProxyAddress", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ProxyAddress = o
+
+		case "server_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ServerName", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ServerName = o
+
+		case "skip_unavailable":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "SkipUnavailable", err)
+				}
+				s.SkipUnavailable = value
+			case bool:
+				s.SkipUnavailable = v
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewClusterRemoteProxyInfo provides a builder for the ClusterRemoteProxyInfo struct.
-func NewClusterRemoteProxyInfoBuilder() *ClusterRemoteProxyInfoBuilder {
-	r := ClusterRemoteProxyInfoBuilder{
-		&ClusterRemoteProxyInfo{},
+// MarshalJSON override marshalling to include literal value
+func (s ClusterRemoteProxyInfo) MarshalJSON() ([]byte, error) {
+	type innerClusterRemoteProxyInfo ClusterRemoteProxyInfo
+	tmp := innerClusterRemoteProxyInfo{
+		Connected:                 s.Connected,
+		InitialConnectTimeout:     s.InitialConnectTimeout,
+		MaxProxySocketConnections: s.MaxProxySocketConnections,
+		Mode:                      s.Mode,
+		NumProxySocketsConnected:  s.NumProxySocketsConnected,
+		ProxyAddress:              s.ProxyAddress,
+		ServerName:                s.ServerName,
+		SkipUnavailable:           s.SkipUnavailable,
 	}
 
-	r.v.Mode = "proxy"
+	tmp.Mode = "proxy"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the ClusterRemoteProxyInfo struct
-func (rb *ClusterRemoteProxyInfoBuilder) Build() ClusterRemoteProxyInfo {
-	return *rb.v
-}
+// NewClusterRemoteProxyInfo returns a ClusterRemoteProxyInfo.
+func NewClusterRemoteProxyInfo() *ClusterRemoteProxyInfo {
+	r := &ClusterRemoteProxyInfo{}
 
-func (rb *ClusterRemoteProxyInfoBuilder) Connected(connected bool) *ClusterRemoteProxyInfoBuilder {
-	rb.v.Connected = connected
-	return rb
-}
-
-func (rb *ClusterRemoteProxyInfoBuilder) InitialConnectTimeout(initialconnecttimeout *DurationBuilder) *ClusterRemoteProxyInfoBuilder {
-	v := initialconnecttimeout.Build()
-	rb.v.InitialConnectTimeout = v
-	return rb
-}
-
-func (rb *ClusterRemoteProxyInfoBuilder) MaxProxySocketConnections(maxproxysocketconnections int) *ClusterRemoteProxyInfoBuilder {
-	rb.v.MaxProxySocketConnections = maxproxysocketconnections
-	return rb
-}
-
-func (rb *ClusterRemoteProxyInfoBuilder) NumProxySocketsConnected(numproxysocketsconnected int) *ClusterRemoteProxyInfoBuilder {
-	rb.v.NumProxySocketsConnected = numproxysocketsconnected
-	return rb
-}
-
-func (rb *ClusterRemoteProxyInfoBuilder) ProxyAddress(proxyaddress string) *ClusterRemoteProxyInfoBuilder {
-	rb.v.ProxyAddress = proxyaddress
-	return rb
-}
-
-func (rb *ClusterRemoteProxyInfoBuilder) ServerName(servername string) *ClusterRemoteProxyInfoBuilder {
-	rb.v.ServerName = servername
-	return rb
-}
-
-func (rb *ClusterRemoteProxyInfoBuilder) SkipUnavailable(skipunavailable bool) *ClusterRemoteProxyInfoBuilder {
-	rb.v.SkipUnavailable = skipunavailable
-	return rb
+	return r
 }

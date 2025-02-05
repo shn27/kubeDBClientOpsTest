@@ -15,46 +15,85 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ExtendedBoundsdouble type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/bucket.ts#L227-L230
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/bucket.ts#L508-L517
 type ExtendedBoundsdouble struct {
-	Max float64 `json:"max"`
-	Min float64 `json:"min"`
+	// Max Maximum value for the bound.
+	Max *Float64 `json:"max,omitempty"`
+	// Min Minimum value for the bound.
+	Min *Float64 `json:"min,omitempty"`
 }
 
-// ExtendedBoundsdoubleBuilder holds ExtendedBoundsdouble struct and provides a builder API.
-type ExtendedBoundsdoubleBuilder struct {
-	v *ExtendedBoundsdouble
-}
+func (s *ExtendedBoundsdouble) UnmarshalJSON(data []byte) error {
 
-// NewExtendedBoundsdouble provides a builder for the ExtendedBoundsdouble struct.
-func NewExtendedBoundsdoubleBuilder() *ExtendedBoundsdoubleBuilder {
-	r := ExtendedBoundsdoubleBuilder{
-		&ExtendedBoundsdouble{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "max":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Max", err)
+				}
+				f := Float64(value)
+				s.Max = &f
+			case float64:
+				f := Float64(v)
+				s.Max = &f
+			}
+
+		case "min":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Min", err)
+				}
+				f := Float64(value)
+				s.Min = &f
+			case float64:
+				f := Float64(v)
+				s.Min = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ExtendedBoundsdouble struct
-func (rb *ExtendedBoundsdoubleBuilder) Build() ExtendedBoundsdouble {
-	return *rb.v
-}
+// NewExtendedBoundsdouble returns a ExtendedBoundsdouble.
+func NewExtendedBoundsdouble() *ExtendedBoundsdouble {
+	r := &ExtendedBoundsdouble{}
 
-func (rb *ExtendedBoundsdoubleBuilder) Max(max float64) *ExtendedBoundsdoubleBuilder {
-	rb.v.Max = max
-	return rb
-}
-
-func (rb *ExtendedBoundsdoubleBuilder) Min(min float64) *ExtendedBoundsdoubleBuilder {
-	rb.v.Min = min
-	return rb
+	return r
 }

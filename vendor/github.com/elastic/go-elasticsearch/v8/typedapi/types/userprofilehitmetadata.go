@@ -15,46 +15,71 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // UserProfileHitMetadata type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/_types/UserProfile.ts#L29-L32
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/_types/UserProfile.ts#L27-L30
 type UserProfileHitMetadata struct {
-	PrimaryTerm_ int64          `json:"_primary_term"`
-	SeqNo_       SequenceNumber `json:"_seq_no"`
+	PrimaryTerm_ int64 `json:"_primary_term"`
+	SeqNo_       int64 `json:"_seq_no"`
 }
 
-// UserProfileHitMetadataBuilder holds UserProfileHitMetadata struct and provides a builder API.
-type UserProfileHitMetadataBuilder struct {
-	v *UserProfileHitMetadata
-}
+func (s *UserProfileHitMetadata) UnmarshalJSON(data []byte) error {
 
-// NewUserProfileHitMetadata provides a builder for the UserProfileHitMetadata struct.
-func NewUserProfileHitMetadataBuilder() *UserProfileHitMetadataBuilder {
-	r := UserProfileHitMetadataBuilder{
-		&UserProfileHitMetadata{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "_primary_term":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PrimaryTerm_", err)
+				}
+				s.PrimaryTerm_ = value
+			case float64:
+				f := int64(v)
+				s.PrimaryTerm_ = f
+			}
+
+		case "_seq_no":
+			if err := dec.Decode(&s.SeqNo_); err != nil {
+				return fmt.Errorf("%s | %w", "SeqNo_", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the UserProfileHitMetadata struct
-func (rb *UserProfileHitMetadataBuilder) Build() UserProfileHitMetadata {
-	return *rb.v
-}
+// NewUserProfileHitMetadata returns a UserProfileHitMetadata.
+func NewUserProfileHitMetadata() *UserProfileHitMetadata {
+	r := &UserProfileHitMetadata{}
 
-func (rb *UserProfileHitMetadataBuilder) PrimaryTerm_(primaryterm_ int64) *UserProfileHitMetadataBuilder {
-	rb.v.PrimaryTerm_ = primaryterm_
-	return rb
-}
-
-func (rb *UserProfileHitMetadataBuilder) SeqNo_(seqno_ SequenceNumber) *UserProfileHitMetadataBuilder {
-	rb.v.SeqNo_ = seqno_
-	return rb
+	return r
 }

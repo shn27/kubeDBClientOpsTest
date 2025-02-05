@@ -15,53 +15,78 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // SecurityRolesDlsBitSetCache type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/usage/types.ts#L295-L299
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/xpack/usage/types.ts#L310-L314
 type SecurityRolesDlsBitSetCache struct {
-	Count         int       `json:"count"`
-	Memory        *ByteSize `json:"memory,omitempty"`
-	MemoryInBytes uint64    `json:"memory_in_bytes"`
+	Count         int      `json:"count"`
+	Memory        ByteSize `json:"memory,omitempty"`
+	MemoryInBytes uint64   `json:"memory_in_bytes"`
 }
 
-// SecurityRolesDlsBitSetCacheBuilder holds SecurityRolesDlsBitSetCache struct and provides a builder API.
-type SecurityRolesDlsBitSetCacheBuilder struct {
-	v *SecurityRolesDlsBitSetCache
-}
+func (s *SecurityRolesDlsBitSetCache) UnmarshalJSON(data []byte) error {
 
-// NewSecurityRolesDlsBitSetCache provides a builder for the SecurityRolesDlsBitSetCache struct.
-func NewSecurityRolesDlsBitSetCacheBuilder() *SecurityRolesDlsBitSetCacheBuilder {
-	r := SecurityRolesDlsBitSetCacheBuilder{
-		&SecurityRolesDlsBitSetCache{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Count", err)
+				}
+				s.Count = value
+			case float64:
+				f := int(v)
+				s.Count = f
+			}
+
+		case "memory":
+			if err := dec.Decode(&s.Memory); err != nil {
+				return fmt.Errorf("%s | %w", "Memory", err)
+			}
+
+		case "memory_in_bytes":
+			if err := dec.Decode(&s.MemoryInBytes); err != nil {
+				return fmt.Errorf("%s | %w", "MemoryInBytes", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SecurityRolesDlsBitSetCache struct
-func (rb *SecurityRolesDlsBitSetCacheBuilder) Build() SecurityRolesDlsBitSetCache {
-	return *rb.v
-}
+// NewSecurityRolesDlsBitSetCache returns a SecurityRolesDlsBitSetCache.
+func NewSecurityRolesDlsBitSetCache() *SecurityRolesDlsBitSetCache {
+	r := &SecurityRolesDlsBitSetCache{}
 
-func (rb *SecurityRolesDlsBitSetCacheBuilder) Count(count int) *SecurityRolesDlsBitSetCacheBuilder {
-	rb.v.Count = count
-	return rb
-}
-
-func (rb *SecurityRolesDlsBitSetCacheBuilder) Memory(memory *ByteSizeBuilder) *SecurityRolesDlsBitSetCacheBuilder {
-	v := memory.Build()
-	rb.v.Memory = &v
-	return rb
-}
-
-func (rb *SecurityRolesDlsBitSetCacheBuilder) MemoryInBytes(memoryinbytes uint64) *SecurityRolesDlsBitSetCacheBuilder {
-	rb.v.MemoryInBytes = memoryinbytes
-	return rb
+	return r
 }

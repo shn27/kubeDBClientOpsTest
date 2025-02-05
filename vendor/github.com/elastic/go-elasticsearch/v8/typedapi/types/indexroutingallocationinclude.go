@@ -15,46 +15,68 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // IndexRoutingAllocationInclude type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/IndexRouting.ts#L52-L55
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/IndexRouting.ts#L52-L55
 type IndexRoutingAllocationInclude struct {
-	Id_             *Id     `json:"_id,omitempty"`
+	Id_             *string `json:"_id,omitempty"`
 	TierPreference_ *string `json:"_tier_preference,omitempty"`
 }
 
-// IndexRoutingAllocationIncludeBuilder holds IndexRoutingAllocationInclude struct and provides a builder API.
-type IndexRoutingAllocationIncludeBuilder struct {
-	v *IndexRoutingAllocationInclude
-}
+func (s *IndexRoutingAllocationInclude) UnmarshalJSON(data []byte) error {
 
-// NewIndexRoutingAllocationInclude provides a builder for the IndexRoutingAllocationInclude struct.
-func NewIndexRoutingAllocationIncludeBuilder() *IndexRoutingAllocationIncludeBuilder {
-	r := IndexRoutingAllocationIncludeBuilder{
-		&IndexRoutingAllocationInclude{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "_id":
+			if err := dec.Decode(&s.Id_); err != nil {
+				return fmt.Errorf("%s | %w", "Id_", err)
+			}
+
+		case "_tier_preference":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "TierPreference_", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.TierPreference_ = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the IndexRoutingAllocationInclude struct
-func (rb *IndexRoutingAllocationIncludeBuilder) Build() IndexRoutingAllocationInclude {
-	return *rb.v
-}
+// NewIndexRoutingAllocationInclude returns a IndexRoutingAllocationInclude.
+func NewIndexRoutingAllocationInclude() *IndexRoutingAllocationInclude {
+	r := &IndexRoutingAllocationInclude{}
 
-func (rb *IndexRoutingAllocationIncludeBuilder) Id_(id_ Id) *IndexRoutingAllocationIncludeBuilder {
-	rb.v.Id_ = &id_
-	return rb
-}
-
-func (rb *IndexRoutingAllocationIncludeBuilder) TierPreference_(tierpreference_ string) *IndexRoutingAllocationIncludeBuilder {
-	rb.v.TierPreference_ = &tierpreference_
-	return rb
+	return r
 }

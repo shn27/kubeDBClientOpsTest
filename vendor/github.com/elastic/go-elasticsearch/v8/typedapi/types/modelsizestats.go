@@ -15,21 +15,26 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/categorizationstatus"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/memorystatus"
 )
 
 // ModelSizeStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/Model.ts#L56-L78
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/Model.ts#L59-L82
 type ModelSizeStats struct {
 	AssignmentMemoryBasis         *string                                   `json:"assignment_memory_basis,omitempty"`
 	BucketAllocationFailuresCount int64                                     `json:"bucket_allocation_failures_count"`
@@ -38,13 +43,14 @@ type ModelSizeStats struct {
 	DeadCategoryCount             int                                       `json:"dead_category_count"`
 	FailedCategoryCount           int                                       `json:"failed_category_count"`
 	FrequentCategoryCount         int                                       `json:"frequent_category_count"`
-	JobId                         Id                                        `json:"job_id"`
+	JobId                         string                                    `json:"job_id"`
 	LogTime                       DateTime                                  `json:"log_time"`
 	MemoryStatus                  memorystatus.MemoryStatus                 `json:"memory_status"`
 	ModelBytes                    ByteSize                                  `json:"model_bytes"`
-	ModelBytesExceeded            *ByteSize                                 `json:"model_bytes_exceeded,omitempty"`
-	ModelBytesMemoryLimit         *ByteSize                                 `json:"model_bytes_memory_limit,omitempty"`
-	PeakModelBytes                *ByteSize                                 `json:"peak_model_bytes,omitempty"`
+	ModelBytesExceeded            ByteSize                                  `json:"model_bytes_exceeded,omitempty"`
+	ModelBytesMemoryLimit         ByteSize                                  `json:"model_bytes_memory_limit,omitempty"`
+	OutputMemoryAllocatorBytes    ByteSize                                  `json:"output_memory_allocator_bytes,omitempty"`
+	PeakModelBytes                ByteSize                                  `json:"peak_model_bytes,omitempty"`
 	RareCategoryCount             int                                       `json:"rare_category_count"`
 	ResultType                    string                                    `json:"result_type"`
 	Timestamp                     *int64                                    `json:"timestamp,omitempty"`
@@ -54,131 +60,269 @@ type ModelSizeStats struct {
 	TotalPartitionFieldCount      int64                                     `json:"total_partition_field_count"`
 }
 
-// ModelSizeStatsBuilder holds ModelSizeStats struct and provides a builder API.
-type ModelSizeStatsBuilder struct {
-	v *ModelSizeStats
-}
+func (s *ModelSizeStats) UnmarshalJSON(data []byte) error {
 
-// NewModelSizeStats provides a builder for the ModelSizeStats struct.
-func NewModelSizeStatsBuilder() *ModelSizeStatsBuilder {
-	r := ModelSizeStatsBuilder{
-		&ModelSizeStats{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "assignment_memory_basis":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "AssignmentMemoryBasis", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.AssignmentMemoryBasis = &o
+
+		case "bucket_allocation_failures_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "BucketAllocationFailuresCount", err)
+				}
+				s.BucketAllocationFailuresCount = value
+			case float64:
+				f := int64(v)
+				s.BucketAllocationFailuresCount = f
+			}
+
+		case "categorization_status":
+			if err := dec.Decode(&s.CategorizationStatus); err != nil {
+				return fmt.Errorf("%s | %w", "CategorizationStatus", err)
+			}
+
+		case "categorized_doc_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CategorizedDocCount", err)
+				}
+				s.CategorizedDocCount = value
+			case float64:
+				f := int(v)
+				s.CategorizedDocCount = f
+			}
+
+		case "dead_category_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DeadCategoryCount", err)
+				}
+				s.DeadCategoryCount = value
+			case float64:
+				f := int(v)
+				s.DeadCategoryCount = f
+			}
+
+		case "failed_category_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "FailedCategoryCount", err)
+				}
+				s.FailedCategoryCount = value
+			case float64:
+				f := int(v)
+				s.FailedCategoryCount = f
+			}
+
+		case "frequent_category_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "FrequentCategoryCount", err)
+				}
+				s.FrequentCategoryCount = value
+			case float64:
+				f := int(v)
+				s.FrequentCategoryCount = f
+			}
+
+		case "job_id":
+			if err := dec.Decode(&s.JobId); err != nil {
+				return fmt.Errorf("%s | %w", "JobId", err)
+			}
+
+		case "log_time":
+			if err := dec.Decode(&s.LogTime); err != nil {
+				return fmt.Errorf("%s | %w", "LogTime", err)
+			}
+
+		case "memory_status":
+			if err := dec.Decode(&s.MemoryStatus); err != nil {
+				return fmt.Errorf("%s | %w", "MemoryStatus", err)
+			}
+
+		case "model_bytes":
+			if err := dec.Decode(&s.ModelBytes); err != nil {
+				return fmt.Errorf("%s | %w", "ModelBytes", err)
+			}
+
+		case "model_bytes_exceeded":
+			if err := dec.Decode(&s.ModelBytesExceeded); err != nil {
+				return fmt.Errorf("%s | %w", "ModelBytesExceeded", err)
+			}
+
+		case "model_bytes_memory_limit":
+			if err := dec.Decode(&s.ModelBytesMemoryLimit); err != nil {
+				return fmt.Errorf("%s | %w", "ModelBytesMemoryLimit", err)
+			}
+
+		case "output_memory_allocator_bytes":
+			if err := dec.Decode(&s.OutputMemoryAllocatorBytes); err != nil {
+				return fmt.Errorf("%s | %w", "OutputMemoryAllocatorBytes", err)
+			}
+
+		case "peak_model_bytes":
+			if err := dec.Decode(&s.PeakModelBytes); err != nil {
+				return fmt.Errorf("%s | %w", "PeakModelBytes", err)
+			}
+
+		case "rare_category_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "RareCategoryCount", err)
+				}
+				s.RareCategoryCount = value
+			case float64:
+				f := int(v)
+				s.RareCategoryCount = f
+			}
+
+		case "result_type":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ResultType", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ResultType = o
+
+		case "timestamp":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Timestamp", err)
+				}
+				s.Timestamp = &value
+			case float64:
+				f := int64(v)
+				s.Timestamp = &f
+			}
+
+		case "total_by_field_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TotalByFieldCount", err)
+				}
+				s.TotalByFieldCount = value
+			case float64:
+				f := int64(v)
+				s.TotalByFieldCount = f
+			}
+
+		case "total_category_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TotalCategoryCount", err)
+				}
+				s.TotalCategoryCount = value
+			case float64:
+				f := int(v)
+				s.TotalCategoryCount = f
+			}
+
+		case "total_over_field_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TotalOverFieldCount", err)
+				}
+				s.TotalOverFieldCount = value
+			case float64:
+				f := int64(v)
+				s.TotalOverFieldCount = f
+			}
+
+		case "total_partition_field_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TotalPartitionFieldCount", err)
+				}
+				s.TotalPartitionFieldCount = value
+			case float64:
+				f := int64(v)
+				s.TotalPartitionFieldCount = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ModelSizeStats struct
-func (rb *ModelSizeStatsBuilder) Build() ModelSizeStats {
-	return *rb.v
-}
+// NewModelSizeStats returns a ModelSizeStats.
+func NewModelSizeStats() *ModelSizeStats {
+	r := &ModelSizeStats{}
 
-func (rb *ModelSizeStatsBuilder) AssignmentMemoryBasis(assignmentmemorybasis string) *ModelSizeStatsBuilder {
-	rb.v.AssignmentMemoryBasis = &assignmentmemorybasis
-	return rb
-}
-
-func (rb *ModelSizeStatsBuilder) BucketAllocationFailuresCount(bucketallocationfailurescount int64) *ModelSizeStatsBuilder {
-	rb.v.BucketAllocationFailuresCount = bucketallocationfailurescount
-	return rb
-}
-
-func (rb *ModelSizeStatsBuilder) CategorizationStatus(categorizationstatus categorizationstatus.CategorizationStatus) *ModelSizeStatsBuilder {
-	rb.v.CategorizationStatus = categorizationstatus
-	return rb
-}
-
-func (rb *ModelSizeStatsBuilder) CategorizedDocCount(categorizeddoccount int) *ModelSizeStatsBuilder {
-	rb.v.CategorizedDocCount = categorizeddoccount
-	return rb
-}
-
-func (rb *ModelSizeStatsBuilder) DeadCategoryCount(deadcategorycount int) *ModelSizeStatsBuilder {
-	rb.v.DeadCategoryCount = deadcategorycount
-	return rb
-}
-
-func (rb *ModelSizeStatsBuilder) FailedCategoryCount(failedcategorycount int) *ModelSizeStatsBuilder {
-	rb.v.FailedCategoryCount = failedcategorycount
-	return rb
-}
-
-func (rb *ModelSizeStatsBuilder) FrequentCategoryCount(frequentcategorycount int) *ModelSizeStatsBuilder {
-	rb.v.FrequentCategoryCount = frequentcategorycount
-	return rb
-}
-
-func (rb *ModelSizeStatsBuilder) JobId(jobid Id) *ModelSizeStatsBuilder {
-	rb.v.JobId = jobid
-	return rb
-}
-
-func (rb *ModelSizeStatsBuilder) LogTime(logtime *DateTimeBuilder) *ModelSizeStatsBuilder {
-	v := logtime.Build()
-	rb.v.LogTime = v
-	return rb
-}
-
-func (rb *ModelSizeStatsBuilder) MemoryStatus(memorystatus memorystatus.MemoryStatus) *ModelSizeStatsBuilder {
-	rb.v.MemoryStatus = memorystatus
-	return rb
-}
-
-func (rb *ModelSizeStatsBuilder) ModelBytes(modelbytes *ByteSizeBuilder) *ModelSizeStatsBuilder {
-	v := modelbytes.Build()
-	rb.v.ModelBytes = v
-	return rb
-}
-
-func (rb *ModelSizeStatsBuilder) ModelBytesExceeded(modelbytesexceeded *ByteSizeBuilder) *ModelSizeStatsBuilder {
-	v := modelbytesexceeded.Build()
-	rb.v.ModelBytesExceeded = &v
-	return rb
-}
-
-func (rb *ModelSizeStatsBuilder) ModelBytesMemoryLimit(modelbytesmemorylimit *ByteSizeBuilder) *ModelSizeStatsBuilder {
-	v := modelbytesmemorylimit.Build()
-	rb.v.ModelBytesMemoryLimit = &v
-	return rb
-}
-
-func (rb *ModelSizeStatsBuilder) PeakModelBytes(peakmodelbytes *ByteSizeBuilder) *ModelSizeStatsBuilder {
-	v := peakmodelbytes.Build()
-	rb.v.PeakModelBytes = &v
-	return rb
-}
-
-func (rb *ModelSizeStatsBuilder) RareCategoryCount(rarecategorycount int) *ModelSizeStatsBuilder {
-	rb.v.RareCategoryCount = rarecategorycount
-	return rb
-}
-
-func (rb *ModelSizeStatsBuilder) ResultType(resulttype string) *ModelSizeStatsBuilder {
-	rb.v.ResultType = resulttype
-	return rb
-}
-
-func (rb *ModelSizeStatsBuilder) Timestamp(timestamp int64) *ModelSizeStatsBuilder {
-	rb.v.Timestamp = &timestamp
-	return rb
-}
-
-func (rb *ModelSizeStatsBuilder) TotalByFieldCount(totalbyfieldcount int64) *ModelSizeStatsBuilder {
-	rb.v.TotalByFieldCount = totalbyfieldcount
-	return rb
-}
-
-func (rb *ModelSizeStatsBuilder) TotalCategoryCount(totalcategorycount int) *ModelSizeStatsBuilder {
-	rb.v.TotalCategoryCount = totalcategorycount
-	return rb
-}
-
-func (rb *ModelSizeStatsBuilder) TotalOverFieldCount(totaloverfieldcount int64) *ModelSizeStatsBuilder {
-	rb.v.TotalOverFieldCount = totaloverfieldcount
-	return rb
-}
-
-func (rb *ModelSizeStatsBuilder) TotalPartitionFieldCount(totalpartitionfieldcount int64) *ModelSizeStatsBuilder {
-	rb.v.TotalPartitionFieldCount = totalpartitionfieldcount
-	return rb
+	return r
 }

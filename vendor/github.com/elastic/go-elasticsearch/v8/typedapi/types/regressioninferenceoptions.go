@@ -15,54 +15,75 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // RegressionInferenceOptions type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/inference.ts#L69-L78
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/inference.ts#L82-L91
 type RegressionInferenceOptions struct {
 	// NumTopFeatureImportanceValues Specifies the maximum number of feature importance values per document.
 	NumTopFeatureImportanceValues *int `json:"num_top_feature_importance_values,omitempty"`
 	// ResultsField The field that is added to incoming documents to contain the inference
 	// prediction. Defaults to predicted_value.
-	ResultsField *Field `json:"results_field,omitempty"`
+	ResultsField *string `json:"results_field,omitempty"`
 }
 
-// RegressionInferenceOptionsBuilder holds RegressionInferenceOptions struct and provides a builder API.
-type RegressionInferenceOptionsBuilder struct {
-	v *RegressionInferenceOptions
-}
+func (s *RegressionInferenceOptions) UnmarshalJSON(data []byte) error {
 
-// NewRegressionInferenceOptions provides a builder for the RegressionInferenceOptions struct.
-func NewRegressionInferenceOptionsBuilder() *RegressionInferenceOptionsBuilder {
-	r := RegressionInferenceOptionsBuilder{
-		&RegressionInferenceOptions{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "num_top_feature_importance_values":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NumTopFeatureImportanceValues", err)
+				}
+				s.NumTopFeatureImportanceValues = &value
+			case float64:
+				f := int(v)
+				s.NumTopFeatureImportanceValues = &f
+			}
+
+		case "results_field":
+			if err := dec.Decode(&s.ResultsField); err != nil {
+				return fmt.Errorf("%s | %w", "ResultsField", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RegressionInferenceOptions struct
-func (rb *RegressionInferenceOptionsBuilder) Build() RegressionInferenceOptions {
-	return *rb.v
-}
+// NewRegressionInferenceOptions returns a RegressionInferenceOptions.
+func NewRegressionInferenceOptions() *RegressionInferenceOptions {
+	r := &RegressionInferenceOptions{}
 
-// NumTopFeatureImportanceValues Specifies the maximum number of feature importance values per document.
-
-func (rb *RegressionInferenceOptionsBuilder) NumTopFeatureImportanceValues(numtopfeatureimportancevalues int) *RegressionInferenceOptionsBuilder {
-	rb.v.NumTopFeatureImportanceValues = &numtopfeatureimportancevalues
-	return rb
-}
-
-// ResultsField The field that is added to incoming documents to contain the inference
-// prediction. Defaults to predicted_value.
-
-func (rb *RegressionInferenceOptionsBuilder) ResultsField(resultsfield Field) *RegressionInferenceOptionsBuilder {
-	rb.v.ResultsField = &resultsfield
-	return rb
+	return r
 }

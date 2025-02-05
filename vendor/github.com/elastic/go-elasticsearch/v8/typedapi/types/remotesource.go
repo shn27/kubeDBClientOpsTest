@@ -15,74 +15,96 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // RemoteSource type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/reindex/types.ts#L59-L66
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/reindex/types.ts#L99-L125
 type RemoteSource struct {
-	ConnectTimeout *Duration         `json:"connect_timeout,omitempty"`
-	Headers        map[string]string `json:"headers,omitempty"`
-	Host           Host              `json:"host"`
-	Password       *Password         `json:"password,omitempty"`
-	SocketTimeout  *Duration         `json:"socket_timeout,omitempty"`
-	Username       *Username         `json:"username,omitempty"`
+	// ConnectTimeout The remote connection timeout.
+	// Defaults to 30 seconds.
+	ConnectTimeout Duration `json:"connect_timeout,omitempty"`
+	// Headers An object containing the headers of the request.
+	Headers map[string]string `json:"headers,omitempty"`
+	// Host The URL for the remote instance of Elasticsearch that you want to index from.
+	Host string `json:"host"`
+	// Password The password to use for authentication with the remote host.
+	Password *string `json:"password,omitempty"`
+	// SocketTimeout The remote socket read timeout. Defaults to 30 seconds.
+	SocketTimeout Duration `json:"socket_timeout,omitempty"`
+	// Username The username to use for authentication with the remote host.
+	Username *string `json:"username,omitempty"`
 }
 
-// RemoteSourceBuilder holds RemoteSource struct and provides a builder API.
-type RemoteSourceBuilder struct {
-	v *RemoteSource
+func (s *RemoteSource) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "connect_timeout":
+			if err := dec.Decode(&s.ConnectTimeout); err != nil {
+				return fmt.Errorf("%s | %w", "ConnectTimeout", err)
+			}
+
+		case "headers":
+			if s.Headers == nil {
+				s.Headers = make(map[string]string, 0)
+			}
+			if err := dec.Decode(&s.Headers); err != nil {
+				return fmt.Errorf("%s | %w", "Headers", err)
+			}
+
+		case "host":
+			if err := dec.Decode(&s.Host); err != nil {
+				return fmt.Errorf("%s | %w", "Host", err)
+			}
+
+		case "password":
+			if err := dec.Decode(&s.Password); err != nil {
+				return fmt.Errorf("%s | %w", "Password", err)
+			}
+
+		case "socket_timeout":
+			if err := dec.Decode(&s.SocketTimeout); err != nil {
+				return fmt.Errorf("%s | %w", "SocketTimeout", err)
+			}
+
+		case "username":
+			if err := dec.Decode(&s.Username); err != nil {
+				return fmt.Errorf("%s | %w", "Username", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewRemoteSource provides a builder for the RemoteSource struct.
-func NewRemoteSourceBuilder() *RemoteSourceBuilder {
-	r := RemoteSourceBuilder{
-		&RemoteSource{
-			Headers: make(map[string]string, 0),
-		},
+// NewRemoteSource returns a RemoteSource.
+func NewRemoteSource() *RemoteSource {
+	r := &RemoteSource{
+		Headers: make(map[string]string, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the RemoteSource struct
-func (rb *RemoteSourceBuilder) Build() RemoteSource {
-	return *rb.v
-}
-
-func (rb *RemoteSourceBuilder) ConnectTimeout(connecttimeout *DurationBuilder) *RemoteSourceBuilder {
-	v := connecttimeout.Build()
-	rb.v.ConnectTimeout = &v
-	return rb
-}
-
-func (rb *RemoteSourceBuilder) Headers(value map[string]string) *RemoteSourceBuilder {
-	rb.v.Headers = value
-	return rb
-}
-
-func (rb *RemoteSourceBuilder) Host(host Host) *RemoteSourceBuilder {
-	rb.v.Host = host
-	return rb
-}
-
-func (rb *RemoteSourceBuilder) Password(password Password) *RemoteSourceBuilder {
-	rb.v.Password = &password
-	return rb
-}
-
-func (rb *RemoteSourceBuilder) SocketTimeout(sockettimeout *DurationBuilder) *RemoteSourceBuilder {
-	v := sockettimeout.Build()
-	rb.v.SocketTimeout = &v
-	return rb
-}
-
-func (rb *RemoteSourceBuilder) Username(username Username) *RemoteSourceBuilder {
-	rb.v.Username = &username
-	return rb
+	return r
 }

@@ -15,36 +15,679 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+	"strings"
 )
 
 // VariableWidthHistogramBucket type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L353-L360
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L406-L413
 type VariableWidthHistogramBucket struct {
-	Aggregations map[AggregateName]Aggregate `json:"-"`
-	DocCount     int64                       `json:"doc_count"`
-	Key          float64                     `json:"key"`
-	KeyAsString  *string                     `json:"key_as_string,omitempty"`
-	Max          float64                     `json:"max"`
-	MaxAsString  *string                     `json:"max_as_string,omitempty"`
-	Min          float64                     `json:"min"`
-	MinAsString  *string                     `json:"min_as_string,omitempty"`
+	Aggregations map[string]Aggregate `json:"-"`
+	DocCount     int64                `json:"doc_count"`
+	Key          Float64              `json:"key"`
+	KeyAsString  *string              `json:"key_as_string,omitempty"`
+	Max          Float64              `json:"max"`
+	MaxAsString  *string              `json:"max_as_string,omitempty"`
+	Min          Float64              `json:"min"`
+	MinAsString  *string              `json:"min_as_string,omitempty"`
+}
+
+func (s *VariableWidthHistogramBucket) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "doc_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DocCount", err)
+				}
+				s.DocCount = value
+			case float64:
+				f := int64(v)
+				s.DocCount = f
+			}
+
+		case "key":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Key", err)
+				}
+				f := Float64(value)
+				s.Key = f
+			case float64:
+				f := Float64(v)
+				s.Key = f
+			}
+
+		case "key_as_string":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "KeyAsString", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.KeyAsString = &o
+
+		case "max":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Max", err)
+				}
+				f := Float64(value)
+				s.Max = f
+			case float64:
+				f := Float64(v)
+				s.Max = f
+			}
+
+		case "max_as_string":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "MaxAsString", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.MaxAsString = &o
+
+		case "min":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Min", err)
+				}
+				f := Float64(value)
+				s.Min = f
+			case float64:
+				f := Float64(v)
+				s.Min = f
+			}
+
+		case "min_as_string":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "MinAsString", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.MinAsString = &o
+
+		default:
+
+			if value, ok := t.(string); ok {
+				if strings.Contains(value, "#") {
+					elems := strings.Split(value, "#")
+					if len(elems) == 2 {
+						if s.Aggregations == nil {
+							s.Aggregations = make(map[string]Aggregate, 0)
+						}
+						switch elems[0] {
+
+						case "cardinality":
+							o := NewCardinalityAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "hdr_percentiles":
+							o := NewHdrPercentilesAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "hdr_percentile_ranks":
+							o := NewHdrPercentileRanksAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "tdigest_percentiles":
+							o := NewTDigestPercentilesAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "tdigest_percentile_ranks":
+							o := NewTDigestPercentileRanksAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "percentiles_bucket":
+							o := NewPercentilesBucketAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "median_absolute_deviation":
+							o := NewMedianAbsoluteDeviationAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "min":
+							o := NewMinAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "max":
+							o := NewMaxAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "sum":
+							o := NewSumAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "avg":
+							o := NewAvgAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "weighted_avg":
+							o := NewWeightedAvgAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "value_count":
+							o := NewValueCountAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "simple_value":
+							o := NewSimpleValueAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "derivative":
+							o := NewDerivativeAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "bucket_metric_value":
+							o := NewBucketMetricValueAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "stats":
+							o := NewStatsAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "stats_bucket":
+							o := NewStatsBucketAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "extended_stats":
+							o := NewExtendedStatsAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "extended_stats_bucket":
+							o := NewExtendedStatsBucketAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "geo_bounds":
+							o := NewGeoBoundsAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "geo_centroid":
+							o := NewGeoCentroidAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "histogram":
+							o := NewHistogramAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "date_histogram":
+							o := NewDateHistogramAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "auto_date_histogram":
+							o := NewAutoDateHistogramAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "variable_width_histogram":
+							o := NewVariableWidthHistogramAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "sterms":
+							o := NewStringTermsAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "lterms":
+							o := NewLongTermsAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "dterms":
+							o := NewDoubleTermsAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "umterms":
+							o := NewUnmappedTermsAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "lrareterms":
+							o := NewLongRareTermsAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "srareterms":
+							o := NewStringRareTermsAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "umrareterms":
+							o := NewUnmappedRareTermsAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "multi_terms":
+							o := NewMultiTermsAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "missing":
+							o := NewMissingAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "nested":
+							o := NewNestedAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "reverse_nested":
+							o := NewReverseNestedAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "global":
+							o := NewGlobalAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "filter":
+							o := NewFilterAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "children":
+							o := NewChildrenAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "parent":
+							o := NewParentAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "sampler":
+							o := NewSamplerAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "unmapped_sampler":
+							o := NewUnmappedSamplerAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "geohash_grid":
+							o := NewGeoHashGridAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "geotile_grid":
+							o := NewGeoTileGridAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "geohex_grid":
+							o := NewGeoHexGridAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "range":
+							o := NewRangeAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "date_range":
+							o := NewDateRangeAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "geo_distance":
+							o := NewGeoDistanceAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "ip_range":
+							o := NewIpRangeAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "ip_prefix":
+							o := NewIpPrefixAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "filters":
+							o := NewFiltersAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "adjacency_matrix":
+							o := NewAdjacencyMatrixAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "siglterms":
+							o := NewSignificantLongTermsAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "sigsterms":
+							o := NewSignificantStringTermsAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "umsigterms":
+							o := NewUnmappedSignificantTermsAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "composite":
+							o := NewCompositeAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "frequent_item_sets":
+							o := NewFrequentItemSetsAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "time_series":
+							o := NewTimeSeriesAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "scripted_metric":
+							o := NewScriptedMetricAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "top_hits":
+							o := NewTopHitsAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "inference":
+							o := NewInferenceAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "string_stats":
+							o := NewStringStatsAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "boxplot":
+							o := NewBoxPlotAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "top_metrics":
+							o := NewTopMetricsAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "t_test":
+							o := NewTTestAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "rate":
+							o := NewRateAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "simple_long_value":
+							o := NewCumulativeCardinalityAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "matrix_stats":
+							o := NewMatrixStatsAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						case "geo_line":
+							o := NewGeoLineAggregate()
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+
+						default:
+							o := make(map[string]any, 0)
+							if err := dec.Decode(&o); err != nil {
+								return fmt.Errorf("%s | %w", "Aggregations", err)
+							}
+							s.Aggregations[elems[1]] = o
+						}
+					} else {
+						return errors.New("cannot decode JSON for field Aggregations")
+					}
+				} else {
+					o := make(map[string]any, 0)
+					if err := dec.Decode(&o); err != nil {
+						return fmt.Errorf("%s | %w", "Aggregations", err)
+					}
+					s.Aggregations[value] = o
+				}
+			}
+
+		}
+	}
+	return nil
 }
 
 // MarhsalJSON overrides marshalling for types with additional properties
 func (s VariableWidthHistogramBucket) MarshalJSON() ([]byte, error) {
 	type opt VariableWidthHistogramBucket
 	// We transform the struct to a map without the embedded additional properties map
-	tmp := make(map[string]interface{}, 0)
+	tmp := make(map[string]any, 0)
 
 	data, err := json.Marshal(opt(s))
 	if err != nil {
@@ -57,8 +700,9 @@ func (s VariableWidthHistogramBucket) MarshalJSON() ([]byte, error) {
 
 	// We inline the additional fields from the underlying map
 	for key, value := range s.Aggregations {
-		tmp[string(key)] = value
+		tmp[fmt.Sprintf("%s", key)] = value
 	}
+	delete(tmp, "Aggregations")
 
 	data, err = json.Marshal(tmp)
 	if err != nil {
@@ -68,67 +712,11 @@ func (s VariableWidthHistogramBucket) MarshalJSON() ([]byte, error) {
 	return data, nil
 }
 
-// VariableWidthHistogramBucketBuilder holds VariableWidthHistogramBucket struct and provides a builder API.
-type VariableWidthHistogramBucketBuilder struct {
-	v *VariableWidthHistogramBucket
-}
-
-// NewVariableWidthHistogramBucket provides a builder for the VariableWidthHistogramBucket struct.
-func NewVariableWidthHistogramBucketBuilder() *VariableWidthHistogramBucketBuilder {
-	r := VariableWidthHistogramBucketBuilder{
-		&VariableWidthHistogramBucket{
-			Aggregations: make(map[AggregateName]Aggregate, 0),
-		},
+// NewVariableWidthHistogramBucket returns a VariableWidthHistogramBucket.
+func NewVariableWidthHistogramBucket() *VariableWidthHistogramBucket {
+	r := &VariableWidthHistogramBucket{
+		Aggregations: make(map[string]Aggregate, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the VariableWidthHistogramBucket struct
-func (rb *VariableWidthHistogramBucketBuilder) Build() VariableWidthHistogramBucket {
-	return *rb.v
-}
-
-func (rb *VariableWidthHistogramBucketBuilder) Aggregations(values map[AggregateName]*AggregateBuilder) *VariableWidthHistogramBucketBuilder {
-	tmp := make(map[AggregateName]Aggregate, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Aggregations = tmp
-	return rb
-}
-
-func (rb *VariableWidthHistogramBucketBuilder) DocCount(doccount int64) *VariableWidthHistogramBucketBuilder {
-	rb.v.DocCount = doccount
-	return rb
-}
-
-func (rb *VariableWidthHistogramBucketBuilder) Key(key float64) *VariableWidthHistogramBucketBuilder {
-	rb.v.Key = key
-	return rb
-}
-
-func (rb *VariableWidthHistogramBucketBuilder) KeyAsString(keyasstring string) *VariableWidthHistogramBucketBuilder {
-	rb.v.KeyAsString = &keyasstring
-	return rb
-}
-
-func (rb *VariableWidthHistogramBucketBuilder) Max(max float64) *VariableWidthHistogramBucketBuilder {
-	rb.v.Max = max
-	return rb
-}
-
-func (rb *VariableWidthHistogramBucketBuilder) MaxAsString(maxasstring string) *VariableWidthHistogramBucketBuilder {
-	rb.v.MaxAsString = &maxasstring
-	return rb
-}
-
-func (rb *VariableWidthHistogramBucketBuilder) Min(min float64) *VariableWidthHistogramBucketBuilder {
-	rb.v.Min = min
-	return rb
-}
-
-func (rb *VariableWidthHistogramBucketBuilder) MinAsString(minasstring string) *VariableWidthHistogramBucketBuilder {
-	rb.v.MinAsString = &minasstring
-	return rb
+	return r
 }

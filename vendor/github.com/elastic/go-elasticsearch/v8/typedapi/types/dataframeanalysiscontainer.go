@@ -15,16 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // DataframeAnalysisContainer type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/DataframeAnalytics.ts#L84-L101
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/DataframeAnalytics.ts#L84-L101
 type DataframeAnalysisContainer struct {
 	// Classification The configuration information necessary to perform classification.
 	Classification *DataframeAnalysisClassification `json:"classification,omitempty"`
@@ -42,53 +40,9 @@ type DataframeAnalysisContainer struct {
 	Regression *DataframeAnalysisRegression `json:"regression,omitempty"`
 }
 
-// DataframeAnalysisContainerBuilder holds DataframeAnalysisContainer struct and provides a builder API.
-type DataframeAnalysisContainerBuilder struct {
-	v *DataframeAnalysisContainer
-}
+// NewDataframeAnalysisContainer returns a DataframeAnalysisContainer.
+func NewDataframeAnalysisContainer() *DataframeAnalysisContainer {
+	r := &DataframeAnalysisContainer{}
 
-// NewDataframeAnalysisContainer provides a builder for the DataframeAnalysisContainer struct.
-func NewDataframeAnalysisContainerBuilder() *DataframeAnalysisContainerBuilder {
-	r := DataframeAnalysisContainerBuilder{
-		&DataframeAnalysisContainer{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the DataframeAnalysisContainer struct
-func (rb *DataframeAnalysisContainerBuilder) Build() DataframeAnalysisContainer {
-	return *rb.v
-}
-
-// Classification The configuration information necessary to perform classification.
-
-func (rb *DataframeAnalysisContainerBuilder) Classification(classification *DataframeAnalysisClassificationBuilder) *DataframeAnalysisContainerBuilder {
-	v := classification.Build()
-	rb.v.Classification = &v
-	return rb
-}
-
-// OutlierDetection The configuration information necessary to perform outlier detection. NOTE:
-// Advanced parameters are for fine-tuning classification analysis. They are set
-// automatically by hyperparameter optimization to give the minimum validation
-// error. It is highly recommended to use the default values unless you fully
-// understand the function of these parameters.
-
-func (rb *DataframeAnalysisContainerBuilder) OutlierDetection(outlierdetection *DataframeAnalysisOutlierDetectionBuilder) *DataframeAnalysisContainerBuilder {
-	v := outlierdetection.Build()
-	rb.v.OutlierDetection = &v
-	return rb
-}
-
-// Regression The configuration information necessary to perform regression. NOTE: Advanced
-// parameters are for fine-tuning regression analysis. They are set
-// automatically by hyperparameter optimization to give the minimum validation
-// error. It is highly recommended to use the default values unless you fully
-// understand the function of these parameters.
-
-func (rb *DataframeAnalysisContainerBuilder) Regression(regression *DataframeAnalysisRegressionBuilder) *DataframeAnalysisContainerBuilder {
-	v := regression.Build()
-	rb.v.Regression = &v
-	return rb
+	return r
 }

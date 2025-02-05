@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // NodeStatistics type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Node.ts#L28-L39
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Node.ts#L28-L39
 type NodeStatistics struct {
 	// Failed Number of nodes that rejected the request or failed to respond. If this value
 	// is not 0, a reason for the rejection or failure is included in the response.
@@ -36,52 +43,82 @@ type NodeStatistics struct {
 	Total int `json:"total"`
 }
 
-// NodeStatisticsBuilder holds NodeStatistics struct and provides a builder API.
-type NodeStatisticsBuilder struct {
-	v *NodeStatistics
-}
+func (s *NodeStatistics) UnmarshalJSON(data []byte) error {
 
-// NewNodeStatistics provides a builder for the NodeStatistics struct.
-func NewNodeStatisticsBuilder() *NodeStatisticsBuilder {
-	r := NodeStatisticsBuilder{
-		&NodeStatistics{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "failed":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Failed", err)
+				}
+				s.Failed = value
+			case float64:
+				f := int(v)
+				s.Failed = f
+			}
+
+		case "failures":
+			if err := dec.Decode(&s.Failures); err != nil {
+				return fmt.Errorf("%s | %w", "Failures", err)
+			}
+
+		case "successful":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Successful", err)
+				}
+				s.Successful = value
+			case float64:
+				f := int(v)
+				s.Successful = f
+			}
+
+		case "total":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Total", err)
+				}
+				s.Total = value
+			case float64:
+				f := int(v)
+				s.Total = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the NodeStatistics struct
-func (rb *NodeStatisticsBuilder) Build() NodeStatistics {
-	return *rb.v
-}
+// NewNodeStatistics returns a NodeStatistics.
+func NewNodeStatistics() *NodeStatistics {
+	r := &NodeStatistics{}
 
-// Failed Number of nodes that rejected the request or failed to respond. If this value
-// is not 0, a reason for the rejection or failure is included in the response.
-
-func (rb *NodeStatisticsBuilder) Failed(failed int) *NodeStatisticsBuilder {
-	rb.v.Failed = failed
-	return rb
-}
-
-func (rb *NodeStatisticsBuilder) Failures(failures []ErrorCauseBuilder) *NodeStatisticsBuilder {
-	tmp := make([]ErrorCause, len(failures))
-	for _, value := range failures {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Failures = tmp
-	return rb
-}
-
-// Successful Number of nodes that responded successfully to the request.
-
-func (rb *NodeStatisticsBuilder) Successful(successful int) *NodeStatisticsBuilder {
-	rb.v.Successful = successful
-	return rb
-}
-
-// Total Total number of nodes selected by the request.
-
-func (rb *NodeStatisticsBuilder) Total(total int) *NodeStatisticsBuilder {
-	rb.v.Total = total
-	return rb
+	return r
 }

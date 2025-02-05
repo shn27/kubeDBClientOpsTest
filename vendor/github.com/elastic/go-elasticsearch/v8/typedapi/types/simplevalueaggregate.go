@@ -15,60 +15,77 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // SimpleValueAggregate type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L213-L214
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L238-L239
 type SimpleValueAggregate struct {
-	Meta *Metadata `json:"meta,omitempty"`
+	Meta Metadata `json:"meta,omitempty"`
 	// Value The metric value. A missing value generally means that there was no data to
 	// aggregate,
 	// unless specified otherwise.
-	Value         float64 `json:"value,omitempty"`
-	ValueAsString *string `json:"value_as_string,omitempty"`
+	Value         *Float64 `json:"value,omitempty"`
+	ValueAsString *string  `json:"value_as_string,omitempty"`
 }
 
-// SimpleValueAggregateBuilder holds SimpleValueAggregate struct and provides a builder API.
-type SimpleValueAggregateBuilder struct {
-	v *SimpleValueAggregate
-}
+func (s *SimpleValueAggregate) UnmarshalJSON(data []byte) error {
 
-// NewSimpleValueAggregate provides a builder for the SimpleValueAggregate struct.
-func NewSimpleValueAggregateBuilder() *SimpleValueAggregateBuilder {
-	r := SimpleValueAggregateBuilder{
-		&SimpleValueAggregate{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "meta":
+			if err := dec.Decode(&s.Meta); err != nil {
+				return fmt.Errorf("%s | %w", "Meta", err)
+			}
+
+		case "value":
+			if err := dec.Decode(&s.Value); err != nil {
+				return fmt.Errorf("%s | %w", "Value", err)
+			}
+
+		case "value_as_string":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ValueAsString", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ValueAsString = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SimpleValueAggregate struct
-func (rb *SimpleValueAggregateBuilder) Build() SimpleValueAggregate {
-	return *rb.v
-}
+// NewSimpleValueAggregate returns a SimpleValueAggregate.
+func NewSimpleValueAggregate() *SimpleValueAggregate {
+	r := &SimpleValueAggregate{}
 
-func (rb *SimpleValueAggregateBuilder) Meta(meta *MetadataBuilder) *SimpleValueAggregateBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-// Value The metric value. A missing value generally means that there was no data to
-// aggregate,
-// unless specified otherwise.
-
-func (rb *SimpleValueAggregateBuilder) Value(value float64) *SimpleValueAggregateBuilder {
-	rb.v.Value = value
-	return rb
-}
-
-func (rb *SimpleValueAggregateBuilder) ValueAsString(valueasstring string) *SimpleValueAggregateBuilder {
-	rb.v.ValueAsString = &valueasstring
-	return rb
+	return r
 }

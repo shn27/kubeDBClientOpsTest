@@ -15,46 +15,85 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // LatLonGeoLocation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Geo.ts#L107-L110
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Geo.ts#L120-L129
 type LatLonGeoLocation struct {
-	Lat float64 `json:"lat"`
-	Lon float64 `json:"lon"`
+	// Lat Latitude
+	Lat Float64 `json:"lat"`
+	// Lon Longitude
+	Lon Float64 `json:"lon"`
 }
 
-// LatLonGeoLocationBuilder holds LatLonGeoLocation struct and provides a builder API.
-type LatLonGeoLocationBuilder struct {
-	v *LatLonGeoLocation
-}
+func (s *LatLonGeoLocation) UnmarshalJSON(data []byte) error {
 
-// NewLatLonGeoLocation provides a builder for the LatLonGeoLocation struct.
-func NewLatLonGeoLocationBuilder() *LatLonGeoLocationBuilder {
-	r := LatLonGeoLocationBuilder{
-		&LatLonGeoLocation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "lat":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Lat", err)
+				}
+				f := Float64(value)
+				s.Lat = f
+			case float64:
+				f := Float64(v)
+				s.Lat = f
+			}
+
+		case "lon":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Lon", err)
+				}
+				f := Float64(value)
+				s.Lon = f
+			case float64:
+				f := Float64(v)
+				s.Lon = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the LatLonGeoLocation struct
-func (rb *LatLonGeoLocationBuilder) Build() LatLonGeoLocation {
-	return *rb.v
-}
+// NewLatLonGeoLocation returns a LatLonGeoLocation.
+func NewLatLonGeoLocation() *LatLonGeoLocation {
+	r := &LatLonGeoLocation{}
 
-func (rb *LatLonGeoLocationBuilder) Lat(lat float64) *LatLonGeoLocationBuilder {
-	rb.v.Lat = lat
-	return rb
-}
-
-func (rb *LatLonGeoLocationBuilder) Lon(lon float64) *LatLonGeoLocationBuilder {
-	rb.v.Lon = lon
-	return rb
+	return r
 }

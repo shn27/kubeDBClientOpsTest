@@ -15,56 +15,106 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // Http type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/_types/Stats.ts#L260-L264
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/_types/Stats.ts#L669-L688
 type Http struct {
-	Clients     []Client `json:"clients,omitempty"`
-	CurrentOpen *int     `json:"current_open,omitempty"`
-	TotalOpened *int64   `json:"total_opened,omitempty"`
+	// Clients Information on current and recently-closed HTTP client connections.
+	// Clients that have been closed longer than the
+	// `http.client_stats.closed_channels.max_age` setting will not be represented
+	// here.
+	Clients []Client `json:"clients,omitempty"`
+	// CurrentOpen Current number of open HTTP connections for the node.
+	CurrentOpen *int `json:"current_open,omitempty"`
+	// Routes Detailed HTTP stats broken down by route
+	Routes map[string]HttpRoute `json:"routes"`
+	// TotalOpened Total number of HTTP connections opened for the node.
+	TotalOpened *int64 `json:"total_opened,omitempty"`
 }
 
-// HttpBuilder holds Http struct and provides a builder API.
-type HttpBuilder struct {
-	v *Http
+func (s *Http) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "clients":
+			if err := dec.Decode(&s.Clients); err != nil {
+				return fmt.Errorf("%s | %w", "Clients", err)
+			}
+
+		case "current_open":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CurrentOpen", err)
+				}
+				s.CurrentOpen = &value
+			case float64:
+				f := int(v)
+				s.CurrentOpen = &f
+			}
+
+		case "routes":
+			if s.Routes == nil {
+				s.Routes = make(map[string]HttpRoute, 0)
+			}
+			if err := dec.Decode(&s.Routes); err != nil {
+				return fmt.Errorf("%s | %w", "Routes", err)
+			}
+
+		case "total_opened":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TotalOpened", err)
+				}
+				s.TotalOpened = &value
+			case float64:
+				f := int64(v)
+				s.TotalOpened = &f
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewHttp provides a builder for the Http struct.
-func NewHttpBuilder() *HttpBuilder {
-	r := HttpBuilder{
-		&Http{},
+// NewHttp returns a Http.
+func NewHttp() *Http {
+	r := &Http{
+		Routes: make(map[string]HttpRoute, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the Http struct
-func (rb *HttpBuilder) Build() Http {
-	return *rb.v
-}
-
-func (rb *HttpBuilder) Clients(clients []ClientBuilder) *HttpBuilder {
-	tmp := make([]Client, len(clients))
-	for _, value := range clients {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Clients = tmp
-	return rb
-}
-
-func (rb *HttpBuilder) CurrentOpen(currentopen int) *HttpBuilder {
-	rb.v.CurrentOpen = &currentopen
-	return rb
-}
-
-func (rb *HttpBuilder) TotalOpened(totalopened int64) *HttpBuilder {
-	rb.v.TotalOpened = &totalopened
-	return rb
+	return r
 }

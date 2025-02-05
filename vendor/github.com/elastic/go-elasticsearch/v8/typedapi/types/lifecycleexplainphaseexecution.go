@@ -15,53 +15,66 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // LifecycleExplainPhaseExecution type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ilm/explain_lifecycle/types.ts#L64-L68
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ilm/explain_lifecycle/types.ts#L64-L68
 type LifecycleExplainPhaseExecution struct {
-	ModifiedDateInMillis EpochTimeUnitMillis `json:"modified_date_in_millis"`
-	Policy               Name                `json:"policy"`
-	Version              VersionNumber       `json:"version"`
+	ModifiedDateInMillis int64  `json:"modified_date_in_millis"`
+	Policy               string `json:"policy"`
+	Version              int64  `json:"version"`
 }
 
-// LifecycleExplainPhaseExecutionBuilder holds LifecycleExplainPhaseExecution struct and provides a builder API.
-type LifecycleExplainPhaseExecutionBuilder struct {
-	v *LifecycleExplainPhaseExecution
-}
+func (s *LifecycleExplainPhaseExecution) UnmarshalJSON(data []byte) error {
 
-// NewLifecycleExplainPhaseExecution provides a builder for the LifecycleExplainPhaseExecution struct.
-func NewLifecycleExplainPhaseExecutionBuilder() *LifecycleExplainPhaseExecutionBuilder {
-	r := LifecycleExplainPhaseExecutionBuilder{
-		&LifecycleExplainPhaseExecution{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "modified_date_in_millis":
+			if err := dec.Decode(&s.ModifiedDateInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "ModifiedDateInMillis", err)
+			}
+
+		case "policy":
+			if err := dec.Decode(&s.Policy); err != nil {
+				return fmt.Errorf("%s | %w", "Policy", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the LifecycleExplainPhaseExecution struct
-func (rb *LifecycleExplainPhaseExecutionBuilder) Build() LifecycleExplainPhaseExecution {
-	return *rb.v
-}
+// NewLifecycleExplainPhaseExecution returns a LifecycleExplainPhaseExecution.
+func NewLifecycleExplainPhaseExecution() *LifecycleExplainPhaseExecution {
+	r := &LifecycleExplainPhaseExecution{}
 
-func (rb *LifecycleExplainPhaseExecutionBuilder) ModifiedDateInMillis(modifieddateinmillis *EpochTimeUnitMillisBuilder) *LifecycleExplainPhaseExecutionBuilder {
-	v := modifieddateinmillis.Build()
-	rb.v.ModifiedDateInMillis = v
-	return rb
-}
-
-func (rb *LifecycleExplainPhaseExecutionBuilder) Policy(policy Name) *LifecycleExplainPhaseExecutionBuilder {
-	rb.v.Policy = policy
-	return rb
-}
-
-func (rb *LifecycleExplainPhaseExecutionBuilder) Version(version VersionNumber) *LifecycleExplainPhaseExecutionBuilder {
-	rb.v.Version = version
-	return rb
+	return r
 }

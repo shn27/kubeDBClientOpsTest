@@ -15,46 +15,62 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // IndexAndDataStreamAction type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/modify_data_stream/types.ts#L28-L31
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/modify_data_stream/types.ts#L39-L44
 type IndexAndDataStreamAction struct {
-	DataStream DataStreamName `json:"data_stream"`
-	Index      IndexName      `json:"index"`
+	// DataStream Data stream targeted by the action.
+	DataStream string `json:"data_stream"`
+	// Index Index for the action.
+	Index string `json:"index"`
 }
 
-// IndexAndDataStreamActionBuilder holds IndexAndDataStreamAction struct and provides a builder API.
-type IndexAndDataStreamActionBuilder struct {
-	v *IndexAndDataStreamAction
-}
+func (s *IndexAndDataStreamAction) UnmarshalJSON(data []byte) error {
 
-// NewIndexAndDataStreamAction provides a builder for the IndexAndDataStreamAction struct.
-func NewIndexAndDataStreamActionBuilder() *IndexAndDataStreamActionBuilder {
-	r := IndexAndDataStreamActionBuilder{
-		&IndexAndDataStreamAction{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "data_stream":
+			if err := dec.Decode(&s.DataStream); err != nil {
+				return fmt.Errorf("%s | %w", "DataStream", err)
+			}
+
+		case "index":
+			if err := dec.Decode(&s.Index); err != nil {
+				return fmt.Errorf("%s | %w", "Index", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the IndexAndDataStreamAction struct
-func (rb *IndexAndDataStreamActionBuilder) Build() IndexAndDataStreamAction {
-	return *rb.v
-}
+// NewIndexAndDataStreamAction returns a IndexAndDataStreamAction.
+func NewIndexAndDataStreamAction() *IndexAndDataStreamAction {
+	r := &IndexAndDataStreamAction{}
 
-func (rb *IndexAndDataStreamActionBuilder) DataStream(datastream DataStreamName) *IndexAndDataStreamActionBuilder {
-	rb.v.DataStream = datastream
-	return rb
-}
-
-func (rb *IndexAndDataStreamActionBuilder) Index(index IndexName) *IndexAndDataStreamActionBuilder {
-	rb.v.Index = index
-	return rb
+	return r
 }

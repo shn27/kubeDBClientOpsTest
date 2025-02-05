@@ -15,48 +15,92 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // SourceFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/SourceFilter.ts#L23-L31
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/SourceFilter.ts#L23-L31
 type SourceFilter struct {
-	Excludes *Fields `json:"excludes,omitempty"`
-	Includes *Fields `json:"includes,omitempty"`
+	Excludes []string `json:"excludes,omitempty"`
+	Includes []string `json:"includes,omitempty"`
 }
 
-// SourceFilterBuilder holds SourceFilter struct and provides a builder API.
-type SourceFilterBuilder struct {
-	v *SourceFilter
-}
+func (s *SourceFilter) UnmarshalJSON(data []byte) error {
 
-// NewSourceFilter provides a builder for the SourceFilter struct.
-func NewSourceFilterBuilder() *SourceFilterBuilder {
-	r := SourceFilterBuilder{
-		&SourceFilter{},
+	if !bytes.HasPrefix(data, []byte(`{`)) {
+		var item string
+		err := json.NewDecoder(bytes.NewReader(data)).Decode(&item)
+		if err != nil {
+			return err
+		}
+		s.Includes = append(s.Includes, item)
+		return nil
 	}
 
-	return &r
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "excludes", "exclude":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Excludes", err)
+				}
+
+				s.Excludes = append(s.Excludes, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Excludes); err != nil {
+					return fmt.Errorf("%s | %w", "Excludes", err)
+				}
+			}
+
+		case "includes", "include":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Includes", err)
+				}
+
+				s.Includes = append(s.Includes, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Includes); err != nil {
+					return fmt.Errorf("%s | %w", "Includes", err)
+				}
+			}
+
+		}
+	}
+	return nil
 }
 
-// Build finalize the chain and returns the SourceFilter struct
-func (rb *SourceFilterBuilder) Build() SourceFilter {
-	return *rb.v
-}
+// NewSourceFilter returns a SourceFilter.
+func NewSourceFilter() *SourceFilter {
+	r := &SourceFilter{}
 
-func (rb *SourceFilterBuilder) Excludes(excludes *FieldsBuilder) *SourceFilterBuilder {
-	v := excludes.Build()
-	rb.v.Excludes = &v
-	return rb
-}
-
-func (rb *SourceFilterBuilder) Includes(includes *FieldsBuilder) *SourceFilterBuilder {
-	v := includes.Build()
-	rb.v.Includes = &v
-	return rb
+	return r
 }

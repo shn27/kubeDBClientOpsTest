@@ -15,28 +15,27 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package changepassword
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
-
-	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
+	"io"
+	"strconv"
 )
 
 // Request holds the request body struct for the package changepassword
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/change_password/SecurityChangePasswordRequest.ts#L23-L52
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/change_password/SecurityChangePasswordRequest.ts#L23-L54
 type Request struct {
 
 	// Password The new password value. Passwords must be at least 6 characters long.
-	Password *types.Password `json:"password,omitempty"`
-
+	Password *string `json:"password,omitempty"`
 	// PasswordHash A hash of the new password value. This must be produced using the same
 	// hashing algorithm as has been configured for password storage. For more
 	// details,
@@ -45,21 +44,15 @@ type Request struct {
 	PasswordHash *string `json:"password_hash,omitempty"`
 }
 
-// RequestBuilder is the builder API for the changepassword.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -70,17 +63,38 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) Password(password types.Password) *RequestBuilder {
-	rb.v.Password = &password
-	return rb
-}
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
 
-func (rb *RequestBuilder) PasswordHash(passwordhash string) *RequestBuilder {
-	rb.v.PasswordHash = &passwordhash
-	return rb
+		switch t {
+
+		case "password":
+			if err := dec.Decode(&s.Password); err != nil {
+				return fmt.Errorf("%s | %w", "Password", err)
+			}
+
+		case "password_hash":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PasswordHash", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PasswordHash = &o
+
+		}
+	}
+	return nil
 }

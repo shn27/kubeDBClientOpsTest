@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // AnalysisMemoryLimit type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/Analysis.ts#L117-L122
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/Analysis.ts#L174-L179
 type AnalysisMemoryLimit struct {
 	// ModelMemoryLimit Limits can be applied for the resources required to hold the mathematical
 	// models in memory. These limits are approximate and can be set per job. They
@@ -33,31 +40,41 @@ type AnalysisMemoryLimit struct {
 	ModelMemoryLimit string `json:"model_memory_limit"`
 }
 
-// AnalysisMemoryLimitBuilder holds AnalysisMemoryLimit struct and provides a builder API.
-type AnalysisMemoryLimitBuilder struct {
-	v *AnalysisMemoryLimit
-}
+func (s *AnalysisMemoryLimit) UnmarshalJSON(data []byte) error {
 
-// NewAnalysisMemoryLimit provides a builder for the AnalysisMemoryLimit struct.
-func NewAnalysisMemoryLimitBuilder() *AnalysisMemoryLimitBuilder {
-	r := AnalysisMemoryLimitBuilder{
-		&AnalysisMemoryLimit{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "model_memory_limit":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ModelMemoryLimit", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ModelMemoryLimit = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the AnalysisMemoryLimit struct
-func (rb *AnalysisMemoryLimitBuilder) Build() AnalysisMemoryLimit {
-	return *rb.v
-}
+// NewAnalysisMemoryLimit returns a AnalysisMemoryLimit.
+func NewAnalysisMemoryLimit() *AnalysisMemoryLimit {
+	r := &AnalysisMemoryLimit{}
 
-// ModelMemoryLimit Limits can be applied for the resources required to hold the mathematical
-// models in memory. These limits are approximate and can be set per job. They
-// do not control the memory used by other processes, for example the
-// Elasticsearch Java processes.
-
-func (rb *AnalysisMemoryLimitBuilder) ModelMemoryLimit(modelmemorylimit string) *AnalysisMemoryLimitBuilder {
-	rb.v.ModelMemoryLimit = modelmemorylimit
-	return rb
+	return r
 }

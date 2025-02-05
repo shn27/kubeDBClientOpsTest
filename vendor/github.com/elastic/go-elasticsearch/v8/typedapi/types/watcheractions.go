@@ -15,46 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // WatcherActions type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/usage/types.ts#L385-L387
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/xpack/usage/types.ts#L394-L396
 type WatcherActions struct {
-	Actions map[Name]WatcherActionTotals `json:"actions"`
+	Actions map[string]WatcherActionTotals `json:"actions"`
 }
 
-// WatcherActionsBuilder holds WatcherActions struct and provides a builder API.
-type WatcherActionsBuilder struct {
-	v *WatcherActions
-}
-
-// NewWatcherActions provides a builder for the WatcherActions struct.
-func NewWatcherActionsBuilder() *WatcherActionsBuilder {
-	r := WatcherActionsBuilder{
-		&WatcherActions{
-			Actions: make(map[Name]WatcherActionTotals, 0),
-		},
+// NewWatcherActions returns a WatcherActions.
+func NewWatcherActions() *WatcherActions {
+	r := &WatcherActions{
+		Actions: make(map[string]WatcherActionTotals, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the WatcherActions struct
-func (rb *WatcherActionsBuilder) Build() WatcherActions {
-	return *rb.v
-}
-
-func (rb *WatcherActionsBuilder) Actions(values map[Name]*WatcherActionTotalsBuilder) *WatcherActionsBuilder {
-	tmp := make(map[Name]WatcherActionTotals, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Actions = tmp
-	return rb
+	return r
 }

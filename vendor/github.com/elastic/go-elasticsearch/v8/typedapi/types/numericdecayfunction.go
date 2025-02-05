@@ -15,32 +15,33 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/multivaluemode"
 )
 
 // NumericDecayFunction type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/compound.ts#L88-L90
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/compound.ts#L208-L208
 type NumericDecayFunction struct {
-	MultiValueMode       *multivaluemode.MultiValueMode       `json:"multi_value_mode,omitempty"`
-	NumericDecayFunction map[Field]DecayPlacementdoubledouble `json:"-"`
+	DecayFunctionBasedoubledouble map[string]DecayPlacementdoubledouble `json:"-"`
+	// MultiValueMode Determines how the distance is calculated when a field used for computing the
+	// decay contains multiple values.
+	MultiValueMode *multivaluemode.MultiValueMode `json:"multi_value_mode,omitempty"`
 }
 
 // MarhsalJSON overrides marshalling for types with additional properties
 func (s NumericDecayFunction) MarshalJSON() ([]byte, error) {
 	type opt NumericDecayFunction
 	// We transform the struct to a map without the embedded additional properties map
-	tmp := make(map[string]interface{}, 0)
+	tmp := make(map[string]any, 0)
 
 	data, err := json.Marshal(opt(s))
 	if err != nil {
@@ -52,9 +53,10 @@ func (s NumericDecayFunction) MarshalJSON() ([]byte, error) {
 	}
 
 	// We inline the additional fields from the underlying map
-	for key, value := range s.NumericDecayFunction {
-		tmp[string(key)] = value
+	for key, value := range s.DecayFunctionBasedoubledouble {
+		tmp[fmt.Sprintf("%s", key)] = value
 	}
+	delete(tmp, "DecayFunctionBasedoubledouble")
 
 	data, err = json.Marshal(tmp)
 	if err != nil {
@@ -64,37 +66,11 @@ func (s NumericDecayFunction) MarshalJSON() ([]byte, error) {
 	return data, nil
 }
 
-// NumericDecayFunctionBuilder holds NumericDecayFunction struct and provides a builder API.
-type NumericDecayFunctionBuilder struct {
-	v *NumericDecayFunction
-}
-
-// NewNumericDecayFunction provides a builder for the NumericDecayFunction struct.
-func NewNumericDecayFunctionBuilder() *NumericDecayFunctionBuilder {
-	r := NumericDecayFunctionBuilder{
-		&NumericDecayFunction{
-			NumericDecayFunction: make(map[Field]DecayPlacementdoubledouble, 0),
-		},
+// NewNumericDecayFunction returns a NumericDecayFunction.
+func NewNumericDecayFunction() *NumericDecayFunction {
+	r := &NumericDecayFunction{
+		DecayFunctionBasedoubledouble: make(map[string]DecayPlacementdoubledouble, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the NumericDecayFunction struct
-func (rb *NumericDecayFunctionBuilder) Build() NumericDecayFunction {
-	return *rb.v
-}
-
-func (rb *NumericDecayFunctionBuilder) MultiValueMode(multivaluemode multivaluemode.MultiValueMode) *NumericDecayFunctionBuilder {
-	rb.v.MultiValueMode = &multivaluemode
-	return rb
-}
-
-func (rb *NumericDecayFunctionBuilder) NumericDecayFunction(values map[Field]*DecayPlacementdoubledoubleBuilder) *NumericDecayFunctionBuilder {
-	tmp := make(map[Field]DecayPlacementdoubledouble, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.NumericDecayFunction = tmp
-	return rb
+	return r
 }

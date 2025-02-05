@@ -15,52 +15,81 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // NodeInfoNetworkInterface type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/info/types.ts#L325-L329
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/info/types.ts#L341-L345
 type NodeInfoNetworkInterface struct {
 	Address    string `json:"address"`
 	MacAddress string `json:"mac_address"`
-	Name       Name   `json:"name"`
+	Name       string `json:"name"`
 }
 
-// NodeInfoNetworkInterfaceBuilder holds NodeInfoNetworkInterface struct and provides a builder API.
-type NodeInfoNetworkInterfaceBuilder struct {
-	v *NodeInfoNetworkInterface
-}
+func (s *NodeInfoNetworkInterface) UnmarshalJSON(data []byte) error {
 
-// NewNodeInfoNetworkInterface provides a builder for the NodeInfoNetworkInterface struct.
-func NewNodeInfoNetworkInterfaceBuilder() *NodeInfoNetworkInterfaceBuilder {
-	r := NodeInfoNetworkInterfaceBuilder{
-		&NodeInfoNetworkInterface{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "address":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Address", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Address = o
+
+		case "mac_address":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "MacAddress", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.MacAddress = o
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the NodeInfoNetworkInterface struct
-func (rb *NodeInfoNetworkInterfaceBuilder) Build() NodeInfoNetworkInterface {
-	return *rb.v
-}
+// NewNodeInfoNetworkInterface returns a NodeInfoNetworkInterface.
+func NewNodeInfoNetworkInterface() *NodeInfoNetworkInterface {
+	r := &NodeInfoNetworkInterface{}
 
-func (rb *NodeInfoNetworkInterfaceBuilder) Address(address string) *NodeInfoNetworkInterfaceBuilder {
-	rb.v.Address = address
-	return rb
-}
-
-func (rb *NodeInfoNetworkInterfaceBuilder) MacAddress(macaddress string) *NodeInfoNetworkInterfaceBuilder {
-	rb.v.MacAddress = macaddress
-	return rb
-}
-
-func (rb *NodeInfoNetworkInterfaceBuilder) Name(name Name) *NodeInfoNetworkInterfaceBuilder {
-	rb.v.Name = name
-	return rb
+	return r
 }

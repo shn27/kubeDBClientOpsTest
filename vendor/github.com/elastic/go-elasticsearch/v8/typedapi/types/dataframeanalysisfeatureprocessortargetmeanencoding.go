@@ -15,72 +15,93 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DataframeAnalysisFeatureProcessorTargetMeanEncoding type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/DataframeAnalytics.ts#L295-L304
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/DataframeAnalytics.ts#L295-L304
 type DataframeAnalysisFeatureProcessorTargetMeanEncoding struct {
 	// DefaultValue The default value if field value is not found in the target_map.
 	DefaultValue int `json:"default_value"`
 	// FeatureName The resulting feature name.
-	FeatureName Name `json:"feature_name"`
+	FeatureName string `json:"feature_name"`
 	// Field The name of the field to encode.
-	Field Field `json:"field"`
+	Field string `json:"field"`
 	// TargetMap The field value to target mean transition map.
-	TargetMap map[string]interface{} `json:"target_map"`
+	TargetMap map[string]json.RawMessage `json:"target_map"`
 }
 
-// DataframeAnalysisFeatureProcessorTargetMeanEncodingBuilder holds DataframeAnalysisFeatureProcessorTargetMeanEncoding struct and provides a builder API.
-type DataframeAnalysisFeatureProcessorTargetMeanEncodingBuilder struct {
-	v *DataframeAnalysisFeatureProcessorTargetMeanEncoding
+func (s *DataframeAnalysisFeatureProcessorTargetMeanEncoding) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "default_value":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DefaultValue", err)
+				}
+				s.DefaultValue = value
+			case float64:
+				f := int(v)
+				s.DefaultValue = f
+			}
+
+		case "feature_name":
+			if err := dec.Decode(&s.FeatureName); err != nil {
+				return fmt.Errorf("%s | %w", "FeatureName", err)
+			}
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "target_map":
+			if s.TargetMap == nil {
+				s.TargetMap = make(map[string]json.RawMessage, 0)
+			}
+			if err := dec.Decode(&s.TargetMap); err != nil {
+				return fmt.Errorf("%s | %w", "TargetMap", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewDataframeAnalysisFeatureProcessorTargetMeanEncoding provides a builder for the DataframeAnalysisFeatureProcessorTargetMeanEncoding struct.
-func NewDataframeAnalysisFeatureProcessorTargetMeanEncodingBuilder() *DataframeAnalysisFeatureProcessorTargetMeanEncodingBuilder {
-	r := DataframeAnalysisFeatureProcessorTargetMeanEncodingBuilder{
-		&DataframeAnalysisFeatureProcessorTargetMeanEncoding{
-			TargetMap: make(map[string]interface{}, 0),
-		},
+// NewDataframeAnalysisFeatureProcessorTargetMeanEncoding returns a DataframeAnalysisFeatureProcessorTargetMeanEncoding.
+func NewDataframeAnalysisFeatureProcessorTargetMeanEncoding() *DataframeAnalysisFeatureProcessorTargetMeanEncoding {
+	r := &DataframeAnalysisFeatureProcessorTargetMeanEncoding{
+		TargetMap: make(map[string]json.RawMessage, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the DataframeAnalysisFeatureProcessorTargetMeanEncoding struct
-func (rb *DataframeAnalysisFeatureProcessorTargetMeanEncodingBuilder) Build() DataframeAnalysisFeatureProcessorTargetMeanEncoding {
-	return *rb.v
-}
-
-// DefaultValue The default value if field value is not found in the target_map.
-
-func (rb *DataframeAnalysisFeatureProcessorTargetMeanEncodingBuilder) DefaultValue(defaultvalue int) *DataframeAnalysisFeatureProcessorTargetMeanEncodingBuilder {
-	rb.v.DefaultValue = defaultvalue
-	return rb
-}
-
-// FeatureName The resulting feature name.
-
-func (rb *DataframeAnalysisFeatureProcessorTargetMeanEncodingBuilder) FeatureName(featurename Name) *DataframeAnalysisFeatureProcessorTargetMeanEncodingBuilder {
-	rb.v.FeatureName = featurename
-	return rb
-}
-
-// Field The name of the field to encode.
-
-func (rb *DataframeAnalysisFeatureProcessorTargetMeanEncodingBuilder) Field(field Field) *DataframeAnalysisFeatureProcessorTargetMeanEncodingBuilder {
-	rb.v.Field = field
-	return rb
-}
-
-// TargetMap The field value to target mean transition map.
-
-func (rb *DataframeAnalysisFeatureProcessorTargetMeanEncodingBuilder) TargetMap(value map[string]interface{}) *DataframeAnalysisFeatureProcessorTargetMeanEncodingBuilder {
-	rb.v.TargetMap = value
-	return rb
+	return r
 }

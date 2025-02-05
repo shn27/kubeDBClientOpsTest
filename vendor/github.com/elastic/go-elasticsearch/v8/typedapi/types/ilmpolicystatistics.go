@@ -15,47 +15,72 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // IlmPolicyStatistics type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/usage/types.ts#L148-L151
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/xpack/usage/types.ts#L155-L158
 type IlmPolicyStatistics struct {
 	IndicesManaged int    `json:"indices_managed"`
 	Phases         Phases `json:"phases"`
 }
 
-// IlmPolicyStatisticsBuilder holds IlmPolicyStatistics struct and provides a builder API.
-type IlmPolicyStatisticsBuilder struct {
-	v *IlmPolicyStatistics
-}
+func (s *IlmPolicyStatistics) UnmarshalJSON(data []byte) error {
 
-// NewIlmPolicyStatistics provides a builder for the IlmPolicyStatistics struct.
-func NewIlmPolicyStatisticsBuilder() *IlmPolicyStatisticsBuilder {
-	r := IlmPolicyStatisticsBuilder{
-		&IlmPolicyStatistics{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "indices_managed":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IndicesManaged", err)
+				}
+				s.IndicesManaged = value
+			case float64:
+				f := int(v)
+				s.IndicesManaged = f
+			}
+
+		case "phases":
+			if err := dec.Decode(&s.Phases); err != nil {
+				return fmt.Errorf("%s | %w", "Phases", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the IlmPolicyStatistics struct
-func (rb *IlmPolicyStatisticsBuilder) Build() IlmPolicyStatistics {
-	return *rb.v
-}
+// NewIlmPolicyStatistics returns a IlmPolicyStatistics.
+func NewIlmPolicyStatistics() *IlmPolicyStatistics {
+	r := &IlmPolicyStatistics{}
 
-func (rb *IlmPolicyStatisticsBuilder) IndicesManaged(indicesmanaged int) *IlmPolicyStatisticsBuilder {
-	rb.v.IndicesManaged = indicesmanaged
-	return rb
-}
-
-func (rb *IlmPolicyStatisticsBuilder) Phases(phases *PhasesBuilder) *IlmPolicyStatisticsBuilder {
-	v := phases.Build()
-	rb.v.Phases = v
-	return rb
+	return r
 }

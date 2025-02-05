@@ -15,52 +15,162 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ClusterStatistics type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Stats.ts#L27-L31
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Stats.ts#L27-L35
 type ClusterStatistics struct {
-	Skipped    int `json:"skipped"`
-	Successful int `json:"successful"`
-	Total      int `json:"total"`
+	Details    map[string]ClusterDetails `json:"details,omitempty"`
+	Failed     int                       `json:"failed"`
+	Partial    int                       `json:"partial"`
+	Running    int                       `json:"running"`
+	Skipped    int                       `json:"skipped"`
+	Successful int                       `json:"successful"`
+	Total      int                       `json:"total"`
 }
 
-// ClusterStatisticsBuilder holds ClusterStatistics struct and provides a builder API.
-type ClusterStatisticsBuilder struct {
-	v *ClusterStatistics
+func (s *ClusterStatistics) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "details":
+			if s.Details == nil {
+				s.Details = make(map[string]ClusterDetails, 0)
+			}
+			if err := dec.Decode(&s.Details); err != nil {
+				return fmt.Errorf("%s | %w", "Details", err)
+			}
+
+		case "failed":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Failed", err)
+				}
+				s.Failed = value
+			case float64:
+				f := int(v)
+				s.Failed = f
+			}
+
+		case "partial":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Partial", err)
+				}
+				s.Partial = value
+			case float64:
+				f := int(v)
+				s.Partial = f
+			}
+
+		case "running":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Running", err)
+				}
+				s.Running = value
+			case float64:
+				f := int(v)
+				s.Running = f
+			}
+
+		case "skipped":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Skipped", err)
+				}
+				s.Skipped = value
+			case float64:
+				f := int(v)
+				s.Skipped = f
+			}
+
+		case "successful":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Successful", err)
+				}
+				s.Successful = value
+			case float64:
+				f := int(v)
+				s.Successful = f
+			}
+
+		case "total":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Total", err)
+				}
+				s.Total = value
+			case float64:
+				f := int(v)
+				s.Total = f
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewClusterStatistics provides a builder for the ClusterStatistics struct.
-func NewClusterStatisticsBuilder() *ClusterStatisticsBuilder {
-	r := ClusterStatisticsBuilder{
-		&ClusterStatistics{},
+// NewClusterStatistics returns a ClusterStatistics.
+func NewClusterStatistics() *ClusterStatistics {
+	r := &ClusterStatistics{
+		Details: make(map[string]ClusterDetails, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the ClusterStatistics struct
-func (rb *ClusterStatisticsBuilder) Build() ClusterStatistics {
-	return *rb.v
-}
-
-func (rb *ClusterStatisticsBuilder) Skipped(skipped int) *ClusterStatisticsBuilder {
-	rb.v.Skipped = skipped
-	return rb
-}
-
-func (rb *ClusterStatisticsBuilder) Successful(successful int) *ClusterStatisticsBuilder {
-	rb.v.Successful = successful
-	return rb
-}
-
-func (rb *ClusterStatisticsBuilder) Total(total int) *ClusterStatisticsBuilder {
-	rb.v.Total = total
-	return rb
+	return r
 }

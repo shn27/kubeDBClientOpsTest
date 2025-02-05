@@ -15,44 +15,22 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // BucketCorrelationFunctionCountCorrelation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/pipeline.ts#L117-L120
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/pipeline.ts#L155-L158
 type BucketCorrelationFunctionCountCorrelation struct {
 	// Indicator The indicator with which to correlate the configured `bucket_path` values.
 	Indicator BucketCorrelationFunctionCountCorrelationIndicator `json:"indicator"`
 }
 
-// BucketCorrelationFunctionCountCorrelationBuilder holds BucketCorrelationFunctionCountCorrelation struct and provides a builder API.
-type BucketCorrelationFunctionCountCorrelationBuilder struct {
-	v *BucketCorrelationFunctionCountCorrelation
-}
+// NewBucketCorrelationFunctionCountCorrelation returns a BucketCorrelationFunctionCountCorrelation.
+func NewBucketCorrelationFunctionCountCorrelation() *BucketCorrelationFunctionCountCorrelation {
+	r := &BucketCorrelationFunctionCountCorrelation{}
 
-// NewBucketCorrelationFunctionCountCorrelation provides a builder for the BucketCorrelationFunctionCountCorrelation struct.
-func NewBucketCorrelationFunctionCountCorrelationBuilder() *BucketCorrelationFunctionCountCorrelationBuilder {
-	r := BucketCorrelationFunctionCountCorrelationBuilder{
-		&BucketCorrelationFunctionCountCorrelation{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the BucketCorrelationFunctionCountCorrelation struct
-func (rb *BucketCorrelationFunctionCountCorrelationBuilder) Build() BucketCorrelationFunctionCountCorrelation {
-	return *rb.v
-}
-
-// Indicator The indicator with which to correlate the configured `bucket_path` values.
-
-func (rb *BucketCorrelationFunctionCountCorrelationBuilder) Indicator(indicator *BucketCorrelationFunctionCountCorrelationIndicatorBuilder) *BucketCorrelationFunctionCountCorrelationBuilder {
-	v := indicator.Build()
-	rb.v.Indicator = v
-	return rb
+	return r
 }

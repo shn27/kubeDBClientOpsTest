@@ -15,60 +15,76 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DataframeEvaluationClassificationMetricsAucRoc type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/DataframeEvaluation.ts#L85-L90
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/DataframeEvaluation.ts#L85-L90
 type DataframeEvaluationClassificationMetricsAucRoc struct {
 	// ClassName Name of the only class that is treated as positive during AUC ROC
 	// calculation. Other classes are treated as negative ("one-vs-all" strategy).
 	// All the evaluated documents must have class_name in the list of their top
 	// classes.
-	ClassName *Name `json:"class_name,omitempty"`
+	ClassName *string `json:"class_name,omitempty"`
 	// IncludeCurve Whether or not the curve should be returned in addition to the score. Default
 	// value is false.
 	IncludeCurve *bool `json:"include_curve,omitempty"`
 }
 
-// DataframeEvaluationClassificationMetricsAucRocBuilder holds DataframeEvaluationClassificationMetricsAucRoc struct and provides a builder API.
-type DataframeEvaluationClassificationMetricsAucRocBuilder struct {
-	v *DataframeEvaluationClassificationMetricsAucRoc
-}
+func (s *DataframeEvaluationClassificationMetricsAucRoc) UnmarshalJSON(data []byte) error {
 
-// NewDataframeEvaluationClassificationMetricsAucRoc provides a builder for the DataframeEvaluationClassificationMetricsAucRoc struct.
-func NewDataframeEvaluationClassificationMetricsAucRocBuilder() *DataframeEvaluationClassificationMetricsAucRocBuilder {
-	r := DataframeEvaluationClassificationMetricsAucRocBuilder{
-		&DataframeEvaluationClassificationMetricsAucRoc{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "class_name":
+			if err := dec.Decode(&s.ClassName); err != nil {
+				return fmt.Errorf("%s | %w", "ClassName", err)
+			}
+
+		case "include_curve":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IncludeCurve", err)
+				}
+				s.IncludeCurve = &value
+			case bool:
+				s.IncludeCurve = &v
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DataframeEvaluationClassificationMetricsAucRoc struct
-func (rb *DataframeEvaluationClassificationMetricsAucRocBuilder) Build() DataframeEvaluationClassificationMetricsAucRoc {
-	return *rb.v
-}
+// NewDataframeEvaluationClassificationMetricsAucRoc returns a DataframeEvaluationClassificationMetricsAucRoc.
+func NewDataframeEvaluationClassificationMetricsAucRoc() *DataframeEvaluationClassificationMetricsAucRoc {
+	r := &DataframeEvaluationClassificationMetricsAucRoc{}
 
-// ClassName Name of the only class that is treated as positive during AUC ROC
-// calculation. Other classes are treated as negative ("one-vs-all" strategy).
-// All the evaluated documents must have class_name in the list of their top
-// classes.
-
-func (rb *DataframeEvaluationClassificationMetricsAucRocBuilder) ClassName(classname Name) *DataframeEvaluationClassificationMetricsAucRocBuilder {
-	rb.v.ClassName = &classname
-	return rb
-}
-
-// IncludeCurve Whether or not the curve should be returned in addition to the score. Default
-// value is false.
-
-func (rb *DataframeEvaluationClassificationMetricsAucRocBuilder) IncludeCurve(includecurve bool) *DataframeEvaluationClassificationMetricsAucRocBuilder {
-	rb.v.IncludeCurve = &includecurve
-	return rb
+	return r
 }

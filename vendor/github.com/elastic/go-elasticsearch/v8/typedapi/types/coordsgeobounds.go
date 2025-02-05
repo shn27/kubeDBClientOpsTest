@@ -15,58 +15,117 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // CoordsGeoBounds type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Geo.ts#L135-L140
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Geo.ts#L154-L159
 type CoordsGeoBounds struct {
-	Bottom float64 `json:"bottom"`
-	Left   float64 `json:"left"`
-	Right  float64 `json:"right"`
-	Top    float64 `json:"top"`
+	Bottom Float64 `json:"bottom"`
+	Left   Float64 `json:"left"`
+	Right  Float64 `json:"right"`
+	Top    Float64 `json:"top"`
 }
 
-// CoordsGeoBoundsBuilder holds CoordsGeoBounds struct and provides a builder API.
-type CoordsGeoBoundsBuilder struct {
-	v *CoordsGeoBounds
-}
+func (s *CoordsGeoBounds) UnmarshalJSON(data []byte) error {
 
-// NewCoordsGeoBounds provides a builder for the CoordsGeoBounds struct.
-func NewCoordsGeoBoundsBuilder() *CoordsGeoBoundsBuilder {
-	r := CoordsGeoBoundsBuilder{
-		&CoordsGeoBounds{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "bottom":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Bottom", err)
+				}
+				f := Float64(value)
+				s.Bottom = f
+			case float64:
+				f := Float64(v)
+				s.Bottom = f
+			}
+
+		case "left":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Left", err)
+				}
+				f := Float64(value)
+				s.Left = f
+			case float64:
+				f := Float64(v)
+				s.Left = f
+			}
+
+		case "right":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Right", err)
+				}
+				f := Float64(value)
+				s.Right = f
+			case float64:
+				f := Float64(v)
+				s.Right = f
+			}
+
+		case "top":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Top", err)
+				}
+				f := Float64(value)
+				s.Top = f
+			case float64:
+				f := Float64(v)
+				s.Top = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the CoordsGeoBounds struct
-func (rb *CoordsGeoBoundsBuilder) Build() CoordsGeoBounds {
-	return *rb.v
-}
+// NewCoordsGeoBounds returns a CoordsGeoBounds.
+func NewCoordsGeoBounds() *CoordsGeoBounds {
+	r := &CoordsGeoBounds{}
 
-func (rb *CoordsGeoBoundsBuilder) Bottom(bottom float64) *CoordsGeoBoundsBuilder {
-	rb.v.Bottom = bottom
-	return rb
-}
-
-func (rb *CoordsGeoBoundsBuilder) Left(left float64) *CoordsGeoBoundsBuilder {
-	rb.v.Left = left
-	return rb
-}
-
-func (rb *CoordsGeoBoundsBuilder) Right(right float64) *CoordsGeoBoundsBuilder {
-	rb.v.Right = right
-	return rb
-}
-
-func (rb *CoordsGeoBoundsBuilder) Top(top float64) *CoordsGeoBoundsBuilder {
-	rb.v.Top = top
-	return rb
+	return r
 }

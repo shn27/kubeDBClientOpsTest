@@ -15,16 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package search
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"strconv"
 
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/resultposition"
@@ -32,63 +34,44 @@ import (
 
 // Request holds the request body struct for the package search
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/eql/search/EqlSearchRequest.ts#L28-L115
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/eql/search/EqlSearchRequest.ts#L28-L122
 type Request struct {
 	CaseSensitive *bool `json:"case_sensitive,omitempty"`
-
 	// EventCategoryField Field containing the event classification, such as process, file, or network.
-	EventCategoryField *types.Field `json:"event_category_field,omitempty"`
-
+	EventCategoryField *string `json:"event_category_field,omitempty"`
 	// FetchSize Maximum number of events to search at a time for sequence queries.
 	FetchSize *uint `json:"fetch_size,omitempty"`
-
 	// Fields Array of wildcard (*) patterns. The response returns values for field names
 	// matching these patterns in the fields property of each hit.
 	Fields []types.FieldAndFormat `json:"fields,omitempty"`
-
 	// Filter Query, written in Query DSL, used to filter the events on which the EQL query
 	// runs.
-	Filter []types.QueryContainer `json:"filter,omitempty"`
-
-	KeepAlive *types.Duration `json:"keep_alive,omitempty"`
-
-	KeepOnCompletion *bool `json:"keep_on_completion,omitempty"`
-
+	Filter           []types.Query  `json:"filter,omitempty"`
+	KeepAlive        types.Duration `json:"keep_alive,omitempty"`
+	KeepOnCompletion *bool          `json:"keep_on_completion,omitempty"`
 	// Query EQL query you wish to run.
-	Query string `json:"query"`
-
-	ResultPosition *resultposition.ResultPosition `json:"result_position,omitempty"`
-
-	RuntimeMappings *types.RuntimeFields `json:"runtime_mappings,omitempty"`
-
+	Query           string                         `json:"query"`
+	ResultPosition  *resultposition.ResultPosition `json:"result_position,omitempty"`
+	RuntimeMappings types.RuntimeFields            `json:"runtime_mappings,omitempty"`
 	// Size For basic queries, the maximum number of matching events to return. Defaults
 	// to 10
 	Size *uint `json:"size,omitempty"`
-
 	// TiebreakerField Field used to sort hits with the same timestamp in ascending order
-	TiebreakerField *types.Field `json:"tiebreaker_field,omitempty"`
-
+	TiebreakerField *string `json:"tiebreaker_field,omitempty"`
 	// TimestampField Field containing event timestamp. Default "@timestamp"
-	TimestampField *types.Field `json:"timestamp_field,omitempty"`
-
-	WaitForCompletionTimeout *types.Duration `json:"wait_for_completion_timeout,omitempty"`
+	TimestampField           *string        `json:"timestamp_field,omitempty"`
+	WaitForCompletionTimeout types.Duration `json:"wait_for_completion_timeout,omitempty"`
 }
 
-// RequestBuilder is the builder API for the search.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -99,80 +82,138 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) CaseSensitive(casesensitive bool) *RequestBuilder {
-	rb.v.CaseSensitive = &casesensitive
-	return rb
-}
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
 
-func (rb *RequestBuilder) EventCategoryField(eventcategoryfield types.Field) *RequestBuilder {
-	rb.v.EventCategoryField = &eventcategoryfield
-	return rb
-}
+		switch t {
 
-func (rb *RequestBuilder) FetchSize(fetchsize uint) *RequestBuilder {
-	rb.v.FetchSize = &fetchsize
-	return rb
-}
+		case "case_sensitive":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CaseSensitive", err)
+				}
+				s.CaseSensitive = &value
+			case bool:
+				s.CaseSensitive = &v
+			}
 
-func (rb *RequestBuilder) Fields(arg []types.FieldAndFormat) *RequestBuilder {
-	rb.v.Fields = arg
-	return rb
-}
+		case "event_category_field":
+			if err := dec.Decode(&s.EventCategoryField); err != nil {
+				return fmt.Errorf("%s | %w", "EventCategoryField", err)
+			}
 
-func (rb *RequestBuilder) Filter(arg []types.QueryContainer) *RequestBuilder {
-	rb.v.Filter = arg
-	return rb
-}
+		case "fetch_size":
+			if err := dec.Decode(&s.FetchSize); err != nil {
+				return fmt.Errorf("%s | %w", "FetchSize", err)
+			}
 
-func (rb *RequestBuilder) KeepAlive(keepalive *types.DurationBuilder) *RequestBuilder {
-	v := keepalive.Build()
-	rb.v.KeepAlive = &v
-	return rb
-}
+		case "fields":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := types.NewFieldAndFormat()
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Fields", err)
+				}
 
-func (rb *RequestBuilder) KeepOnCompletion(keeponcompletion bool) *RequestBuilder {
-	rb.v.KeepOnCompletion = &keeponcompletion
-	return rb
-}
+				s.Fields = append(s.Fields, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Fields); err != nil {
+					return fmt.Errorf("%s | %w", "Fields", err)
+				}
+			}
 
-func (rb *RequestBuilder) Query(query string) *RequestBuilder {
-	rb.v.Query = query
-	return rb
-}
+		case "filter":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := types.NewQuery()
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Filter", err)
+				}
 
-func (rb *RequestBuilder) ResultPosition(resultposition resultposition.ResultPosition) *RequestBuilder {
-	rb.v.ResultPosition = &resultposition
-	return rb
-}
+				s.Filter = append(s.Filter, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Filter); err != nil {
+					return fmt.Errorf("%s | %w", "Filter", err)
+				}
+			}
 
-func (rb *RequestBuilder) RuntimeMappings(runtimemappings *types.RuntimeFieldsBuilder) *RequestBuilder {
-	v := runtimemappings.Build()
-	rb.v.RuntimeMappings = &v
-	return rb
-}
+		case "keep_alive":
+			if err := dec.Decode(&s.KeepAlive); err != nil {
+				return fmt.Errorf("%s | %w", "KeepAlive", err)
+			}
 
-func (rb *RequestBuilder) Size(size uint) *RequestBuilder {
-	rb.v.Size = &size
-	return rb
-}
+		case "keep_on_completion":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "KeepOnCompletion", err)
+				}
+				s.KeepOnCompletion = &value
+			case bool:
+				s.KeepOnCompletion = &v
+			}
 
-func (rb *RequestBuilder) TiebreakerField(tiebreakerfield types.Field) *RequestBuilder {
-	rb.v.TiebreakerField = &tiebreakerfield
-	return rb
-}
+		case "query":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Query", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Query = o
 
-func (rb *RequestBuilder) TimestampField(timestampfield types.Field) *RequestBuilder {
-	rb.v.TimestampField = &timestampfield
-	return rb
-}
+		case "result_position":
+			if err := dec.Decode(&s.ResultPosition); err != nil {
+				return fmt.Errorf("%s | %w", "ResultPosition", err)
+			}
 
-func (rb *RequestBuilder) WaitForCompletionTimeout(waitforcompletiontimeout *types.DurationBuilder) *RequestBuilder {
-	v := waitforcompletiontimeout.Build()
-	rb.v.WaitForCompletionTimeout = &v
-	return rb
+		case "runtime_mappings":
+			if err := dec.Decode(&s.RuntimeMappings); err != nil {
+				return fmt.Errorf("%s | %w", "RuntimeMappings", err)
+			}
+
+		case "size":
+			if err := dec.Decode(&s.Size); err != nil {
+				return fmt.Errorf("%s | %w", "Size", err)
+			}
+
+		case "tiebreaker_field":
+			if err := dec.Decode(&s.TiebreakerField); err != nil {
+				return fmt.Errorf("%s | %w", "TiebreakerField", err)
+			}
+
+		case "timestamp_field":
+			if err := dec.Decode(&s.TimestampField); err != nil {
+				return fmt.Errorf("%s | %w", "TimestampField", err)
+			}
+
+		case "wait_for_completion_timeout":
+			if err := dec.Decode(&s.WaitForCompletionTimeout); err != nil {
+				return fmt.Errorf("%s | %w", "WaitForCompletionTimeout", err)
+			}
+
+		}
+	}
+	return nil
 }

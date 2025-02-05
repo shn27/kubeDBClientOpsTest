@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
@@ -28,36 +26,5 @@ package types
 //	[]string
 //	TermsPartition
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/bucket.ts#L415-L416
-type TermsInclude interface{}
-
-// TermsIncludeBuilder holds TermsInclude struct and provides a builder API.
-type TermsIncludeBuilder struct {
-	v TermsInclude
-}
-
-// NewTermsInclude provides a builder for the TermsInclude struct.
-func NewTermsIncludeBuilder() *TermsIncludeBuilder {
-	return &TermsIncludeBuilder{}
-}
-
-// Build finalize the chain and returns the TermsInclude struct
-func (u *TermsIncludeBuilder) Build() TermsInclude {
-	return u.v
-}
-
-func (u *TermsIncludeBuilder) String(string string) *TermsIncludeBuilder {
-	u.v = &string
-	return u
-}
-
-func (u *TermsIncludeBuilder) Strings(strings ...string) *TermsIncludeBuilder {
-	u.v = strings
-	return u
-}
-
-func (u *TermsIncludeBuilder) TermsPartition(termspartition *TermsPartitionBuilder) *TermsIncludeBuilder {
-	v := termspartition.Build()
-	u.v = &v
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/bucket.ts#L1074-L1075
+type TermsInclude any

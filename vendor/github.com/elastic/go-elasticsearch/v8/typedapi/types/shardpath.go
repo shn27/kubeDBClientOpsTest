@@ -15,52 +15,90 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ShardPath type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/stats/types.ts#L128-L132
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/stats/types.ts#L140-L144
 type ShardPath struct {
 	DataPath         string `json:"data_path"`
 	IsCustomDataPath bool   `json:"is_custom_data_path"`
 	StatePath        string `json:"state_path"`
 }
 
-// ShardPathBuilder holds ShardPath struct and provides a builder API.
-type ShardPathBuilder struct {
-	v *ShardPath
-}
+func (s *ShardPath) UnmarshalJSON(data []byte) error {
 
-// NewShardPath provides a builder for the ShardPath struct.
-func NewShardPathBuilder() *ShardPathBuilder {
-	r := ShardPathBuilder{
-		&ShardPath{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "data_path":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "DataPath", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.DataPath = o
+
+		case "is_custom_data_path":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IsCustomDataPath", err)
+				}
+				s.IsCustomDataPath = value
+			case bool:
+				s.IsCustomDataPath = v
+			}
+
+		case "state_path":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "StatePath", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.StatePath = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ShardPath struct
-func (rb *ShardPathBuilder) Build() ShardPath {
-	return *rb.v
-}
+// NewShardPath returns a ShardPath.
+func NewShardPath() *ShardPath {
+	r := &ShardPath{}
 
-func (rb *ShardPathBuilder) DataPath(datapath string) *ShardPathBuilder {
-	rb.v.DataPath = datapath
-	return rb
-}
-
-func (rb *ShardPathBuilder) IsCustomDataPath(iscustomdatapath bool) *ShardPathBuilder {
-	rb.v.IsCustomDataPath = iscustomdatapath
-	return rb
-}
-
-func (rb *ShardPathBuilder) StatePath(statepath string) *ShardPathBuilder {
-	rb.v.StatePath = statepath
-	return rb
+	return r
 }

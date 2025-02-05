@@ -15,47 +15,60 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // PointInTimeReference type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/PointInTimeReference.ts#L23-L26
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/PointInTimeReference.ts#L23-L26
 type PointInTimeReference struct {
-	Id        Id        `json:"id"`
-	KeepAlive *Duration `json:"keep_alive,omitempty"`
+	Id        string   `json:"id"`
+	KeepAlive Duration `json:"keep_alive,omitempty"`
 }
 
-// PointInTimeReferenceBuilder holds PointInTimeReference struct and provides a builder API.
-type PointInTimeReferenceBuilder struct {
-	v *PointInTimeReference
-}
+func (s *PointInTimeReference) UnmarshalJSON(data []byte) error {
 
-// NewPointInTimeReference provides a builder for the PointInTimeReference struct.
-func NewPointInTimeReferenceBuilder() *PointInTimeReferenceBuilder {
-	r := PointInTimeReferenceBuilder{
-		&PointInTimeReference{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "id":
+			if err := dec.Decode(&s.Id); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
+
+		case "keep_alive":
+			if err := dec.Decode(&s.KeepAlive); err != nil {
+				return fmt.Errorf("%s | %w", "KeepAlive", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the PointInTimeReference struct
-func (rb *PointInTimeReferenceBuilder) Build() PointInTimeReference {
-	return *rb.v
-}
+// NewPointInTimeReference returns a PointInTimeReference.
+func NewPointInTimeReference() *PointInTimeReference {
+	r := &PointInTimeReference{}
 
-func (rb *PointInTimeReferenceBuilder) Id(id Id) *PointInTimeReferenceBuilder {
-	rb.v.Id = id
-	return rb
-}
-
-func (rb *PointInTimeReferenceBuilder) KeepAlive(keepalive *DurationBuilder) *PointInTimeReferenceBuilder {
-	v := keepalive.Build()
-	rb.v.KeepAlive = &v
-	return rb
+	return r
 }

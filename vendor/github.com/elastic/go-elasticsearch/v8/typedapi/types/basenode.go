@@ -15,73 +15,91 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+
+	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/noderole"
+)
+
 // BaseNode type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_spec_utils/BaseNode.ts#L25-L32
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_spec_utils/BaseNode.ts#L25-L32
 type BaseNode struct {
-	Attributes       map[string]string `json:"attributes"`
-	Host             Host              `json:"host"`
-	Ip               Ip                `json:"ip"`
-	Name             Name              `json:"name"`
-	Roles            *NodeRoles        `json:"roles,omitempty"`
-	TransportAddress TransportAddress  `json:"transport_address"`
+	Attributes       map[string]string   `json:"attributes"`
+	Host             string              `json:"host"`
+	Ip               string              `json:"ip"`
+	Name             string              `json:"name"`
+	Roles            []noderole.NodeRole `json:"roles,omitempty"`
+	TransportAddress string              `json:"transport_address"`
 }
 
-// BaseNodeBuilder holds BaseNode struct and provides a builder API.
-type BaseNodeBuilder struct {
-	v *BaseNode
+func (s *BaseNode) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "attributes":
+			if s.Attributes == nil {
+				s.Attributes = make(map[string]string, 0)
+			}
+			if err := dec.Decode(&s.Attributes); err != nil {
+				return fmt.Errorf("%s | %w", "Attributes", err)
+			}
+
+		case "host":
+			if err := dec.Decode(&s.Host); err != nil {
+				return fmt.Errorf("%s | %w", "Host", err)
+			}
+
+		case "ip":
+			if err := dec.Decode(&s.Ip); err != nil {
+				return fmt.Errorf("%s | %w", "Ip", err)
+			}
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		case "roles":
+			if err := dec.Decode(&s.Roles); err != nil {
+				return fmt.Errorf("%s | %w", "Roles", err)
+			}
+
+		case "transport_address":
+			if err := dec.Decode(&s.TransportAddress); err != nil {
+				return fmt.Errorf("%s | %w", "TransportAddress", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewBaseNode provides a builder for the BaseNode struct.
-func NewBaseNodeBuilder() *BaseNodeBuilder {
-	r := BaseNodeBuilder{
-		&BaseNode{
-			Attributes: make(map[string]string, 0),
-		},
+// NewBaseNode returns a BaseNode.
+func NewBaseNode() *BaseNode {
+	r := &BaseNode{
+		Attributes: make(map[string]string, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the BaseNode struct
-func (rb *BaseNodeBuilder) Build() BaseNode {
-	return *rb.v
-}
-
-func (rb *BaseNodeBuilder) Attributes(value map[string]string) *BaseNodeBuilder {
-	rb.v.Attributes = value
-	return rb
-}
-
-func (rb *BaseNodeBuilder) Host(host Host) *BaseNodeBuilder {
-	rb.v.Host = host
-	return rb
-}
-
-func (rb *BaseNodeBuilder) Ip(ip Ip) *BaseNodeBuilder {
-	rb.v.Ip = ip
-	return rb
-}
-
-func (rb *BaseNodeBuilder) Name(name Name) *BaseNodeBuilder {
-	rb.v.Name = name
-	return rb
-}
-
-func (rb *BaseNodeBuilder) Roles(roles *NodeRolesBuilder) *BaseNodeBuilder {
-	v := roles.Build()
-	rb.v.Roles = &v
-	return rb
-}
-
-func (rb *BaseNodeBuilder) TransportAddress(transportaddress TransportAddress) *BaseNodeBuilder {
-	rb.v.TransportAddress = transportaddress
-	return rb
+	return r
 }

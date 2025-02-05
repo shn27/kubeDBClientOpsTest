@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
@@ -27,30 +25,5 @@ package types
 //	bool
 //	int
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/hits.ts#L122-L130
-type TrackHits interface{}
-
-// TrackHitsBuilder holds TrackHits struct and provides a builder API.
-type TrackHitsBuilder struct {
-	v TrackHits
-}
-
-// NewTrackHits provides a builder for the TrackHits struct.
-func NewTrackHitsBuilder() *TrackHitsBuilder {
-	return &TrackHitsBuilder{}
-}
-
-// Build finalize the chain and returns the TrackHits struct
-func (u *TrackHitsBuilder) Build() TrackHits {
-	return u.v
-}
-
-func (u *TrackHitsBuilder) Bool(bool bool) *TrackHitsBuilder {
-	u.v = &bool
-	return u
-}
-
-func (u *TrackHitsBuilder) Int(int int) *TrackHitsBuilder {
-	u.v = &int
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/hits.ts#L144-L152
+type TrackHits any

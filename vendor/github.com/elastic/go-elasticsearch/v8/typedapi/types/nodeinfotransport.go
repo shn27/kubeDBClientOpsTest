@@ -15,54 +15,79 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // NodeInfoTransport type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/info/types.ts#L342-L346
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/info/types.ts#L358-L362
 type NodeInfoTransport struct {
 	BoundAddress   []string          `json:"bound_address"`
 	Profiles       map[string]string `json:"profiles"`
 	PublishAddress string            `json:"publish_address"`
 }
 
-// NodeInfoTransportBuilder holds NodeInfoTransport struct and provides a builder API.
-type NodeInfoTransportBuilder struct {
-	v *NodeInfoTransport
+func (s *NodeInfoTransport) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "bound_address":
+			if err := dec.Decode(&s.BoundAddress); err != nil {
+				return fmt.Errorf("%s | %w", "BoundAddress", err)
+			}
+
+		case "profiles":
+			if s.Profiles == nil {
+				s.Profiles = make(map[string]string, 0)
+			}
+			if err := dec.Decode(&s.Profiles); err != nil {
+				return fmt.Errorf("%s | %w", "Profiles", err)
+			}
+
+		case "publish_address":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PublishAddress", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PublishAddress = o
+
+		}
+	}
+	return nil
 }
 
-// NewNodeInfoTransport provides a builder for the NodeInfoTransport struct.
-func NewNodeInfoTransportBuilder() *NodeInfoTransportBuilder {
-	r := NodeInfoTransportBuilder{
-		&NodeInfoTransport{
-			Profiles: make(map[string]string, 0),
-		},
+// NewNodeInfoTransport returns a NodeInfoTransport.
+func NewNodeInfoTransport() *NodeInfoTransport {
+	r := &NodeInfoTransport{
+		Profiles: make(map[string]string, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the NodeInfoTransport struct
-func (rb *NodeInfoTransportBuilder) Build() NodeInfoTransport {
-	return *rb.v
-}
-
-func (rb *NodeInfoTransportBuilder) BoundAddress(bound_address ...string) *NodeInfoTransportBuilder {
-	rb.v.BoundAddress = bound_address
-	return rb
-}
-
-func (rb *NodeInfoTransportBuilder) Profiles(value map[string]string) *NodeInfoTransportBuilder {
-	rb.v.Profiles = value
-	return rb
-}
-
-func (rb *NodeInfoTransportBuilder) PublishAddress(publishaddress string) *NodeInfoTransportBuilder {
-	rb.v.PublishAddress = publishaddress
-	return rb
+	return r
 }

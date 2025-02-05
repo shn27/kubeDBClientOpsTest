@@ -15,40 +15,69 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // TDigest type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/metric.ts#L123-L125
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/metric.ts#L232-L237
 type TDigest struct {
+	// Compression Limits the maximum number of nodes used by the underlying TDigest algorithm
+	// to `20 * compression`, enabling control of memory usage and approximation
+	// error.
 	Compression *int `json:"compression,omitempty"`
 }
 
-// TDigestBuilder holds TDigest struct and provides a builder API.
-type TDigestBuilder struct {
-	v *TDigest
-}
+func (s *TDigest) UnmarshalJSON(data []byte) error {
 
-// NewTDigest provides a builder for the TDigest struct.
-func NewTDigestBuilder() *TDigestBuilder {
-	r := TDigestBuilder{
-		&TDigest{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "compression":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Compression", err)
+				}
+				s.Compression = &value
+			case float64:
+				f := int(v)
+				s.Compression = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TDigest struct
-func (rb *TDigestBuilder) Build() TDigest {
-	return *rb.v
-}
+// NewTDigest returns a TDigest.
+func NewTDigest() *TDigest {
+	r := &TDigest{}
 
-func (rb *TDigestBuilder) Compression(compression int) *TDigestBuilder {
-	rb.v.Compression = &compression
-	return rb
+	return r
 }

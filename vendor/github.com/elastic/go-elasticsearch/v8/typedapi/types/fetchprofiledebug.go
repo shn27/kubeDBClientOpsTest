@@ -15,46 +15,72 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // FetchProfileDebug type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/profile.ts#L155-L158
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/profile.ts#L250-L253
 type FetchProfileDebug struct {
 	FastPath     *int     `json:"fast_path,omitempty"`
 	StoredFields []string `json:"stored_fields,omitempty"`
 }
 
-// FetchProfileDebugBuilder holds FetchProfileDebug struct and provides a builder API.
-type FetchProfileDebugBuilder struct {
-	v *FetchProfileDebug
-}
+func (s *FetchProfileDebug) UnmarshalJSON(data []byte) error {
 
-// NewFetchProfileDebug provides a builder for the FetchProfileDebug struct.
-func NewFetchProfileDebugBuilder() *FetchProfileDebugBuilder {
-	r := FetchProfileDebugBuilder{
-		&FetchProfileDebug{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "fast_path":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "FastPath", err)
+				}
+				s.FastPath = &value
+			case float64:
+				f := int(v)
+				s.FastPath = &f
+			}
+
+		case "stored_fields":
+			if err := dec.Decode(&s.StoredFields); err != nil {
+				return fmt.Errorf("%s | %w", "StoredFields", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the FetchProfileDebug struct
-func (rb *FetchProfileDebugBuilder) Build() FetchProfileDebug {
-	return *rb.v
-}
+// NewFetchProfileDebug returns a FetchProfileDebug.
+func NewFetchProfileDebug() *FetchProfileDebug {
+	r := &FetchProfileDebug{}
 
-func (rb *FetchProfileDebugBuilder) FastPath(fastpath int) *FetchProfileDebugBuilder {
-	rb.v.FastPath = &fastpath
-	return rb
-}
-
-func (rb *FetchProfileDebugBuilder) StoredFields(stored_fields ...string) *FetchProfileDebugBuilder {
-	rb.v.StoredFields = stored_fields
-	return rb
+	return r
 }

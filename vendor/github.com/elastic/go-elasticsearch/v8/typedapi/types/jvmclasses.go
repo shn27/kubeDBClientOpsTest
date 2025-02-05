@@ -15,52 +15,100 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // JvmClasses type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/_types/Stats.ts#L351-L355
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/_types/Stats.ts#L979-L992
 type JvmClasses struct {
+	// CurrentLoadedCount Number of classes currently loaded by JVM.
 	CurrentLoadedCount *int64 `json:"current_loaded_count,omitempty"`
-	TotalLoadedCount   *int64 `json:"total_loaded_count,omitempty"`
+	// TotalLoadedCount Total number of classes loaded since the JVM started.
+	TotalLoadedCount *int64 `json:"total_loaded_count,omitempty"`
+	// TotalUnloadedCount Total number of classes unloaded since the JVM started.
 	TotalUnloadedCount *int64 `json:"total_unloaded_count,omitempty"`
 }
 
-// JvmClassesBuilder holds JvmClasses struct and provides a builder API.
-type JvmClassesBuilder struct {
-	v *JvmClasses
-}
+func (s *JvmClasses) UnmarshalJSON(data []byte) error {
 
-// NewJvmClasses provides a builder for the JvmClasses struct.
-func NewJvmClassesBuilder() *JvmClassesBuilder {
-	r := JvmClassesBuilder{
-		&JvmClasses{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "current_loaded_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CurrentLoadedCount", err)
+				}
+				s.CurrentLoadedCount = &value
+			case float64:
+				f := int64(v)
+				s.CurrentLoadedCount = &f
+			}
+
+		case "total_loaded_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TotalLoadedCount", err)
+				}
+				s.TotalLoadedCount = &value
+			case float64:
+				f := int64(v)
+				s.TotalLoadedCount = &f
+			}
+
+		case "total_unloaded_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TotalUnloadedCount", err)
+				}
+				s.TotalUnloadedCount = &value
+			case float64:
+				f := int64(v)
+				s.TotalUnloadedCount = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the JvmClasses struct
-func (rb *JvmClassesBuilder) Build() JvmClasses {
-	return *rb.v
-}
+// NewJvmClasses returns a JvmClasses.
+func NewJvmClasses() *JvmClasses {
+	r := &JvmClasses{}
 
-func (rb *JvmClassesBuilder) CurrentLoadedCount(currentloadedcount int64) *JvmClassesBuilder {
-	rb.v.CurrentLoadedCount = &currentloadedcount
-	return rb
-}
-
-func (rb *JvmClassesBuilder) TotalLoadedCount(totalloadedcount int64) *JvmClassesBuilder {
-	rb.v.TotalLoadedCount = &totalloadedcount
-	return rb
-}
-
-func (rb *JvmClassesBuilder) TotalUnloadedCount(totalunloadedcount int64) *JvmClassesBuilder {
-	rb.v.TotalUnloadedCount = &totalunloadedcount
-	return rb
+	return r
 }

@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // QueryBreakdown type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/profile.ts#L95-L114
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/profile.ts#L105-L126
 type QueryBreakdown struct {
 	Advance                     int64 `json:"advance"`
 	AdvanceCount                int64 `json:"advance_count"`
@@ -32,6 +39,8 @@ type QueryBreakdown struct {
 	BuildScorerCount            int64 `json:"build_scorer_count"`
 	ComputeMaxScore             int64 `json:"compute_max_score"`
 	ComputeMaxScoreCount        int64 `json:"compute_max_score_count"`
+	CountWeight                 int64 `json:"count_weight"`
+	CountWeightCount            int64 `json:"count_weight_count"`
 	CreateWeight                int64 `json:"create_weight"`
 	CreateWeightCount           int64 `json:"create_weight_count"`
 	Match                       int64 `json:"match"`
@@ -46,111 +55,329 @@ type QueryBreakdown struct {
 	ShallowAdvanceCount         int64 `json:"shallow_advance_count"`
 }
 
-// QueryBreakdownBuilder holds QueryBreakdown struct and provides a builder API.
-type QueryBreakdownBuilder struct {
-	v *QueryBreakdown
-}
+func (s *QueryBreakdown) UnmarshalJSON(data []byte) error {
 
-// NewQueryBreakdown provides a builder for the QueryBreakdown struct.
-func NewQueryBreakdownBuilder() *QueryBreakdownBuilder {
-	r := QueryBreakdownBuilder{
-		&QueryBreakdown{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "advance":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Advance", err)
+				}
+				s.Advance = value
+			case float64:
+				f := int64(v)
+				s.Advance = f
+			}
+
+		case "advance_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "AdvanceCount", err)
+				}
+				s.AdvanceCount = value
+			case float64:
+				f := int64(v)
+				s.AdvanceCount = f
+			}
+
+		case "build_scorer":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "BuildScorer", err)
+				}
+				s.BuildScorer = value
+			case float64:
+				f := int64(v)
+				s.BuildScorer = f
+			}
+
+		case "build_scorer_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "BuildScorerCount", err)
+				}
+				s.BuildScorerCount = value
+			case float64:
+				f := int64(v)
+				s.BuildScorerCount = f
+			}
+
+		case "compute_max_score":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ComputeMaxScore", err)
+				}
+				s.ComputeMaxScore = value
+			case float64:
+				f := int64(v)
+				s.ComputeMaxScore = f
+			}
+
+		case "compute_max_score_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ComputeMaxScoreCount", err)
+				}
+				s.ComputeMaxScoreCount = value
+			case float64:
+				f := int64(v)
+				s.ComputeMaxScoreCount = f
+			}
+
+		case "count_weight":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CountWeight", err)
+				}
+				s.CountWeight = value
+			case float64:
+				f := int64(v)
+				s.CountWeight = f
+			}
+
+		case "count_weight_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CountWeightCount", err)
+				}
+				s.CountWeightCount = value
+			case float64:
+				f := int64(v)
+				s.CountWeightCount = f
+			}
+
+		case "create_weight":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CreateWeight", err)
+				}
+				s.CreateWeight = value
+			case float64:
+				f := int64(v)
+				s.CreateWeight = f
+			}
+
+		case "create_weight_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CreateWeightCount", err)
+				}
+				s.CreateWeightCount = value
+			case float64:
+				f := int64(v)
+				s.CreateWeightCount = f
+			}
+
+		case "match":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Match", err)
+				}
+				s.Match = value
+			case float64:
+				f := int64(v)
+				s.Match = f
+			}
+
+		case "match_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MatchCount", err)
+				}
+				s.MatchCount = value
+			case float64:
+				f := int64(v)
+				s.MatchCount = f
+			}
+
+		case "next_doc":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NextDoc", err)
+				}
+				s.NextDoc = value
+			case float64:
+				f := int64(v)
+				s.NextDoc = f
+			}
+
+		case "next_doc_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NextDocCount", err)
+				}
+				s.NextDocCount = value
+			case float64:
+				f := int64(v)
+				s.NextDocCount = f
+			}
+
+		case "score":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Score", err)
+				}
+				s.Score = value
+			case float64:
+				f := int64(v)
+				s.Score = f
+			}
+
+		case "score_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ScoreCount", err)
+				}
+				s.ScoreCount = value
+			case float64:
+				f := int64(v)
+				s.ScoreCount = f
+			}
+
+		case "set_min_competitive_score":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "SetMinCompetitiveScore", err)
+				}
+				s.SetMinCompetitiveScore = value
+			case float64:
+				f := int64(v)
+				s.SetMinCompetitiveScore = f
+			}
+
+		case "set_min_competitive_score_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "SetMinCompetitiveScoreCount", err)
+				}
+				s.SetMinCompetitiveScoreCount = value
+			case float64:
+				f := int64(v)
+				s.SetMinCompetitiveScoreCount = f
+			}
+
+		case "shallow_advance":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ShallowAdvance", err)
+				}
+				s.ShallowAdvance = value
+			case float64:
+				f := int64(v)
+				s.ShallowAdvance = f
+			}
+
+		case "shallow_advance_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ShallowAdvanceCount", err)
+				}
+				s.ShallowAdvanceCount = value
+			case float64:
+				f := int64(v)
+				s.ShallowAdvanceCount = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the QueryBreakdown struct
-func (rb *QueryBreakdownBuilder) Build() QueryBreakdown {
-	return *rb.v
-}
+// NewQueryBreakdown returns a QueryBreakdown.
+func NewQueryBreakdown() *QueryBreakdown {
+	r := &QueryBreakdown{}
 
-func (rb *QueryBreakdownBuilder) Advance(advance int64) *QueryBreakdownBuilder {
-	rb.v.Advance = advance
-	return rb
-}
-
-func (rb *QueryBreakdownBuilder) AdvanceCount(advancecount int64) *QueryBreakdownBuilder {
-	rb.v.AdvanceCount = advancecount
-	return rb
-}
-
-func (rb *QueryBreakdownBuilder) BuildScorer(buildscorer int64) *QueryBreakdownBuilder {
-	rb.v.BuildScorer = buildscorer
-	return rb
-}
-
-func (rb *QueryBreakdownBuilder) BuildScorerCount(buildscorercount int64) *QueryBreakdownBuilder {
-	rb.v.BuildScorerCount = buildscorercount
-	return rb
-}
-
-func (rb *QueryBreakdownBuilder) ComputeMaxScore(computemaxscore int64) *QueryBreakdownBuilder {
-	rb.v.ComputeMaxScore = computemaxscore
-	return rb
-}
-
-func (rb *QueryBreakdownBuilder) ComputeMaxScoreCount(computemaxscorecount int64) *QueryBreakdownBuilder {
-	rb.v.ComputeMaxScoreCount = computemaxscorecount
-	return rb
-}
-
-func (rb *QueryBreakdownBuilder) CreateWeight(createweight int64) *QueryBreakdownBuilder {
-	rb.v.CreateWeight = createweight
-	return rb
-}
-
-func (rb *QueryBreakdownBuilder) CreateWeightCount(createweightcount int64) *QueryBreakdownBuilder {
-	rb.v.CreateWeightCount = createweightcount
-	return rb
-}
-
-func (rb *QueryBreakdownBuilder) Match(match int64) *QueryBreakdownBuilder {
-	rb.v.Match = match
-	return rb
-}
-
-func (rb *QueryBreakdownBuilder) MatchCount(matchcount int64) *QueryBreakdownBuilder {
-	rb.v.MatchCount = matchcount
-	return rb
-}
-
-func (rb *QueryBreakdownBuilder) NextDoc(nextdoc int64) *QueryBreakdownBuilder {
-	rb.v.NextDoc = nextdoc
-	return rb
-}
-
-func (rb *QueryBreakdownBuilder) NextDocCount(nextdoccount int64) *QueryBreakdownBuilder {
-	rb.v.NextDocCount = nextdoccount
-	return rb
-}
-
-func (rb *QueryBreakdownBuilder) Score(score int64) *QueryBreakdownBuilder {
-	rb.v.Score = score
-	return rb
-}
-
-func (rb *QueryBreakdownBuilder) ScoreCount(scorecount int64) *QueryBreakdownBuilder {
-	rb.v.ScoreCount = scorecount
-	return rb
-}
-
-func (rb *QueryBreakdownBuilder) SetMinCompetitiveScore(setmincompetitivescore int64) *QueryBreakdownBuilder {
-	rb.v.SetMinCompetitiveScore = setmincompetitivescore
-	return rb
-}
-
-func (rb *QueryBreakdownBuilder) SetMinCompetitiveScoreCount(setmincompetitivescorecount int64) *QueryBreakdownBuilder {
-	rb.v.SetMinCompetitiveScoreCount = setmincompetitivescorecount
-	return rb
-}
-
-func (rb *QueryBreakdownBuilder) ShallowAdvance(shallowadvance int64) *QueryBreakdownBuilder {
-	rb.v.ShallowAdvance = shallowadvance
-	return rb
-}
-
-func (rb *QueryBreakdownBuilder) ShallowAdvanceCount(shallowadvancecount int64) *QueryBreakdownBuilder {
-	rb.v.ShallowAdvanceCount = shallowadvancecount
-	return rb
+	return r
 }

@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // NodeInfoSettingsHttp type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/info/types.ts#L181-L186
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/info/types.ts#L192-L197
 type NodeInfoSettingsHttp struct {
 	Compression string                   `json:"compression,omitempty"`
 	Port        string                   `json:"port,omitempty"`
@@ -32,42 +39,70 @@ type NodeInfoSettingsHttp struct {
 	TypeDefault *string                  `json:"type.default,omitempty"`
 }
 
-// NodeInfoSettingsHttpBuilder holds NodeInfoSettingsHttp struct and provides a builder API.
-type NodeInfoSettingsHttpBuilder struct {
-	v *NodeInfoSettingsHttp
-}
+func (s *NodeInfoSettingsHttp) UnmarshalJSON(data []byte) error {
 
-// NewNodeInfoSettingsHttp provides a builder for the NodeInfoSettingsHttp struct.
-func NewNodeInfoSettingsHttpBuilder() *NodeInfoSettingsHttpBuilder {
-	r := NodeInfoSettingsHttpBuilder{
-		&NodeInfoSettingsHttp{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "compression":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Compression", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Compression = o
+
+		case "port":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Port", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Port = o
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "type.default":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "TypeDefault", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.TypeDefault = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the NodeInfoSettingsHttp struct
-func (rb *NodeInfoSettingsHttpBuilder) Build() NodeInfoSettingsHttp {
-	return *rb.v
-}
+// NewNodeInfoSettingsHttp returns a NodeInfoSettingsHttp.
+func NewNodeInfoSettingsHttp() *NodeInfoSettingsHttp {
+	r := &NodeInfoSettingsHttp{}
 
-func (rb *NodeInfoSettingsHttpBuilder) Compression(arg string) *NodeInfoSettingsHttpBuilder {
-	rb.v.Compression = arg
-	return rb
-}
-
-func (rb *NodeInfoSettingsHttpBuilder) Port(arg string) *NodeInfoSettingsHttpBuilder {
-	rb.v.Port = arg
-	return rb
-}
-
-func (rb *NodeInfoSettingsHttpBuilder) Type_(type_ *NodeInfoSettingsHttpTypeBuilder) *NodeInfoSettingsHttpBuilder {
-	v := type_.Build()
-	rb.v.Type = v
-	return rb
-}
-
-func (rb *NodeInfoSettingsHttpBuilder) TypeDefault(typedefault string) *NodeInfoSettingsHttpBuilder {
-	rb.v.TypeDefault = &typedefault
-	return rb
+	return r
 }

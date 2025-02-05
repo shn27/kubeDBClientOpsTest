@@ -15,49 +15,88 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // IcuFoldingTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/icu-plugin.ts#L46-L49
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/icu-plugin.ts#L46-L49
 type IcuFoldingTokenFilter struct {
-	Type             string         `json:"type,omitempty"`
-	UnicodeSetFilter string         `json:"unicode_set_filter"`
-	Version          *VersionString `json:"version,omitempty"`
+	Type             string  `json:"type,omitempty"`
+	UnicodeSetFilter string  `json:"unicode_set_filter"`
+	Version          *string `json:"version,omitempty"`
 }
 
-// IcuFoldingTokenFilterBuilder holds IcuFoldingTokenFilter struct and provides a builder API.
-type IcuFoldingTokenFilterBuilder struct {
-	v *IcuFoldingTokenFilter
+func (s *IcuFoldingTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "unicode_set_filter":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "UnicodeSetFilter", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.UnicodeSetFilter = o
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewIcuFoldingTokenFilter provides a builder for the IcuFoldingTokenFilter struct.
-func NewIcuFoldingTokenFilterBuilder() *IcuFoldingTokenFilterBuilder {
-	r := IcuFoldingTokenFilterBuilder{
-		&IcuFoldingTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s IcuFoldingTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerIcuFoldingTokenFilter IcuFoldingTokenFilter
+	tmp := innerIcuFoldingTokenFilter{
+		Type:             s.Type,
+		UnicodeSetFilter: s.UnicodeSetFilter,
+		Version:          s.Version,
 	}
 
-	r.v.Type = "icu_folding"
+	tmp.Type = "icu_folding"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the IcuFoldingTokenFilter struct
-func (rb *IcuFoldingTokenFilterBuilder) Build() IcuFoldingTokenFilter {
-	return *rb.v
-}
+// NewIcuFoldingTokenFilter returns a IcuFoldingTokenFilter.
+func NewIcuFoldingTokenFilter() *IcuFoldingTokenFilter {
+	r := &IcuFoldingTokenFilter{}
 
-func (rb *IcuFoldingTokenFilterBuilder) UnicodeSetFilter(unicodesetfilter string) *IcuFoldingTokenFilterBuilder {
-	rb.v.UnicodeSetFilter = unicodesetfilter
-	return rb
-}
-
-func (rb *IcuFoldingTokenFilterBuilder) Version(version VersionString) *IcuFoldingTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

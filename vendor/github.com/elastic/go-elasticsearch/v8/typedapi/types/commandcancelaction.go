@@ -15,58 +15,100 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // CommandCancelAction type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/reroute/types.ts#L45-L50
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/reroute/types.ts#L45-L50
 type CommandCancelAction struct {
-	AllowPrimary *bool     `json:"allow_primary,omitempty"`
-	Index        IndexName `json:"index"`
-	Node         string    `json:"node"`
-	Shard        int       `json:"shard"`
+	AllowPrimary *bool  `json:"allow_primary,omitempty"`
+	Index        string `json:"index"`
+	Node         string `json:"node"`
+	Shard        int    `json:"shard"`
 }
 
-// CommandCancelActionBuilder holds CommandCancelAction struct and provides a builder API.
-type CommandCancelActionBuilder struct {
-	v *CommandCancelAction
-}
+func (s *CommandCancelAction) UnmarshalJSON(data []byte) error {
 
-// NewCommandCancelAction provides a builder for the CommandCancelAction struct.
-func NewCommandCancelActionBuilder() *CommandCancelActionBuilder {
-	r := CommandCancelActionBuilder{
-		&CommandCancelAction{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "allow_primary":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "AllowPrimary", err)
+				}
+				s.AllowPrimary = &value
+			case bool:
+				s.AllowPrimary = &v
+			}
+
+		case "index":
+			if err := dec.Decode(&s.Index); err != nil {
+				return fmt.Errorf("%s | %w", "Index", err)
+			}
+
+		case "node":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Node", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Node = o
+
+		case "shard":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Shard", err)
+				}
+				s.Shard = value
+			case float64:
+				f := int(v)
+				s.Shard = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the CommandCancelAction struct
-func (rb *CommandCancelActionBuilder) Build() CommandCancelAction {
-	return *rb.v
-}
+// NewCommandCancelAction returns a CommandCancelAction.
+func NewCommandCancelAction() *CommandCancelAction {
+	r := &CommandCancelAction{}
 
-func (rb *CommandCancelActionBuilder) AllowPrimary(allowprimary bool) *CommandCancelActionBuilder {
-	rb.v.AllowPrimary = &allowprimary
-	return rb
-}
-
-func (rb *CommandCancelActionBuilder) Index(index IndexName) *CommandCancelActionBuilder {
-	rb.v.Index = index
-	return rb
-}
-
-func (rb *CommandCancelActionBuilder) Node(node string) *CommandCancelActionBuilder {
-	rb.v.Node = node
-	return rb
-}
-
-func (rb *CommandCancelActionBuilder) Shard(shard int) *CommandCancelActionBuilder {
-	rb.v.Shard = shard
-	return rb
+	return r
 }

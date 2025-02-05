@@ -15,48 +15,76 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // MultiBucketAggregateBaseStringRareTermsBucket type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L314-L316
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L357-L359
 type MultiBucketAggregateBaseStringRareTermsBucket struct {
 	Buckets BucketsStringRareTermsBucket `json:"buckets"`
-	Meta    *Metadata                    `json:"meta,omitempty"`
+	Meta    Metadata                     `json:"meta,omitempty"`
 }
 
-// MultiBucketAggregateBaseStringRareTermsBucketBuilder holds MultiBucketAggregateBaseStringRareTermsBucket struct and provides a builder API.
-type MultiBucketAggregateBaseStringRareTermsBucketBuilder struct {
-	v *MultiBucketAggregateBaseStringRareTermsBucket
-}
+func (s *MultiBucketAggregateBaseStringRareTermsBucket) UnmarshalJSON(data []byte) error {
 
-// NewMultiBucketAggregateBaseStringRareTermsBucket provides a builder for the MultiBucketAggregateBaseStringRareTermsBucket struct.
-func NewMultiBucketAggregateBaseStringRareTermsBucketBuilder() *MultiBucketAggregateBaseStringRareTermsBucketBuilder {
-	r := MultiBucketAggregateBaseStringRareTermsBucketBuilder{
-		&MultiBucketAggregateBaseStringRareTermsBucket{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "buckets":
+
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			source := bytes.NewReader(rawMsg)
+			localDec := json.NewDecoder(source)
+			switch rawMsg[0] {
+			case '{':
+				o := make(map[string]StringRareTermsBucket, 0)
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Buckets", err)
+				}
+				s.Buckets = o
+			case '[':
+				o := []StringRareTermsBucket{}
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Buckets", err)
+				}
+				s.Buckets = o
+			}
+
+		case "meta":
+			if err := dec.Decode(&s.Meta); err != nil {
+				return fmt.Errorf("%s | %w", "Meta", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the MultiBucketAggregateBaseStringRareTermsBucket struct
-func (rb *MultiBucketAggregateBaseStringRareTermsBucketBuilder) Build() MultiBucketAggregateBaseStringRareTermsBucket {
-	return *rb.v
-}
+// NewMultiBucketAggregateBaseStringRareTermsBucket returns a MultiBucketAggregateBaseStringRareTermsBucket.
+func NewMultiBucketAggregateBaseStringRareTermsBucket() *MultiBucketAggregateBaseStringRareTermsBucket {
+	r := &MultiBucketAggregateBaseStringRareTermsBucket{}
 
-func (rb *MultiBucketAggregateBaseStringRareTermsBucketBuilder) Buckets(buckets *BucketsStringRareTermsBucketBuilder) *MultiBucketAggregateBaseStringRareTermsBucketBuilder {
-	v := buckets.Build()
-	rb.v.Buckets = v
-	return rb
-}
-
-func (rb *MultiBucketAggregateBaseStringRareTermsBucketBuilder) Meta(meta *MetadataBuilder) *MultiBucketAggregateBaseStringRareTermsBucketBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
+	return r
 }

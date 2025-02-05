@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // AnalyticsStatistics type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/usage/types.ts#L56-L66
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/xpack/usage/types.ts#L59-L69
 type AnalyticsStatistics struct {
 	BoxplotUsage               int64  `json:"boxplot_usage"`
 	CumulativeCardinalityUsage int64  `json:"cumulative_cardinality_usage"`
@@ -37,66 +44,164 @@ type AnalyticsStatistics struct {
 	TopMetricsUsage            int64  `json:"top_metrics_usage"`
 }
 
-// AnalyticsStatisticsBuilder holds AnalyticsStatistics struct and provides a builder API.
-type AnalyticsStatisticsBuilder struct {
-	v *AnalyticsStatistics
-}
+func (s *AnalyticsStatistics) UnmarshalJSON(data []byte) error {
 
-// NewAnalyticsStatistics provides a builder for the AnalyticsStatistics struct.
-func NewAnalyticsStatisticsBuilder() *AnalyticsStatisticsBuilder {
-	r := AnalyticsStatisticsBuilder{
-		&AnalyticsStatistics{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "boxplot_usage":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "BoxplotUsage", err)
+				}
+				s.BoxplotUsage = value
+			case float64:
+				f := int64(v)
+				s.BoxplotUsage = f
+			}
+
+		case "cumulative_cardinality_usage":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CumulativeCardinalityUsage", err)
+				}
+				s.CumulativeCardinalityUsage = value
+			case float64:
+				f := int64(v)
+				s.CumulativeCardinalityUsage = f
+			}
+
+		case "moving_percentiles_usage":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MovingPercentilesUsage", err)
+				}
+				s.MovingPercentilesUsage = value
+			case float64:
+				f := int64(v)
+				s.MovingPercentilesUsage = f
+			}
+
+		case "multi_terms_usage":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MultiTermsUsage", err)
+				}
+				s.MultiTermsUsage = &value
+			case float64:
+				f := int64(v)
+				s.MultiTermsUsage = &f
+			}
+
+		case "normalize_usage":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NormalizeUsage", err)
+				}
+				s.NormalizeUsage = value
+			case float64:
+				f := int64(v)
+				s.NormalizeUsage = f
+			}
+
+		case "rate_usage":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "RateUsage", err)
+				}
+				s.RateUsage = value
+			case float64:
+				f := int64(v)
+				s.RateUsage = f
+			}
+
+		case "string_stats_usage":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "StringStatsUsage", err)
+				}
+				s.StringStatsUsage = value
+			case float64:
+				f := int64(v)
+				s.StringStatsUsage = f
+			}
+
+		case "t_test_usage":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TTestUsage", err)
+				}
+				s.TTestUsage = value
+			case float64:
+				f := int64(v)
+				s.TTestUsage = f
+			}
+
+		case "top_metrics_usage":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TopMetricsUsage", err)
+				}
+				s.TopMetricsUsage = value
+			case float64:
+				f := int64(v)
+				s.TopMetricsUsage = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the AnalyticsStatistics struct
-func (rb *AnalyticsStatisticsBuilder) Build() AnalyticsStatistics {
-	return *rb.v
-}
+// NewAnalyticsStatistics returns a AnalyticsStatistics.
+func NewAnalyticsStatistics() *AnalyticsStatistics {
+	r := &AnalyticsStatistics{}
 
-func (rb *AnalyticsStatisticsBuilder) BoxplotUsage(boxplotusage int64) *AnalyticsStatisticsBuilder {
-	rb.v.BoxplotUsage = boxplotusage
-	return rb
-}
-
-func (rb *AnalyticsStatisticsBuilder) CumulativeCardinalityUsage(cumulativecardinalityusage int64) *AnalyticsStatisticsBuilder {
-	rb.v.CumulativeCardinalityUsage = cumulativecardinalityusage
-	return rb
-}
-
-func (rb *AnalyticsStatisticsBuilder) MovingPercentilesUsage(movingpercentilesusage int64) *AnalyticsStatisticsBuilder {
-	rb.v.MovingPercentilesUsage = movingpercentilesusage
-	return rb
-}
-
-func (rb *AnalyticsStatisticsBuilder) MultiTermsUsage(multitermsusage int64) *AnalyticsStatisticsBuilder {
-	rb.v.MultiTermsUsage = &multitermsusage
-	return rb
-}
-
-func (rb *AnalyticsStatisticsBuilder) NormalizeUsage(normalizeusage int64) *AnalyticsStatisticsBuilder {
-	rb.v.NormalizeUsage = normalizeusage
-	return rb
-}
-
-func (rb *AnalyticsStatisticsBuilder) RateUsage(rateusage int64) *AnalyticsStatisticsBuilder {
-	rb.v.RateUsage = rateusage
-	return rb
-}
-
-func (rb *AnalyticsStatisticsBuilder) StringStatsUsage(stringstatsusage int64) *AnalyticsStatisticsBuilder {
-	rb.v.StringStatsUsage = stringstatsusage
-	return rb
-}
-
-func (rb *AnalyticsStatisticsBuilder) TTestUsage(ttestusage int64) *AnalyticsStatisticsBuilder {
-	rb.v.TTestUsage = ttestusage
-	return rb
-}
-
-func (rb *AnalyticsStatisticsBuilder) TopMetricsUsage(topmetricsusage int64) *AnalyticsStatisticsBuilder {
-	rb.v.TopMetricsUsage = topmetricsusage
-	return rb
+	return r
 }

@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // AggregationBreakdown type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/profile.ts#L23-L36
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/profile.ts#L26-L39
 type AggregationBreakdown struct {
 	BuildAggregation        int64  `json:"build_aggregation"`
 	BuildAggregationCount   int64  `json:"build_aggregation_count"`
@@ -40,81 +47,209 @@ type AggregationBreakdown struct {
 	ReduceCount             int64  `json:"reduce_count"`
 }
 
-// AggregationBreakdownBuilder holds AggregationBreakdown struct and provides a builder API.
-type AggregationBreakdownBuilder struct {
-	v *AggregationBreakdown
-}
+func (s *AggregationBreakdown) UnmarshalJSON(data []byte) error {
 
-// NewAggregationBreakdown provides a builder for the AggregationBreakdown struct.
-func NewAggregationBreakdownBuilder() *AggregationBreakdownBuilder {
-	r := AggregationBreakdownBuilder{
-		&AggregationBreakdown{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "build_aggregation":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "BuildAggregation", err)
+				}
+				s.BuildAggregation = value
+			case float64:
+				f := int64(v)
+				s.BuildAggregation = f
+			}
+
+		case "build_aggregation_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "BuildAggregationCount", err)
+				}
+				s.BuildAggregationCount = value
+			case float64:
+				f := int64(v)
+				s.BuildAggregationCount = f
+			}
+
+		case "build_leaf_collector":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "BuildLeafCollector", err)
+				}
+				s.BuildLeafCollector = value
+			case float64:
+				f := int64(v)
+				s.BuildLeafCollector = f
+			}
+
+		case "build_leaf_collector_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "BuildLeafCollectorCount", err)
+				}
+				s.BuildLeafCollectorCount = value
+			case float64:
+				f := int64(v)
+				s.BuildLeafCollectorCount = f
+			}
+
+		case "collect":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Collect", err)
+				}
+				s.Collect = value
+			case float64:
+				f := int64(v)
+				s.Collect = f
+			}
+
+		case "collect_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CollectCount", err)
+				}
+				s.CollectCount = value
+			case float64:
+				f := int64(v)
+				s.CollectCount = f
+			}
+
+		case "initialize":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Initialize", err)
+				}
+				s.Initialize = value
+			case float64:
+				f := int64(v)
+				s.Initialize = f
+			}
+
+		case "initialize_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "InitializeCount", err)
+				}
+				s.InitializeCount = value
+			case float64:
+				f := int64(v)
+				s.InitializeCount = f
+			}
+
+		case "post_collection":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PostCollection", err)
+				}
+				s.PostCollection = &value
+			case float64:
+				f := int64(v)
+				s.PostCollection = &f
+			}
+
+		case "post_collection_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PostCollectionCount", err)
+				}
+				s.PostCollectionCount = &value
+			case float64:
+				f := int64(v)
+				s.PostCollectionCount = &f
+			}
+
+		case "reduce":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Reduce", err)
+				}
+				s.Reduce = value
+			case float64:
+				f := int64(v)
+				s.Reduce = f
+			}
+
+		case "reduce_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ReduceCount", err)
+				}
+				s.ReduceCount = value
+			case float64:
+				f := int64(v)
+				s.ReduceCount = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the AggregationBreakdown struct
-func (rb *AggregationBreakdownBuilder) Build() AggregationBreakdown {
-	return *rb.v
-}
+// NewAggregationBreakdown returns a AggregationBreakdown.
+func NewAggregationBreakdown() *AggregationBreakdown {
+	r := &AggregationBreakdown{}
 
-func (rb *AggregationBreakdownBuilder) BuildAggregation(buildaggregation int64) *AggregationBreakdownBuilder {
-	rb.v.BuildAggregation = buildaggregation
-	return rb
-}
-
-func (rb *AggregationBreakdownBuilder) BuildAggregationCount(buildaggregationcount int64) *AggregationBreakdownBuilder {
-	rb.v.BuildAggregationCount = buildaggregationcount
-	return rb
-}
-
-func (rb *AggregationBreakdownBuilder) BuildLeafCollector(buildleafcollector int64) *AggregationBreakdownBuilder {
-	rb.v.BuildLeafCollector = buildleafcollector
-	return rb
-}
-
-func (rb *AggregationBreakdownBuilder) BuildLeafCollectorCount(buildleafcollectorcount int64) *AggregationBreakdownBuilder {
-	rb.v.BuildLeafCollectorCount = buildleafcollectorcount
-	return rb
-}
-
-func (rb *AggregationBreakdownBuilder) Collect(collect int64) *AggregationBreakdownBuilder {
-	rb.v.Collect = collect
-	return rb
-}
-
-func (rb *AggregationBreakdownBuilder) CollectCount(collectcount int64) *AggregationBreakdownBuilder {
-	rb.v.CollectCount = collectcount
-	return rb
-}
-
-func (rb *AggregationBreakdownBuilder) Initialize(initialize int64) *AggregationBreakdownBuilder {
-	rb.v.Initialize = initialize
-	return rb
-}
-
-func (rb *AggregationBreakdownBuilder) InitializeCount(initializecount int64) *AggregationBreakdownBuilder {
-	rb.v.InitializeCount = initializecount
-	return rb
-}
-
-func (rb *AggregationBreakdownBuilder) PostCollection(postcollection int64) *AggregationBreakdownBuilder {
-	rb.v.PostCollection = &postcollection
-	return rb
-}
-
-func (rb *AggregationBreakdownBuilder) PostCollectionCount(postcollectioncount int64) *AggregationBreakdownBuilder {
-	rb.v.PostCollectionCount = &postcollectioncount
-	return rb
-}
-
-func (rb *AggregationBreakdownBuilder) Reduce(reduce int64) *AggregationBreakdownBuilder {
-	rb.v.Reduce = reduce
-	return rb
-}
-
-func (rb *AggregationBreakdownBuilder) ReduceCount(reducecount int64) *AggregationBreakdownBuilder {
-	rb.v.ReduceCount = reducecount
-	return rb
+	return r
 }

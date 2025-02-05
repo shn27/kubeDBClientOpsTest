@@ -15,117 +15,225 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ReindexStatus type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/reindex_rethrottle/types.ts#L37-L51
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/reindex_rethrottle/types.ts#L37-L85
 type ReindexStatus struct {
-	Batches              int64                   `json:"batches"`
-	Created              int64                   `json:"created"`
-	Deleted              int64                   `json:"deleted"`
-	Noops                int64                   `json:"noops"`
-	RequestsPerSecond    float32                 `json:"requests_per_second"`
-	Retries              Retries                 `json:"retries"`
-	Throttled            *Duration               `json:"throttled,omitempty"`
-	ThrottledMillis      DurationValueUnitMillis `json:"throttled_millis"`
-	ThrottledUntil       *Duration               `json:"throttled_until,omitempty"`
-	ThrottledUntilMillis DurationValueUnitMillis `json:"throttled_until_millis"`
-	Total                int64                   `json:"total"`
-	Updated              int64                   `json:"updated"`
-	VersionConflicts     int64                   `json:"version_conflicts"`
+	// Batches The number of scroll responses pulled back by the reindex.
+	Batches int64 `json:"batches"`
+	// Created The number of documents that were successfully created.
+	Created int64 `json:"created"`
+	// Deleted The number of documents that were successfully deleted.
+	Deleted int64 `json:"deleted"`
+	// Noops The number of documents that were ignored because the script used for the
+	// reindex returned a `noop` value for `ctx.op`.
+	Noops int64 `json:"noops"`
+	// RequestsPerSecond The number of requests per second effectively executed during the reindex.
+	RequestsPerSecond float32 `json:"requests_per_second"`
+	// Retries The number of retries attempted by reindex. `bulk` is the number of bulk
+	// actions retried and `search` is the number of search actions retried.
+	Retries   Retries  `json:"retries"`
+	Throttled Duration `json:"throttled,omitempty"`
+	// ThrottledMillis Number of milliseconds the request slept to conform to `requests_per_second`.
+	ThrottledMillis int64    `json:"throttled_millis"`
+	ThrottledUntil  Duration `json:"throttled_until,omitempty"`
+	// ThrottledUntilMillis This field should always be equal to zero in a `_reindex` response.
+	// It only has meaning when using the Task API, where it indicates the next time
+	// (in milliseconds since epoch) a throttled request will be executed again in
+	// order to conform to `requests_per_second`.
+	ThrottledUntilMillis int64 `json:"throttled_until_millis"`
+	// Total The number of documents that were successfully processed.
+	Total int64 `json:"total"`
+	// Updated The number of documents that were successfully updated, for example, a
+	// document with same ID already existed prior to reindex updating it.
+	Updated int64 `json:"updated"`
+	// VersionConflicts The number of version conflicts that reindex hits.
+	VersionConflicts int64 `json:"version_conflicts"`
 }
 
-// ReindexStatusBuilder holds ReindexStatus struct and provides a builder API.
-type ReindexStatusBuilder struct {
-	v *ReindexStatus
-}
+func (s *ReindexStatus) UnmarshalJSON(data []byte) error {
 
-// NewReindexStatus provides a builder for the ReindexStatus struct.
-func NewReindexStatusBuilder() *ReindexStatusBuilder {
-	r := ReindexStatusBuilder{
-		&ReindexStatus{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "batches":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Batches", err)
+				}
+				s.Batches = value
+			case float64:
+				f := int64(v)
+				s.Batches = f
+			}
+
+		case "created":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Created", err)
+				}
+				s.Created = value
+			case float64:
+				f := int64(v)
+				s.Created = f
+			}
+
+		case "deleted":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Deleted", err)
+				}
+				s.Deleted = value
+			case float64:
+				f := int64(v)
+				s.Deleted = f
+			}
+
+		case "noops":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Noops", err)
+				}
+				s.Noops = value
+			case float64:
+				f := int64(v)
+				s.Noops = f
+			}
+
+		case "requests_per_second":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "RequestsPerSecond", err)
+				}
+				f := float32(value)
+				s.RequestsPerSecond = f
+			case float64:
+				f := float32(v)
+				s.RequestsPerSecond = f
+			}
+
+		case "retries":
+			if err := dec.Decode(&s.Retries); err != nil {
+				return fmt.Errorf("%s | %w", "Retries", err)
+			}
+
+		case "throttled":
+			if err := dec.Decode(&s.Throttled); err != nil {
+				return fmt.Errorf("%s | %w", "Throttled", err)
+			}
+
+		case "throttled_millis":
+			if err := dec.Decode(&s.ThrottledMillis); err != nil {
+				return fmt.Errorf("%s | %w", "ThrottledMillis", err)
+			}
+
+		case "throttled_until":
+			if err := dec.Decode(&s.ThrottledUntil); err != nil {
+				return fmt.Errorf("%s | %w", "ThrottledUntil", err)
+			}
+
+		case "throttled_until_millis":
+			if err := dec.Decode(&s.ThrottledUntilMillis); err != nil {
+				return fmt.Errorf("%s | %w", "ThrottledUntilMillis", err)
+			}
+
+		case "total":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Total", err)
+				}
+				s.Total = value
+			case float64:
+				f := int64(v)
+				s.Total = f
+			}
+
+		case "updated":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Updated", err)
+				}
+				s.Updated = value
+			case float64:
+				f := int64(v)
+				s.Updated = f
+			}
+
+		case "version_conflicts":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "VersionConflicts", err)
+				}
+				s.VersionConflicts = value
+			case float64:
+				f := int64(v)
+				s.VersionConflicts = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ReindexStatus struct
-func (rb *ReindexStatusBuilder) Build() ReindexStatus {
-	return *rb.v
-}
+// NewReindexStatus returns a ReindexStatus.
+func NewReindexStatus() *ReindexStatus {
+	r := &ReindexStatus{}
 
-func (rb *ReindexStatusBuilder) Batches(batches int64) *ReindexStatusBuilder {
-	rb.v.Batches = batches
-	return rb
-}
-
-func (rb *ReindexStatusBuilder) Created(created int64) *ReindexStatusBuilder {
-	rb.v.Created = created
-	return rb
-}
-
-func (rb *ReindexStatusBuilder) Deleted(deleted int64) *ReindexStatusBuilder {
-	rb.v.Deleted = deleted
-	return rb
-}
-
-func (rb *ReindexStatusBuilder) Noops(noops int64) *ReindexStatusBuilder {
-	rb.v.Noops = noops
-	return rb
-}
-
-func (rb *ReindexStatusBuilder) RequestsPerSecond(requestspersecond float32) *ReindexStatusBuilder {
-	rb.v.RequestsPerSecond = requestspersecond
-	return rb
-}
-
-func (rb *ReindexStatusBuilder) Retries(retries *RetriesBuilder) *ReindexStatusBuilder {
-	v := retries.Build()
-	rb.v.Retries = v
-	return rb
-}
-
-func (rb *ReindexStatusBuilder) Throttled(throttled *DurationBuilder) *ReindexStatusBuilder {
-	v := throttled.Build()
-	rb.v.Throttled = &v
-	return rb
-}
-
-func (rb *ReindexStatusBuilder) ThrottledMillis(throttledmillis *DurationValueUnitMillisBuilder) *ReindexStatusBuilder {
-	v := throttledmillis.Build()
-	rb.v.ThrottledMillis = v
-	return rb
-}
-
-func (rb *ReindexStatusBuilder) ThrottledUntil(throttleduntil *DurationBuilder) *ReindexStatusBuilder {
-	v := throttleduntil.Build()
-	rb.v.ThrottledUntil = &v
-	return rb
-}
-
-func (rb *ReindexStatusBuilder) ThrottledUntilMillis(throttleduntilmillis *DurationValueUnitMillisBuilder) *ReindexStatusBuilder {
-	v := throttleduntilmillis.Build()
-	rb.v.ThrottledUntilMillis = v
-	return rb
-}
-
-func (rb *ReindexStatusBuilder) Total(total int64) *ReindexStatusBuilder {
-	rb.v.Total = total
-	return rb
-}
-
-func (rb *ReindexStatusBuilder) Updated(updated int64) *ReindexStatusBuilder {
-	rb.v.Updated = updated
-	return rb
-}
-
-func (rb *ReindexStatusBuilder) VersionConflicts(versionconflicts int64) *ReindexStatusBuilder {
-	rb.v.VersionConflicts = versionconflicts
-	return rb
+	return r
 }

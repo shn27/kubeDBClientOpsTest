@@ -15,62 +15,79 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // MatrixAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/matrix.ts#L26-L29
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/matrix.ts#L26-L36
 type MatrixAggregation struct {
-	Fields  *Fields           `json:"fields,omitempty"`
-	Meta    *Metadata         `json:"meta,omitempty"`
-	Missing map[Field]float64 `json:"missing,omitempty"`
-	Name    *string           `json:"name,omitempty"`
+	// Fields An array of fields for computing the statistics.
+	Fields []string `json:"fields,omitempty"`
+	// Missing The value to apply to documents that do not have a value.
+	// By default, documents without a value are ignored.
+	Missing map[string]Float64 `json:"missing,omitempty"`
 }
 
-// MatrixAggregationBuilder holds MatrixAggregation struct and provides a builder API.
-type MatrixAggregationBuilder struct {
-	v *MatrixAggregation
+func (s *MatrixAggregation) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "fields":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Fields", err)
+				}
+
+				s.Fields = append(s.Fields, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Fields); err != nil {
+					return fmt.Errorf("%s | %w", "Fields", err)
+				}
+			}
+
+		case "missing":
+			if s.Missing == nil {
+				s.Missing = make(map[string]Float64, 0)
+			}
+			if err := dec.Decode(&s.Missing); err != nil {
+				return fmt.Errorf("%s | %w", "Missing", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewMatrixAggregation provides a builder for the MatrixAggregation struct.
-func NewMatrixAggregationBuilder() *MatrixAggregationBuilder {
-	r := MatrixAggregationBuilder{
-		&MatrixAggregation{
-			Missing: make(map[Field]float64, 0),
-		},
+// NewMatrixAggregation returns a MatrixAggregation.
+func NewMatrixAggregation() *MatrixAggregation {
+	r := &MatrixAggregation{
+		Missing: make(map[string]Float64, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the MatrixAggregation struct
-func (rb *MatrixAggregationBuilder) Build() MatrixAggregation {
-	return *rb.v
-}
-
-func (rb *MatrixAggregationBuilder) Fields(fields *FieldsBuilder) *MatrixAggregationBuilder {
-	v := fields.Build()
-	rb.v.Fields = &v
-	return rb
-}
-
-func (rb *MatrixAggregationBuilder) Meta(meta *MetadataBuilder) *MatrixAggregationBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *MatrixAggregationBuilder) Missing(value map[Field]float64) *MatrixAggregationBuilder {
-	rb.v.Missing = value
-	return rb
-}
-
-func (rb *MatrixAggregationBuilder) Name(name string) *MatrixAggregationBuilder {
-	rb.v.Name = &name
-	return rb
+	return r
 }

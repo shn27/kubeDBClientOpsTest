@@ -15,58 +15,117 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // Pool type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/_types/Stats.ts#L339-L344
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/_types/Stats.ts#L949-L966
 type Pool struct {
-	MaxInBytes      *int64 `json:"max_in_bytes,omitempty"`
-	PeakMaxInBytes  *int64 `json:"peak_max_in_bytes,omitempty"`
+	// MaxInBytes Maximum amount of memory, in bytes, available for use by the heap.
+	MaxInBytes *int64 `json:"max_in_bytes,omitempty"`
+	// PeakMaxInBytes Largest amount of memory, in bytes, historically used by the heap.
+	PeakMaxInBytes *int64 `json:"peak_max_in_bytes,omitempty"`
+	// PeakUsedInBytes Largest amount of memory, in bytes, historically used by the heap.
 	PeakUsedInBytes *int64 `json:"peak_used_in_bytes,omitempty"`
-	UsedInBytes     *int64 `json:"used_in_bytes,omitempty"`
+	// UsedInBytes Memory, in bytes, used by the heap.
+	UsedInBytes *int64 `json:"used_in_bytes,omitempty"`
 }
 
-// PoolBuilder holds Pool struct and provides a builder API.
-type PoolBuilder struct {
-	v *Pool
-}
+func (s *Pool) UnmarshalJSON(data []byte) error {
 
-// NewPool provides a builder for the Pool struct.
-func NewPoolBuilder() *PoolBuilder {
-	r := PoolBuilder{
-		&Pool{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "max_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxInBytes", err)
+				}
+				s.MaxInBytes = &value
+			case float64:
+				f := int64(v)
+				s.MaxInBytes = &f
+			}
+
+		case "peak_max_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PeakMaxInBytes", err)
+				}
+				s.PeakMaxInBytes = &value
+			case float64:
+				f := int64(v)
+				s.PeakMaxInBytes = &f
+			}
+
+		case "peak_used_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PeakUsedInBytes", err)
+				}
+				s.PeakUsedInBytes = &value
+			case float64:
+				f := int64(v)
+				s.PeakUsedInBytes = &f
+			}
+
+		case "used_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "UsedInBytes", err)
+				}
+				s.UsedInBytes = &value
+			case float64:
+				f := int64(v)
+				s.UsedInBytes = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the Pool struct
-func (rb *PoolBuilder) Build() Pool {
-	return *rb.v
-}
+// NewPool returns a Pool.
+func NewPool() *Pool {
+	r := &Pool{}
 
-func (rb *PoolBuilder) MaxInBytes(maxinbytes int64) *PoolBuilder {
-	rb.v.MaxInBytes = &maxinbytes
-	return rb
-}
-
-func (rb *PoolBuilder) PeakMaxInBytes(peakmaxinbytes int64) *PoolBuilder {
-	rb.v.PeakMaxInBytes = &peakmaxinbytes
-	return rb
-}
-
-func (rb *PoolBuilder) PeakUsedInBytes(peakusedinbytes int64) *PoolBuilder {
-	rb.v.PeakUsedInBytes = &peakusedinbytes
-	return rb
-}
-
-func (rb *PoolBuilder) UsedInBytes(usedinbytes int64) *PoolBuilder {
-	rb.v.UsedInBytes = &usedinbytes
-	return rb
+	return r
 }

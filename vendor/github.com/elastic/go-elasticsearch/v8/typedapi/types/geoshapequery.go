@@ -15,32 +15,118 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
 )
 
 // GeoShapeQuery type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/geo.ts#L86-L91
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/geo.ts#L131-L147
 type GeoShapeQuery struct {
-	Boost          *float32                     `json:"boost,omitempty"`
-	GeoShapeQuery  map[Field]GeoShapeFieldQuery `json:"-"`
-	IgnoreUnmapped *bool                        `json:"ignore_unmapped,omitempty"`
-	QueryName_     *string                      `json:"_name,omitempty"`
+	// Boost Floating point number used to decrease or increase the relevance scores of
+	// the query.
+	// Boost values are relative to the default value of 1.0.
+	// A boost value between 0 and 1.0 decreases the relevance score.
+	// A value greater than 1.0 increases the relevance score.
+	Boost         *float32                      `json:"boost,omitempty"`
+	GeoShapeQuery map[string]GeoShapeFieldQuery `json:"-"`
+	// IgnoreUnmapped Set to `true` to ignore an unmapped field and not match any documents for
+	// this query.
+	// Set to `false` to throw an exception if the field is not mapped.
+	IgnoreUnmapped *bool   `json:"ignore_unmapped,omitempty"`
+	QueryName_     *string `json:"_name,omitempty"`
+}
+
+func (s *GeoShapeQuery) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "boost":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Boost", err)
+				}
+				f := float32(value)
+				s.Boost = &f
+			case float64:
+				f := float32(v)
+				s.Boost = &f
+			}
+
+		case "ignore_unmapped":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IgnoreUnmapped", err)
+				}
+				s.IgnoreUnmapped = &value
+			case bool:
+				s.IgnoreUnmapped = &v
+			}
+
+		case "_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "QueryName_", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.QueryName_ = &o
+
+		default:
+
+			if key, ok := t.(string); ok {
+				if s.GeoShapeQuery == nil {
+					s.GeoShapeQuery = make(map[string]GeoShapeFieldQuery, 0)
+				}
+				raw := NewGeoShapeFieldQuery()
+				if err := dec.Decode(&raw); err != nil {
+					return fmt.Errorf("%s | %w", "GeoShapeQuery", err)
+				}
+				s.GeoShapeQuery[key] = *raw
+			}
+
+		}
+	}
+	return nil
 }
 
 // MarhsalJSON overrides marshalling for types with additional properties
 func (s GeoShapeQuery) MarshalJSON() ([]byte, error) {
 	type opt GeoShapeQuery
 	// We transform the struct to a map without the embedded additional properties map
-	tmp := make(map[string]interface{}, 0)
+	tmp := make(map[string]any, 0)
 
 	data, err := json.Marshal(opt(s))
 	if err != nil {
@@ -53,8 +139,9 @@ func (s GeoShapeQuery) MarshalJSON() ([]byte, error) {
 
 	// We inline the additional fields from the underlying map
 	for key, value := range s.GeoShapeQuery {
-		tmp[string(key)] = value
+		tmp[fmt.Sprintf("%s", key)] = value
 	}
+	delete(tmp, "GeoShapeQuery")
 
 	data, err = json.Marshal(tmp)
 	if err != nil {
@@ -64,47 +151,11 @@ func (s GeoShapeQuery) MarshalJSON() ([]byte, error) {
 	return data, nil
 }
 
-// GeoShapeQueryBuilder holds GeoShapeQuery struct and provides a builder API.
-type GeoShapeQueryBuilder struct {
-	v *GeoShapeQuery
-}
-
-// NewGeoShapeQuery provides a builder for the GeoShapeQuery struct.
-func NewGeoShapeQueryBuilder() *GeoShapeQueryBuilder {
-	r := GeoShapeQueryBuilder{
-		&GeoShapeQuery{
-			GeoShapeQuery: make(map[Field]GeoShapeFieldQuery, 0),
-		},
+// NewGeoShapeQuery returns a GeoShapeQuery.
+func NewGeoShapeQuery() *GeoShapeQuery {
+	r := &GeoShapeQuery{
+		GeoShapeQuery: make(map[string]GeoShapeFieldQuery, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the GeoShapeQuery struct
-func (rb *GeoShapeQueryBuilder) Build() GeoShapeQuery {
-	return *rb.v
-}
-
-func (rb *GeoShapeQueryBuilder) Boost(boost float32) *GeoShapeQueryBuilder {
-	rb.v.Boost = &boost
-	return rb
-}
-
-func (rb *GeoShapeQueryBuilder) GeoShapeQuery(values map[Field]*GeoShapeFieldQueryBuilder) *GeoShapeQueryBuilder {
-	tmp := make(map[Field]GeoShapeFieldQuery, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.GeoShapeQuery = tmp
-	return rb
-}
-
-func (rb *GeoShapeQueryBuilder) IgnoreUnmapped(ignoreunmapped bool) *GeoShapeQueryBuilder {
-	rb.v.IgnoreUnmapped = &ignoreunmapped
-	return rb
-}
-
-func (rb *GeoShapeQueryBuilder) QueryName_(queryname_ string) *GeoShapeQueryBuilder {
-	rb.v.QueryName_ = &queryname_
-	return rb
+	return r
 }

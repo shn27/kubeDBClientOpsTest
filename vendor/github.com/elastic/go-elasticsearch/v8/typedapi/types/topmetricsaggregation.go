@@ -15,73 +15,124 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // TopMetricsAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/metric.ts#L186-L190
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/metric.ts#L408-L425
 type TopMetricsAggregation struct {
-	Field   *Field            `json:"field,omitempty"`
+	// Field The field on which to run the aggregation.
+	Field *string `json:"field,omitempty"`
+	// Metrics The fields of the top document to return.
 	Metrics []TopMetricsValue `json:"metrics,omitempty"`
-	Missing *Missing          `json:"missing,omitempty"`
-	Script  *Script           `json:"script,omitempty"`
-	Size    *int              `json:"size,omitempty"`
-	Sort    *Sort             `json:"sort,omitempty"`
+	// Missing The value to apply to documents that do not have a value.
+	// By default, documents without a value are ignored.
+	Missing Missing `json:"missing,omitempty"`
+	Script  *Script `json:"script,omitempty"`
+	// Size The number of top documents from which to return metrics.
+	Size *int `json:"size,omitempty"`
+	// Sort The sort order of the documents.
+	Sort []SortCombinations `json:"sort,omitempty"`
 }
 
-// TopMetricsAggregationBuilder holds TopMetricsAggregation struct and provides a builder API.
-type TopMetricsAggregationBuilder struct {
-	v *TopMetricsAggregation
-}
+func (s *TopMetricsAggregation) UnmarshalJSON(data []byte) error {
 
-// NewTopMetricsAggregation provides a builder for the TopMetricsAggregation struct.
-func NewTopMetricsAggregationBuilder() *TopMetricsAggregationBuilder {
-	r := TopMetricsAggregationBuilder{
-		&TopMetricsAggregation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "metrics":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := NewTopMetricsValue()
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Metrics", err)
+				}
+
+				s.Metrics = append(s.Metrics, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Metrics); err != nil {
+					return fmt.Errorf("%s | %w", "Metrics", err)
+				}
+			}
+
+		case "missing":
+			if err := dec.Decode(&s.Missing); err != nil {
+				return fmt.Errorf("%s | %w", "Missing", err)
+			}
+
+		case "script":
+			if err := dec.Decode(&s.Script); err != nil {
+				return fmt.Errorf("%s | %w", "Script", err)
+			}
+
+		case "size":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Size", err)
+				}
+				s.Size = &value
+			case float64:
+				f := int(v)
+				s.Size = &f
+			}
+
+		case "sort":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(SortCombinations)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Sort", err)
+				}
+
+				s.Sort = append(s.Sort, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Sort); err != nil {
+					return fmt.Errorf("%s | %w", "Sort", err)
+				}
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TopMetricsAggregation struct
-func (rb *TopMetricsAggregationBuilder) Build() TopMetricsAggregation {
-	return *rb.v
-}
+// NewTopMetricsAggregation returns a TopMetricsAggregation.
+func NewTopMetricsAggregation() *TopMetricsAggregation {
+	r := &TopMetricsAggregation{}
 
-func (rb *TopMetricsAggregationBuilder) Field(field Field) *TopMetricsAggregationBuilder {
-	rb.v.Field = &field
-	return rb
-}
-
-func (rb *TopMetricsAggregationBuilder) Metrics(arg []TopMetricsValue) *TopMetricsAggregationBuilder {
-	rb.v.Metrics = arg
-	return rb
-}
-
-func (rb *TopMetricsAggregationBuilder) Missing(missing *MissingBuilder) *TopMetricsAggregationBuilder {
-	v := missing.Build()
-	rb.v.Missing = &v
-	return rb
-}
-
-func (rb *TopMetricsAggregationBuilder) Script(script *ScriptBuilder) *TopMetricsAggregationBuilder {
-	v := script.Build()
-	rb.v.Script = &v
-	return rb
-}
-
-func (rb *TopMetricsAggregationBuilder) Size(size int) *TopMetricsAggregationBuilder {
-	rb.v.Size = &size
-	return rb
-}
-
-func (rb *TopMetricsAggregationBuilder) Sort(sort *SortBuilder) *TopMetricsAggregationBuilder {
-	v := sort.Build()
-	rb.v.Sort = &v
-	return rb
+	return r
 }

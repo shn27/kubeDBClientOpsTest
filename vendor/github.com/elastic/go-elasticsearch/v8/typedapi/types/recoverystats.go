@@ -15,60 +15,93 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // RecoveryStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Stats.ts#L161-L166
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Stats.ts#L228-L233
 type RecoveryStats struct {
-	CurrentAsSource      int64                   `json:"current_as_source"`
-	CurrentAsTarget      int64                   `json:"current_as_target"`
-	ThrottleTime         *Duration               `json:"throttle_time,omitempty"`
-	ThrottleTimeInMillis DurationValueUnitMillis `json:"throttle_time_in_millis"`
+	CurrentAsSource      int64    `json:"current_as_source"`
+	CurrentAsTarget      int64    `json:"current_as_target"`
+	ThrottleTime         Duration `json:"throttle_time,omitempty"`
+	ThrottleTimeInMillis int64    `json:"throttle_time_in_millis"`
 }
 
-// RecoveryStatsBuilder holds RecoveryStats struct and provides a builder API.
-type RecoveryStatsBuilder struct {
-	v *RecoveryStats
-}
+func (s *RecoveryStats) UnmarshalJSON(data []byte) error {
 
-// NewRecoveryStats provides a builder for the RecoveryStats struct.
-func NewRecoveryStatsBuilder() *RecoveryStatsBuilder {
-	r := RecoveryStatsBuilder{
-		&RecoveryStats{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "current_as_source":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CurrentAsSource", err)
+				}
+				s.CurrentAsSource = value
+			case float64:
+				f := int64(v)
+				s.CurrentAsSource = f
+			}
+
+		case "current_as_target":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CurrentAsTarget", err)
+				}
+				s.CurrentAsTarget = value
+			case float64:
+				f := int64(v)
+				s.CurrentAsTarget = f
+			}
+
+		case "throttle_time":
+			if err := dec.Decode(&s.ThrottleTime); err != nil {
+				return fmt.Errorf("%s | %w", "ThrottleTime", err)
+			}
+
+		case "throttle_time_in_millis":
+			if err := dec.Decode(&s.ThrottleTimeInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "ThrottleTimeInMillis", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RecoveryStats struct
-func (rb *RecoveryStatsBuilder) Build() RecoveryStats {
-	return *rb.v
-}
+// NewRecoveryStats returns a RecoveryStats.
+func NewRecoveryStats() *RecoveryStats {
+	r := &RecoveryStats{}
 
-func (rb *RecoveryStatsBuilder) CurrentAsSource(currentassource int64) *RecoveryStatsBuilder {
-	rb.v.CurrentAsSource = currentassource
-	return rb
-}
-
-func (rb *RecoveryStatsBuilder) CurrentAsTarget(currentastarget int64) *RecoveryStatsBuilder {
-	rb.v.CurrentAsTarget = currentastarget
-	return rb
-}
-
-func (rb *RecoveryStatsBuilder) ThrottleTime(throttletime *DurationBuilder) *RecoveryStatsBuilder {
-	v := throttletime.Build()
-	rb.v.ThrottleTime = &v
-	return rb
-}
-
-func (rb *RecoveryStatsBuilder) ThrottleTimeInMillis(throttletimeinmillis *DurationValueUnitMillisBuilder) *RecoveryStatsBuilder {
-	v := throttletimeinmillis.Build()
-	rb.v.ThrottleTimeInMillis = v
-	return rb
+	return r
 }

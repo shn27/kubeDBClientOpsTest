@@ -15,49 +15,27 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // ClusterNetworkTypes type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/stats/types.ts#L171-L174
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/stats/types.ts#L337-L346
 type ClusterNetworkTypes struct {
-	HttpTypes      map[string]int `json:"http_types"`
+	// HttpTypes Contains statistics about the HTTP network types used by selected nodes.
+	HttpTypes map[string]int `json:"http_types"`
+	// TransportTypes Contains statistics about the transport network types used by selected nodes.
 	TransportTypes map[string]int `json:"transport_types"`
 }
 
-// ClusterNetworkTypesBuilder holds ClusterNetworkTypes struct and provides a builder API.
-type ClusterNetworkTypesBuilder struct {
-	v *ClusterNetworkTypes
-}
-
-// NewClusterNetworkTypes provides a builder for the ClusterNetworkTypes struct.
-func NewClusterNetworkTypesBuilder() *ClusterNetworkTypesBuilder {
-	r := ClusterNetworkTypesBuilder{
-		&ClusterNetworkTypes{
-			HttpTypes:      make(map[string]int, 0),
-			TransportTypes: make(map[string]int, 0),
-		},
+// NewClusterNetworkTypes returns a ClusterNetworkTypes.
+func NewClusterNetworkTypes() *ClusterNetworkTypes {
+	r := &ClusterNetworkTypes{
+		HttpTypes:      make(map[string]int, 0),
+		TransportTypes: make(map[string]int, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the ClusterNetworkTypes struct
-func (rb *ClusterNetworkTypesBuilder) Build() ClusterNetworkTypes {
-	return *rb.v
-}
-
-func (rb *ClusterNetworkTypesBuilder) HttpTypes(value map[string]int) *ClusterNetworkTypesBuilder {
-	rb.v.HttpTypes = value
-	return rb
-}
-
-func (rb *ClusterNetworkTypesBuilder) TransportTypes(value map[string]int) *ClusterNetworkTypesBuilder {
-	rb.v.TransportTypes = value
-	return rb
+	return r
 }

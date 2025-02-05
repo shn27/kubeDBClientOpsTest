@@ -15,96 +15,140 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/shardroutingstate"
 )
 
 // NodeShard type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Node.ts#L55-L65
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Node.ts#L54-L65
 type NodeShard struct {
-	AllocationId   map[string]Id                       `json:"allocation_id,omitempty"`
-	Index          IndexName                           `json:"index"`
-	Node           *NodeName                           `json:"node,omitempty"`
-	Primary        bool                                `json:"primary"`
-	RecoverySource map[string]Id                       `json:"recovery_source,omitempty"`
-	RelocatingNode NodeId                              `json:"relocating_node,omitempty"`
-	Shard          int                                 `json:"shard"`
-	State          shardroutingstate.ShardRoutingState `json:"state"`
-	UnassignedInfo *UnassignedInformation              `json:"unassigned_info,omitempty"`
+	AllocationId          map[string]string                   `json:"allocation_id,omitempty"`
+	Index                 string                              `json:"index"`
+	Node                  *string                             `json:"node,omitempty"`
+	Primary               bool                                `json:"primary"`
+	RecoverySource        map[string]string                   `json:"recovery_source,omitempty"`
+	RelocatingNode        *string                             `json:"relocating_node,omitempty"`
+	RelocationFailureInfo *RelocationFailureInfo              `json:"relocation_failure_info,omitempty"`
+	Shard                 int                                 `json:"shard"`
+	State                 shardroutingstate.ShardRoutingState `json:"state"`
+	UnassignedInfo        *UnassignedInformation              `json:"unassigned_info,omitempty"`
 }
 
-// NodeShardBuilder holds NodeShard struct and provides a builder API.
-type NodeShardBuilder struct {
-	v *NodeShard
+func (s *NodeShard) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "allocation_id":
+			if s.AllocationId == nil {
+				s.AllocationId = make(map[string]string, 0)
+			}
+			if err := dec.Decode(&s.AllocationId); err != nil {
+				return fmt.Errorf("%s | %w", "AllocationId", err)
+			}
+
+		case "index":
+			if err := dec.Decode(&s.Index); err != nil {
+				return fmt.Errorf("%s | %w", "Index", err)
+			}
+
+		case "node":
+			if err := dec.Decode(&s.Node); err != nil {
+				return fmt.Errorf("%s | %w", "Node", err)
+			}
+
+		case "primary":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Primary", err)
+				}
+				s.Primary = value
+			case bool:
+				s.Primary = v
+			}
+
+		case "recovery_source":
+			if s.RecoverySource == nil {
+				s.RecoverySource = make(map[string]string, 0)
+			}
+			if err := dec.Decode(&s.RecoverySource); err != nil {
+				return fmt.Errorf("%s | %w", "RecoverySource", err)
+			}
+
+		case "relocating_node":
+			if err := dec.Decode(&s.RelocatingNode); err != nil {
+				return fmt.Errorf("%s | %w", "RelocatingNode", err)
+			}
+
+		case "relocation_failure_info":
+			if err := dec.Decode(&s.RelocationFailureInfo); err != nil {
+				return fmt.Errorf("%s | %w", "RelocationFailureInfo", err)
+			}
+
+		case "shard":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Shard", err)
+				}
+				s.Shard = value
+			case float64:
+				f := int(v)
+				s.Shard = f
+			}
+
+		case "state":
+			if err := dec.Decode(&s.State); err != nil {
+				return fmt.Errorf("%s | %w", "State", err)
+			}
+
+		case "unassigned_info":
+			if err := dec.Decode(&s.UnassignedInfo); err != nil {
+				return fmt.Errorf("%s | %w", "UnassignedInfo", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewNodeShard provides a builder for the NodeShard struct.
-func NewNodeShardBuilder() *NodeShardBuilder {
-	r := NodeShardBuilder{
-		&NodeShard{
-			AllocationId:   make(map[string]Id, 0),
-			RecoverySource: make(map[string]Id, 0),
-		},
+// NewNodeShard returns a NodeShard.
+func NewNodeShard() *NodeShard {
+	r := &NodeShard{
+		AllocationId:   make(map[string]string, 0),
+		RecoverySource: make(map[string]string, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the NodeShard struct
-func (rb *NodeShardBuilder) Build() NodeShard {
-	return *rb.v
-}
-
-func (rb *NodeShardBuilder) AllocationId(value map[string]Id) *NodeShardBuilder {
-	rb.v.AllocationId = value
-	return rb
-}
-
-func (rb *NodeShardBuilder) Index(index IndexName) *NodeShardBuilder {
-	rb.v.Index = index
-	return rb
-}
-
-func (rb *NodeShardBuilder) Node(node NodeName) *NodeShardBuilder {
-	rb.v.Node = &node
-	return rb
-}
-
-func (rb *NodeShardBuilder) Primary(primary bool) *NodeShardBuilder {
-	rb.v.Primary = primary
-	return rb
-}
-
-func (rb *NodeShardBuilder) RecoverySource(value map[string]Id) *NodeShardBuilder {
-	rb.v.RecoverySource = value
-	return rb
-}
-
-func (rb *NodeShardBuilder) RelocatingNode(relocatingnode NodeId) *NodeShardBuilder {
-	rb.v.RelocatingNode = relocatingnode
-	return rb
-}
-
-func (rb *NodeShardBuilder) Shard(shard int) *NodeShardBuilder {
-	rb.v.Shard = shard
-	return rb
-}
-
-func (rb *NodeShardBuilder) State(state shardroutingstate.ShardRoutingState) *NodeShardBuilder {
-	rb.v.State = state
-	return rb
-}
-
-func (rb *NodeShardBuilder) UnassignedInfo(unassignedinfo *UnassignedInformationBuilder) *NodeShardBuilder {
-	v := unassignedinfo.Build()
-	rb.v.UnassignedInfo = &v
-	return rb
+	return r
 }

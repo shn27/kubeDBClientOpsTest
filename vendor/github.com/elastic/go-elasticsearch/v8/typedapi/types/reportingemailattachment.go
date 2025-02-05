@@ -15,66 +15,106 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ReportingEmailAttachment type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Actions.ts#L224-L232
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Actions.ts#L224-L232
 type ReportingEmailAttachment struct {
 	Inline   *bool                       `json:"inline,omitempty"`
-	Interval *Duration                   `json:"interval,omitempty"`
+	Interval Duration                    `json:"interval,omitempty"`
 	Request  *HttpInputRequestDefinition `json:"request,omitempty"`
 	Retries  *int                        `json:"retries,omitempty"`
 	Url      string                      `json:"url"`
 }
 
-// ReportingEmailAttachmentBuilder holds ReportingEmailAttachment struct and provides a builder API.
-type ReportingEmailAttachmentBuilder struct {
-	v *ReportingEmailAttachment
-}
+func (s *ReportingEmailAttachment) UnmarshalJSON(data []byte) error {
 
-// NewReportingEmailAttachment provides a builder for the ReportingEmailAttachment struct.
-func NewReportingEmailAttachmentBuilder() *ReportingEmailAttachmentBuilder {
-	r := ReportingEmailAttachmentBuilder{
-		&ReportingEmailAttachment{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "inline":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Inline", err)
+				}
+				s.Inline = &value
+			case bool:
+				s.Inline = &v
+			}
+
+		case "interval":
+			if err := dec.Decode(&s.Interval); err != nil {
+				return fmt.Errorf("%s | %w", "Interval", err)
+			}
+
+		case "request":
+			if err := dec.Decode(&s.Request); err != nil {
+				return fmt.Errorf("%s | %w", "Request", err)
+			}
+
+		case "retries":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Retries", err)
+				}
+				s.Retries = &value
+			case float64:
+				f := int(v)
+				s.Retries = &f
+			}
+
+		case "url":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Url", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Url = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ReportingEmailAttachment struct
-func (rb *ReportingEmailAttachmentBuilder) Build() ReportingEmailAttachment {
-	return *rb.v
-}
+// NewReportingEmailAttachment returns a ReportingEmailAttachment.
+func NewReportingEmailAttachment() *ReportingEmailAttachment {
+	r := &ReportingEmailAttachment{}
 
-func (rb *ReportingEmailAttachmentBuilder) Inline(inline bool) *ReportingEmailAttachmentBuilder {
-	rb.v.Inline = &inline
-	return rb
-}
-
-func (rb *ReportingEmailAttachmentBuilder) Interval(interval *DurationBuilder) *ReportingEmailAttachmentBuilder {
-	v := interval.Build()
-	rb.v.Interval = &v
-	return rb
-}
-
-func (rb *ReportingEmailAttachmentBuilder) Request(request *HttpInputRequestDefinitionBuilder) *ReportingEmailAttachmentBuilder {
-	v := request.Build()
-	rb.v.Request = &v
-	return rb
-}
-
-func (rb *ReportingEmailAttachmentBuilder) Retries(retries int) *ReportingEmailAttachmentBuilder {
-	rb.v.Retries = &retries
-	return rb
-}
-
-func (rb *ReportingEmailAttachmentBuilder) Url(url string) *ReportingEmailAttachmentBuilder {
-	rb.v.Url = url
-	return rb
+	return r
 }

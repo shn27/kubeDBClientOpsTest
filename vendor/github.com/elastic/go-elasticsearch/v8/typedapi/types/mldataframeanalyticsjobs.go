@@ -15,16 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // MlDataFrameAnalyticsJobs type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/usage/types.ts#L168-L173
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/xpack/usage/types.ts#L175-L180
 type MlDataFrameAnalyticsJobs struct {
 	All_           MlDataFrameAnalyticsJobsCount     `json:"_all"`
 	AnalysisCounts *MlDataFrameAnalyticsJobsAnalysis `json:"analysis_counts,omitempty"`
@@ -32,45 +30,9 @@ type MlDataFrameAnalyticsJobs struct {
 	Stopped        *MlDataFrameAnalyticsJobsCount    `json:"stopped,omitempty"`
 }
 
-// MlDataFrameAnalyticsJobsBuilder holds MlDataFrameAnalyticsJobs struct and provides a builder API.
-type MlDataFrameAnalyticsJobsBuilder struct {
-	v *MlDataFrameAnalyticsJobs
-}
+// NewMlDataFrameAnalyticsJobs returns a MlDataFrameAnalyticsJobs.
+func NewMlDataFrameAnalyticsJobs() *MlDataFrameAnalyticsJobs {
+	r := &MlDataFrameAnalyticsJobs{}
 
-// NewMlDataFrameAnalyticsJobs provides a builder for the MlDataFrameAnalyticsJobs struct.
-func NewMlDataFrameAnalyticsJobsBuilder() *MlDataFrameAnalyticsJobsBuilder {
-	r := MlDataFrameAnalyticsJobsBuilder{
-		&MlDataFrameAnalyticsJobs{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the MlDataFrameAnalyticsJobs struct
-func (rb *MlDataFrameAnalyticsJobsBuilder) Build() MlDataFrameAnalyticsJobs {
-	return *rb.v
-}
-
-func (rb *MlDataFrameAnalyticsJobsBuilder) All_(all_ *MlDataFrameAnalyticsJobsCountBuilder) *MlDataFrameAnalyticsJobsBuilder {
-	v := all_.Build()
-	rb.v.All_ = v
-	return rb
-}
-
-func (rb *MlDataFrameAnalyticsJobsBuilder) AnalysisCounts(analysiscounts *MlDataFrameAnalyticsJobsAnalysisBuilder) *MlDataFrameAnalyticsJobsBuilder {
-	v := analysiscounts.Build()
-	rb.v.AnalysisCounts = &v
-	return rb
-}
-
-func (rb *MlDataFrameAnalyticsJobsBuilder) MemoryUsage(memoryusage *MlDataFrameAnalyticsJobsMemoryBuilder) *MlDataFrameAnalyticsJobsBuilder {
-	v := memoryusage.Build()
-	rb.v.MemoryUsage = &v
-	return rb
-}
-
-func (rb *MlDataFrameAnalyticsJobsBuilder) Stopped(stopped *MlDataFrameAnalyticsJobsCountBuilder) *MlDataFrameAnalyticsJobsBuilder {
-	v := stopped.Build()
-	rb.v.Stopped = &v
-	return rb
+	return r
 }

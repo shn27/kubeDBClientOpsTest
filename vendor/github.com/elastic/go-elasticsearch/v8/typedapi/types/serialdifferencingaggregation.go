@@ -15,79 +15,100 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/gappolicy"
 )
 
 // SerialDifferencingAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/pipeline.ts#L268-L270
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/pipeline.ts#L399-L408
 type SerialDifferencingAggregation struct {
 	// BucketsPath Path to the buckets that contain one set of values to correlate.
-	BucketsPath *BucketsPath         `json:"buckets_path,omitempty"`
-	Format      *string              `json:"format,omitempty"`
-	GapPolicy   *gappolicy.GapPolicy `json:"gap_policy,omitempty"`
-	Lag         *int                 `json:"lag,omitempty"`
-	Meta        *Metadata            `json:"meta,omitempty"`
-	Name        *string              `json:"name,omitempty"`
+	BucketsPath BucketsPath `json:"buckets_path,omitempty"`
+	// Format `DecimalFormat` pattern for the output value.
+	// If specified, the formatted value is returned in the aggregation’s
+	// `value_as_string` property.
+	Format *string `json:"format,omitempty"`
+	// GapPolicy Policy to apply when gaps are found in the data.
+	GapPolicy *gappolicy.GapPolicy `json:"gap_policy,omitempty"`
+	// Lag The historical bucket to subtract from the current value.
+	// Must be a positive, non-zero integer.
+	Lag *int `json:"lag,omitempty"`
 }
 
-// SerialDifferencingAggregationBuilder holds SerialDifferencingAggregation struct and provides a builder API.
-type SerialDifferencingAggregationBuilder struct {
-	v *SerialDifferencingAggregation
-}
+func (s *SerialDifferencingAggregation) UnmarshalJSON(data []byte) error {
 
-// NewSerialDifferencingAggregation provides a builder for the SerialDifferencingAggregation struct.
-func NewSerialDifferencingAggregationBuilder() *SerialDifferencingAggregationBuilder {
-	r := SerialDifferencingAggregationBuilder{
-		&SerialDifferencingAggregation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "buckets_path":
+			if err := dec.Decode(&s.BucketsPath); err != nil {
+				return fmt.Errorf("%s | %w", "BucketsPath", err)
+			}
+
+		case "format":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Format", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Format = &o
+
+		case "gap_policy":
+			if err := dec.Decode(&s.GapPolicy); err != nil {
+				return fmt.Errorf("%s | %w", "GapPolicy", err)
+			}
+
+		case "lag":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Lag", err)
+				}
+				s.Lag = &value
+			case float64:
+				f := int(v)
+				s.Lag = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SerialDifferencingAggregation struct
-func (rb *SerialDifferencingAggregationBuilder) Build() SerialDifferencingAggregation {
-	return *rb.v
-}
+// NewSerialDifferencingAggregation returns a SerialDifferencingAggregation.
+func NewSerialDifferencingAggregation() *SerialDifferencingAggregation {
+	r := &SerialDifferencingAggregation{}
 
-// BucketsPath Path to the buckets that contain one set of values to correlate.
-
-func (rb *SerialDifferencingAggregationBuilder) BucketsPath(bucketspath *BucketsPathBuilder) *SerialDifferencingAggregationBuilder {
-	v := bucketspath.Build()
-	rb.v.BucketsPath = &v
-	return rb
-}
-
-func (rb *SerialDifferencingAggregationBuilder) Format(format string) *SerialDifferencingAggregationBuilder {
-	rb.v.Format = &format
-	return rb
-}
-
-func (rb *SerialDifferencingAggregationBuilder) GapPolicy(gappolicy gappolicy.GapPolicy) *SerialDifferencingAggregationBuilder {
-	rb.v.GapPolicy = &gappolicy
-	return rb
-}
-
-func (rb *SerialDifferencingAggregationBuilder) Lag(lag int) *SerialDifferencingAggregationBuilder {
-	rb.v.Lag = &lag
-	return rb
-}
-
-func (rb *SerialDifferencingAggregationBuilder) Meta(meta *MetadataBuilder) *SerialDifferencingAggregationBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *SerialDifferencingAggregationBuilder) Name(name string) *SerialDifferencingAggregationBuilder {
-	rb.v.Name = &name
-	return rb
+	return r
 }

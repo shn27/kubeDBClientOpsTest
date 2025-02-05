@@ -15,178 +15,245 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // TasksRecord type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cat/tasks/types.ts#L22-L101
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cat/tasks/types.ts#L22-L101
 type TasksRecord struct {
-	// Action task action
+	// Action The task action.
 	Action *string `json:"action,omitempty"`
-	// Description task action
+	// Description The task action description.
 	Description *string `json:"description,omitempty"`
-	// Id id of the task with the node
-	Id *Id `json:"id,omitempty"`
-	// Ip ip address
+	// Id The identifier of the task with the node.
+	Id *string `json:"id,omitempty"`
+	// Ip The IP address for the node.
 	Ip *string `json:"ip,omitempty"`
-	// Node node name
+	// Node The node name.
 	Node *string `json:"node,omitempty"`
-	// NodeId unique node id
-	NodeId *NodeId `json:"node_id,omitempty"`
-	// ParentTaskId parent task id
+	// NodeId The unique node identifier.
+	NodeId *string `json:"node_id,omitempty"`
+	// ParentTaskId The parent task identifier.
 	ParentTaskId *string `json:"parent_task_id,omitempty"`
-	// Port bound transport port
+	// Port The bound transport port for the node.
 	Port *string `json:"port,omitempty"`
-	// RunningTime running time
+	// RunningTime The running time.
 	RunningTime *string `json:"running_time,omitempty"`
-	// RunningTimeNs running time ns
+	// RunningTimeNs The running time in nanoseconds.
 	RunningTimeNs *string `json:"running_time_ns,omitempty"`
-	// StartTime start time in ms
+	// StartTime The start time in milliseconds.
 	StartTime *string `json:"start_time,omitempty"`
-	// TaskId unique task id
-	TaskId *Id `json:"task_id,omitempty"`
-	// Timestamp start time in HH:MM:SS
+	// TaskId The unique task identifier.
+	TaskId *string `json:"task_id,omitempty"`
+	// Timestamp The start time in `HH:MM:SS` format.
 	Timestamp *string `json:"timestamp,omitempty"`
-	// Type task type
+	// Type The task type.
 	Type *string `json:"type,omitempty"`
-	// Version es version
-	Version *VersionString `json:"version,omitempty"`
-	// XOpaqueId X-Opaque-ID header
+	// Version The Elasticsearch version.
+	Version *string `json:"version,omitempty"`
+	// XOpaqueId The X-Opaque-ID header.
 	XOpaqueId *string `json:"x_opaque_id,omitempty"`
 }
 
-// TasksRecordBuilder holds TasksRecord struct and provides a builder API.
-type TasksRecordBuilder struct {
-	v *TasksRecord
-}
+func (s *TasksRecord) UnmarshalJSON(data []byte) error {
 
-// NewTasksRecord provides a builder for the TasksRecord struct.
-func NewTasksRecordBuilder() *TasksRecordBuilder {
-	r := TasksRecordBuilder{
-		&TasksRecord{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "action", "ac":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Action", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Action = &o
+
+		case "description", "desc":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Description", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Description = &o
+
+		case "id":
+			if err := dec.Decode(&s.Id); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
+
+		case "ip", "i":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Ip", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Ip = &o
+
+		case "node", "n":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Node", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Node = &o
+
+		case "node_id", "ni":
+			if err := dec.Decode(&s.NodeId); err != nil {
+				return fmt.Errorf("%s | %w", "NodeId", err)
+			}
+
+		case "parent_task_id", "pti":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ParentTaskId", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ParentTaskId = &o
+
+		case "port", "po":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Port", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Port = &o
+
+		case "running_time", "time":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "RunningTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.RunningTime = &o
+
+		case "running_time_ns":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "RunningTimeNs", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.RunningTimeNs = &o
+
+		case "start_time", "start":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "StartTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.StartTime = &o
+
+		case "task_id", "ti":
+			if err := dec.Decode(&s.TaskId); err != nil {
+				return fmt.Errorf("%s | %w", "TaskId", err)
+			}
+
+		case "timestamp", "ts", "hms", "hhmmss":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Timestamp", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Timestamp = &o
+
+		case "type", "ty":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Type = &o
+
+		case "version", "v":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		case "x_opaque_id", "x":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "XOpaqueId", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.XOpaqueId = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TasksRecord struct
-func (rb *TasksRecordBuilder) Build() TasksRecord {
-	return *rb.v
-}
+// NewTasksRecord returns a TasksRecord.
+func NewTasksRecord() *TasksRecord {
+	r := &TasksRecord{}
 
-// Action task action
-
-func (rb *TasksRecordBuilder) Action(action string) *TasksRecordBuilder {
-	rb.v.Action = &action
-	return rb
-}
-
-// Description task action
-
-func (rb *TasksRecordBuilder) Description(description string) *TasksRecordBuilder {
-	rb.v.Description = &description
-	return rb
-}
-
-// Id id of the task with the node
-
-func (rb *TasksRecordBuilder) Id(id Id) *TasksRecordBuilder {
-	rb.v.Id = &id
-	return rb
-}
-
-// Ip ip address
-
-func (rb *TasksRecordBuilder) Ip(ip string) *TasksRecordBuilder {
-	rb.v.Ip = &ip
-	return rb
-}
-
-// Node node name
-
-func (rb *TasksRecordBuilder) Node(node string) *TasksRecordBuilder {
-	rb.v.Node = &node
-	return rb
-}
-
-// NodeId unique node id
-
-func (rb *TasksRecordBuilder) NodeId(nodeid NodeId) *TasksRecordBuilder {
-	rb.v.NodeId = &nodeid
-	return rb
-}
-
-// ParentTaskId parent task id
-
-func (rb *TasksRecordBuilder) ParentTaskId(parenttaskid string) *TasksRecordBuilder {
-	rb.v.ParentTaskId = &parenttaskid
-	return rb
-}
-
-// Port bound transport port
-
-func (rb *TasksRecordBuilder) Port(port string) *TasksRecordBuilder {
-	rb.v.Port = &port
-	return rb
-}
-
-// RunningTime running time
-
-func (rb *TasksRecordBuilder) RunningTime(runningtime string) *TasksRecordBuilder {
-	rb.v.RunningTime = &runningtime
-	return rb
-}
-
-// RunningTimeNs running time ns
-
-func (rb *TasksRecordBuilder) RunningTimeNs(runningtimens string) *TasksRecordBuilder {
-	rb.v.RunningTimeNs = &runningtimens
-	return rb
-}
-
-// StartTime start time in ms
-
-func (rb *TasksRecordBuilder) StartTime(starttime string) *TasksRecordBuilder {
-	rb.v.StartTime = &starttime
-	return rb
-}
-
-// TaskId unique task id
-
-func (rb *TasksRecordBuilder) TaskId(taskid Id) *TasksRecordBuilder {
-	rb.v.TaskId = &taskid
-	return rb
-}
-
-// Timestamp start time in HH:MM:SS
-
-func (rb *TasksRecordBuilder) Timestamp(timestamp string) *TasksRecordBuilder {
-	rb.v.Timestamp = &timestamp
-	return rb
-}
-
-// Type task type
-
-func (rb *TasksRecordBuilder) Type_(type_ string) *TasksRecordBuilder {
-	rb.v.Type = &type_
-	return rb
-}
-
-// Version es version
-
-func (rb *TasksRecordBuilder) Version(version VersionString) *TasksRecordBuilder {
-	rb.v.Version = &version
-	return rb
-}
-
-// XOpaqueId X-Opaque-ID header
-
-func (rb *TasksRecordBuilder) XOpaqueId(xopaqueid string) *TasksRecordBuilder {
-	rb.v.XOpaqueId = &xopaqueid
-	return rb
+	return r
 }

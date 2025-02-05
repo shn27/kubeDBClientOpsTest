@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DataframeAnalyticsFieldSelection type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/DataframeAnalytics.ts#L55-L68
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/DataframeAnalytics.ts#L55-L68
 type DataframeAnalyticsFieldSelection struct {
 	// FeatureType The feature type of this field for the analysis. May be categorical or
 	// numerical.
@@ -36,69 +43,96 @@ type DataframeAnalyticsFieldSelection struct {
 	// MappingTypes The mapping types of the field.
 	MappingTypes []string `json:"mapping_types"`
 	// Name The field name.
-	Name Field `json:"name"`
+	Name string `json:"name"`
 	// Reason The reason a field is not selected to be included in the analysis.
 	Reason *string `json:"reason,omitempty"`
 }
 
-// DataframeAnalyticsFieldSelectionBuilder holds DataframeAnalyticsFieldSelection struct and provides a builder API.
-type DataframeAnalyticsFieldSelectionBuilder struct {
-	v *DataframeAnalyticsFieldSelection
-}
+func (s *DataframeAnalyticsFieldSelection) UnmarshalJSON(data []byte) error {
 
-// NewDataframeAnalyticsFieldSelection provides a builder for the DataframeAnalyticsFieldSelection struct.
-func NewDataframeAnalyticsFieldSelectionBuilder() *DataframeAnalyticsFieldSelectionBuilder {
-	r := DataframeAnalyticsFieldSelectionBuilder{
-		&DataframeAnalyticsFieldSelection{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "feature_type":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "FeatureType", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.FeatureType = &o
+
+		case "is_included":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IsIncluded", err)
+				}
+				s.IsIncluded = value
+			case bool:
+				s.IsIncluded = v
+			}
+
+		case "is_required":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IsRequired", err)
+				}
+				s.IsRequired = value
+			case bool:
+				s.IsRequired = v
+			}
+
+		case "mapping_types":
+			if err := dec.Decode(&s.MappingTypes); err != nil {
+				return fmt.Errorf("%s | %w", "MappingTypes", err)
+			}
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		case "reason":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Reason", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Reason = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DataframeAnalyticsFieldSelection struct
-func (rb *DataframeAnalyticsFieldSelectionBuilder) Build() DataframeAnalyticsFieldSelection {
-	return *rb.v
-}
+// NewDataframeAnalyticsFieldSelection returns a DataframeAnalyticsFieldSelection.
+func NewDataframeAnalyticsFieldSelection() *DataframeAnalyticsFieldSelection {
+	r := &DataframeAnalyticsFieldSelection{}
 
-// FeatureType The feature type of this field for the analysis. May be categorical or
-// numerical.
-
-func (rb *DataframeAnalyticsFieldSelectionBuilder) FeatureType(featuretype string) *DataframeAnalyticsFieldSelectionBuilder {
-	rb.v.FeatureType = &featuretype
-	return rb
-}
-
-// IsIncluded Whether the field is selected to be included in the analysis.
-
-func (rb *DataframeAnalyticsFieldSelectionBuilder) IsIncluded(isincluded bool) *DataframeAnalyticsFieldSelectionBuilder {
-	rb.v.IsIncluded = isincluded
-	return rb
-}
-
-// IsRequired Whether the field is required.
-
-func (rb *DataframeAnalyticsFieldSelectionBuilder) IsRequired(isrequired bool) *DataframeAnalyticsFieldSelectionBuilder {
-	rb.v.IsRequired = isrequired
-	return rb
-}
-
-// MappingTypes The mapping types of the field.
-
-func (rb *DataframeAnalyticsFieldSelectionBuilder) MappingTypes(mapping_types ...string) *DataframeAnalyticsFieldSelectionBuilder {
-	rb.v.MappingTypes = mapping_types
-	return rb
-}
-
-// Name The field name.
-
-func (rb *DataframeAnalyticsFieldSelectionBuilder) Name(name Field) *DataframeAnalyticsFieldSelectionBuilder {
-	rb.v.Name = name
-	return rb
-}
-
-// Reason The reason a field is not selected to be included in the analysis.
-
-func (rb *DataframeAnalyticsFieldSelectionBuilder) Reason(reason string) *DataframeAnalyticsFieldSelectionBuilder {
-	rb.v.Reason = &reason
-	return rb
+	return r
 }

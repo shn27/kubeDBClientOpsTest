@@ -1,6 +1,7 @@
 package work_ElasticSearch
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	utils "github.com/shn27/Test/utils"
@@ -10,6 +11,7 @@ import (
 	kmapi "kmodules.xyz/client-go/api/v1"
 	api "kubedb.dev/apimachinery/apis/kubedb/v1"
 	"kubedb.dev/db-client-go/elasticsearch"
+	"log"
 )
 
 var ElasticSearch = &cobra.Command{
@@ -24,6 +26,7 @@ var ElasticSearch = &cobra.Command{
 		}
 	},
 }
+var indentL1 = "  "
 
 func GetElasticSearchClient() (*elasticsearch.Client, error) {
 	fmt.Println("GetElasticSearchClient")
@@ -54,12 +57,111 @@ func GetElasticSearchClient() (*elasticsearch.Client, error) {
 
 	elasticsearchClient, err := elasticsearch.NewKubeDBClientBuilder(kbClient, db).
 		WithContext(context.Background()).
+		WithURL("http://127.0.0.1:9200").
 		//WithPod("").
 		GetElasticClient()
 	if err != nil {
 		fmt.Println("failed to get kube db client: %w", err)
 		return nil, err
 	}
-	fmt.Println("========================hey done su")
+	fmt.Println("========================done===============")
+	nodesStats, err := elasticsearchClient.NodesStats()
+	if err != nil {
+		log.Fatalf("Failed to get node stats: %v", err)
+	}
+	nodes, ok := nodesStats["nodes"].(map[string]interface{})
+	if !ok {
+		log.Fatalf("Failed to parse node data")
+	}
+	var data bytes.Buffer
+	getGCData(&data, nodes)
+
 	return elasticsearchClient, nil
+}
+
+func getGCData(data *bytes.Buffer, nodes map[string]interface{}) {
+	data.WriteString("Analyzing Garbage Collection (GC)...\n")
+	for _, nodeData := range nodes {
+		node, ok := nodeData.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		nodeName := node["name"]
+		jvm, ok := node["jvm"].(map[string]interface{})
+		if !ok {
+			continue
+		} else {
+			gc, ok := jvm["gc"].(map[string]interface{})
+			if !ok {
+				continue
+			}
+			collectors, ok := gc["collectors"].(map[string]interface{})
+			if !ok {
+				continue
+			}
+			data.WriteString(fmt.Sprintf("Node Name: %s\n", nodeName))
+			for key, collectorData := range collectors {
+				collector, ok := collectorData.(map[string]interface{})
+				if !ok {
+					continue
+				}
+				collectionCount := collector["collection_count"]
+				data.WriteString(indentL1)
+				data.WriteString(fmt.Sprintf("GC Collector: %s, Collection Count: %s, Collection Time: %s\n", key, collectionCount, collector["collection_time"]))
+			}
+		}
+	}
+	data.WriteString("\n")
+}
+
+func getThreadPoolData(data *bytes.Buffer, nodes map[string]interface{}) {
+	data.WriteString("Reviewing Thread Pool Activity...\n")
+	for _, nodeData := range nodes {
+		node, ok := nodeData.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		nodeName := node["name"]
+		threadPool, ok := node["thread_pool"].(map[string]interface{})
+		if !ok {
+			continue
+		} else {
+			data.WriteString(fmt.Sprintf("Node Name: %s\n", nodeName))
+			for key, threadPoolData := range threadPool {
+				thread, ok := threadPoolData.(map[string]interface{})
+				if !ok {
+					continue
+				} else {
+					if key == "write" || key == "search" || thread["rejected"].(float64) > 0 {
+						data.WriteString(indentL1)
+						data.WriteString(fmt.Sprintf("ThreadPool Threads: %s, Active: %v, rejected: %v, Completed: %v\n", key, thread["active"], thread["rejected"], thread["completed"]))
+					}
+				}
+			}
+		}
+	}
+	data.WriteString("\n")
+}
+
+func getHeapUsageData(data *bytes.Buffer, nodes map[string]interface{}) {
+	data.WriteString("Analyzing Heap Usage...\n")
+	for _, nodeData := range nodes {
+		node, ok := nodeData.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		nodeName := node["name"]
+		jvm, ok := node["jvm"].(map[string]interface{})
+		if !ok {
+			continue
+		} else {
+			mem, ok := jvm["mem"].(map[string]interface{})
+			if !ok {
+				continue
+			}
+			heapUsedPercent := mem["heap_used_percent"]
+			data.WriteString(fmt.Sprintf("Node Name: %s Heap Usage: %s\n", nodeName, heapUsedPercent))
+		}
+	}
+	data.WriteString("\n")
 }

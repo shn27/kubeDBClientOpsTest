@@ -15,53 +15,92 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DatafeedRunningState type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/Datafeed.ts#L158-L162
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/Datafeed.ts#L210-L224
 type DatafeedRunningState struct {
-	RealTimeConfigured bool                        `json:"real_time_configured"`
-	RealTimeRunning    bool                        `json:"real_time_running"`
-	SearchInterval     *RunningStateSearchInterval `json:"search_interval,omitempty"`
+	// RealTimeConfigured Indicates if the datafeed is "real-time"; meaning that the datafeed has no
+	// configured `end` time.
+	RealTimeConfigured bool `json:"real_time_configured"`
+	// RealTimeRunning Indicates whether the datafeed has finished running on the available past
+	// data.
+	// For datafeeds without a configured `end` time, this means that the datafeed
+	// is now running on "real-time" data.
+	RealTimeRunning bool `json:"real_time_running"`
+	// SearchInterval Provides the latest time interval the datafeed has searched.
+	SearchInterval *RunningStateSearchInterval `json:"search_interval,omitempty"`
 }
 
-// DatafeedRunningStateBuilder holds DatafeedRunningState struct and provides a builder API.
-type DatafeedRunningStateBuilder struct {
-	v *DatafeedRunningState
-}
+func (s *DatafeedRunningState) UnmarshalJSON(data []byte) error {
 
-// NewDatafeedRunningState provides a builder for the DatafeedRunningState struct.
-func NewDatafeedRunningStateBuilder() *DatafeedRunningStateBuilder {
-	r := DatafeedRunningStateBuilder{
-		&DatafeedRunningState{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "real_time_configured":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "RealTimeConfigured", err)
+				}
+				s.RealTimeConfigured = value
+			case bool:
+				s.RealTimeConfigured = v
+			}
+
+		case "real_time_running":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "RealTimeRunning", err)
+				}
+				s.RealTimeRunning = value
+			case bool:
+				s.RealTimeRunning = v
+			}
+
+		case "search_interval":
+			if err := dec.Decode(&s.SearchInterval); err != nil {
+				return fmt.Errorf("%s | %w", "SearchInterval", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DatafeedRunningState struct
-func (rb *DatafeedRunningStateBuilder) Build() DatafeedRunningState {
-	return *rb.v
-}
+// NewDatafeedRunningState returns a DatafeedRunningState.
+func NewDatafeedRunningState() *DatafeedRunningState {
+	r := &DatafeedRunningState{}
 
-func (rb *DatafeedRunningStateBuilder) RealTimeConfigured(realtimeconfigured bool) *DatafeedRunningStateBuilder {
-	rb.v.RealTimeConfigured = realtimeconfigured
-	return rb
-}
-
-func (rb *DatafeedRunningStateBuilder) RealTimeRunning(realtimerunning bool) *DatafeedRunningStateBuilder {
-	rb.v.RealTimeRunning = realtimerunning
-	return rb
-}
-
-func (rb *DatafeedRunningStateBuilder) SearchInterval(searchinterval *RunningStateSearchIntervalBuilder) *DatafeedRunningStateBuilder {
-	v := searchinterval.Build()
-	rb.v.SearchInterval = &v
-	return rb
+	return r
 }

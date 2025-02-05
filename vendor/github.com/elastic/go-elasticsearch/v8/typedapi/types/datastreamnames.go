@@ -15,34 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // DataStreamNames type alias.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/common.ts#L79-L79
-type DataStreamNames []DataStreamName
-
-// DataStreamNamesBuilder holds DataStreamNames struct and provides a builder API.
-type DataStreamNamesBuilder struct {
-	v DataStreamNames
-}
-
-// NewDataStreamNames provides a builder for the DataStreamNames struct.
-func NewDataStreamNamesBuilder() *DataStreamNamesBuilder {
-	return &DataStreamNamesBuilder{}
-}
-
-// Build finalize the chain and returns the DataStreamNames struct
-func (b *DataStreamNamesBuilder) Build() DataStreamNames {
-	return b.v
-}
-
-func (b *DataStreamNamesBuilder) DataStreamNames(value DataStreamNames) *DataStreamNamesBuilder {
-	b.v = value
-	return b
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/common.ts#L95-L95
+type DataStreamNames []string

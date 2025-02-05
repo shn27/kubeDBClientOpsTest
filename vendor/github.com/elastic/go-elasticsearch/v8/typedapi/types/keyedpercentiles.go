@@ -15,34 +15,49 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"io"
+
+	"bytes"
+
+	"encoding/json"
+
+	"errors"
+
+	"fmt"
+)
+
 // KeyedPercentiles type alias.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L147-L147
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L160-L160
 type KeyedPercentiles map[string]string
 
-// KeyedPercentilesBuilder holds KeyedPercentiles struct and provides a builder API.
-type KeyedPercentilesBuilder struct {
-	v KeyedPercentiles
-}
+func (s KeyedPercentiles) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-// NewKeyedPercentiles provides a builder for the KeyedPercentiles struct.
-func NewKeyedPercentilesBuilder() *KeyedPercentilesBuilder {
-	return &KeyedPercentilesBuilder{}
-}
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
 
-// Build finalize the chain and returns the KeyedPercentiles struct
-func (b *KeyedPercentilesBuilder) Build() KeyedPercentiles {
-	return b.v
-}
+		if key, ok := t.(string); ok {
 
-func (b *KeyedPercentilesBuilder) KeyedPercentiles(value KeyedPercentiles) *KeyedPercentilesBuilder {
-	b.v = value
-	return b
+			var tmp any
+			if err := dec.Decode(&tmp); err != nil {
+				return err
+			}
+			s[key] = fmt.Sprintf("%v", tmp)
+
+		}
+	}
+	return nil
 }

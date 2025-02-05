@@ -15,19 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package indexroutingallocationoptions
 package indexroutingallocationoptions
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/IndexRouting.ts#L38-L43
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/IndexRouting.ts#L38-L43
 type IndexRoutingAllocationOptions struct {
-	name string
+	Name string
 }
 
 var (
@@ -45,7 +43,7 @@ func (i IndexRoutingAllocationOptions) MarshalText() (text []byte, err error) {
 }
 
 func (i *IndexRoutingAllocationOptions) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
 	case "all":
 		*i = All
@@ -63,5 +61,5 @@ func (i *IndexRoutingAllocationOptions) UnmarshalText(text []byte) error {
 }
 
 func (i IndexRoutingAllocationOptions) String() string {
-	return i.name
+	return i.Name
 }

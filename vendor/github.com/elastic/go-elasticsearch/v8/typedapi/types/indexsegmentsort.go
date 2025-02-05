@@ -15,14 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/segmentsortmissing"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/segmentsortmode"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/segmentsortorder"
@@ -30,50 +34,101 @@ import (
 
 // IndexSegmentSort type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/IndexSegmentSort.ts#L22-L27
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/IndexSegmentSort.ts#L22-L27
 type IndexSegmentSort struct {
-	Field   *Fields                                 `json:"field,omitempty"`
+	Field   []string                                `json:"field,omitempty"`
 	Missing []segmentsortmissing.SegmentSortMissing `json:"missing,omitempty"`
 	Mode    []segmentsortmode.SegmentSortMode       `json:"mode,omitempty"`
 	Order   []segmentsortorder.SegmentSortOrder     `json:"order,omitempty"`
 }
 
-// IndexSegmentSortBuilder holds IndexSegmentSort struct and provides a builder API.
-type IndexSegmentSortBuilder struct {
-	v *IndexSegmentSort
-}
+func (s *IndexSegmentSort) UnmarshalJSON(data []byte) error {
 
-// NewIndexSegmentSort provides a builder for the IndexSegmentSort struct.
-func NewIndexSegmentSortBuilder() *IndexSegmentSortBuilder {
-	r := IndexSegmentSortBuilder{
-		&IndexSegmentSort{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "field":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Field", err)
+				}
+
+				s.Field = append(s.Field, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Field); err != nil {
+					return fmt.Errorf("%s | %w", "Field", err)
+				}
+			}
+
+		case "missing":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := &segmentsortmissing.SegmentSortMissing{}
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Missing", err)
+				}
+
+				s.Missing = append(s.Missing, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Missing); err != nil {
+					return fmt.Errorf("%s | %w", "Missing", err)
+				}
+			}
+
+		case "mode":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := &segmentsortmode.SegmentSortMode{}
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Mode", err)
+				}
+
+				s.Mode = append(s.Mode, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Mode); err != nil {
+					return fmt.Errorf("%s | %w", "Mode", err)
+				}
+			}
+
+		case "order":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := &segmentsortorder.SegmentSortOrder{}
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Order", err)
+				}
+
+				s.Order = append(s.Order, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Order); err != nil {
+					return fmt.Errorf("%s | %w", "Order", err)
+				}
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the IndexSegmentSort struct
-func (rb *IndexSegmentSortBuilder) Build() IndexSegmentSort {
-	return *rb.v
-}
+// NewIndexSegmentSort returns a IndexSegmentSort.
+func NewIndexSegmentSort() *IndexSegmentSort {
+	r := &IndexSegmentSort{}
 
-func (rb *IndexSegmentSortBuilder) Field(field *FieldsBuilder) *IndexSegmentSortBuilder {
-	v := field.Build()
-	rb.v.Field = &v
-	return rb
-}
-
-func (rb *IndexSegmentSortBuilder) Missing(arg []segmentsortmissing.SegmentSortMissing) *IndexSegmentSortBuilder {
-	rb.v.Missing = arg
-	return rb
-}
-
-func (rb *IndexSegmentSortBuilder) Mode(arg []segmentsortmode.SegmentSortMode) *IndexSegmentSortBuilder {
-	rb.v.Mode = arg
-	return rb
-}
-
-func (rb *IndexSegmentSortBuilder) Order(arg []segmentsortorder.SegmentSortOrder) *IndexSegmentSortBuilder {
-	rb.v.Order = arg
-	return rb
+	return r
 }

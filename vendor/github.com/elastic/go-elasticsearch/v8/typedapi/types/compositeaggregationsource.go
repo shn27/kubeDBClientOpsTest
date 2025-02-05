@@ -15,62 +15,28 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // CompositeAggregationSource type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/bucket.ts#L83-L88
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/bucket.ts#L151-L168
 type CompositeAggregationSource struct {
-	DateHistogram *DateHistogramAggregation `json:"date_histogram,omitempty"`
-	GeotileGrid   *GeoTileGridAggregation   `json:"geotile_grid,omitempty"`
-	Histogram     *HistogramAggregation     `json:"histogram,omitempty"`
-	Terms         *TermsAggregation         `json:"terms,omitempty"`
+	// DateHistogram A date histogram aggregation.
+	DateHistogram *CompositeDateHistogramAggregation `json:"date_histogram,omitempty"`
+	// GeotileGrid A geotile grid aggregation.
+	GeotileGrid *CompositeGeoTileGridAggregation `json:"geotile_grid,omitempty"`
+	// Histogram A histogram aggregation.
+	Histogram *CompositeHistogramAggregation `json:"histogram,omitempty"`
+	// Terms A terms aggregation.
+	Terms *CompositeTermsAggregation `json:"terms,omitempty"`
 }
 
-// CompositeAggregationSourceBuilder holds CompositeAggregationSource struct and provides a builder API.
-type CompositeAggregationSourceBuilder struct {
-	v *CompositeAggregationSource
-}
+// NewCompositeAggregationSource returns a CompositeAggregationSource.
+func NewCompositeAggregationSource() *CompositeAggregationSource {
+	r := &CompositeAggregationSource{}
 
-// NewCompositeAggregationSource provides a builder for the CompositeAggregationSource struct.
-func NewCompositeAggregationSourceBuilder() *CompositeAggregationSourceBuilder {
-	r := CompositeAggregationSourceBuilder{
-		&CompositeAggregationSource{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the CompositeAggregationSource struct
-func (rb *CompositeAggregationSourceBuilder) Build() CompositeAggregationSource {
-	return *rb.v
-}
-
-func (rb *CompositeAggregationSourceBuilder) DateHistogram(datehistogram *DateHistogramAggregationBuilder) *CompositeAggregationSourceBuilder {
-	v := datehistogram.Build()
-	rb.v.DateHistogram = &v
-	return rb
-}
-
-func (rb *CompositeAggregationSourceBuilder) GeotileGrid(geotilegrid *GeoTileGridAggregationBuilder) *CompositeAggregationSourceBuilder {
-	v := geotilegrid.Build()
-	rb.v.GeotileGrid = &v
-	return rb
-}
-
-func (rb *CompositeAggregationSourceBuilder) Histogram(histogram *HistogramAggregationBuilder) *CompositeAggregationSourceBuilder {
-	v := histogram.Build()
-	rb.v.Histogram = &v
-	return rb
-}
-
-func (rb *CompositeAggregationSourceBuilder) Terms(terms *TermsAggregationBuilder) *CompositeAggregationSourceBuilder {
-	v := terms.Build()
-	rb.v.Terms = &v
-	return rb
+	return r
 }

@@ -15,46 +15,90 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DocStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Stats.ts#L64-L67
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Stats.ts#L97-L109
 type DocStats struct {
-	Count   int64  `json:"count"`
+	// Count Total number of non-deleted documents across all primary shards assigned to
+	// selected nodes.
+	// This number is based on documents in Lucene segments and may include
+	// documents from nested fields.
+	Count int64 `json:"count"`
+	// Deleted Total number of deleted documents across all primary shards assigned to
+	// selected nodes.
+	// This number is based on documents in Lucene segments.
+	// Elasticsearch reclaims the disk space of deleted Lucene documents when a
+	// segment is merged.
 	Deleted *int64 `json:"deleted,omitempty"`
 }
 
-// DocStatsBuilder holds DocStats struct and provides a builder API.
-type DocStatsBuilder struct {
-	v *DocStats
-}
+func (s *DocStats) UnmarshalJSON(data []byte) error {
 
-// NewDocStats provides a builder for the DocStats struct.
-func NewDocStatsBuilder() *DocStatsBuilder {
-	r := DocStatsBuilder{
-		&DocStats{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Count", err)
+				}
+				s.Count = value
+			case float64:
+				f := int64(v)
+				s.Count = f
+			}
+
+		case "deleted":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Deleted", err)
+				}
+				s.Deleted = &value
+			case float64:
+				f := int64(v)
+				s.Deleted = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DocStats struct
-func (rb *DocStatsBuilder) Build() DocStats {
-	return *rb.v
-}
+// NewDocStats returns a DocStats.
+func NewDocStats() *DocStats {
+	r := &DocStats{}
 
-func (rb *DocStatsBuilder) Count(count int64) *DocStatsBuilder {
-	rb.v.Count = count
-	return rb
-}
-
-func (rb *DocStatsBuilder) Deleted(deleted int64) *DocStatsBuilder {
-	rb.v.Deleted = &deleted
-	return rb
+	return r
 }

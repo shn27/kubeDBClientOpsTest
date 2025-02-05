@@ -15,59 +15,97 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/delimitedpayloadencoding"
 )
 
 // DelimitedPayloadTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L67-L71
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L67-L71
 type DelimitedPayloadTokenFilter struct {
 	Delimiter *string                                            `json:"delimiter,omitempty"`
 	Encoding  *delimitedpayloadencoding.DelimitedPayloadEncoding `json:"encoding,omitempty"`
 	Type      string                                             `json:"type,omitempty"`
-	Version   *VersionString                                     `json:"version,omitempty"`
+	Version   *string                                            `json:"version,omitempty"`
 }
 
-// DelimitedPayloadTokenFilterBuilder holds DelimitedPayloadTokenFilter struct and provides a builder API.
-type DelimitedPayloadTokenFilterBuilder struct {
-	v *DelimitedPayloadTokenFilter
+func (s *DelimitedPayloadTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "delimiter":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Delimiter", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Delimiter = &o
+
+		case "encoding":
+			if err := dec.Decode(&s.Encoding); err != nil {
+				return fmt.Errorf("%s | %w", "Encoding", err)
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewDelimitedPayloadTokenFilter provides a builder for the DelimitedPayloadTokenFilter struct.
-func NewDelimitedPayloadTokenFilterBuilder() *DelimitedPayloadTokenFilterBuilder {
-	r := DelimitedPayloadTokenFilterBuilder{
-		&DelimitedPayloadTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s DelimitedPayloadTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerDelimitedPayloadTokenFilter DelimitedPayloadTokenFilter
+	tmp := innerDelimitedPayloadTokenFilter{
+		Delimiter: s.Delimiter,
+		Encoding:  s.Encoding,
+		Type:      s.Type,
+		Version:   s.Version,
 	}
 
-	r.v.Type = "delimited_payload"
+	tmp.Type = "delimited_payload"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the DelimitedPayloadTokenFilter struct
-func (rb *DelimitedPayloadTokenFilterBuilder) Build() DelimitedPayloadTokenFilter {
-	return *rb.v
-}
+// NewDelimitedPayloadTokenFilter returns a DelimitedPayloadTokenFilter.
+func NewDelimitedPayloadTokenFilter() *DelimitedPayloadTokenFilter {
+	r := &DelimitedPayloadTokenFilter{}
 
-func (rb *DelimitedPayloadTokenFilterBuilder) Delimiter(delimiter string) *DelimitedPayloadTokenFilterBuilder {
-	rb.v.Delimiter = &delimiter
-	return rb
-}
-
-func (rb *DelimitedPayloadTokenFilterBuilder) Encoding(encoding delimitedpayloadencoding.DelimitedPayloadEncoding) *DelimitedPayloadTokenFilterBuilder {
-	rb.v.Encoding = &encoding
-	return rb
-}
-
-func (rb *DelimitedPayloadTokenFilterBuilder) Version(version VersionString) *DelimitedPayloadTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

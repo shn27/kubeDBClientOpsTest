@@ -15,20 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/deploymentallocationstate"
 )
 
 // TrainedModelDeploymentAllocationStatus type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/TrainedModel.ts#L370-L377
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/TrainedModel.ts#L438-L445
 type TrainedModelDeploymentAllocationStatus struct {
 	// AllocationCount The current number of nodes where the model is allocated.
 	AllocationCount int `json:"allocation_count"`
@@ -38,42 +43,66 @@ type TrainedModelDeploymentAllocationStatus struct {
 	TargetAllocationCount int `json:"target_allocation_count"`
 }
 
-// TrainedModelDeploymentAllocationStatusBuilder holds TrainedModelDeploymentAllocationStatus struct and provides a builder API.
-type TrainedModelDeploymentAllocationStatusBuilder struct {
-	v *TrainedModelDeploymentAllocationStatus
-}
+func (s *TrainedModelDeploymentAllocationStatus) UnmarshalJSON(data []byte) error {
 
-// NewTrainedModelDeploymentAllocationStatus provides a builder for the TrainedModelDeploymentAllocationStatus struct.
-func NewTrainedModelDeploymentAllocationStatusBuilder() *TrainedModelDeploymentAllocationStatusBuilder {
-	r := TrainedModelDeploymentAllocationStatusBuilder{
-		&TrainedModelDeploymentAllocationStatus{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "allocation_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "AllocationCount", err)
+				}
+				s.AllocationCount = value
+			case float64:
+				f := int(v)
+				s.AllocationCount = f
+			}
+
+		case "state":
+			if err := dec.Decode(&s.State); err != nil {
+				return fmt.Errorf("%s | %w", "State", err)
+			}
+
+		case "target_allocation_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TargetAllocationCount", err)
+				}
+				s.TargetAllocationCount = value
+			case float64:
+				f := int(v)
+				s.TargetAllocationCount = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TrainedModelDeploymentAllocationStatus struct
-func (rb *TrainedModelDeploymentAllocationStatusBuilder) Build() TrainedModelDeploymentAllocationStatus {
-	return *rb.v
-}
+// NewTrainedModelDeploymentAllocationStatus returns a TrainedModelDeploymentAllocationStatus.
+func NewTrainedModelDeploymentAllocationStatus() *TrainedModelDeploymentAllocationStatus {
+	r := &TrainedModelDeploymentAllocationStatus{}
 
-// AllocationCount The current number of nodes where the model is allocated.
-
-func (rb *TrainedModelDeploymentAllocationStatusBuilder) AllocationCount(allocationcount int) *TrainedModelDeploymentAllocationStatusBuilder {
-	rb.v.AllocationCount = allocationcount
-	return rb
-}
-
-// State The detailed allocation state related to the nodes.
-
-func (rb *TrainedModelDeploymentAllocationStatusBuilder) State(state deploymentallocationstate.DeploymentAllocationState) *TrainedModelDeploymentAllocationStatusBuilder {
-	rb.v.State = state
-	return rb
-}
-
-// TargetAllocationCount The desired number of nodes for model allocation.
-
-func (rb *TrainedModelDeploymentAllocationStatusBuilder) TargetAllocationCount(targetallocationcount int) *TrainedModelDeploymentAllocationStatusBuilder {
-	rb.v.TargetAllocationCount = targetallocationcount
-	return rb
+	return r
 }

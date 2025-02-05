@@ -15,69 +15,58 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package updatetransform
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"strconv"
 
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 )
 
 // Request holds the request body struct for the package updatetransform
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/transform/update_transform/UpdateTransformRequest.ts#L31-L105
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/transform/update_transform/UpdateTransformRequest.ts#L31-L106
 type Request struct {
 
 	// Description Free text description of the transform.
 	Description *string `json:"description,omitempty"`
-
 	// Dest The destination for the transform.
-	Dest *types.Destination `json:"dest,omitempty"`
-
+	Dest *types.TransformDestination `json:"dest,omitempty"`
 	// Frequency The interval between checks for changes in the source indices when the
 	// transform is running continuously. Also determines the retry interval in
 	// the event of transient failures while the transform is searching or
 	// indexing. The minimum value is 1s and the maximum is 1h.
-	Frequency *types.Duration `json:"frequency,omitempty"`
-
+	Frequency types.Duration `json:"frequency,omitempty"`
 	// Meta_ Defines optional transform metadata.
-	Meta_ *types.Metadata `json:"_meta,omitempty"`
-
+	Meta_ types.Metadata `json:"_meta,omitempty"`
 	// RetentionPolicy Defines a retention policy for the transform. Data that meets the defined
 	// criteria is deleted from the destination index.
-	RetentionPolicy types.RetentionPolicyContainer `json:"retention_policy,omitempty"`
-
+	RetentionPolicy *types.RetentionPolicyContainer `json:"retention_policy,omitempty"`
 	// Settings Defines optional transform settings.
 	Settings *types.Settings `json:"settings,omitempty"`
-
 	// Source The source of the data for the transform.
-	Source *types.Source `json:"source,omitempty"`
-
+	Source *types.TransformSource `json:"source,omitempty"`
 	// Sync Defines the properties transforms require to run continuously.
 	Sync *types.SyncContainer `json:"sync,omitempty"`
 }
 
-// RequestBuilder is the builder API for the updatetransform.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -88,53 +77,68 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) Description(description string) *RequestBuilder {
-	rb.v.Description = &description
-	return rb
-}
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
 
-func (rb *RequestBuilder) Dest(dest *types.DestinationBuilder) *RequestBuilder {
-	v := dest.Build()
-	rb.v.Dest = &v
-	return rb
-}
+		switch t {
 
-func (rb *RequestBuilder) Frequency(frequency *types.DurationBuilder) *RequestBuilder {
-	v := frequency.Build()
-	rb.v.Frequency = &v
-	return rb
-}
+		case "description":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Description", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Description = &o
 
-func (rb *RequestBuilder) Meta_(meta_ *types.MetadataBuilder) *RequestBuilder {
-	v := meta_.Build()
-	rb.v.Meta_ = &v
-	return rb
-}
+		case "dest":
+			if err := dec.Decode(&s.Dest); err != nil {
+				return fmt.Errorf("%s | %w", "Dest", err)
+			}
 
-func (rb *RequestBuilder) RetentionPolicy(retentionpolicy types.RetentionPolicyContainer) *RequestBuilder {
-	rb.v.RetentionPolicy = retentionpolicy
-	return rb
-}
+		case "frequency":
+			if err := dec.Decode(&s.Frequency); err != nil {
+				return fmt.Errorf("%s | %w", "Frequency", err)
+			}
 
-func (rb *RequestBuilder) Settings(settings *types.SettingsBuilder) *RequestBuilder {
-	v := settings.Build()
-	rb.v.Settings = &v
-	return rb
-}
+		case "_meta":
+			if err := dec.Decode(&s.Meta_); err != nil {
+				return fmt.Errorf("%s | %w", "Meta_", err)
+			}
 
-func (rb *RequestBuilder) Source(source *types.SourceBuilder) *RequestBuilder {
-	v := source.Build()
-	rb.v.Source = &v
-	return rb
-}
+		case "retention_policy":
+			if err := dec.Decode(&s.RetentionPolicy); err != nil {
+				return fmt.Errorf("%s | %w", "RetentionPolicy", err)
+			}
 
-func (rb *RequestBuilder) Sync(sync *types.SyncContainerBuilder) *RequestBuilder {
-	v := sync.Build()
-	rb.v.Sync = &v
-	return rb
+		case "settings":
+			if err := dec.Decode(&s.Settings); err != nil {
+				return fmt.Errorf("%s | %w", "Settings", err)
+			}
+
+		case "source":
+			if err := dec.Decode(&s.Source); err != nil {
+				return fmt.Errorf("%s | %w", "Source", err)
+			}
+
+		case "sync":
+			if err := dec.Decode(&s.Sync); err != nil {
+				return fmt.Errorf("%s | %w", "Sync", err)
+			}
+
+		}
+	}
+	return nil
 }

@@ -15,58 +15,90 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ReservedSize type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/allocation_explain/types.ts#L71-L76
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/allocation_explain/types.ts#L72-L77
 type ReservedSize struct {
-	NodeId Id       `json:"node_id"`
+	NodeId string   `json:"node_id"`
 	Path   string   `json:"path"`
 	Shards []string `json:"shards"`
 	Total  int64    `json:"total"`
 }
 
-// ReservedSizeBuilder holds ReservedSize struct and provides a builder API.
-type ReservedSizeBuilder struct {
-	v *ReservedSize
-}
+func (s *ReservedSize) UnmarshalJSON(data []byte) error {
 
-// NewReservedSize provides a builder for the ReservedSize struct.
-func NewReservedSizeBuilder() *ReservedSizeBuilder {
-	r := ReservedSizeBuilder{
-		&ReservedSize{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "node_id":
+			if err := dec.Decode(&s.NodeId); err != nil {
+				return fmt.Errorf("%s | %w", "NodeId", err)
+			}
+
+		case "path":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Path", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Path = o
+
+		case "shards":
+			if err := dec.Decode(&s.Shards); err != nil {
+				return fmt.Errorf("%s | %w", "Shards", err)
+			}
+
+		case "total":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Total", err)
+				}
+				s.Total = value
+			case float64:
+				f := int64(v)
+				s.Total = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ReservedSize struct
-func (rb *ReservedSizeBuilder) Build() ReservedSize {
-	return *rb.v
-}
+// NewReservedSize returns a ReservedSize.
+func NewReservedSize() *ReservedSize {
+	r := &ReservedSize{}
 
-func (rb *ReservedSizeBuilder) NodeId(nodeid Id) *ReservedSizeBuilder {
-	rb.v.NodeId = nodeid
-	return rb
-}
-
-func (rb *ReservedSizeBuilder) Path(path string) *ReservedSizeBuilder {
-	rb.v.Path = path
-	return rb
-}
-
-func (rb *ReservedSizeBuilder) Shards(shards ...string) *ReservedSizeBuilder {
-	rb.v.Shards = shards
-	return rb
-}
-
-func (rb *ReservedSizeBuilder) Total(total int64) *ReservedSizeBuilder {
-	rb.v.Total = total
-	return rb
+	return r
 }

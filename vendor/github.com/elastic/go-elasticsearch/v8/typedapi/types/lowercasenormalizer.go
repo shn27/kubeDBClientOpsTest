@@ -15,37 +15,37 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"encoding/json"
+)
+
 // LowercaseNormalizer type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/normalizers.ts#L26-L28
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/normalizers.ts#L26-L28
 type LowercaseNormalizer struct {
 	Type string `json:"type,omitempty"`
 }
 
-// LowercaseNormalizerBuilder holds LowercaseNormalizer struct and provides a builder API.
-type LowercaseNormalizerBuilder struct {
-	v *LowercaseNormalizer
-}
-
-// NewLowercaseNormalizer provides a builder for the LowercaseNormalizer struct.
-func NewLowercaseNormalizerBuilder() *LowercaseNormalizerBuilder {
-	r := LowercaseNormalizerBuilder{
-		&LowercaseNormalizer{},
+// MarshalJSON override marshalling to include literal value
+func (s LowercaseNormalizer) MarshalJSON() ([]byte, error) {
+	type innerLowercaseNormalizer LowercaseNormalizer
+	tmp := innerLowercaseNormalizer{
+		Type: s.Type,
 	}
 
-	r.v.Type = "lowercase"
+	tmp.Type = "lowercase"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the LowercaseNormalizer struct
-func (rb *LowercaseNormalizerBuilder) Build() LowercaseNormalizer {
-	return *rb.v
+// NewLowercaseNormalizer returns a LowercaseNormalizer.
+func NewLowercaseNormalizer() *LowercaseNormalizer {
+	r := &LowercaseNormalizer{}
+
+	return r
 }

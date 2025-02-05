@@ -15,49 +15,90 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // UniqueTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L333-L336
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L336-L339
 type UniqueTokenFilter struct {
-	OnlyOnSamePosition *bool          `json:"only_on_same_position,omitempty"`
-	Type               string         `json:"type,omitempty"`
-	Version            *VersionString `json:"version,omitempty"`
+	OnlyOnSamePosition *bool   `json:"only_on_same_position,omitempty"`
+	Type               string  `json:"type,omitempty"`
+	Version            *string `json:"version,omitempty"`
 }
 
-// UniqueTokenFilterBuilder holds UniqueTokenFilter struct and provides a builder API.
-type UniqueTokenFilterBuilder struct {
-	v *UniqueTokenFilter
+func (s *UniqueTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "only_on_same_position":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "OnlyOnSamePosition", err)
+				}
+				s.OnlyOnSamePosition = &value
+			case bool:
+				s.OnlyOnSamePosition = &v
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewUniqueTokenFilter provides a builder for the UniqueTokenFilter struct.
-func NewUniqueTokenFilterBuilder() *UniqueTokenFilterBuilder {
-	r := UniqueTokenFilterBuilder{
-		&UniqueTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s UniqueTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerUniqueTokenFilter UniqueTokenFilter
+	tmp := innerUniqueTokenFilter{
+		OnlyOnSamePosition: s.OnlyOnSamePosition,
+		Type:               s.Type,
+		Version:            s.Version,
 	}
 
-	r.v.Type = "unique"
+	tmp.Type = "unique"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the UniqueTokenFilter struct
-func (rb *UniqueTokenFilterBuilder) Build() UniqueTokenFilter {
-	return *rb.v
-}
+// NewUniqueTokenFilter returns a UniqueTokenFilter.
+func NewUniqueTokenFilter() *UniqueTokenFilter {
+	r := &UniqueTokenFilter{}
 
-func (rb *UniqueTokenFilterBuilder) OnlyOnSamePosition(onlyonsameposition bool) *UniqueTokenFilterBuilder {
-	rb.v.OnlyOnSamePosition = &onlyonsameposition
-	return rb
-}
-
-func (rb *UniqueTokenFilterBuilder) Version(version VersionString) *UniqueTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

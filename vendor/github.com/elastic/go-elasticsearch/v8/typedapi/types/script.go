@@ -15,44 +15,114 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
-// Script holds the union for the following types:
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
+	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/scriptlanguage"
+)
+
+// Script type.
 //
-//	InlineScript
-//	StoredScriptId
-//
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Scripting.ts#L56-L57
-type Script interface{}
-
-// ScriptBuilder holds Script struct and provides a builder API.
-type ScriptBuilder struct {
-	v Script
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Scripting.ts#L73-L97
+type Script struct {
+	// Id The `id` for a stored script.
+	Id *string `json:"id,omitempty"`
+	// Lang Specifies the language the script is written in.
+	Lang    *scriptlanguage.ScriptLanguage `json:"lang,omitempty"`
+	Options map[string]string              `json:"options,omitempty"`
+	// Params Specifies any named parameters that are passed into the script as variables.
+	// Use parameters instead of hard-coded values to decrease compile time.
+	Params map[string]json.RawMessage `json:"params,omitempty"`
+	// Source The script source.
+	Source *string `json:"source,omitempty"`
 }
 
-// NewScript provides a builder for the Script struct.
-func NewScriptBuilder() *ScriptBuilder {
-	return &ScriptBuilder{}
+func (s *Script) UnmarshalJSON(data []byte) error {
+
+	if !bytes.HasPrefix(data, []byte(`{`)) {
+		if !bytes.HasPrefix(data, []byte(`"`)) {
+			data = append([]byte{'"'}, data...)
+			data = append(data, []byte{'"'}...)
+		}
+		err := json.NewDecoder(bytes.NewReader(data)).Decode(&s.Source)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "id":
+			if err := dec.Decode(&s.Id); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
+
+		case "lang":
+			if err := dec.Decode(&s.Lang); err != nil {
+				return fmt.Errorf("%s | %w", "Lang", err)
+			}
+
+		case "options":
+			if s.Options == nil {
+				s.Options = make(map[string]string, 0)
+			}
+			if err := dec.Decode(&s.Options); err != nil {
+				return fmt.Errorf("%s | %w", "Options", err)
+			}
+
+		case "params":
+			if s.Params == nil {
+				s.Params = make(map[string]json.RawMessage, 0)
+			}
+			if err := dec.Decode(&s.Params); err != nil {
+				return fmt.Errorf("%s | %w", "Params", err)
+			}
+
+		case "source":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Source", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Source = &o
+
+		}
+	}
+	return nil
 }
 
-// Build finalize the chain and returns the Script struct
-func (u *ScriptBuilder) Build() Script {
-	return u.v
-}
+// NewScript returns a Script.
+func NewScript() *Script {
+	r := &Script{
+		Options: make(map[string]string, 0),
+		Params:  make(map[string]json.RawMessage, 0),
+	}
 
-func (u *ScriptBuilder) InlineScript(inlinescript *InlineScriptBuilder) *ScriptBuilder {
-	v := inlinescript.Build()
-	u.v = &v
-	return u
-}
-
-func (u *ScriptBuilder) StoredScriptId(storedscriptid *StoredScriptIdBuilder) *ScriptBuilder {
-	v := storedscriptid.Build()
-	u.v = &v
-	return u
+	return r
 }

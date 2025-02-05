@@ -15,47 +15,41 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"encoding/json"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/dfiindependencemeasure"
 )
 
 // SettingsSimilarityDfi type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/IndexSettings.ts#L187-L190
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/IndexSettings.ts#L195-L198
 type SettingsSimilarityDfi struct {
 	IndependenceMeasure dfiindependencemeasure.DFIIndependenceMeasure `json:"independence_measure"`
 	Type                string                                        `json:"type,omitempty"`
 }
 
-// SettingsSimilarityDfiBuilder holds SettingsSimilarityDfi struct and provides a builder API.
-type SettingsSimilarityDfiBuilder struct {
-	v *SettingsSimilarityDfi
-}
-
-// NewSettingsSimilarityDfi provides a builder for the SettingsSimilarityDfi struct.
-func NewSettingsSimilarityDfiBuilder() *SettingsSimilarityDfiBuilder {
-	r := SettingsSimilarityDfiBuilder{
-		&SettingsSimilarityDfi{},
+// MarshalJSON override marshalling to include literal value
+func (s SettingsSimilarityDfi) MarshalJSON() ([]byte, error) {
+	type innerSettingsSimilarityDfi SettingsSimilarityDfi
+	tmp := innerSettingsSimilarityDfi{
+		IndependenceMeasure: s.IndependenceMeasure,
+		Type:                s.Type,
 	}
 
-	r.v.Type = "DFI"
+	tmp.Type = "DFI"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the SettingsSimilarityDfi struct
-func (rb *SettingsSimilarityDfiBuilder) Build() SettingsSimilarityDfi {
-	return *rb.v
-}
+// NewSettingsSimilarityDfi returns a SettingsSimilarityDfi.
+func NewSettingsSimilarityDfi() *SettingsSimilarityDfi {
+	r := &SettingsSimilarityDfi{}
 
-func (rb *SettingsSimilarityDfiBuilder) IndependenceMeasure(independencemeasure dfiindependencemeasure.DFIIndependenceMeasure) *SettingsSimilarityDfiBuilder {
-	rb.v.IndependenceMeasure = independencemeasure
-	return rb
+	return r
 }

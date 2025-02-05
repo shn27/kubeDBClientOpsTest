@@ -15,88 +15,88 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // NodeAttributes type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Node.ts#L41-L53
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Node.ts#L41-L52
 type NodeAttributes struct {
 	// Attributes Lists node attributes.
 	Attributes map[string]string `json:"attributes"`
 	// EphemeralId The ephemeral ID of the node.
-	EphemeralId Id `json:"ephemeral_id"`
+	EphemeralId string `json:"ephemeral_id"`
 	// Id The unique identifier of the node.
-	Id *Id `json:"id,omitempty"`
+	Id *string `json:"id,omitempty"`
 	// Name The unique identifier of the node.
-	Name  NodeName   `json:"name"`
-	Roles *NodeRoles `json:"roles,omitempty"`
+	Name string `json:"name"`
 	// TransportAddress The host and port where transport HTTP connections are accepted.
-	TransportAddress TransportAddress `json:"transport_address"`
+	TransportAddress string `json:"transport_address"`
 }
 
-// NodeAttributesBuilder holds NodeAttributes struct and provides a builder API.
-type NodeAttributesBuilder struct {
-	v *NodeAttributes
+func (s *NodeAttributes) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "attributes":
+			if s.Attributes == nil {
+				s.Attributes = make(map[string]string, 0)
+			}
+			if err := dec.Decode(&s.Attributes); err != nil {
+				return fmt.Errorf("%s | %w", "Attributes", err)
+			}
+
+		case "ephemeral_id":
+			if err := dec.Decode(&s.EphemeralId); err != nil {
+				return fmt.Errorf("%s | %w", "EphemeralId", err)
+			}
+
+		case "id":
+			if err := dec.Decode(&s.Id); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		case "transport_address":
+			if err := dec.Decode(&s.TransportAddress); err != nil {
+				return fmt.Errorf("%s | %w", "TransportAddress", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewNodeAttributes provides a builder for the NodeAttributes struct.
-func NewNodeAttributesBuilder() *NodeAttributesBuilder {
-	r := NodeAttributesBuilder{
-		&NodeAttributes{
-			Attributes: make(map[string]string, 0),
-		},
+// NewNodeAttributes returns a NodeAttributes.
+func NewNodeAttributes() *NodeAttributes {
+	r := &NodeAttributes{
+		Attributes: make(map[string]string, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the NodeAttributes struct
-func (rb *NodeAttributesBuilder) Build() NodeAttributes {
-	return *rb.v
-}
-
-// Attributes Lists node attributes.
-
-func (rb *NodeAttributesBuilder) Attributes(value map[string]string) *NodeAttributesBuilder {
-	rb.v.Attributes = value
-	return rb
-}
-
-// EphemeralId The ephemeral ID of the node.
-
-func (rb *NodeAttributesBuilder) EphemeralId(ephemeralid Id) *NodeAttributesBuilder {
-	rb.v.EphemeralId = ephemeralid
-	return rb
-}
-
-// Id The unique identifier of the node.
-
-func (rb *NodeAttributesBuilder) Id(id Id) *NodeAttributesBuilder {
-	rb.v.Id = &id
-	return rb
-}
-
-// Name The unique identifier of the node.
-
-func (rb *NodeAttributesBuilder) Name(name NodeName) *NodeAttributesBuilder {
-	rb.v.Name = name
-	return rb
-}
-
-func (rb *NodeAttributesBuilder) Roles(roles *NodeRolesBuilder) *NodeAttributesBuilder {
-	v := roles.Build()
-	rb.v.Roles = &v
-	return rb
-}
-
-// TransportAddress The host and port where transport HTTP connections are accepted.
-
-func (rb *NodeAttributesBuilder) TransportAddress(transportaddress TransportAddress) *NodeAttributesBuilder {
-	rb.v.TransportAddress = transportaddress
-	return rb
+	return r
 }

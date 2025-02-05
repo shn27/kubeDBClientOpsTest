@@ -15,67 +15,99 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // FieldRule type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/_types/RoleMappingRule.ts#L33-L42
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/_types/RoleMappingRule.ts#L35-L43
 type FieldRule struct {
-	Dn       *Names      `json:"dn,omitempty"`
-	Groups   *Names      `json:"groups,omitempty"`
-	Metadata interface{} `json:"metadata,omitempty"`
-	Realm    *Realm      `json:"realm,omitempty"`
-	Username *Name       `json:"username,omitempty"`
+	Dn       []string `json:"dn,omitempty"`
+	Groups   []string `json:"groups,omitempty"`
+	Username []string `json:"username,omitempty"`
 }
 
-// FieldRuleBuilder holds FieldRule struct and provides a builder API.
-type FieldRuleBuilder struct {
-	v *FieldRule
-}
+func (s *FieldRule) UnmarshalJSON(data []byte) error {
 
-// NewFieldRule provides a builder for the FieldRule struct.
-func NewFieldRuleBuilder() *FieldRuleBuilder {
-	r := FieldRuleBuilder{
-		&FieldRule{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "dn":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Dn", err)
+				}
+
+				s.Dn = append(s.Dn, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Dn); err != nil {
+					return fmt.Errorf("%s | %w", "Dn", err)
+				}
+			}
+
+		case "groups":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Groups", err)
+				}
+
+				s.Groups = append(s.Groups, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Groups); err != nil {
+					return fmt.Errorf("%s | %w", "Groups", err)
+				}
+			}
+
+		case "username":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Username", err)
+				}
+
+				s.Username = append(s.Username, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Username); err != nil {
+					return fmt.Errorf("%s | %w", "Username", err)
+				}
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the FieldRule struct
-func (rb *FieldRuleBuilder) Build() FieldRule {
-	return *rb.v
-}
+// NewFieldRule returns a FieldRule.
+func NewFieldRule() *FieldRule {
+	r := &FieldRule{}
 
-func (rb *FieldRuleBuilder) Dn(dn *NamesBuilder) *FieldRuleBuilder {
-	v := dn.Build()
-	rb.v.Dn = &v
-	return rb
-}
-
-func (rb *FieldRuleBuilder) Groups(groups *NamesBuilder) *FieldRuleBuilder {
-	v := groups.Build()
-	rb.v.Groups = &v
-	return rb
-}
-
-func (rb *FieldRuleBuilder) Metadata(metadata interface{}) *FieldRuleBuilder {
-	rb.v.Metadata = metadata
-	return rb
-}
-
-func (rb *FieldRuleBuilder) Realm(realm *RealmBuilder) *FieldRuleBuilder {
-	v := realm.Build()
-	rb.v.Realm = &v
-	return rb
-}
-
-func (rb *FieldRuleBuilder) Username(username Name) *FieldRuleBuilder {
-	rb.v.Username = &username
-	return rb
+	return r
 }

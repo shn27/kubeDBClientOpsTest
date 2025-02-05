@@ -15,48 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // SerializedClusterState type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/_types/Stats.ts#L95-L98
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/_types/Stats.ts#L232-L238
 type SerializedClusterState struct {
-	Diffs      *SerializedClusterStateDetail `json:"diffs,omitempty"`
+	Diffs *SerializedClusterStateDetail `json:"diffs,omitempty"`
+	// FullStates Number of published cluster states.
 	FullStates *SerializedClusterStateDetail `json:"full_states,omitempty"`
 }
 
-// SerializedClusterStateBuilder holds SerializedClusterState struct and provides a builder API.
-type SerializedClusterStateBuilder struct {
-	v *SerializedClusterState
-}
+// NewSerializedClusterState returns a SerializedClusterState.
+func NewSerializedClusterState() *SerializedClusterState {
+	r := &SerializedClusterState{}
 
-// NewSerializedClusterState provides a builder for the SerializedClusterState struct.
-func NewSerializedClusterStateBuilder() *SerializedClusterStateBuilder {
-	r := SerializedClusterStateBuilder{
-		&SerializedClusterState{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the SerializedClusterState struct
-func (rb *SerializedClusterStateBuilder) Build() SerializedClusterState {
-	return *rb.v
-}
-
-func (rb *SerializedClusterStateBuilder) Diffs(diffs *SerializedClusterStateDetailBuilder) *SerializedClusterStateBuilder {
-	v := diffs.Build()
-	rb.v.Diffs = &v
-	return rb
-}
-
-func (rb *SerializedClusterStateBuilder) FullStates(fullstates *SerializedClusterStateDetailBuilder) *SerializedClusterStateBuilder {
-	v := fullstates.Build()
-	rb.v.FullStates = &v
-	return rb
+	return r
 }

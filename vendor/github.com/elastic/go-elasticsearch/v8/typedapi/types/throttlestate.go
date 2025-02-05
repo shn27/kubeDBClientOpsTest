@@ -15,47 +15,68 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ThrottleState type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Action.ts#L123-L126
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Action.ts#L120-L123
 type ThrottleState struct {
 	Reason    string   `json:"reason"`
 	Timestamp DateTime `json:"timestamp"`
 }
 
-// ThrottleStateBuilder holds ThrottleState struct and provides a builder API.
-type ThrottleStateBuilder struct {
-	v *ThrottleState
-}
+func (s *ThrottleState) UnmarshalJSON(data []byte) error {
 
-// NewThrottleState provides a builder for the ThrottleState struct.
-func NewThrottleStateBuilder() *ThrottleStateBuilder {
-	r := ThrottleStateBuilder{
-		&ThrottleState{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "reason":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Reason", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Reason = o
+
+		case "timestamp":
+			if err := dec.Decode(&s.Timestamp); err != nil {
+				return fmt.Errorf("%s | %w", "Timestamp", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ThrottleState struct
-func (rb *ThrottleStateBuilder) Build() ThrottleState {
-	return *rb.v
-}
+// NewThrottleState returns a ThrottleState.
+func NewThrottleState() *ThrottleState {
+	r := &ThrottleState{}
 
-func (rb *ThrottleStateBuilder) Reason(reason string) *ThrottleStateBuilder {
-	rb.v.Reason = reason
-	return rb
-}
-
-func (rb *ThrottleStateBuilder) Timestamp(timestamp *DateTimeBuilder) *ThrottleStateBuilder {
-	v := timestamp.Build()
-	rb.v.Timestamp = v
-	return rb
+	return r
 }

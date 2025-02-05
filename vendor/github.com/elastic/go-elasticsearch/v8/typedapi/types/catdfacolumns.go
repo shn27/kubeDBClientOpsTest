@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
@@ -28,25 +26,5 @@ import (
 
 // CatDfaColumns type alias.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cat/_types/CatBase.ts#L558-L558
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cat/_types/CatBase.ts#L558-L558
 type CatDfaColumns []catdfacolumn.CatDfaColumn
-
-// CatDfaColumnsBuilder holds CatDfaColumns struct and provides a builder API.
-type CatDfaColumnsBuilder struct {
-	v CatDfaColumns
-}
-
-// NewCatDfaColumns provides a builder for the CatDfaColumns struct.
-func NewCatDfaColumnsBuilder() *CatDfaColumnsBuilder {
-	return &CatDfaColumnsBuilder{}
-}
-
-// Build finalize the chain and returns the CatDfaColumns struct
-func (b *CatDfaColumnsBuilder) Build() CatDfaColumns {
-	return b.v
-}
-
-func (b *CatDfaColumnsBuilder) CatDfaColumns(value CatDfaColumns) *CatDfaColumnsBuilder {
-	b.v = value
-	return b
-}

@@ -15,46 +15,83 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // TextIndexPrefixes type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/mapping/core.ts#L231-L234
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/mapping/core.ts#L265-L268
 type TextIndexPrefixes struct {
 	MaxChars int `json:"max_chars"`
 	MinChars int `json:"min_chars"`
 }
 
-// TextIndexPrefixesBuilder holds TextIndexPrefixes struct and provides a builder API.
-type TextIndexPrefixesBuilder struct {
-	v *TextIndexPrefixes
-}
+func (s *TextIndexPrefixes) UnmarshalJSON(data []byte) error {
 
-// NewTextIndexPrefixes provides a builder for the TextIndexPrefixes struct.
-func NewTextIndexPrefixesBuilder() *TextIndexPrefixesBuilder {
-	r := TextIndexPrefixesBuilder{
-		&TextIndexPrefixes{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "max_chars":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxChars", err)
+				}
+				s.MaxChars = value
+			case float64:
+				f := int(v)
+				s.MaxChars = f
+			}
+
+		case "min_chars":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MinChars", err)
+				}
+				s.MinChars = value
+			case float64:
+				f := int(v)
+				s.MinChars = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TextIndexPrefixes struct
-func (rb *TextIndexPrefixesBuilder) Build() TextIndexPrefixes {
-	return *rb.v
-}
+// NewTextIndexPrefixes returns a TextIndexPrefixes.
+func NewTextIndexPrefixes() *TextIndexPrefixes {
+	r := &TextIndexPrefixes{}
 
-func (rb *TextIndexPrefixesBuilder) MaxChars(maxchars int) *TextIndexPrefixesBuilder {
-	rb.v.MaxChars = maxchars
-	return rb
-}
-
-func (rb *TextIndexPrefixesBuilder) MinChars(minchars int) *TextIndexPrefixesBuilder {
-	rb.v.MinChars = minchars
-	return rb
+	return r
 }

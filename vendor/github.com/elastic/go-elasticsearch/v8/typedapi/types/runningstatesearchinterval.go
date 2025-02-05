@@ -15,62 +15,76 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // RunningStateSearchInterval type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/Datafeed.ts#L164-L169
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/Datafeed.ts#L226-L243
 type RunningStateSearchInterval struct {
-	End     *Duration               `json:"end,omitempty"`
-	EndMs   DurationValueUnitMillis `json:"end_ms"`
-	Start   *Duration               `json:"start,omitempty"`
-	StartMs DurationValueUnitMillis `json:"start_ms"`
+	// End The end time.
+	End Duration `json:"end,omitempty"`
+	// EndMs The end time as an epoch in milliseconds.
+	EndMs int64 `json:"end_ms"`
+	// Start The start time.
+	Start Duration `json:"start,omitempty"`
+	// StartMs The start time as an epoch in milliseconds.
+	StartMs int64 `json:"start_ms"`
 }
 
-// RunningStateSearchIntervalBuilder holds RunningStateSearchInterval struct and provides a builder API.
-type RunningStateSearchIntervalBuilder struct {
-	v *RunningStateSearchInterval
-}
+func (s *RunningStateSearchInterval) UnmarshalJSON(data []byte) error {
 
-// NewRunningStateSearchInterval provides a builder for the RunningStateSearchInterval struct.
-func NewRunningStateSearchIntervalBuilder() *RunningStateSearchIntervalBuilder {
-	r := RunningStateSearchIntervalBuilder{
-		&RunningStateSearchInterval{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "end":
+			if err := dec.Decode(&s.End); err != nil {
+				return fmt.Errorf("%s | %w", "End", err)
+			}
+
+		case "end_ms":
+			if err := dec.Decode(&s.EndMs); err != nil {
+				return fmt.Errorf("%s | %w", "EndMs", err)
+			}
+
+		case "start":
+			if err := dec.Decode(&s.Start); err != nil {
+				return fmt.Errorf("%s | %w", "Start", err)
+			}
+
+		case "start_ms":
+			if err := dec.Decode(&s.StartMs); err != nil {
+				return fmt.Errorf("%s | %w", "StartMs", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RunningStateSearchInterval struct
-func (rb *RunningStateSearchIntervalBuilder) Build() RunningStateSearchInterval {
-	return *rb.v
-}
+// NewRunningStateSearchInterval returns a RunningStateSearchInterval.
+func NewRunningStateSearchInterval() *RunningStateSearchInterval {
+	r := &RunningStateSearchInterval{}
 
-func (rb *RunningStateSearchIntervalBuilder) End(end *DurationBuilder) *RunningStateSearchIntervalBuilder {
-	v := end.Build()
-	rb.v.End = &v
-	return rb
-}
-
-func (rb *RunningStateSearchIntervalBuilder) EndMs(endms *DurationValueUnitMillisBuilder) *RunningStateSearchIntervalBuilder {
-	v := endms.Build()
-	rb.v.EndMs = v
-	return rb
-}
-
-func (rb *RunningStateSearchIntervalBuilder) Start(start *DurationBuilder) *RunningStateSearchIntervalBuilder {
-	v := start.Build()
-	rb.v.Start = &v
-	return rb
-}
-
-func (rb *RunningStateSearchIntervalBuilder) StartMs(startms *DurationValueUnitMillisBuilder) *RunningStateSearchIntervalBuilder {
-	v := startms.Build()
-	rb.v.StartMs = v
-	return rb
+	return r
 }

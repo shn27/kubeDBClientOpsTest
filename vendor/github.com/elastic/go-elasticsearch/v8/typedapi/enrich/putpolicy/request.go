@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package putpolicy
 
@@ -31,30 +29,27 @@ import (
 
 // Request holds the request body struct for the package putpolicy
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/enrich/put_policy/PutEnrichPolicyRequest.ts#L24-L38
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/enrich/put_policy/PutEnrichPolicyRequest.ts#L24-L53
 type Request struct {
-	GeoMatch *types.Policy `json:"geo_match,omitempty"`
 
-	Match *types.Policy `json:"match,omitempty"`
-
-	Range *types.Policy `json:"range,omitempty"`
+	// GeoMatch Matches enrich data to incoming documents based on a `geo_shape` query.
+	GeoMatch *types.EnrichPolicy `json:"geo_match,omitempty"`
+	// Match Matches enrich data to incoming documents based on a `term` query.
+	Match *types.EnrichPolicy `json:"match,omitempty"`
+	// Range Matches a number, date, or IP address in incoming documents to a range in the
+	// enrich index based on a `term` query.
+	Range *types.EnrichPolicy `json:"range,omitempty"`
 }
 
-// RequestBuilder is the builder API for the putpolicy.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -63,27 +58,4 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	}
 
 	return &req, nil
-}
-
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
-
-func (rb *RequestBuilder) GeoMatch(geomatch *types.PolicyBuilder) *RequestBuilder {
-	v := geomatch.Build()
-	rb.v.GeoMatch = &v
-	return rb
-}
-
-func (rb *RequestBuilder) Match(match *types.PolicyBuilder) *RequestBuilder {
-	v := match.Build()
-	rb.v.Match = &v
-	return rb
-}
-
-func (rb *RequestBuilder) Range_(range_ *types.PolicyBuilder) *RequestBuilder {
-	v := range_.Build()
-	rb.v.Range = &v
-	return rb
 }

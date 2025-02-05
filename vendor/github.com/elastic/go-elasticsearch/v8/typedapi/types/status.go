@@ -15,90 +15,132 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // Status type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/snapshot/_types/SnapshotStatus.ts#L26-L35
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/snapshot/_types/SnapshotStatus.ts#L26-L35
 type Status struct {
 	IncludeGlobalState bool                          `json:"include_global_state"`
 	Indices            map[string]SnapshotIndexStats `json:"indices"`
 	Repository         string                        `json:"repository"`
-	ShardsStats        ShardsStats                   `json:"shards_stats"`
+	ShardsStats        SnapshotShardsStats           `json:"shards_stats"`
 	Snapshot           string                        `json:"snapshot"`
 	State              string                        `json:"state"`
 	Stats              SnapshotStats                 `json:"stats"`
-	Uuid               Uuid                          `json:"uuid"`
+	Uuid               string                        `json:"uuid"`
 }
 
-// StatusBuilder holds Status struct and provides a builder API.
-type StatusBuilder struct {
-	v *Status
+func (s *Status) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "include_global_state":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IncludeGlobalState", err)
+				}
+				s.IncludeGlobalState = value
+			case bool:
+				s.IncludeGlobalState = v
+			}
+
+		case "indices":
+			if s.Indices == nil {
+				s.Indices = make(map[string]SnapshotIndexStats, 0)
+			}
+			if err := dec.Decode(&s.Indices); err != nil {
+				return fmt.Errorf("%s | %w", "Indices", err)
+			}
+
+		case "repository":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Repository", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Repository = o
+
+		case "shards_stats":
+			if err := dec.Decode(&s.ShardsStats); err != nil {
+				return fmt.Errorf("%s | %w", "ShardsStats", err)
+			}
+
+		case "snapshot":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Snapshot", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Snapshot = o
+
+		case "state":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "State", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.State = o
+
+		case "stats":
+			if err := dec.Decode(&s.Stats); err != nil {
+				return fmt.Errorf("%s | %w", "Stats", err)
+			}
+
+		case "uuid":
+			if err := dec.Decode(&s.Uuid); err != nil {
+				return fmt.Errorf("%s | %w", "Uuid", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewStatus provides a builder for the Status struct.
-func NewStatusBuilder() *StatusBuilder {
-	r := StatusBuilder{
-		&Status{
-			Indices: make(map[string]SnapshotIndexStats, 0),
-		},
+// NewStatus returns a Status.
+func NewStatus() *Status {
+	r := &Status{
+		Indices: make(map[string]SnapshotIndexStats, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the Status struct
-func (rb *StatusBuilder) Build() Status {
-	return *rb.v
-}
-
-func (rb *StatusBuilder) IncludeGlobalState(includeglobalstate bool) *StatusBuilder {
-	rb.v.IncludeGlobalState = includeglobalstate
-	return rb
-}
-
-func (rb *StatusBuilder) Indices(values map[string]*SnapshotIndexStatsBuilder) *StatusBuilder {
-	tmp := make(map[string]SnapshotIndexStats, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Indices = tmp
-	return rb
-}
-
-func (rb *StatusBuilder) Repository(repository string) *StatusBuilder {
-	rb.v.Repository = repository
-	return rb
-}
-
-func (rb *StatusBuilder) ShardsStats(shardsstats *ShardsStatsBuilder) *StatusBuilder {
-	v := shardsstats.Build()
-	rb.v.ShardsStats = v
-	return rb
-}
-
-func (rb *StatusBuilder) Snapshot(snapshot string) *StatusBuilder {
-	rb.v.Snapshot = snapshot
-	return rb
-}
-
-func (rb *StatusBuilder) State(state string) *StatusBuilder {
-	rb.v.State = state
-	return rb
-}
-
-func (rb *StatusBuilder) Stats(stats *SnapshotStatsBuilder) *StatusBuilder {
-	v := stats.Build()
-	rb.v.Stats = v
-	return rb
-}
-
-func (rb *StatusBuilder) Uuid(uuid Uuid) *StatusBuilder {
-	rb.v.Uuid = uuid
-	return rb
+	return r
 }

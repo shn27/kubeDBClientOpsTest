@@ -15,90 +15,118 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // ScriptedMetricAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/metric.ts#L137-L143
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/metric.ts#L263-L289
 type ScriptedMetricAggregation struct {
-	CombineScript *Script                `json:"combine_script,omitempty"`
-	Field         *Field                 `json:"field,omitempty"`
-	InitScript    *Script                `json:"init_script,omitempty"`
-	MapScript     *Script                `json:"map_script,omitempty"`
-	Missing       *Missing               `json:"missing,omitempty"`
-	Params        map[string]interface{} `json:"params,omitempty"`
-	ReduceScript  *Script                `json:"reduce_script,omitempty"`
-	Script        *Script                `json:"script,omitempty"`
+	// CombineScript Runs once on each shard after document collection is complete.
+	// Allows the aggregation to consolidate the state returned from each shard.
+	CombineScript *Script `json:"combine_script,omitempty"`
+	// Field The field on which to run the aggregation.
+	Field *string `json:"field,omitempty"`
+	// InitScript Runs prior to any collection of documents.
+	// Allows the aggregation to set up any initial state.
+	InitScript *Script `json:"init_script,omitempty"`
+	// MapScript Run once per document collected.
+	// If no `combine_script` is specified, the resulting state needs to be stored
+	// in the `state` object.
+	MapScript *Script `json:"map_script,omitempty"`
+	// Missing The value to apply to documents that do not have a value.
+	// By default, documents without a value are ignored.
+	Missing Missing `json:"missing,omitempty"`
+	// Params A global object with script parameters for `init`, `map` and `combine`
+	// scripts.
+	// It is shared between the scripts.
+	Params map[string]json.RawMessage `json:"params,omitempty"`
+	// ReduceScript Runs once on the coordinating node after all shards have returned their
+	// results.
+	// The script is provided with access to a variable `states`, which is an array
+	// of the result of the `combine_script` on each shard.
+	ReduceScript *Script `json:"reduce_script,omitempty"`
+	Script       *Script `json:"script,omitempty"`
 }
 
-// ScriptedMetricAggregationBuilder holds ScriptedMetricAggregation struct and provides a builder API.
-type ScriptedMetricAggregationBuilder struct {
-	v *ScriptedMetricAggregation
+func (s *ScriptedMetricAggregation) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "combine_script":
+			if err := dec.Decode(&s.CombineScript); err != nil {
+				return fmt.Errorf("%s | %w", "CombineScript", err)
+			}
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "init_script":
+			if err := dec.Decode(&s.InitScript); err != nil {
+				return fmt.Errorf("%s | %w", "InitScript", err)
+			}
+
+		case "map_script":
+			if err := dec.Decode(&s.MapScript); err != nil {
+				return fmt.Errorf("%s | %w", "MapScript", err)
+			}
+
+		case "missing":
+			if err := dec.Decode(&s.Missing); err != nil {
+				return fmt.Errorf("%s | %w", "Missing", err)
+			}
+
+		case "params":
+			if s.Params == nil {
+				s.Params = make(map[string]json.RawMessage, 0)
+			}
+			if err := dec.Decode(&s.Params); err != nil {
+				return fmt.Errorf("%s | %w", "Params", err)
+			}
+
+		case "reduce_script":
+			if err := dec.Decode(&s.ReduceScript); err != nil {
+				return fmt.Errorf("%s | %w", "ReduceScript", err)
+			}
+
+		case "script":
+			if err := dec.Decode(&s.Script); err != nil {
+				return fmt.Errorf("%s | %w", "Script", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewScriptedMetricAggregation provides a builder for the ScriptedMetricAggregation struct.
-func NewScriptedMetricAggregationBuilder() *ScriptedMetricAggregationBuilder {
-	r := ScriptedMetricAggregationBuilder{
-		&ScriptedMetricAggregation{
-			Params: make(map[string]interface{}, 0),
-		},
+// NewScriptedMetricAggregation returns a ScriptedMetricAggregation.
+func NewScriptedMetricAggregation() *ScriptedMetricAggregation {
+	r := &ScriptedMetricAggregation{
+		Params: make(map[string]json.RawMessage, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the ScriptedMetricAggregation struct
-func (rb *ScriptedMetricAggregationBuilder) Build() ScriptedMetricAggregation {
-	return *rb.v
-}
-
-func (rb *ScriptedMetricAggregationBuilder) CombineScript(combinescript *ScriptBuilder) *ScriptedMetricAggregationBuilder {
-	v := combinescript.Build()
-	rb.v.CombineScript = &v
-	return rb
-}
-
-func (rb *ScriptedMetricAggregationBuilder) Field(field Field) *ScriptedMetricAggregationBuilder {
-	rb.v.Field = &field
-	return rb
-}
-
-func (rb *ScriptedMetricAggregationBuilder) InitScript(initscript *ScriptBuilder) *ScriptedMetricAggregationBuilder {
-	v := initscript.Build()
-	rb.v.InitScript = &v
-	return rb
-}
-
-func (rb *ScriptedMetricAggregationBuilder) MapScript(mapscript *ScriptBuilder) *ScriptedMetricAggregationBuilder {
-	v := mapscript.Build()
-	rb.v.MapScript = &v
-	return rb
-}
-
-func (rb *ScriptedMetricAggregationBuilder) Missing(missing *MissingBuilder) *ScriptedMetricAggregationBuilder {
-	v := missing.Build()
-	rb.v.Missing = &v
-	return rb
-}
-
-func (rb *ScriptedMetricAggregationBuilder) Params(value map[string]interface{}) *ScriptedMetricAggregationBuilder {
-	rb.v.Params = value
-	return rb
-}
-
-func (rb *ScriptedMetricAggregationBuilder) ReduceScript(reducescript *ScriptBuilder) *ScriptedMetricAggregationBuilder {
-	v := reducescript.Build()
-	rb.v.ReduceScript = &v
-	return rb
-}
-
-func (rb *ScriptedMetricAggregationBuilder) Script(script *ScriptBuilder) *ScriptedMetricAggregationBuilder {
-	v := script.Build()
-	rb.v.Script = &v
-	return rb
+	return r
 }

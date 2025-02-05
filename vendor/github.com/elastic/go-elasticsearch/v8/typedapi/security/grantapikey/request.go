@@ -15,16 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package grantapikey
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"strconv"
 
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/apikeygranttype"
@@ -32,34 +34,38 @@ import (
 
 // Request holds the request body struct for the package grantapikey
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/grant_api_key/SecurityGrantApiKeyRequest.ts#L24-L37
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/grant_api_key/SecurityGrantApiKeyRequest.ts#L24-L77
 type Request struct {
+
+	// AccessToken The user’s access token.
+	// If you specify the `access_token` grant type, this parameter is required.
+	// It is not valid with other grant types.
 	AccessToken *string `json:"access_token,omitempty"`
-
+	// ApiKey Defines the API key.
 	ApiKey types.GrantApiKey `json:"api_key"`
-
+	// GrantType The type of grant. Supported grant types are: `access_token`, `password`.
 	GrantType apikeygranttype.ApiKeyGrantType `json:"grant_type"`
-
-	Password *types.Password `json:"password,omitempty"`
-
-	Username *types.Username `json:"username,omitempty"`
+	// Password The user’s password. If you specify the `password` grant type, this parameter
+	// is required.
+	// It is not valid with other grant types.
+	Password *string `json:"password,omitempty"`
+	// RunAs The name of the user to be impersonated.
+	RunAs *string `json:"run_as,omitempty"`
+	// Username The user name that identifies the user.
+	// If you specify the `password` grant type, this parameter is required.
+	// It is not valid with other grant types.
+	Username *string `json:"username,omitempty"`
 }
 
-// RequestBuilder is the builder API for the grantapikey.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -70,33 +76,58 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) AccessToken(accesstoken string) *RequestBuilder {
-	rb.v.AccessToken = &accesstoken
-	return rb
-}
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
 
-func (rb *RequestBuilder) ApiKey(apikey *types.GrantApiKeyBuilder) *RequestBuilder {
-	v := apikey.Build()
-	rb.v.ApiKey = v
-	return rb
-}
+		switch t {
 
-func (rb *RequestBuilder) GrantType(granttype apikeygranttype.ApiKeyGrantType) *RequestBuilder {
-	rb.v.GrantType = granttype
-	return rb
-}
+		case "access_token":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "AccessToken", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.AccessToken = &o
 
-func (rb *RequestBuilder) Password(password types.Password) *RequestBuilder {
-	rb.v.Password = &password
-	return rb
-}
+		case "api_key":
+			if err := dec.Decode(&s.ApiKey); err != nil {
+				return fmt.Errorf("%s | %w", "ApiKey", err)
+			}
 
-func (rb *RequestBuilder) Username(username types.Username) *RequestBuilder {
-	rb.v.Username = &username
-	return rb
+		case "grant_type":
+			if err := dec.Decode(&s.GrantType); err != nil {
+				return fmt.Errorf("%s | %w", "GrantType", err)
+			}
+
+		case "password":
+			if err := dec.Decode(&s.Password); err != nil {
+				return fmt.Errorf("%s | %w", "Password", err)
+			}
+
+		case "run_as":
+			if err := dec.Decode(&s.RunAs); err != nil {
+				return fmt.Errorf("%s | %w", "RunAs", err)
+			}
+
+		case "username":
+			if err := dec.Decode(&s.Username); err != nil {
+				return fmt.Errorf("%s | %w", "Username", err)
+			}
+
+		}
+	}
+	return nil
 }

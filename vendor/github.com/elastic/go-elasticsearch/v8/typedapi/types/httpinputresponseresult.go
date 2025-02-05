@@ -15,53 +15,85 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // HttpInputResponseResult type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Actions.ts#L302-L306
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Actions.ts#L302-L306
 type HttpInputResponseResult struct {
 	Body    string      `json:"body"`
 	Headers HttpHeaders `json:"headers"`
 	Status  int         `json:"status"`
 }
 
-// HttpInputResponseResultBuilder holds HttpInputResponseResult struct and provides a builder API.
-type HttpInputResponseResultBuilder struct {
-	v *HttpInputResponseResult
-}
+func (s *HttpInputResponseResult) UnmarshalJSON(data []byte) error {
 
-// NewHttpInputResponseResult provides a builder for the HttpInputResponseResult struct.
-func NewHttpInputResponseResultBuilder() *HttpInputResponseResultBuilder {
-	r := HttpInputResponseResultBuilder{
-		&HttpInputResponseResult{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "body":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Body", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Body = o
+
+		case "headers":
+			if err := dec.Decode(&s.Headers); err != nil {
+				return fmt.Errorf("%s | %w", "Headers", err)
+			}
+
+		case "status":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Status", err)
+				}
+				s.Status = value
+			case float64:
+				f := int(v)
+				s.Status = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the HttpInputResponseResult struct
-func (rb *HttpInputResponseResultBuilder) Build() HttpInputResponseResult {
-	return *rb.v
-}
+// NewHttpInputResponseResult returns a HttpInputResponseResult.
+func NewHttpInputResponseResult() *HttpInputResponseResult {
+	r := &HttpInputResponseResult{}
 
-func (rb *HttpInputResponseResultBuilder) Body(body string) *HttpInputResponseResultBuilder {
-	rb.v.Body = body
-	return rb
-}
-
-func (rb *HttpInputResponseResultBuilder) Headers(headers *HttpHeadersBuilder) *HttpInputResponseResultBuilder {
-	v := headers.Build()
-	rb.v.Headers = v
-	return rb
-}
-
-func (rb *HttpInputResponseResultBuilder) Status(status int) *HttpInputResponseResultBuilder {
-	rb.v.Status = status
-	return rb
+	return r
 }

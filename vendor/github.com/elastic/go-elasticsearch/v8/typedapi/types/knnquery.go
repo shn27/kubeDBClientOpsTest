@@ -15,87 +15,178 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // KnnQuery type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Knn.ts#L24-L37
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Knn.ts#L54-L72
 type KnnQuery struct {
-	// Boost Boost value to apply to kNN scores
+	// Boost Floating point number used to decrease or increase the relevance scores of
+	// the query.
+	// Boost values are relative to the default value of 1.0.
+	// A boost value between 0 and 1.0 decreases the relevance score.
+	// A value greater than 1.0 increases the relevance score.
 	Boost *float32 `json:"boost,omitempty"`
 	// Field The name of the vector field to search against
-	Field Field `json:"field"`
+	Field string `json:"field"`
 	// Filter Filters for the kNN search query
-	Filter []QueryContainer `json:"filter,omitempty"`
+	Filter []Query `json:"filter,omitempty"`
 	// K The final number of nearest neighbors to return as top hits
-	K int64 `json:"k"`
+	K *int `json:"k,omitempty"`
 	// NumCandidates The number of nearest neighbor candidates to consider per shard
-	NumCandidates int64 `json:"num_candidates"`
+	NumCandidates *int    `json:"num_candidates,omitempty"`
+	QueryName_    *string `json:"_name,omitempty"`
 	// QueryVector The query vector
-	QueryVector []float64 `json:"query_vector"`
+	QueryVector []float32 `json:"query_vector,omitempty"`
+	// QueryVectorBuilder The query vector builder. You must provide a query_vector_builder or
+	// query_vector, but not both.
+	QueryVectorBuilder *QueryVectorBuilder `json:"query_vector_builder,omitempty"`
+	// Similarity The minimum similarity for a vector to be considered a match
+	Similarity *float32 `json:"similarity,omitempty"`
 }
 
-// KnnQueryBuilder holds KnnQuery struct and provides a builder API.
-type KnnQueryBuilder struct {
-	v *KnnQuery
-}
+func (s *KnnQuery) UnmarshalJSON(data []byte) error {
 
-// NewKnnQuery provides a builder for the KnnQuery struct.
-func NewKnnQueryBuilder() *KnnQueryBuilder {
-	r := KnnQueryBuilder{
-		&KnnQuery{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "boost":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Boost", err)
+				}
+				f := float32(value)
+				s.Boost = &f
+			case float64:
+				f := float32(v)
+				s.Boost = &f
+			}
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "filter":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := NewQuery()
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Filter", err)
+				}
+
+				s.Filter = append(s.Filter, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Filter); err != nil {
+					return fmt.Errorf("%s | %w", "Filter", err)
+				}
+			}
+
+		case "k":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "K", err)
+				}
+				s.K = &value
+			case float64:
+				f := int(v)
+				s.K = &f
+			}
+
+		case "num_candidates":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NumCandidates", err)
+				}
+				s.NumCandidates = &value
+			case float64:
+				f := int(v)
+				s.NumCandidates = &f
+			}
+
+		case "_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "QueryName_", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.QueryName_ = &o
+
+		case "query_vector":
+			if err := dec.Decode(&s.QueryVector); err != nil {
+				return fmt.Errorf("%s | %w", "QueryVector", err)
+			}
+
+		case "query_vector_builder":
+			if err := dec.Decode(&s.QueryVectorBuilder); err != nil {
+				return fmt.Errorf("%s | %w", "QueryVectorBuilder", err)
+			}
+
+		case "similarity":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Similarity", err)
+				}
+				f := float32(value)
+				s.Similarity = &f
+			case float64:
+				f := float32(v)
+				s.Similarity = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the KnnQuery struct
-func (rb *KnnQueryBuilder) Build() KnnQuery {
-	return *rb.v
-}
+// NewKnnQuery returns a KnnQuery.
+func NewKnnQuery() *KnnQuery {
+	r := &KnnQuery{}
 
-// Boost Boost value to apply to kNN scores
-
-func (rb *KnnQueryBuilder) Boost(boost float32) *KnnQueryBuilder {
-	rb.v.Boost = &boost
-	return rb
-}
-
-// Field The name of the vector field to search against
-
-func (rb *KnnQueryBuilder) Field(field Field) *KnnQueryBuilder {
-	rb.v.Field = field
-	return rb
-}
-
-// Filter Filters for the kNN search query
-func (rb *KnnQueryBuilder) Filter(arg []QueryContainer) *KnnQueryBuilder {
-	rb.v.Filter = arg
-	return rb
-}
-
-// K The final number of nearest neighbors to return as top hits
-
-func (rb *KnnQueryBuilder) K(k int64) *KnnQueryBuilder {
-	rb.v.K = k
-	return rb
-}
-
-// NumCandidates The number of nearest neighbor candidates to consider per shard
-
-func (rb *KnnQueryBuilder) NumCandidates(numcandidates int64) *KnnQueryBuilder {
-	rb.v.NumCandidates = numcandidates
-	return rb
-}
-
-// QueryVector The query vector
-
-func (rb *KnnQueryBuilder) QueryVector(query_vector ...float64) *KnnQueryBuilder {
-	rb.v.QueryVector = query_vector
-	return rb
+	return r
 }

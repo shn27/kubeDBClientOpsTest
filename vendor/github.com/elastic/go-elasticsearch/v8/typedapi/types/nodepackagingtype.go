@@ -15,52 +15,95 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // NodePackagingType type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/stats/types.ts#L276-L280
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/stats/types.ts#L526-L539
 type NodePackagingType struct {
-	Count  int    `json:"count"`
+	// Count Number of selected nodes using the distribution flavor and file type.
+	Count int `json:"count"`
+	// Flavor Type of Elasticsearch distribution. This is always `default`.
 	Flavor string `json:"flavor"`
-	Type   string `json:"type"`
+	// Type File type (such as `tar` or `zip`) used for the distribution package.
+	Type string `json:"type"`
 }
 
-// NodePackagingTypeBuilder holds NodePackagingType struct and provides a builder API.
-type NodePackagingTypeBuilder struct {
-	v *NodePackagingType
-}
+func (s *NodePackagingType) UnmarshalJSON(data []byte) error {
 
-// NewNodePackagingType provides a builder for the NodePackagingType struct.
-func NewNodePackagingTypeBuilder() *NodePackagingTypeBuilder {
-	r := NodePackagingTypeBuilder{
-		&NodePackagingType{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Count", err)
+				}
+				s.Count = value
+			case float64:
+				f := int(v)
+				s.Count = f
+			}
+
+		case "flavor":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Flavor", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Flavor = o
+
+		case "type":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Type = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the NodePackagingType struct
-func (rb *NodePackagingTypeBuilder) Build() NodePackagingType {
-	return *rb.v
-}
+// NewNodePackagingType returns a NodePackagingType.
+func NewNodePackagingType() *NodePackagingType {
+	r := &NodePackagingType{}
 
-func (rb *NodePackagingTypeBuilder) Count(count int) *NodePackagingTypeBuilder {
-	rb.v.Count = count
-	return rb
-}
-
-func (rb *NodePackagingTypeBuilder) Flavor(flavor string) *NodePackagingTypeBuilder {
-	rb.v.Flavor = flavor
-	return rb
-}
-
-func (rb *NodePackagingTypeBuilder) Type_(type_ string) *NodePackagingTypeBuilder {
-	rb.v.Type = type_
-	return rb
+	return r
 }

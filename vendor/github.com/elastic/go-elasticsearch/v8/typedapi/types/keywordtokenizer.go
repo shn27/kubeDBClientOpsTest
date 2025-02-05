@@ -15,49 +15,92 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // KeywordTokenizer type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/tokenizers.ts#L61-L64
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/tokenizers.ts#L68-L74
 type KeywordTokenizer struct {
-	BufferSize int            `json:"buffer_size"`
-	Type       string         `json:"type,omitempty"`
-	Version    *VersionString `json:"version,omitempty"`
+	BufferSize *int    `json:"buffer_size,omitempty"`
+	Type       string  `json:"type,omitempty"`
+	Version    *string `json:"version,omitempty"`
 }
 
-// KeywordTokenizerBuilder holds KeywordTokenizer struct and provides a builder API.
-type KeywordTokenizerBuilder struct {
-	v *KeywordTokenizer
+func (s *KeywordTokenizer) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "buffer_size":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "BufferSize", err)
+				}
+				s.BufferSize = &value
+			case float64:
+				f := int(v)
+				s.BufferSize = &f
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewKeywordTokenizer provides a builder for the KeywordTokenizer struct.
-func NewKeywordTokenizerBuilder() *KeywordTokenizerBuilder {
-	r := KeywordTokenizerBuilder{
-		&KeywordTokenizer{},
+// MarshalJSON override marshalling to include literal value
+func (s KeywordTokenizer) MarshalJSON() ([]byte, error) {
+	type innerKeywordTokenizer KeywordTokenizer
+	tmp := innerKeywordTokenizer{
+		BufferSize: s.BufferSize,
+		Type:       s.Type,
+		Version:    s.Version,
 	}
 
-	r.v.Type = "keyword"
+	tmp.Type = "keyword"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the KeywordTokenizer struct
-func (rb *KeywordTokenizerBuilder) Build() KeywordTokenizer {
-	return *rb.v
-}
+// NewKeywordTokenizer returns a KeywordTokenizer.
+func NewKeywordTokenizer() *KeywordTokenizer {
+	r := &KeywordTokenizer{}
 
-func (rb *KeywordTokenizerBuilder) BufferSize(buffersize int) *KeywordTokenizerBuilder {
-	rb.v.BufferSize = buffersize
-	return rb
-}
-
-func (rb *KeywordTokenizerBuilder) Version(version VersionString) *KeywordTokenizerBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

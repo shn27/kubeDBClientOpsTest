@@ -15,40 +15,55 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // TopMetricsValue type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/metric.ts#L192-L194
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/metric.ts#L427-L432
 type TopMetricsValue struct {
-	Field Field `json:"field"`
+	// Field A field to return as a metric.
+	Field string `json:"field"`
 }
 
-// TopMetricsValueBuilder holds TopMetricsValue struct and provides a builder API.
-type TopMetricsValueBuilder struct {
-	v *TopMetricsValue
-}
+func (s *TopMetricsValue) UnmarshalJSON(data []byte) error {
 
-// NewTopMetricsValue provides a builder for the TopMetricsValue struct.
-func NewTopMetricsValueBuilder() *TopMetricsValueBuilder {
-	r := TopMetricsValueBuilder{
-		&TopMetricsValue{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TopMetricsValue struct
-func (rb *TopMetricsValueBuilder) Build() TopMetricsValue {
-	return *rb.v
-}
+// NewTopMetricsValue returns a TopMetricsValue.
+func NewTopMetricsValue() *TopMetricsValue {
+	r := &TopMetricsValue{}
 
-func (rb *TopMetricsValueBuilder) Field(field Field) *TopMetricsValueBuilder {
-	rb.v.Field = field
-	return rb
+	return r
 }

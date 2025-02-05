@@ -15,48 +15,140 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // TopLeftBottomRightGeoBounds type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Geo.ts#L142-L145
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Geo.ts#L161-L164
 type TopLeftBottomRightGeoBounds struct {
 	BottomRight GeoLocation `json:"bottom_right"`
 	TopLeft     GeoLocation `json:"top_left"`
 }
 
-// TopLeftBottomRightGeoBoundsBuilder holds TopLeftBottomRightGeoBounds struct and provides a builder API.
-type TopLeftBottomRightGeoBoundsBuilder struct {
-	v *TopLeftBottomRightGeoBounds
-}
+func (s *TopLeftBottomRightGeoBounds) UnmarshalJSON(data []byte) error {
 
-// NewTopLeftBottomRightGeoBounds provides a builder for the TopLeftBottomRightGeoBounds struct.
-func NewTopLeftBottomRightGeoBoundsBuilder() *TopLeftBottomRightGeoBoundsBuilder {
-	r := TopLeftBottomRightGeoBoundsBuilder{
-		&TopLeftBottomRightGeoBounds{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "bottom_right":
+			message := json.RawMessage{}
+			if err := dec.Decode(&message); err != nil {
+				return fmt.Errorf("%s | %w", "BottomRight", err)
+			}
+			keyDec := json.NewDecoder(bytes.NewReader(message))
+		bottomright_field:
+			for {
+				t, err := keyDec.Token()
+				if err != nil {
+					if errors.Is(err, io.EOF) {
+						break
+					}
+					return fmt.Errorf("%s | %w", "BottomRight", err)
+				}
+
+				switch t {
+
+				case "lat", "lon":
+					o := NewLatLonGeoLocation()
+					localDec := json.NewDecoder(bytes.NewReader(message))
+					if err := localDec.Decode(&o); err != nil {
+						return fmt.Errorf("%s | %w", "BottomRight", err)
+					}
+					s.BottomRight = o
+					break bottomright_field
+
+				case "geohash":
+					o := NewGeoHashLocation()
+					localDec := json.NewDecoder(bytes.NewReader(message))
+					if err := localDec.Decode(&o); err != nil {
+						return fmt.Errorf("%s | %w", "BottomRight", err)
+					}
+					s.BottomRight = o
+					break bottomright_field
+
+				}
+			}
+			if s.BottomRight == nil {
+				localDec := json.NewDecoder(bytes.NewReader(message))
+				if err := localDec.Decode(&s.BottomRight); err != nil {
+					return fmt.Errorf("%s | %w", "BottomRight", err)
+				}
+			}
+
+		case "top_left":
+			message := json.RawMessage{}
+			if err := dec.Decode(&message); err != nil {
+				return fmt.Errorf("%s | %w", "TopLeft", err)
+			}
+			keyDec := json.NewDecoder(bytes.NewReader(message))
+		topleft_field:
+			for {
+				t, err := keyDec.Token()
+				if err != nil {
+					if errors.Is(err, io.EOF) {
+						break
+					}
+					return fmt.Errorf("%s | %w", "TopLeft", err)
+				}
+
+				switch t {
+
+				case "lat", "lon":
+					o := NewLatLonGeoLocation()
+					localDec := json.NewDecoder(bytes.NewReader(message))
+					if err := localDec.Decode(&o); err != nil {
+						return fmt.Errorf("%s | %w", "TopLeft", err)
+					}
+					s.TopLeft = o
+					break topleft_field
+
+				case "geohash":
+					o := NewGeoHashLocation()
+					localDec := json.NewDecoder(bytes.NewReader(message))
+					if err := localDec.Decode(&o); err != nil {
+						return fmt.Errorf("%s | %w", "TopLeft", err)
+					}
+					s.TopLeft = o
+					break topleft_field
+
+				}
+			}
+			if s.TopLeft == nil {
+				localDec := json.NewDecoder(bytes.NewReader(message))
+				if err := localDec.Decode(&s.TopLeft); err != nil {
+					return fmt.Errorf("%s | %w", "TopLeft", err)
+				}
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TopLeftBottomRightGeoBounds struct
-func (rb *TopLeftBottomRightGeoBoundsBuilder) Build() TopLeftBottomRightGeoBounds {
-	return *rb.v
-}
+// NewTopLeftBottomRightGeoBounds returns a TopLeftBottomRightGeoBounds.
+func NewTopLeftBottomRightGeoBounds() *TopLeftBottomRightGeoBounds {
+	r := &TopLeftBottomRightGeoBounds{}
 
-func (rb *TopLeftBottomRightGeoBoundsBuilder) BottomRight(bottomright *GeoLocationBuilder) *TopLeftBottomRightGeoBoundsBuilder {
-	v := bottomright.Build()
-	rb.v.BottomRight = v
-	return rb
-}
-
-func (rb *TopLeftBottomRightGeoBoundsBuilder) TopLeft(topleft *GeoLocationBuilder) *TopLeftBottomRightGeoBoundsBuilder {
-	v := topleft.Build()
-	rb.v.TopLeft = v
-	return rb
+	return r
 }

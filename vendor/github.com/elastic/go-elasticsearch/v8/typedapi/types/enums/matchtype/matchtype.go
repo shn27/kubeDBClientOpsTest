@@ -15,19 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package matchtype
 package matchtype
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/mapping/dynamic-template.ts#L32-L35
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/mapping/dynamic-template.ts#L44-L47
 type MatchType struct {
-	name string
+	Name string
 }
 
 var (
@@ -41,7 +39,7 @@ func (m MatchType) MarshalText() (text []byte, err error) {
 }
 
 func (m *MatchType) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
 	case "simple":
 		*m = Simple
@@ -55,5 +53,5 @@ func (m *MatchType) UnmarshalText(text []byte) error {
 }
 
 func (m MatchType) String() string {
-	return m.name
+	return m.Name
 }

@@ -15,48 +15,39 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package invalidatetoken
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
-
-	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
+	"io"
+	"strconv"
 )
 
 // Request holds the request body struct for the package invalidatetoken
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/invalidate_token/SecurityInvalidateTokenRequest.ts#L23-L35
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/invalidate_token/SecurityInvalidateTokenRequest.ts#L23-L43
 type Request struct {
-	RealmName *types.Name `json:"realm_name,omitempty"`
-
+	RealmName    *string `json:"realm_name,omitempty"`
 	RefreshToken *string `json:"refresh_token,omitempty"`
-
-	Token *string `json:"token,omitempty"`
-
-	Username *types.Username `json:"username,omitempty"`
+	Token        *string `json:"token,omitempty"`
+	Username     *string `json:"username,omitempty"`
 }
 
-// RequestBuilder is the builder API for the invalidatetoken.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -67,27 +58,55 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) RealmName(realmname types.Name) *RequestBuilder {
-	rb.v.RealmName = &realmname
-	return rb
-}
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
 
-func (rb *RequestBuilder) RefreshToken(refreshtoken string) *RequestBuilder {
-	rb.v.RefreshToken = &refreshtoken
-	return rb
-}
+		switch t {
 
-func (rb *RequestBuilder) Token(token string) *RequestBuilder {
-	rb.v.Token = &token
-	return rb
-}
+		case "realm_name":
+			if err := dec.Decode(&s.RealmName); err != nil {
+				return fmt.Errorf("%s | %w", "RealmName", err)
+			}
 
-func (rb *RequestBuilder) Username(username types.Username) *RequestBuilder {
-	rb.v.Username = &username
-	return rb
+		case "refresh_token":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "RefreshToken", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.RefreshToken = &o
+
+		case "token":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Token", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Token = &o
+
+		case "username":
+			if err := dec.Decode(&s.Username); err != nil {
+				return fmt.Errorf("%s | %w", "Username", err)
+			}
+
+		}
+	}
+	return nil
 }

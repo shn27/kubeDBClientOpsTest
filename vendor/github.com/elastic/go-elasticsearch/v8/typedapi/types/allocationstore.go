@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // AllocationStore type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/allocation_explain/types.ts#L39-L46
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/allocation_explain/types.ts#L40-L47
 type AllocationStore struct {
 	AllocationId        string `json:"allocation_id"`
 	Found               bool   `json:"found"`
@@ -34,51 +41,110 @@ type AllocationStore struct {
 	StoreException      string `json:"store_exception"`
 }
 
-// AllocationStoreBuilder holds AllocationStore struct and provides a builder API.
-type AllocationStoreBuilder struct {
-	v *AllocationStore
-}
+func (s *AllocationStore) UnmarshalJSON(data []byte) error {
 
-// NewAllocationStore provides a builder for the AllocationStore struct.
-func NewAllocationStoreBuilder() *AllocationStoreBuilder {
-	r := AllocationStoreBuilder{
-		&AllocationStore{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "allocation_id":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "AllocationId", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.AllocationId = o
+
+		case "found":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Found", err)
+				}
+				s.Found = value
+			case bool:
+				s.Found = v
+			}
+
+		case "in_sync":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "InSync", err)
+				}
+				s.InSync = value
+			case bool:
+				s.InSync = v
+			}
+
+		case "matching_size_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MatchingSizeInBytes", err)
+				}
+				s.MatchingSizeInBytes = value
+			case float64:
+				f := int64(v)
+				s.MatchingSizeInBytes = f
+			}
+
+		case "matching_sync_id":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MatchingSyncId", err)
+				}
+				s.MatchingSyncId = value
+			case bool:
+				s.MatchingSyncId = v
+			}
+
+		case "store_exception":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "StoreException", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.StoreException = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the AllocationStore struct
-func (rb *AllocationStoreBuilder) Build() AllocationStore {
-	return *rb.v
-}
+// NewAllocationStore returns a AllocationStore.
+func NewAllocationStore() *AllocationStore {
+	r := &AllocationStore{}
 
-func (rb *AllocationStoreBuilder) AllocationId(allocationid string) *AllocationStoreBuilder {
-	rb.v.AllocationId = allocationid
-	return rb
-}
-
-func (rb *AllocationStoreBuilder) Found(found bool) *AllocationStoreBuilder {
-	rb.v.Found = found
-	return rb
-}
-
-func (rb *AllocationStoreBuilder) InSync(insync bool) *AllocationStoreBuilder {
-	rb.v.InSync = insync
-	return rb
-}
-
-func (rb *AllocationStoreBuilder) MatchingSizeInBytes(matchingsizeinbytes int64) *AllocationStoreBuilder {
-	rb.v.MatchingSizeInBytes = matchingsizeinbytes
-	return rb
-}
-
-func (rb *AllocationStoreBuilder) MatchingSyncId(matchingsyncid bool) *AllocationStoreBuilder {
-	rb.v.MatchingSyncId = matchingsyncid
-	return rb
-}
-
-func (rb *AllocationStoreBuilder) StoreException(storeexception string) *AllocationStoreBuilder {
-	rb.v.StoreException = storeexception
-	return rb
+	return r
 }

@@ -15,43 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // DateTime holds the union for the following types:
 //
-//	EpochTimeUnitMillis
 //	string
+//	int64
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Time.ts#L22-L27
-type DateTime interface{}
-
-// DateTimeBuilder holds DateTime struct and provides a builder API.
-type DateTimeBuilder struct {
-	v DateTime
-}
-
-// NewDateTime provides a builder for the DateTime struct.
-func NewDateTimeBuilder() *DateTimeBuilder {
-	return &DateTimeBuilder{}
-}
-
-// Build finalize the chain and returns the DateTime struct
-func (u *DateTimeBuilder) Build() DateTime {
-	return u.v
-}
-
-func (u *DateTimeBuilder) EpochTimeUnitMillis(epochtimeunitmillis *EpochTimeUnitMillisBuilder) *DateTimeBuilder {
-	v := epochtimeunitmillis.Build()
-	u.v = &v
-	return u
-}
-
-func (u *DateTimeBuilder) String(string string) *DateTimeBuilder {
-	u.v = &string
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Time.ts#L22-L27
+type DateTime any

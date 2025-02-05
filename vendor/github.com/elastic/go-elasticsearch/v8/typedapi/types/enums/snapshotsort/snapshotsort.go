@@ -15,19 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package snapshotsort
 package snapshotsort
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/snapshot/_types/SnapshotInfo.ts#L67-L78
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/snapshot/_types/SnapshotInfo.ts#L73-L93
 type SnapshotSort struct {
-	name string
+	Name string
 }
 
 var (
@@ -51,7 +49,7 @@ func (s SnapshotSort) MarshalText() (text []byte, err error) {
 }
 
 func (s *SnapshotSort) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
 	case "start_time":
 		*s = Starttime
@@ -75,5 +73,5 @@ func (s *SnapshotSort) UnmarshalText(text []byte) error {
 }
 
 func (s SnapshotSort) String() string {
-	return s.name
+	return s.Name
 }

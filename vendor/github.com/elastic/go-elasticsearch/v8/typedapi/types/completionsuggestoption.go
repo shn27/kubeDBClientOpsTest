@@ -15,97 +15,163 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // CompletionSuggestOption type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/suggester.ts#L73-L84
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/suggester.ts#L73-L84
 type CompletionSuggestOption struct {
-	CollateMatch *bool                  `json:"collate_match,omitempty"`
-	Contexts     map[string][]Context   `json:"contexts,omitempty"`
-	Fields       map[string]interface{} `json:"fields,omitempty"`
-	Id_          *string                `json:"_id,omitempty"`
-	Index_       *IndexName             `json:"_index,omitempty"`
-	Routing_     *Routing               `json:"_routing,omitempty"`
-	Score        *float64               `json:"score,omitempty"`
-	Score_       *float64               `json:"_score,omitempty"`
-	Source_      interface{}            `json:"_source,omitempty"`
-	Text         string                 `json:"text"`
+	CollateMatch *bool                      `json:"collate_match,omitempty"`
+	Contexts     map[string][]Context       `json:"contexts,omitempty"`
+	Fields       map[string]json.RawMessage `json:"fields,omitempty"`
+	Id_          *string                    `json:"_id,omitempty"`
+	Index_       *string                    `json:"_index,omitempty"`
+	Routing_     *string                    `json:"_routing,omitempty"`
+	Score        *Float64                   `json:"score,omitempty"`
+	Score_       *Float64                   `json:"_score,omitempty"`
+	Source_      json.RawMessage            `json:"_source,omitempty"`
+	Text         string                     `json:"text"`
 }
 
-// CompletionSuggestOptionBuilder holds CompletionSuggestOption struct and provides a builder API.
-type CompletionSuggestOptionBuilder struct {
-	v *CompletionSuggestOption
+func (s *CompletionSuggestOption) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "collate_match":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CollateMatch", err)
+				}
+				s.CollateMatch = &value
+			case bool:
+				s.CollateMatch = &v
+			}
+
+		case "contexts":
+			if s.Contexts == nil {
+				s.Contexts = make(map[string][]Context, 0)
+			}
+			if err := dec.Decode(&s.Contexts); err != nil {
+				return fmt.Errorf("%s | %w", "Contexts", err)
+			}
+
+		case "fields":
+			if s.Fields == nil {
+				s.Fields = make(map[string]json.RawMessage, 0)
+			}
+			if err := dec.Decode(&s.Fields); err != nil {
+				return fmt.Errorf("%s | %w", "Fields", err)
+			}
+
+		case "_id":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Id_", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Id_ = &o
+
+		case "_index":
+			if err := dec.Decode(&s.Index_); err != nil {
+				return fmt.Errorf("%s | %w", "Index_", err)
+			}
+
+		case "_routing":
+			if err := dec.Decode(&s.Routing_); err != nil {
+				return fmt.Errorf("%s | %w", "Routing_", err)
+			}
+
+		case "score":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Score", err)
+				}
+				f := Float64(value)
+				s.Score = &f
+			case float64:
+				f := Float64(v)
+				s.Score = &f
+			}
+
+		case "_score":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Score_", err)
+				}
+				f := Float64(value)
+				s.Score_ = &f
+			case float64:
+				f := Float64(v)
+				s.Score_ = &f
+			}
+
+		case "_source":
+			if err := dec.Decode(&s.Source_); err != nil {
+				return fmt.Errorf("%s | %w", "Source_", err)
+			}
+
+		case "text":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Text", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Text = o
+
+		}
+	}
+	return nil
 }
 
-// NewCompletionSuggestOption provides a builder for the CompletionSuggestOption struct.
-func NewCompletionSuggestOptionBuilder() *CompletionSuggestOptionBuilder {
-	r := CompletionSuggestOptionBuilder{
-		&CompletionSuggestOption{
-			Contexts: make(map[string][]Context, 0),
-			Fields:   make(map[string]interface{}, 0),
-		},
+// NewCompletionSuggestOption returns a CompletionSuggestOption.
+func NewCompletionSuggestOption() *CompletionSuggestOption {
+	r := &CompletionSuggestOption{
+		Contexts: make(map[string][]Context, 0),
+		Fields:   make(map[string]json.RawMessage, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the CompletionSuggestOption struct
-func (rb *CompletionSuggestOptionBuilder) Build() CompletionSuggestOption {
-	return *rb.v
-}
-
-func (rb *CompletionSuggestOptionBuilder) CollateMatch(collatematch bool) *CompletionSuggestOptionBuilder {
-	rb.v.CollateMatch = &collatematch
-	return rb
-}
-
-func (rb *CompletionSuggestOptionBuilder) Contexts(value map[string][]Context) *CompletionSuggestOptionBuilder {
-	rb.v.Contexts = value
-	return rb
-}
-
-func (rb *CompletionSuggestOptionBuilder) Fields(value map[string]interface{}) *CompletionSuggestOptionBuilder {
-	rb.v.Fields = value
-	return rb
-}
-
-func (rb *CompletionSuggestOptionBuilder) Id_(id_ string) *CompletionSuggestOptionBuilder {
-	rb.v.Id_ = &id_
-	return rb
-}
-
-func (rb *CompletionSuggestOptionBuilder) Index_(index_ IndexName) *CompletionSuggestOptionBuilder {
-	rb.v.Index_ = &index_
-	return rb
-}
-
-func (rb *CompletionSuggestOptionBuilder) Routing_(routing_ Routing) *CompletionSuggestOptionBuilder {
-	rb.v.Routing_ = &routing_
-	return rb
-}
-
-func (rb *CompletionSuggestOptionBuilder) Score(score float64) *CompletionSuggestOptionBuilder {
-	rb.v.Score = &score
-	return rb
-}
-
-func (rb *CompletionSuggestOptionBuilder) Score_(score_ float64) *CompletionSuggestOptionBuilder {
-	rb.v.Score_ = &score_
-	return rb
-}
-
-func (rb *CompletionSuggestOptionBuilder) Source_(source_ interface{}) *CompletionSuggestOptionBuilder {
-	rb.v.Source_ = source_
-	return rb
-}
-
-func (rb *CompletionSuggestOptionBuilder) Text(text string) *CompletionSuggestOptionBuilder {
-	rb.v.Text = text
-	return rb
+	return r
 }

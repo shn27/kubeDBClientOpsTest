@@ -15,56 +15,106 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // StopAnalyzer type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/analyzers.ts#L101-L106
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/analyzers.ts#L347-L352
 type StopAnalyzer struct {
-	Stopwords     *StopWords     `json:"stopwords,omitempty"`
-	StopwordsPath *string        `json:"stopwords_path,omitempty"`
-	Type          string         `json:"type,omitempty"`
-	Version       *VersionString `json:"version,omitempty"`
+	Stopwords     []string `json:"stopwords,omitempty"`
+	StopwordsPath *string  `json:"stopwords_path,omitempty"`
+	Type          string   `json:"type,omitempty"`
+	Version       *string  `json:"version,omitempty"`
 }
 
-// StopAnalyzerBuilder holds StopAnalyzer struct and provides a builder API.
-type StopAnalyzerBuilder struct {
-	v *StopAnalyzer
+func (s *StopAnalyzer) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "stopwords":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Stopwords", err)
+				}
+
+				s.Stopwords = append(s.Stopwords, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Stopwords); err != nil {
+					return fmt.Errorf("%s | %w", "Stopwords", err)
+				}
+			}
+
+		case "stopwords_path":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "StopwordsPath", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.StopwordsPath = &o
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewStopAnalyzer provides a builder for the StopAnalyzer struct.
-func NewStopAnalyzerBuilder() *StopAnalyzerBuilder {
-	r := StopAnalyzerBuilder{
-		&StopAnalyzer{},
+// MarshalJSON override marshalling to include literal value
+func (s StopAnalyzer) MarshalJSON() ([]byte, error) {
+	type innerStopAnalyzer StopAnalyzer
+	tmp := innerStopAnalyzer{
+		Stopwords:     s.Stopwords,
+		StopwordsPath: s.StopwordsPath,
+		Type:          s.Type,
+		Version:       s.Version,
 	}
 
-	r.v.Type = "stop"
+	tmp.Type = "stop"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the StopAnalyzer struct
-func (rb *StopAnalyzerBuilder) Build() StopAnalyzer {
-	return *rb.v
-}
+// NewStopAnalyzer returns a StopAnalyzer.
+func NewStopAnalyzer() *StopAnalyzer {
+	r := &StopAnalyzer{}
 
-func (rb *StopAnalyzerBuilder) Stopwords(stopwords *StopWordsBuilder) *StopAnalyzerBuilder {
-	v := stopwords.Build()
-	rb.v.Stopwords = &v
-	return rb
-}
-
-func (rb *StopAnalyzerBuilder) StopwordsPath(stopwordspath string) *StopAnalyzerBuilder {
-	rb.v.StopwordsPath = &stopwordspath
-	return rb
-}
-
-func (rb *StopAnalyzerBuilder) Version(version VersionString) *StopAnalyzerBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

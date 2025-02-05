@@ -15,19 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package datafeedstate
 package datafeedstate
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/Datafeed.ts#L133-L138
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/Datafeed.ts#L136-L141
 type DatafeedState struct {
-	name string
+	Name string
 }
 
 var (
@@ -45,7 +43,7 @@ func (d DatafeedState) MarshalText() (text []byte, err error) {
 }
 
 func (d *DatafeedState) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
 	case "started":
 		*d = Started
@@ -63,5 +61,5 @@ func (d *DatafeedState) UnmarshalText(text []byte) error {
 }
 
 func (d DatafeedState) String() string {
-	return d.name
+	return d.Name
 }

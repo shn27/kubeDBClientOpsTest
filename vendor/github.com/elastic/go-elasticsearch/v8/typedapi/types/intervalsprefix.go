@@ -15,52 +15,87 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // IntervalsPrefix type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/fulltext.ts#L110-L114
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/fulltext.ts#L218-L233
 type IntervalsPrefix struct {
+	// Analyzer Analyzer used to analyze the `prefix`.
 	Analyzer *string `json:"analyzer,omitempty"`
-	Prefix   string  `json:"prefix"`
-	UseField *Field  `json:"use_field,omitempty"`
+	// Prefix Beginning characters of terms you wish to find in the top-level field.
+	Prefix string `json:"prefix"`
+	// UseField If specified, match intervals from this field rather than the top-level
+	// field.
+	// The `prefix` is normalized using the search analyzer from this field, unless
+	// `analyzer` is specified separately.
+	UseField *string `json:"use_field,omitempty"`
 }
 
-// IntervalsPrefixBuilder holds IntervalsPrefix struct and provides a builder API.
-type IntervalsPrefixBuilder struct {
-	v *IntervalsPrefix
-}
+func (s *IntervalsPrefix) UnmarshalJSON(data []byte) error {
 
-// NewIntervalsPrefix provides a builder for the IntervalsPrefix struct.
-func NewIntervalsPrefixBuilder() *IntervalsPrefixBuilder {
-	r := IntervalsPrefixBuilder{
-		&IntervalsPrefix{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "analyzer":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Analyzer", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Analyzer = &o
+
+		case "prefix":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Prefix", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Prefix = o
+
+		case "use_field":
+			if err := dec.Decode(&s.UseField); err != nil {
+				return fmt.Errorf("%s | %w", "UseField", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the IntervalsPrefix struct
-func (rb *IntervalsPrefixBuilder) Build() IntervalsPrefix {
-	return *rb.v
-}
+// NewIntervalsPrefix returns a IntervalsPrefix.
+func NewIntervalsPrefix() *IntervalsPrefix {
+	r := &IntervalsPrefix{}
 
-func (rb *IntervalsPrefixBuilder) Analyzer(analyzer string) *IntervalsPrefixBuilder {
-	rb.v.Analyzer = &analyzer
-	return rb
-}
-
-func (rb *IntervalsPrefixBuilder) Prefix(prefix string) *IntervalsPrefixBuilder {
-	rb.v.Prefix = prefix
-	return rb
-}
-
-func (rb *IntervalsPrefixBuilder) UseField(usefield Field) *IntervalsPrefixBuilder {
-	rb.v.UseField = &usefield
-	return rb
+	return r
 }

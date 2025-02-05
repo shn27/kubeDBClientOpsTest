@@ -15,41 +15,68 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // TermsGrouping type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/rollup/_types/Groupings.ts#L40-L42
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/rollup/_types/Groupings.ts#L75-L82
 type TermsGrouping struct {
-	Fields Fields `json:"fields"`
+	// Fields The set of fields that you wish to collect terms for.
+	// This array can contain fields that are both keyword and numerics.
+	// Order does not matter.
+	Fields []string `json:"fields"`
 }
 
-// TermsGroupingBuilder holds TermsGrouping struct and provides a builder API.
-type TermsGroupingBuilder struct {
-	v *TermsGrouping
-}
+func (s *TermsGrouping) UnmarshalJSON(data []byte) error {
 
-// NewTermsGrouping provides a builder for the TermsGrouping struct.
-func NewTermsGroupingBuilder() *TermsGroupingBuilder {
-	r := TermsGroupingBuilder{
-		&TermsGrouping{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "fields":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Fields", err)
+				}
+
+				s.Fields = append(s.Fields, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Fields); err != nil {
+					return fmt.Errorf("%s | %w", "Fields", err)
+				}
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TermsGrouping struct
-func (rb *TermsGroupingBuilder) Build() TermsGrouping {
-	return *rb.v
-}
+// NewTermsGrouping returns a TermsGrouping.
+func NewTermsGrouping() *TermsGrouping {
+	r := &TermsGrouping{}
 
-func (rb *TermsGroupingBuilder) Fields(fields *FieldsBuilder) *TermsGroupingBuilder {
-	v := fields.Build()
-	rb.v.Fields = v
-	return rb
+	return r
 }

@@ -15,44 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // Profile type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/profile.ts#L91-L93
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/profile.ts#L101-L103
 type Profile struct {
 	Shards []ShardProfile `json:"shards"`
 }
 
-// ProfileBuilder holds Profile struct and provides a builder API.
-type ProfileBuilder struct {
-	v *Profile
-}
+// NewProfile returns a Profile.
+func NewProfile() *Profile {
+	r := &Profile{}
 
-// NewProfile provides a builder for the Profile struct.
-func NewProfileBuilder() *ProfileBuilder {
-	r := ProfileBuilder{
-		&Profile{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the Profile struct
-func (rb *ProfileBuilder) Build() Profile {
-	return *rb.v
-}
-
-func (rb *ProfileBuilder) Shards(shards []ShardProfileBuilder) *ProfileBuilder {
-	tmp := make([]ShardProfile, len(shards))
-	for _, value := range shards {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Shards = tmp
-	return rb
+	return r
 }

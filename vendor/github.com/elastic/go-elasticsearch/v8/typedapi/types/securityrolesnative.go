@@ -15,52 +15,95 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // SecurityRolesNative type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/usage/types.ts#L285-L289
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/xpack/usage/types.ts#L300-L304
 type SecurityRolesNative struct {
 	Dls  bool  `json:"dls"`
 	Fls  bool  `json:"fls"`
 	Size int64 `json:"size"`
 }
 
-// SecurityRolesNativeBuilder holds SecurityRolesNative struct and provides a builder API.
-type SecurityRolesNativeBuilder struct {
-	v *SecurityRolesNative
-}
+func (s *SecurityRolesNative) UnmarshalJSON(data []byte) error {
 
-// NewSecurityRolesNative provides a builder for the SecurityRolesNative struct.
-func NewSecurityRolesNativeBuilder() *SecurityRolesNativeBuilder {
-	r := SecurityRolesNativeBuilder{
-		&SecurityRolesNative{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "dls":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Dls", err)
+				}
+				s.Dls = value
+			case bool:
+				s.Dls = v
+			}
+
+		case "fls":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Fls", err)
+				}
+				s.Fls = value
+			case bool:
+				s.Fls = v
+			}
+
+		case "size":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Size", err)
+				}
+				s.Size = value
+			case float64:
+				f := int64(v)
+				s.Size = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SecurityRolesNative struct
-func (rb *SecurityRolesNativeBuilder) Build() SecurityRolesNative {
-	return *rb.v
-}
+// NewSecurityRolesNative returns a SecurityRolesNative.
+func NewSecurityRolesNative() *SecurityRolesNative {
+	r := &SecurityRolesNative{}
 
-func (rb *SecurityRolesNativeBuilder) Dls(dls bool) *SecurityRolesNativeBuilder {
-	rb.v.Dls = dls
-	return rb
-}
-
-func (rb *SecurityRolesNativeBuilder) Fls(fls bool) *SecurityRolesNativeBuilder {
-	rb.v.Fls = fls
-	return rb
-}
-
-func (rb *SecurityRolesNativeBuilder) Size(size int64) *SecurityRolesNativeBuilder {
-	rb.v.Size = size
-	return rb
+	return r
 }

@@ -15,46 +15,68 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // Acknowledgement type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/license/post/types.ts#L20-L23
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/license/post/types.ts#L20-L23
 type Acknowledgement struct {
 	License []string `json:"license"`
 	Message string   `json:"message"`
 }
 
-// AcknowledgementBuilder holds Acknowledgement struct and provides a builder API.
-type AcknowledgementBuilder struct {
-	v *Acknowledgement
-}
+func (s *Acknowledgement) UnmarshalJSON(data []byte) error {
 
-// NewAcknowledgement provides a builder for the Acknowledgement struct.
-func NewAcknowledgementBuilder() *AcknowledgementBuilder {
-	r := AcknowledgementBuilder{
-		&Acknowledgement{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "license":
+			if err := dec.Decode(&s.License); err != nil {
+				return fmt.Errorf("%s | %w", "License", err)
+			}
+
+		case "message":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Message", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Message = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the Acknowledgement struct
-func (rb *AcknowledgementBuilder) Build() Acknowledgement {
-	return *rb.v
-}
+// NewAcknowledgement returns a Acknowledgement.
+func NewAcknowledgement() *Acknowledgement {
+	r := &Acknowledgement{}
 
-func (rb *AcknowledgementBuilder) License(license ...string) *AcknowledgementBuilder {
-	rb.v.License = license
-	return rb
-}
-
-func (rb *AcknowledgementBuilder) Message(message string) *AcknowledgementBuilder {
-	rb.v.Message = message
-	return rb
+	return r
 }

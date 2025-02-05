@@ -15,52 +15,74 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ReloadDetails type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/reload_search_analyzers/types.ts#L20-L24
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/reload_search_analyzers/types.ts#L27-L31
 type ReloadDetails struct {
 	Index             string   `json:"index"`
 	ReloadedAnalyzers []string `json:"reloaded_analyzers"`
 	ReloadedNodeIds   []string `json:"reloaded_node_ids"`
 }
 
-// ReloadDetailsBuilder holds ReloadDetails struct and provides a builder API.
-type ReloadDetailsBuilder struct {
-	v *ReloadDetails
-}
+func (s *ReloadDetails) UnmarshalJSON(data []byte) error {
 
-// NewReloadDetails provides a builder for the ReloadDetails struct.
-func NewReloadDetailsBuilder() *ReloadDetailsBuilder {
-	r := ReloadDetailsBuilder{
-		&ReloadDetails{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "index":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Index", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Index = o
+
+		case "reloaded_analyzers":
+			if err := dec.Decode(&s.ReloadedAnalyzers); err != nil {
+				return fmt.Errorf("%s | %w", "ReloadedAnalyzers", err)
+			}
+
+		case "reloaded_node_ids":
+			if err := dec.Decode(&s.ReloadedNodeIds); err != nil {
+				return fmt.Errorf("%s | %w", "ReloadedNodeIds", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ReloadDetails struct
-func (rb *ReloadDetailsBuilder) Build() ReloadDetails {
-	return *rb.v
-}
+// NewReloadDetails returns a ReloadDetails.
+func NewReloadDetails() *ReloadDetails {
+	r := &ReloadDetails{}
 
-func (rb *ReloadDetailsBuilder) Index(index string) *ReloadDetailsBuilder {
-	rb.v.Index = index
-	return rb
-}
-
-func (rb *ReloadDetailsBuilder) ReloadedAnalyzers(reloaded_analyzers ...string) *ReloadDetailsBuilder {
-	rb.v.ReloadedAnalyzers = reloaded_analyzers
-	return rb
-}
-
-func (rb *ReloadDetailsBuilder) ReloadedNodeIds(reloaded_node_ids ...string) *ReloadDetailsBuilder {
-	rb.v.ReloadedNodeIds = reloaded_node_ids
-	return rb
+	return r
 }

@@ -15,41 +15,54 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // SearchIdle type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/IndexSettings.ts#L236-L239
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/IndexSettings.ts#L245-L248
 type SearchIdle struct {
-	After *Duration `json:"after,omitempty"`
+	After Duration `json:"after,omitempty"`
 }
 
-// SearchIdleBuilder holds SearchIdle struct and provides a builder API.
-type SearchIdleBuilder struct {
-	v *SearchIdle
-}
+func (s *SearchIdle) UnmarshalJSON(data []byte) error {
 
-// NewSearchIdle provides a builder for the SearchIdle struct.
-func NewSearchIdleBuilder() *SearchIdleBuilder {
-	r := SearchIdleBuilder{
-		&SearchIdle{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "after":
+			if err := dec.Decode(&s.After); err != nil {
+				return fmt.Errorf("%s | %w", "After", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SearchIdle struct
-func (rb *SearchIdleBuilder) Build() SearchIdle {
-	return *rb.v
-}
+// NewSearchIdle returns a SearchIdle.
+func NewSearchIdle() *SearchIdle {
+	r := &SearchIdle{}
 
-func (rb *SearchIdleBuilder) After(after *DurationBuilder) *SearchIdleBuilder {
-	v := after.Build()
-	rb.v.After = &v
-	return rb
+	return r
 }

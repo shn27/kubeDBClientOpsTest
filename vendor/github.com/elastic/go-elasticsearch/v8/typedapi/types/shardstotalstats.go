@@ -15,40 +15,65 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ShardsTotalStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/stats/types.ts#L170-L172
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/stats/types.ts#L182-L184
 type ShardsTotalStats struct {
 	TotalCount int64 `json:"total_count"`
 }
 
-// ShardsTotalStatsBuilder holds ShardsTotalStats struct and provides a builder API.
-type ShardsTotalStatsBuilder struct {
-	v *ShardsTotalStats
-}
+func (s *ShardsTotalStats) UnmarshalJSON(data []byte) error {
 
-// NewShardsTotalStats provides a builder for the ShardsTotalStats struct.
-func NewShardsTotalStatsBuilder() *ShardsTotalStatsBuilder {
-	r := ShardsTotalStatsBuilder{
-		&ShardsTotalStats{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "total_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TotalCount", err)
+				}
+				s.TotalCount = value
+			case float64:
+				f := int64(v)
+				s.TotalCount = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ShardsTotalStats struct
-func (rb *ShardsTotalStatsBuilder) Build() ShardsTotalStats {
-	return *rb.v
-}
+// NewShardsTotalStats returns a ShardsTotalStats.
+func NewShardsTotalStats() *ShardsTotalStats {
+	r := &ShardsTotalStats{}
 
-func (rb *ShardsTotalStatsBuilder) TotalCount(totalcount int64) *ShardsTotalStatsBuilder {
-	rb.v.TotalCount = totalcount
-	return rb
+	return r
 }

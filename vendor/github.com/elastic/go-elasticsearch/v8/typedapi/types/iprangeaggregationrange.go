@@ -15,52 +15,91 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // IpRangeAggregationRange type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/bucket.ts#L251-L255
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/bucket.ts#L578-L591
 type IpRangeAggregationRange struct {
-	From string  `json:"from,omitempty"`
+	// From Start of the range.
+	From *string `json:"from,omitempty"`
+	// Mask IP range defined as a CIDR mask.
 	Mask *string `json:"mask,omitempty"`
-	To   string  `json:"to,omitempty"`
+	// To End of the range.
+	To *string `json:"to,omitempty"`
 }
 
-// IpRangeAggregationRangeBuilder holds IpRangeAggregationRange struct and provides a builder API.
-type IpRangeAggregationRangeBuilder struct {
-	v *IpRangeAggregationRange
-}
+func (s *IpRangeAggregationRange) UnmarshalJSON(data []byte) error {
 
-// NewIpRangeAggregationRange provides a builder for the IpRangeAggregationRange struct.
-func NewIpRangeAggregationRangeBuilder() *IpRangeAggregationRangeBuilder {
-	r := IpRangeAggregationRangeBuilder{
-		&IpRangeAggregationRange{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "from":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "From", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.From = &o
+
+		case "mask":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Mask", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Mask = &o
+
+		case "to":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "To", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.To = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the IpRangeAggregationRange struct
-func (rb *IpRangeAggregationRangeBuilder) Build() IpRangeAggregationRange {
-	return *rb.v
-}
+// NewIpRangeAggregationRange returns a IpRangeAggregationRange.
+func NewIpRangeAggregationRange() *IpRangeAggregationRange {
+	r := &IpRangeAggregationRange{}
 
-func (rb *IpRangeAggregationRangeBuilder) From(from string) *IpRangeAggregationRangeBuilder {
-	rb.v.From = from
-	return rb
-}
-
-func (rb *IpRangeAggregationRangeBuilder) Mask(mask string) *IpRangeAggregationRangeBuilder {
-	rb.v.Mask = &mask
-	return rb
-}
-
-func (rb *IpRangeAggregationRangeBuilder) To(to string) *IpRangeAggregationRangeBuilder {
-	rb.v.To = to
-	return rb
+	return r
 }

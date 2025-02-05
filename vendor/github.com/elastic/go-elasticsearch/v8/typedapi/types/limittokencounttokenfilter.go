@@ -15,55 +15,97 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // LimitTokenCountTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L248-L252
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L250-L254
 type LimitTokenCountTokenFilter struct {
-	ConsumeAllTokens *bool          `json:"consume_all_tokens,omitempty"`
-	MaxTokenCount    *int           `json:"max_token_count,omitempty"`
-	Type             string         `json:"type,omitempty"`
-	Version          *VersionString `json:"version,omitempty"`
+	ConsumeAllTokens *bool              `json:"consume_all_tokens,omitempty"`
+	MaxTokenCount    Stringifiedinteger `json:"max_token_count,omitempty"`
+	Type             string             `json:"type,omitempty"`
+	Version          *string            `json:"version,omitempty"`
 }
 
-// LimitTokenCountTokenFilterBuilder holds LimitTokenCountTokenFilter struct and provides a builder API.
-type LimitTokenCountTokenFilterBuilder struct {
-	v *LimitTokenCountTokenFilter
+func (s *LimitTokenCountTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "consume_all_tokens":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ConsumeAllTokens", err)
+				}
+				s.ConsumeAllTokens = &value
+			case bool:
+				s.ConsumeAllTokens = &v
+			}
+
+		case "max_token_count":
+			if err := dec.Decode(&s.MaxTokenCount); err != nil {
+				return fmt.Errorf("%s | %w", "MaxTokenCount", err)
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewLimitTokenCountTokenFilter provides a builder for the LimitTokenCountTokenFilter struct.
-func NewLimitTokenCountTokenFilterBuilder() *LimitTokenCountTokenFilterBuilder {
-	r := LimitTokenCountTokenFilterBuilder{
-		&LimitTokenCountTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s LimitTokenCountTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerLimitTokenCountTokenFilter LimitTokenCountTokenFilter
+	tmp := innerLimitTokenCountTokenFilter{
+		ConsumeAllTokens: s.ConsumeAllTokens,
+		MaxTokenCount:    s.MaxTokenCount,
+		Type:             s.Type,
+		Version:          s.Version,
 	}
 
-	r.v.Type = "limit"
+	tmp.Type = "limit"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the LimitTokenCountTokenFilter struct
-func (rb *LimitTokenCountTokenFilterBuilder) Build() LimitTokenCountTokenFilter {
-	return *rb.v
-}
+// NewLimitTokenCountTokenFilter returns a LimitTokenCountTokenFilter.
+func NewLimitTokenCountTokenFilter() *LimitTokenCountTokenFilter {
+	r := &LimitTokenCountTokenFilter{}
 
-func (rb *LimitTokenCountTokenFilterBuilder) ConsumeAllTokens(consumealltokens bool) *LimitTokenCountTokenFilterBuilder {
-	rb.v.ConsumeAllTokens = &consumealltokens
-	return rb
-}
-
-func (rb *LimitTokenCountTokenFilterBuilder) MaxTokenCount(maxtokencount int) *LimitTokenCountTokenFilterBuilder {
-	rb.v.MaxTokenCount = &maxtokencount
-	return rb
-}
-
-func (rb *LimitTokenCountTokenFilterBuilder) Version(version VersionString) *LimitTokenCountTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

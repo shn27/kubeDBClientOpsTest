@@ -15,86 +15,168 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DissectProcessor type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ingest/_types/Processors.ts#L187-L192
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ingest/_types/Processors.ts#L804-L823
 type DissectProcessor struct {
-	AppendSeparator string               `json:"append_separator"`
-	Field           Field                `json:"field"`
-	If              *string              `json:"if,omitempty"`
-	IgnoreFailure   *bool                `json:"ignore_failure,omitempty"`
-	IgnoreMissing   bool                 `json:"ignore_missing"`
-	OnFailure       []ProcessorContainer `json:"on_failure,omitempty"`
-	Pattern         string               `json:"pattern"`
-	Tag             *string              `json:"tag,omitempty"`
+	// AppendSeparator The character(s) that separate the appended fields.
+	AppendSeparator *string `json:"append_separator,omitempty"`
+	// Description Description of the processor.
+	// Useful for describing the purpose of the processor or its configuration.
+	Description *string `json:"description,omitempty"`
+	// Field The field to dissect.
+	Field string `json:"field"`
+	// If Conditionally execute the processor.
+	If *string `json:"if,omitempty"`
+	// IgnoreFailure Ignore failures for the processor.
+	IgnoreFailure *bool `json:"ignore_failure,omitempty"`
+	// IgnoreMissing If `true` and `field` does not exist or is `null`, the processor quietly
+	// exits without modifying the document.
+	IgnoreMissing *bool `json:"ignore_missing,omitempty"`
+	// OnFailure Handle failures for the processor.
+	OnFailure []ProcessorContainer `json:"on_failure,omitempty"`
+	// Pattern The pattern to apply to the field.
+	Pattern string `json:"pattern"`
+	// Tag Identifier for the processor.
+	// Useful for debugging and metrics.
+	Tag *string `json:"tag,omitempty"`
 }
 
-// DissectProcessorBuilder holds DissectProcessor struct and provides a builder API.
-type DissectProcessorBuilder struct {
-	v *DissectProcessor
-}
+func (s *DissectProcessor) UnmarshalJSON(data []byte) error {
 
-// NewDissectProcessor provides a builder for the DissectProcessor struct.
-func NewDissectProcessorBuilder() *DissectProcessorBuilder {
-	r := DissectProcessorBuilder{
-		&DissectProcessor{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "append_separator":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "AppendSeparator", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.AppendSeparator = &o
+
+		case "description":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Description", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Description = &o
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "if":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "If", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.If = &o
+
+		case "ignore_failure":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IgnoreFailure", err)
+				}
+				s.IgnoreFailure = &value
+			case bool:
+				s.IgnoreFailure = &v
+			}
+
+		case "ignore_missing":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IgnoreMissing", err)
+				}
+				s.IgnoreMissing = &value
+			case bool:
+				s.IgnoreMissing = &v
+			}
+
+		case "on_failure":
+			if err := dec.Decode(&s.OnFailure); err != nil {
+				return fmt.Errorf("%s | %w", "OnFailure", err)
+			}
+
+		case "pattern":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Pattern", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Pattern = o
+
+		case "tag":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Tag", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Tag = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DissectProcessor struct
-func (rb *DissectProcessorBuilder) Build() DissectProcessor {
-	return *rb.v
-}
+// NewDissectProcessor returns a DissectProcessor.
+func NewDissectProcessor() *DissectProcessor {
+	r := &DissectProcessor{}
 
-func (rb *DissectProcessorBuilder) AppendSeparator(appendseparator string) *DissectProcessorBuilder {
-	rb.v.AppendSeparator = appendseparator
-	return rb
-}
-
-func (rb *DissectProcessorBuilder) Field(field Field) *DissectProcessorBuilder {
-	rb.v.Field = field
-	return rb
-}
-
-func (rb *DissectProcessorBuilder) If_(if_ string) *DissectProcessorBuilder {
-	rb.v.If = &if_
-	return rb
-}
-
-func (rb *DissectProcessorBuilder) IgnoreFailure(ignorefailure bool) *DissectProcessorBuilder {
-	rb.v.IgnoreFailure = &ignorefailure
-	return rb
-}
-
-func (rb *DissectProcessorBuilder) IgnoreMissing(ignoremissing bool) *DissectProcessorBuilder {
-	rb.v.IgnoreMissing = ignoremissing
-	return rb
-}
-
-func (rb *DissectProcessorBuilder) OnFailure(on_failure []ProcessorContainerBuilder) *DissectProcessorBuilder {
-	tmp := make([]ProcessorContainer, len(on_failure))
-	for _, value := range on_failure {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.OnFailure = tmp
-	return rb
-}
-
-func (rb *DissectProcessorBuilder) Pattern(pattern string) *DissectProcessorBuilder {
-	rb.v.Pattern = pattern
-	return rb
-}
-
-func (rb *DissectProcessorBuilder) Tag(tag string) *DissectProcessorBuilder {
-	rb.v.Tag = &tag
-	return rb
+	return r
 }

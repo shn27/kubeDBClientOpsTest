@@ -15,15 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
 
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/distanceunit"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/geodistancetype"
@@ -33,21 +36,104 @@ import (
 
 // GeoDistanceSort type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/sort.ts#L57-L65
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/sort.ts#L58-L70
 type GeoDistanceSort struct {
 	DistanceType    *geodistancetype.GeoDistanceType `json:"distance_type,omitempty"`
-	GeoDistanceSort map[Field][]GeoLocation          `json:"-"`
+	GeoDistanceSort map[string][]GeoLocation         `json:"-"`
 	IgnoreUnmapped  *bool                            `json:"ignore_unmapped,omitempty"`
 	Mode            *sortmode.SortMode               `json:"mode,omitempty"`
+	Nested          *NestedSortValue                 `json:"nested,omitempty"`
 	Order           *sortorder.SortOrder             `json:"order,omitempty"`
 	Unit            *distanceunit.DistanceUnit       `json:"unit,omitempty"`
+}
+
+func (s *GeoDistanceSort) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "distance_type":
+			if err := dec.Decode(&s.DistanceType); err != nil {
+				return fmt.Errorf("%s | %w", "DistanceType", err)
+			}
+
+		case "ignore_unmapped":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IgnoreUnmapped", err)
+				}
+				s.IgnoreUnmapped = &value
+			case bool:
+				s.IgnoreUnmapped = &v
+			}
+
+		case "mode":
+			if err := dec.Decode(&s.Mode); err != nil {
+				return fmt.Errorf("%s | %w", "Mode", err)
+			}
+
+		case "nested":
+			if err := dec.Decode(&s.Nested); err != nil {
+				return fmt.Errorf("%s | %w", "Nested", err)
+			}
+
+		case "order":
+			if err := dec.Decode(&s.Order); err != nil {
+				return fmt.Errorf("%s | %w", "Order", err)
+			}
+
+		case "unit":
+			if err := dec.Decode(&s.Unit); err != nil {
+				return fmt.Errorf("%s | %w", "Unit", err)
+			}
+
+		default:
+
+			rawMsg := make(map[string]json.RawMessage, 0)
+			dec.Decode(&rawMsg)
+			for key, value := range rawMsg {
+				switch {
+				case bytes.HasPrefix(value, []byte("\"")), bytes.HasPrefix(value, []byte("{")):
+					o := new(GeoLocation)
+					err := json.NewDecoder(bytes.NewReader(value)).Decode(&o)
+					if err != nil {
+						return fmt.Errorf("%s | %w", "GeoDistanceSort", err)
+					}
+					s.GeoDistanceSort[key] = append(s.GeoDistanceSort[key], o)
+				default:
+					o := []GeoLocation{}
+					err := json.NewDecoder(bytes.NewReader(value)).Decode(&o)
+					if err != nil {
+						return fmt.Errorf("%s | %w", "GeoDistanceSort", err)
+					}
+					s.GeoDistanceSort[key] = o
+				}
+			}
+
+		}
+	}
+	return nil
 }
 
 // MarhsalJSON overrides marshalling for types with additional properties
 func (s GeoDistanceSort) MarshalJSON() ([]byte, error) {
 	type opt GeoDistanceSort
 	// We transform the struct to a map without the embedded additional properties map
-	tmp := make(map[string]interface{}, 0)
+	tmp := make(map[string]any, 0)
 
 	data, err := json.Marshal(opt(s))
 	if err != nil {
@@ -60,8 +146,9 @@ func (s GeoDistanceSort) MarshalJSON() ([]byte, error) {
 
 	// We inline the additional fields from the underlying map
 	for key, value := range s.GeoDistanceSort {
-		tmp[string(key)] = value
+		tmp[fmt.Sprintf("%s", key)] = value
 	}
+	delete(tmp, "GeoDistanceSort")
 
 	data, err = json.Marshal(tmp)
 	if err != nil {
@@ -71,53 +158,11 @@ func (s GeoDistanceSort) MarshalJSON() ([]byte, error) {
 	return data, nil
 }
 
-// GeoDistanceSortBuilder holds GeoDistanceSort struct and provides a builder API.
-type GeoDistanceSortBuilder struct {
-	v *GeoDistanceSort
-}
-
-// NewGeoDistanceSort provides a builder for the GeoDistanceSort struct.
-func NewGeoDistanceSortBuilder() *GeoDistanceSortBuilder {
-	r := GeoDistanceSortBuilder{
-		&GeoDistanceSort{
-			GeoDistanceSort: make(map[Field][]GeoLocation, 0),
-		},
+// NewGeoDistanceSort returns a GeoDistanceSort.
+func NewGeoDistanceSort() *GeoDistanceSort {
+	r := &GeoDistanceSort{
+		GeoDistanceSort: make(map[string][]GeoLocation, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the GeoDistanceSort struct
-func (rb *GeoDistanceSortBuilder) Build() GeoDistanceSort {
-	return *rb.v
-}
-
-func (rb *GeoDistanceSortBuilder) DistanceType(distancetype geodistancetype.GeoDistanceType) *GeoDistanceSortBuilder {
-	rb.v.DistanceType = &distancetype
-	return rb
-}
-
-func (rb *GeoDistanceSortBuilder) GeoDistanceSort(value map[Field][]GeoLocation) *GeoDistanceSortBuilder {
-	rb.v.GeoDistanceSort = value
-	return rb
-}
-
-func (rb *GeoDistanceSortBuilder) IgnoreUnmapped(ignoreunmapped bool) *GeoDistanceSortBuilder {
-	rb.v.IgnoreUnmapped = &ignoreunmapped
-	return rb
-}
-
-func (rb *GeoDistanceSortBuilder) Mode(mode sortmode.SortMode) *GeoDistanceSortBuilder {
-	rb.v.Mode = &mode
-	return rb
-}
-
-func (rb *GeoDistanceSortBuilder) Order(order sortorder.SortOrder) *GeoDistanceSortBuilder {
-	rb.v.Order = &order
-	return rb
-}
-
-func (rb *GeoDistanceSortBuilder) Unit(unit distanceunit.DistanceUnit) *GeoDistanceSortBuilder {
-	rb.v.Unit = &unit
-	return rb
+	return r
 }

@@ -15,67 +15,127 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // CommonGramsTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L172-L178
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L174-L180
 type CommonGramsTokenFilter struct {
-	CommonWords     []string       `json:"common_words,omitempty"`
-	CommonWordsPath *string        `json:"common_words_path,omitempty"`
-	IgnoreCase      *bool          `json:"ignore_case,omitempty"`
-	QueryMode       *bool          `json:"query_mode,omitempty"`
-	Type            string         `json:"type,omitempty"`
-	Version         *VersionString `json:"version,omitempty"`
+	CommonWords     []string `json:"common_words,omitempty"`
+	CommonWordsPath *string  `json:"common_words_path,omitempty"`
+	IgnoreCase      *bool    `json:"ignore_case,omitempty"`
+	QueryMode       *bool    `json:"query_mode,omitempty"`
+	Type            string   `json:"type,omitempty"`
+	Version         *string  `json:"version,omitempty"`
 }
 
-// CommonGramsTokenFilterBuilder holds CommonGramsTokenFilter struct and provides a builder API.
-type CommonGramsTokenFilterBuilder struct {
-	v *CommonGramsTokenFilter
+func (s *CommonGramsTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "common_words":
+			if err := dec.Decode(&s.CommonWords); err != nil {
+				return fmt.Errorf("%s | %w", "CommonWords", err)
+			}
+
+		case "common_words_path":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "CommonWordsPath", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.CommonWordsPath = &o
+
+		case "ignore_case":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IgnoreCase", err)
+				}
+				s.IgnoreCase = &value
+			case bool:
+				s.IgnoreCase = &v
+			}
+
+		case "query_mode":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "QueryMode", err)
+				}
+				s.QueryMode = &value
+			case bool:
+				s.QueryMode = &v
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewCommonGramsTokenFilter provides a builder for the CommonGramsTokenFilter struct.
-func NewCommonGramsTokenFilterBuilder() *CommonGramsTokenFilterBuilder {
-	r := CommonGramsTokenFilterBuilder{
-		&CommonGramsTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s CommonGramsTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerCommonGramsTokenFilter CommonGramsTokenFilter
+	tmp := innerCommonGramsTokenFilter{
+		CommonWords:     s.CommonWords,
+		CommonWordsPath: s.CommonWordsPath,
+		IgnoreCase:      s.IgnoreCase,
+		QueryMode:       s.QueryMode,
+		Type:            s.Type,
+		Version:         s.Version,
 	}
 
-	r.v.Type = "common_grams"
+	tmp.Type = "common_grams"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the CommonGramsTokenFilter struct
-func (rb *CommonGramsTokenFilterBuilder) Build() CommonGramsTokenFilter {
-	return *rb.v
-}
+// NewCommonGramsTokenFilter returns a CommonGramsTokenFilter.
+func NewCommonGramsTokenFilter() *CommonGramsTokenFilter {
+	r := &CommonGramsTokenFilter{}
 
-func (rb *CommonGramsTokenFilterBuilder) CommonWords(common_words ...string) *CommonGramsTokenFilterBuilder {
-	rb.v.CommonWords = common_words
-	return rb
-}
-
-func (rb *CommonGramsTokenFilterBuilder) CommonWordsPath(commonwordspath string) *CommonGramsTokenFilterBuilder {
-	rb.v.CommonWordsPath = &commonwordspath
-	return rb
-}
-
-func (rb *CommonGramsTokenFilterBuilder) IgnoreCase(ignorecase bool) *CommonGramsTokenFilterBuilder {
-	rb.v.IgnoreCase = &ignorecase
-	return rb
-}
-
-func (rb *CommonGramsTokenFilterBuilder) QueryMode(querymode bool) *CommonGramsTokenFilterBuilder {
-	rb.v.QueryMode = &querymode
-	return rb
-}
-
-func (rb *CommonGramsTokenFilterBuilder) Version(version VersionString) *CommonGramsTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
@@ -29,44 +27,5 @@ package types
 //	TopRightBottomLeftGeoBounds
 //	WktGeoBounds
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Geo.ts#L116-L129
-type GeoBounds interface{}
-
-// GeoBoundsBuilder holds GeoBounds struct and provides a builder API.
-type GeoBoundsBuilder struct {
-	v GeoBounds
-}
-
-// NewGeoBounds provides a builder for the GeoBounds struct.
-func NewGeoBoundsBuilder() *GeoBoundsBuilder {
-	return &GeoBoundsBuilder{}
-}
-
-// Build finalize the chain and returns the GeoBounds struct
-func (u *GeoBoundsBuilder) Build() GeoBounds {
-	return u.v
-}
-
-func (u *GeoBoundsBuilder) CoordsGeoBounds(coordsgeobounds *CoordsGeoBoundsBuilder) *GeoBoundsBuilder {
-	v := coordsgeobounds.Build()
-	u.v = &v
-	return u
-}
-
-func (u *GeoBoundsBuilder) TopLeftBottomRightGeoBounds(topleftbottomrightgeobounds *TopLeftBottomRightGeoBoundsBuilder) *GeoBoundsBuilder {
-	v := topleftbottomrightgeobounds.Build()
-	u.v = &v
-	return u
-}
-
-func (u *GeoBoundsBuilder) TopRightBottomLeftGeoBounds(toprightbottomleftgeobounds *TopRightBottomLeftGeoBoundsBuilder) *GeoBoundsBuilder {
-	v := toprightbottomleftgeobounds.Build()
-	u.v = &v
-	return u
-}
-
-func (u *GeoBoundsBuilder) WktGeoBounds(wktgeobounds *WktGeoBoundsBuilder) *GeoBoundsBuilder {
-	v := wktgeobounds.Build()
-	u.v = &v
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Geo.ts#L135-L148
+type GeoBounds any

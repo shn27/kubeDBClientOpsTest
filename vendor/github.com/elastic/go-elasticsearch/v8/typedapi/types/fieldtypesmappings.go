@@ -15,54 +15,124 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // FieldTypesMappings type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/stats/types.ts#L96-L99
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/stats/types.ts#L109-L134
 type FieldTypesMappings struct {
-	FieldTypes        []FieldTypes        `json:"field_types"`
-	RuntimeFieldTypes []RuntimeFieldTypes `json:"runtime_field_types,omitempty"`
+	// FieldTypes Contains statistics about field data types used in selected nodes.
+	FieldTypes []FieldTypes `json:"field_types"`
+	// RuntimeFieldTypes Contains statistics about runtime field data types used in selected nodes.
+	RuntimeFieldTypes []ClusterRuntimeFieldTypes `json:"runtime_field_types,omitempty"`
+	// TotalDeduplicatedFieldCount Total number of fields in all non-system indices, accounting for mapping
+	// deduplication.
+	TotalDeduplicatedFieldCount *int `json:"total_deduplicated_field_count,omitempty"`
+	// TotalDeduplicatedMappingSize Total size of all mappings after deduplication and compression.
+	TotalDeduplicatedMappingSize ByteSize `json:"total_deduplicated_mapping_size,omitempty"`
+	// TotalDeduplicatedMappingSizeInBytes Total size of all mappings, in bytes, after deduplication and compression.
+	TotalDeduplicatedMappingSizeInBytes *int64 `json:"total_deduplicated_mapping_size_in_bytes,omitempty"`
+	// TotalFieldCount Total number of fields in all non-system indices.
+	TotalFieldCount *int `json:"total_field_count,omitempty"`
 }
 
-// FieldTypesMappingsBuilder holds FieldTypesMappings struct and provides a builder API.
-type FieldTypesMappingsBuilder struct {
-	v *FieldTypesMappings
-}
+func (s *FieldTypesMappings) UnmarshalJSON(data []byte) error {
 
-// NewFieldTypesMappings provides a builder for the FieldTypesMappings struct.
-func NewFieldTypesMappingsBuilder() *FieldTypesMappingsBuilder {
-	r := FieldTypesMappingsBuilder{
-		&FieldTypesMappings{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "field_types":
+			if err := dec.Decode(&s.FieldTypes); err != nil {
+				return fmt.Errorf("%s | %w", "FieldTypes", err)
+			}
+
+		case "runtime_field_types":
+			if err := dec.Decode(&s.RuntimeFieldTypes); err != nil {
+				return fmt.Errorf("%s | %w", "RuntimeFieldTypes", err)
+			}
+
+		case "total_deduplicated_field_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TotalDeduplicatedFieldCount", err)
+				}
+				s.TotalDeduplicatedFieldCount = &value
+			case float64:
+				f := int(v)
+				s.TotalDeduplicatedFieldCount = &f
+			}
+
+		case "total_deduplicated_mapping_size":
+			if err := dec.Decode(&s.TotalDeduplicatedMappingSize); err != nil {
+				return fmt.Errorf("%s | %w", "TotalDeduplicatedMappingSize", err)
+			}
+
+		case "total_deduplicated_mapping_size_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TotalDeduplicatedMappingSizeInBytes", err)
+				}
+				s.TotalDeduplicatedMappingSizeInBytes = &value
+			case float64:
+				f := int64(v)
+				s.TotalDeduplicatedMappingSizeInBytes = &f
+			}
+
+		case "total_field_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TotalFieldCount", err)
+				}
+				s.TotalFieldCount = &value
+			case float64:
+				f := int(v)
+				s.TotalFieldCount = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the FieldTypesMappings struct
-func (rb *FieldTypesMappingsBuilder) Build() FieldTypesMappings {
-	return *rb.v
-}
+// NewFieldTypesMappings returns a FieldTypesMappings.
+func NewFieldTypesMappings() *FieldTypesMappings {
+	r := &FieldTypesMappings{}
 
-func (rb *FieldTypesMappingsBuilder) FieldTypes(field_types []FieldTypesBuilder) *FieldTypesMappingsBuilder {
-	tmp := make([]FieldTypes, len(field_types))
-	for _, value := range field_types {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.FieldTypes = tmp
-	return rb
-}
-
-func (rb *FieldTypesMappingsBuilder) RuntimeFieldTypes(runtime_field_types []RuntimeFieldTypesBuilder) *FieldTypesMappingsBuilder {
-	tmp := make([]RuntimeFieldTypes, len(runtime_field_types))
-	for _, value := range runtime_field_types {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.RuntimeFieldTypes = tmp
-	return rb
+	return r
 }

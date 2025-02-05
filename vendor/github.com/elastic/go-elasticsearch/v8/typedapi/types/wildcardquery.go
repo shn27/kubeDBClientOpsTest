@@ -15,25 +15,37 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // WildcardQuery type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/term.ts#L149-L162
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/term.ts#L305-L325
 type WildcardQuery struct {
+	// Boost Floating point number used to decrease or increase the relevance scores of
+	// the query.
+	// Boost values are relative to the default value of 1.0.
+	// A boost value between 0 and 1.0 decreases the relevance score.
+	// A value greater than 1.0 increases the relevance score.
 	Boost *float32 `json:"boost,omitempty"`
 	// CaseInsensitive Allows case insensitive matching of the pattern with the indexed field values
 	// when set to true. Default is false which means the case sensitivity of
 	// matching depends on the underlying field’s mapping.
 	CaseInsensitive *bool   `json:"case_insensitive,omitempty"`
 	QueryName_      *string `json:"_name,omitempty"`
-	// Rewrite Method used to rewrite the query
-	Rewrite *MultiTermQueryRewrite `json:"rewrite,omitempty"`
+	// Rewrite Method used to rewrite the query.
+	Rewrite *string `json:"rewrite,omitempty"`
 	// Value Wildcard pattern for terms you wish to find in the provided field. Required,
 	// when wildcard is not set.
 	Value *string `json:"value,omitempty"`
@@ -42,63 +54,112 @@ type WildcardQuery struct {
 	Wildcard *string `json:"wildcard,omitempty"`
 }
 
-// WildcardQueryBuilder holds WildcardQuery struct and provides a builder API.
-type WildcardQueryBuilder struct {
-	v *WildcardQuery
-}
+func (s *WildcardQuery) UnmarshalJSON(data []byte) error {
 
-// NewWildcardQuery provides a builder for the WildcardQuery struct.
-func NewWildcardQueryBuilder() *WildcardQueryBuilder {
-	r := WildcardQueryBuilder{
-		&WildcardQuery{},
+	if !bytes.HasPrefix(data, []byte(`{`)) {
+		if !bytes.HasPrefix(data, []byte(`"`)) {
+			data = append([]byte{'"'}, data...)
+			data = append(data, []byte{'"'}...)
+		}
+		err := json.NewDecoder(bytes.NewReader(data)).Decode(&s.Value)
+		if err != nil {
+			return err
+		}
+		return nil
 	}
 
-	return &r
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "boost":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Boost", err)
+				}
+				f := float32(value)
+				s.Boost = &f
+			case float64:
+				f := float32(v)
+				s.Boost = &f
+			}
+
+		case "case_insensitive":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CaseInsensitive", err)
+				}
+				s.CaseInsensitive = &value
+			case bool:
+				s.CaseInsensitive = &v
+			}
+
+		case "_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "QueryName_", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.QueryName_ = &o
+
+		case "rewrite":
+			if err := dec.Decode(&s.Rewrite); err != nil {
+				return fmt.Errorf("%s | %w", "Rewrite", err)
+			}
+
+		case "value":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Value", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Value = &o
+
+		case "wildcard":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Wildcard", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Wildcard = &o
+
+		}
+	}
+	return nil
 }
 
-// Build finalize the chain and returns the WildcardQuery struct
-func (rb *WildcardQueryBuilder) Build() WildcardQuery {
-	return *rb.v
-}
+// NewWildcardQuery returns a WildcardQuery.
+func NewWildcardQuery() *WildcardQuery {
+	r := &WildcardQuery{}
 
-func (rb *WildcardQueryBuilder) Boost(boost float32) *WildcardQueryBuilder {
-	rb.v.Boost = &boost
-	return rb
-}
-
-// CaseInsensitive Allows case insensitive matching of the pattern with the indexed field values
-// when set to true. Default is false which means the case sensitivity of
-// matching depends on the underlying field’s mapping.
-
-func (rb *WildcardQueryBuilder) CaseInsensitive(caseinsensitive bool) *WildcardQueryBuilder {
-	rb.v.CaseInsensitive = &caseinsensitive
-	return rb
-}
-
-func (rb *WildcardQueryBuilder) QueryName_(queryname_ string) *WildcardQueryBuilder {
-	rb.v.QueryName_ = &queryname_
-	return rb
-}
-
-// Rewrite Method used to rewrite the query
-
-func (rb *WildcardQueryBuilder) Rewrite(rewrite MultiTermQueryRewrite) *WildcardQueryBuilder {
-	rb.v.Rewrite = &rewrite
-	return rb
-}
-
-// Value Wildcard pattern for terms you wish to find in the provided field. Required,
-// when wildcard is not set.
-
-func (rb *WildcardQueryBuilder) Value(value string) *WildcardQueryBuilder {
-	rb.v.Value = &value
-	return rb
-}
-
-// Wildcard Wildcard pattern for terms you wish to find in the provided field. Required,
-// when value is not set.
-
-func (rb *WildcardQueryBuilder) Wildcard(wildcard string) *WildcardQueryBuilder {
-	rb.v.Wildcard = &wildcard
-	return rb
+	return r
 }

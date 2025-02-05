@@ -15,65 +15,159 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // GeoDistanceFeatureQuery type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/specialized.ts#L46-L49
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/specialized.ts#L66-L69
 type GeoDistanceFeatureQuery struct {
-	Boost      *float32    `json:"boost,omitempty"`
-	Field      Field       `json:"field"`
-	Origin     GeoLocation `json:"origin"`
-	Pivot      Distance    `json:"pivot"`
-	QueryName_ *string     `json:"_name,omitempty"`
+	// Boost Floating point number used to decrease or increase the relevance scores of
+	// the query.
+	// Boost values are relative to the default value of 1.0.
+	// A boost value between 0 and 1.0 decreases the relevance score.
+	// A value greater than 1.0 increases the relevance score.
+	Boost *float32 `json:"boost,omitempty"`
+	// Field Name of the field used to calculate distances. This field must meet the
+	// following criteria:
+	// be a `date`, `date_nanos` or `geo_point` field;
+	// have an `index` mapping parameter value of `true`, which is the default;
+	// have an `doc_values` mapping parameter value of `true`, which is the default.
+	Field string `json:"field"`
+	// Origin Date or point of origin used to calculate distances.
+	// If the `field` value is a `date` or `date_nanos` field, the `origin` value
+	// must be a date.
+	// Date Math, such as `now-1h`, is supported.
+	// If the field value is a `geo_point` field, the `origin` value must be a
+	// geopoint.
+	Origin GeoLocation `json:"origin"`
+	// Pivot Distance from the `origin` at which relevance scores receive half of the
+	// `boost` value.
+	// If the `field` value is a `date` or `date_nanos` field, the `pivot` value
+	// must be a time unit, such as `1h` or `10d`. If the `field` value is a
+	// `geo_point` field, the `pivot` value must be a distance unit, such as `1km`
+	// or `12m`.
+	Pivot      string  `json:"pivot"`
+	QueryName_ *string `json:"_name,omitempty"`
 }
 
-// GeoDistanceFeatureQueryBuilder holds GeoDistanceFeatureQuery struct and provides a builder API.
-type GeoDistanceFeatureQueryBuilder struct {
-	v *GeoDistanceFeatureQuery
-}
+func (s *GeoDistanceFeatureQuery) UnmarshalJSON(data []byte) error {
 
-// NewGeoDistanceFeatureQuery provides a builder for the GeoDistanceFeatureQuery struct.
-func NewGeoDistanceFeatureQueryBuilder() *GeoDistanceFeatureQueryBuilder {
-	r := GeoDistanceFeatureQueryBuilder{
-		&GeoDistanceFeatureQuery{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "boost":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Boost", err)
+				}
+				f := float32(value)
+				s.Boost = &f
+			case float64:
+				f := float32(v)
+				s.Boost = &f
+			}
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "origin":
+			message := json.RawMessage{}
+			if err := dec.Decode(&message); err != nil {
+				return fmt.Errorf("%s | %w", "Origin", err)
+			}
+			keyDec := json.NewDecoder(bytes.NewReader(message))
+		origin_field:
+			for {
+				t, err := keyDec.Token()
+				if err != nil {
+					if errors.Is(err, io.EOF) {
+						break
+					}
+					return fmt.Errorf("%s | %w", "Origin", err)
+				}
+
+				switch t {
+
+				case "lat", "lon":
+					o := NewLatLonGeoLocation()
+					localDec := json.NewDecoder(bytes.NewReader(message))
+					if err := localDec.Decode(&o); err != nil {
+						return fmt.Errorf("%s | %w", "Origin", err)
+					}
+					s.Origin = o
+					break origin_field
+
+				case "geohash":
+					o := NewGeoHashLocation()
+					localDec := json.NewDecoder(bytes.NewReader(message))
+					if err := localDec.Decode(&o); err != nil {
+						return fmt.Errorf("%s | %w", "Origin", err)
+					}
+					s.Origin = o
+					break origin_field
+
+				}
+			}
+			if s.Origin == nil {
+				localDec := json.NewDecoder(bytes.NewReader(message))
+				if err := localDec.Decode(&s.Origin); err != nil {
+					return fmt.Errorf("%s | %w", "Origin", err)
+				}
+			}
+
+		case "pivot":
+			if err := dec.Decode(&s.Pivot); err != nil {
+				return fmt.Errorf("%s | %w", "Pivot", err)
+			}
+
+		case "_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "QueryName_", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.QueryName_ = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the GeoDistanceFeatureQuery struct
-func (rb *GeoDistanceFeatureQueryBuilder) Build() GeoDistanceFeatureQuery {
-	return *rb.v
-}
+// NewGeoDistanceFeatureQuery returns a GeoDistanceFeatureQuery.
+func NewGeoDistanceFeatureQuery() *GeoDistanceFeatureQuery {
+	r := &GeoDistanceFeatureQuery{}
 
-func (rb *GeoDistanceFeatureQueryBuilder) Boost(boost float32) *GeoDistanceFeatureQueryBuilder {
-	rb.v.Boost = &boost
-	return rb
-}
-
-func (rb *GeoDistanceFeatureQueryBuilder) Field(field Field) *GeoDistanceFeatureQueryBuilder {
-	rb.v.Field = field
-	return rb
-}
-
-func (rb *GeoDistanceFeatureQueryBuilder) Origin(origin *GeoLocationBuilder) *GeoDistanceFeatureQueryBuilder {
-	v := origin.Build()
-	rb.v.Origin = v
-	return rb
-}
-
-func (rb *GeoDistanceFeatureQueryBuilder) Pivot(pivot Distance) *GeoDistanceFeatureQueryBuilder {
-	rb.v.Pivot = pivot
-	return rb
-}
-
-func (rb *GeoDistanceFeatureQueryBuilder) QueryName_(queryname_ string) *GeoDistanceFeatureQueryBuilder {
-	rb.v.QueryName_ = &queryname_
-	return rb
+	return r
 }

@@ -15,19 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package phoneticencoder
 package phoneticencoder
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/phonetic-plugin.ts#L23-L36
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/phonetic-plugin.ts#L23-L36
 type PhoneticEncoder struct {
-	name string
+	Name string
 }
 
 var (
@@ -61,7 +59,7 @@ func (p PhoneticEncoder) MarshalText() (text []byte, err error) {
 }
 
 func (p *PhoneticEncoder) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
 	case "metaphone":
 		*p = Metaphone
@@ -95,5 +93,5 @@ func (p *PhoneticEncoder) UnmarshalText(text []byte) error {
 }
 
 func (p PhoneticEncoder) String() string {
-	return p.name
+	return p.Name
 }

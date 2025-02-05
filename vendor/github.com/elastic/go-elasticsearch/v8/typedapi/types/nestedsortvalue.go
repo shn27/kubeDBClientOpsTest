@@ -15,60 +15,84 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // NestedSortValue type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/sort.ts#L29-L34
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/sort.ts#L29-L34
 type NestedSortValue struct {
-	Filter      *QueryContainer  `json:"filter,omitempty"`
+	Filter      *Query           `json:"filter,omitempty"`
 	MaxChildren *int             `json:"max_children,omitempty"`
 	Nested      *NestedSortValue `json:"nested,omitempty"`
-	Path        Field            `json:"path"`
+	Path        string           `json:"path"`
 }
 
-// NestedSortValueBuilder holds NestedSortValue struct and provides a builder API.
-type NestedSortValueBuilder struct {
-	v *NestedSortValue
-}
+func (s *NestedSortValue) UnmarshalJSON(data []byte) error {
 
-// NewNestedSortValue provides a builder for the NestedSortValue struct.
-func NewNestedSortValueBuilder() *NestedSortValueBuilder {
-	r := NestedSortValueBuilder{
-		&NestedSortValue{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "filter":
+			if err := dec.Decode(&s.Filter); err != nil {
+				return fmt.Errorf("%s | %w", "Filter", err)
+			}
+
+		case "max_children":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxChildren", err)
+				}
+				s.MaxChildren = &value
+			case float64:
+				f := int(v)
+				s.MaxChildren = &f
+			}
+
+		case "nested":
+			if err := dec.Decode(&s.Nested); err != nil {
+				return fmt.Errorf("%s | %w", "Nested", err)
+			}
+
+		case "path":
+			if err := dec.Decode(&s.Path); err != nil {
+				return fmt.Errorf("%s | %w", "Path", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the NestedSortValue struct
-func (rb *NestedSortValueBuilder) Build() NestedSortValue {
-	return *rb.v
-}
+// NewNestedSortValue returns a NestedSortValue.
+func NewNestedSortValue() *NestedSortValue {
+	r := &NestedSortValue{}
 
-func (rb *NestedSortValueBuilder) Filter(filter *QueryContainerBuilder) *NestedSortValueBuilder {
-	v := filter.Build()
-	rb.v.Filter = &v
-	return rb
-}
-
-func (rb *NestedSortValueBuilder) MaxChildren(maxchildren int) *NestedSortValueBuilder {
-	rb.v.MaxChildren = &maxchildren
-	return rb
-}
-
-func (rb *NestedSortValueBuilder) Nested(nested *NestedSortValueBuilder) *NestedSortValueBuilder {
-	v := nested.Build()
-	rb.v.Nested = &v
-	return rb
-}
-
-func (rb *NestedSortValueBuilder) Path(path Field) *NestedSortValueBuilder {
-	rb.v.Path = path
-	return rb
+	return r
 }

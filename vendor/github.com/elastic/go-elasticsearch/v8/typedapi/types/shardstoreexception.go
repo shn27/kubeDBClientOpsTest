@@ -15,46 +15,75 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ShardStoreException type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/shard_stores/types.ts#L46-L49
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/shard_stores/types.ts#L53-L56
 type ShardStoreException struct {
 	Reason string `json:"reason"`
 	Type   string `json:"type"`
 }
 
-// ShardStoreExceptionBuilder holds ShardStoreException struct and provides a builder API.
-type ShardStoreExceptionBuilder struct {
-	v *ShardStoreException
-}
+func (s *ShardStoreException) UnmarshalJSON(data []byte) error {
 
-// NewShardStoreException provides a builder for the ShardStoreException struct.
-func NewShardStoreExceptionBuilder() *ShardStoreExceptionBuilder {
-	r := ShardStoreExceptionBuilder{
-		&ShardStoreException{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "reason":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Reason", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Reason = o
+
+		case "type":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Type = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ShardStoreException struct
-func (rb *ShardStoreExceptionBuilder) Build() ShardStoreException {
-	return *rb.v
-}
+// NewShardStoreException returns a ShardStoreException.
+func NewShardStoreException() *ShardStoreException {
+	r := &ShardStoreException{}
 
-func (rb *ShardStoreExceptionBuilder) Reason(reason string) *ShardStoreExceptionBuilder {
-	rb.v.Reason = reason
-	return rb
-}
-
-func (rb *ShardStoreExceptionBuilder) Type_(type_ string) *ShardStoreExceptionBuilder {
-	rb.v.Type = type_
-	return rb
+	return r
 }

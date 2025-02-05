@@ -15,146 +15,221 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/datafeedstate"
 )
 
 // DatafeedsRecord type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cat/ml_datafeeds/types.ts#L22-L83
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cat/ml_datafeeds/types.ts#L22-L87
 type DatafeedsRecord struct {
-	// AssignmentExplanation why the datafeed is or is not assigned to a node
+	// AssignmentExplanation For started datafeeds only, contains messages relating to the selection of a
+	// node.
 	AssignmentExplanation *string `json:"assignment_explanation,omitempty"`
-	// BucketsCount bucket count
+	// BucketsCount The number of buckets processed.
 	BucketsCount *string `json:"buckets.count,omitempty"`
-	// Id the datafeed_id
+	// Id The datafeed identifier.
 	Id *string `json:"id,omitempty"`
-	// NodeAddress network address of the assigned node
+	// NodeAddress The network address of the assigned node.
+	// For started datafeeds only, this information pertains to the node upon which
+	// the datafeed is started.
 	NodeAddress *string `json:"node.address,omitempty"`
-	// NodeEphemeralId ephemeral id of the assigned node
+	// NodeEphemeralId The ephemeral identifier of the assigned node.
+	// For started datafeeds only, this information pertains to the node upon which
+	// the datafeed is started.
 	NodeEphemeralId *string `json:"node.ephemeral_id,omitempty"`
-	// NodeId id of the assigned node
+	// NodeId The unique identifier of the assigned node.
+	// For started datafeeds only, this information pertains to the node upon which
+	// the datafeed is started.
 	NodeId *string `json:"node.id,omitempty"`
-	// NodeName name of the assigned node
+	// NodeName The name of the assigned node.
+	// For started datafeeds only, this information pertains to the node upon which
+	// the datafeed is started.
 	NodeName *string `json:"node.name,omitempty"`
-	// SearchBucketAvg the average search time per bucket (millisecond)
+	// SearchBucketAvg The average search time per bucket, in milliseconds.
 	SearchBucketAvg *string `json:"search.bucket_avg,omitempty"`
-	// SearchCount number of searches ran by the datafeed
+	// SearchCount The number of searches run by the datafeed.
 	SearchCount *string `json:"search.count,omitempty"`
-	// SearchExpAvgHour the exponential average search time per hour (millisecond)
+	// SearchExpAvgHour The exponential average search time per hour, in milliseconds.
 	SearchExpAvgHour *string `json:"search.exp_avg_hour,omitempty"`
-	// SearchTime the total search time
+	// SearchTime The total time the datafeed spent searching, in milliseconds.
 	SearchTime *string `json:"search.time,omitempty"`
-	// State the datafeed state
+	// State The status of the datafeed.
 	State *datafeedstate.DatafeedState `json:"state,omitempty"`
 }
 
-// DatafeedsRecordBuilder holds DatafeedsRecord struct and provides a builder API.
-type DatafeedsRecordBuilder struct {
-	v *DatafeedsRecord
-}
+func (s *DatafeedsRecord) UnmarshalJSON(data []byte) error {
 
-// NewDatafeedsRecord provides a builder for the DatafeedsRecord struct.
-func NewDatafeedsRecordBuilder() *DatafeedsRecordBuilder {
-	r := DatafeedsRecordBuilder{
-		&DatafeedsRecord{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "assignment_explanation", "ae":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "AssignmentExplanation", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.AssignmentExplanation = &o
+
+		case "buckets.count", "bc", "bucketsCount":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "BucketsCount", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.BucketsCount = &o
+
+		case "id":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Id = &o
+
+		case "node.address", "na", "nodeAddress":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "NodeAddress", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.NodeAddress = &o
+
+		case "node.ephemeral_id", "ne", "nodeEphemeralId":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "NodeEphemeralId", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.NodeEphemeralId = &o
+
+		case "node.id", "ni", "nodeId":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "NodeId", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.NodeId = &o
+
+		case "node.name", "nn", "nodeName":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "NodeName", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.NodeName = &o
+
+		case "search.bucket_avg", "sba", "searchBucketAvg":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SearchBucketAvg", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SearchBucketAvg = &o
+
+		case "search.count", "sc", "searchCount":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SearchCount", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SearchCount = &o
+
+		case "search.exp_avg_hour", "seah", "searchExpAvgHour":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SearchExpAvgHour", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SearchExpAvgHour = &o
+
+		case "search.time", "st", "searchTime":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SearchTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SearchTime = &o
+
+		case "state", "s":
+			if err := dec.Decode(&s.State); err != nil {
+				return fmt.Errorf("%s | %w", "State", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DatafeedsRecord struct
-func (rb *DatafeedsRecordBuilder) Build() DatafeedsRecord {
-	return *rb.v
-}
+// NewDatafeedsRecord returns a DatafeedsRecord.
+func NewDatafeedsRecord() *DatafeedsRecord {
+	r := &DatafeedsRecord{}
 
-// AssignmentExplanation why the datafeed is or is not assigned to a node
-
-func (rb *DatafeedsRecordBuilder) AssignmentExplanation(assignmentexplanation string) *DatafeedsRecordBuilder {
-	rb.v.AssignmentExplanation = &assignmentexplanation
-	return rb
-}
-
-// BucketsCount bucket count
-
-func (rb *DatafeedsRecordBuilder) BucketsCount(bucketscount string) *DatafeedsRecordBuilder {
-	rb.v.BucketsCount = &bucketscount
-	return rb
-}
-
-// Id the datafeed_id
-
-func (rb *DatafeedsRecordBuilder) Id(id string) *DatafeedsRecordBuilder {
-	rb.v.Id = &id
-	return rb
-}
-
-// NodeAddress network address of the assigned node
-
-func (rb *DatafeedsRecordBuilder) NodeAddress(nodeaddress string) *DatafeedsRecordBuilder {
-	rb.v.NodeAddress = &nodeaddress
-	return rb
-}
-
-// NodeEphemeralId ephemeral id of the assigned node
-
-func (rb *DatafeedsRecordBuilder) NodeEphemeralId(nodeephemeralid string) *DatafeedsRecordBuilder {
-	rb.v.NodeEphemeralId = &nodeephemeralid
-	return rb
-}
-
-// NodeId id of the assigned node
-
-func (rb *DatafeedsRecordBuilder) NodeId(nodeid string) *DatafeedsRecordBuilder {
-	rb.v.NodeId = &nodeid
-	return rb
-}
-
-// NodeName name of the assigned node
-
-func (rb *DatafeedsRecordBuilder) NodeName(nodename string) *DatafeedsRecordBuilder {
-	rb.v.NodeName = &nodename
-	return rb
-}
-
-// SearchBucketAvg the average search time per bucket (millisecond)
-
-func (rb *DatafeedsRecordBuilder) SearchBucketAvg(searchbucketavg string) *DatafeedsRecordBuilder {
-	rb.v.SearchBucketAvg = &searchbucketavg
-	return rb
-}
-
-// SearchCount number of searches ran by the datafeed
-
-func (rb *DatafeedsRecordBuilder) SearchCount(searchcount string) *DatafeedsRecordBuilder {
-	rb.v.SearchCount = &searchcount
-	return rb
-}
-
-// SearchExpAvgHour the exponential average search time per hour (millisecond)
-
-func (rb *DatafeedsRecordBuilder) SearchExpAvgHour(searchexpavghour string) *DatafeedsRecordBuilder {
-	rb.v.SearchExpAvgHour = &searchexpavghour
-	return rb
-}
-
-// SearchTime the total search time
-
-func (rb *DatafeedsRecordBuilder) SearchTime(searchtime string) *DatafeedsRecordBuilder {
-	rb.v.SearchTime = &searchtime
-	return rb
-}
-
-// State the datafeed state
-
-func (rb *DatafeedsRecordBuilder) State(state datafeedstate.DatafeedState) *DatafeedsRecordBuilder {
-	rb.v.State = &state
-	return rb
+	return r
 }

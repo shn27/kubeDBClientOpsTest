@@ -15,25 +15,29 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // GeohexGridAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/bucket.ts#L197-L223
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/bucket.ts#L479-L504
 type GeohexGridAggregation struct {
 	// Bounds Bounding box used to filter the geo-points in each bucket.
-	Bounds *GeoBounds `json:"bounds,omitempty"`
-	// Field Field containing indexed geo-point values. Must be explicitly
-	// mapped as a `geo_point` field. If the field contains an array
-	// `geohex_grid` aggregates all array values.
-	Field Field     `json:"field"`
-	Meta  *Metadata `json:"meta,omitempty"`
-	Name  *string   `json:"name,omitempty"`
+	Bounds GeoBounds `json:"bounds,omitempty"`
+	// Field Field containing indexed `geo_point` or `geo_shape` values.
+	// If the field contains an array, `geohex_grid` aggregates all array values.
+	Field string `json:"field"`
 	// Precision Integer zoom of the key used to defined cells or buckets
 	// in the results. Value should be between 0-15.
 	Precision *int `json:"precision,omitempty"`
@@ -43,71 +47,145 @@ type GeohexGridAggregation struct {
 	Size *int `json:"size,omitempty"`
 }
 
-// GeohexGridAggregationBuilder holds GeohexGridAggregation struct and provides a builder API.
-type GeohexGridAggregationBuilder struct {
-	v *GeohexGridAggregation
-}
+func (s *GeohexGridAggregation) UnmarshalJSON(data []byte) error {
 
-// NewGeohexGridAggregation provides a builder for the GeohexGridAggregation struct.
-func NewGeohexGridAggregationBuilder() *GeohexGridAggregationBuilder {
-	r := GeohexGridAggregationBuilder{
-		&GeohexGridAggregation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "bounds":
+			message := json.RawMessage{}
+			if err := dec.Decode(&message); err != nil {
+				return fmt.Errorf("%s | %w", "Bounds", err)
+			}
+			keyDec := json.NewDecoder(bytes.NewReader(message))
+		bounds_field:
+			for {
+				t, err := keyDec.Token()
+				if err != nil {
+					if errors.Is(err, io.EOF) {
+						break
+					}
+					return fmt.Errorf("%s | %w", "Bounds", err)
+				}
+
+				switch t {
+
+				case "bottom", "left", "right", "top":
+					o := NewCoordsGeoBounds()
+					localDec := json.NewDecoder(bytes.NewReader(message))
+					if err := localDec.Decode(&o); err != nil {
+						return fmt.Errorf("%s | %w", "Bounds", err)
+					}
+					s.Bounds = o
+					break bounds_field
+
+				case "bottom_right", "top_left":
+					o := NewTopLeftBottomRightGeoBounds()
+					localDec := json.NewDecoder(bytes.NewReader(message))
+					if err := localDec.Decode(&o); err != nil {
+						return fmt.Errorf("%s | %w", "Bounds", err)
+					}
+					s.Bounds = o
+					break bounds_field
+
+				case "bottom_left", "top_right":
+					o := NewTopRightBottomLeftGeoBounds()
+					localDec := json.NewDecoder(bytes.NewReader(message))
+					if err := localDec.Decode(&o); err != nil {
+						return fmt.Errorf("%s | %w", "Bounds", err)
+					}
+					s.Bounds = o
+					break bounds_field
+
+				case "wkt":
+					o := NewWktGeoBounds()
+					localDec := json.NewDecoder(bytes.NewReader(message))
+					if err := localDec.Decode(&o); err != nil {
+						return fmt.Errorf("%s | %w", "Bounds", err)
+					}
+					s.Bounds = o
+					break bounds_field
+
+				}
+			}
+			if s.Bounds == nil {
+				localDec := json.NewDecoder(bytes.NewReader(message))
+				if err := localDec.Decode(&s.Bounds); err != nil {
+					return fmt.Errorf("%s | %w", "Bounds", err)
+				}
+			}
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "precision":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Precision", err)
+				}
+				s.Precision = &value
+			case float64:
+				f := int(v)
+				s.Precision = &f
+			}
+
+		case "shard_size":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ShardSize", err)
+				}
+				s.ShardSize = &value
+			case float64:
+				f := int(v)
+				s.ShardSize = &f
+			}
+
+		case "size":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Size", err)
+				}
+				s.Size = &value
+			case float64:
+				f := int(v)
+				s.Size = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the GeohexGridAggregation struct
-func (rb *GeohexGridAggregationBuilder) Build() GeohexGridAggregation {
-	return *rb.v
-}
+// NewGeohexGridAggregation returns a GeohexGridAggregation.
+func NewGeohexGridAggregation() *GeohexGridAggregation {
+	r := &GeohexGridAggregation{}
 
-// Bounds Bounding box used to filter the geo-points in each bucket.
-
-func (rb *GeohexGridAggregationBuilder) Bounds(bounds *GeoBoundsBuilder) *GeohexGridAggregationBuilder {
-	v := bounds.Build()
-	rb.v.Bounds = &v
-	return rb
-}
-
-// Field Field containing indexed geo-point values. Must be explicitly
-// mapped as a `geo_point` field. If the field contains an array
-// `geohex_grid` aggregates all array values.
-
-func (rb *GeohexGridAggregationBuilder) Field(field Field) *GeohexGridAggregationBuilder {
-	rb.v.Field = field
-	return rb
-}
-
-func (rb *GeohexGridAggregationBuilder) Meta(meta *MetadataBuilder) *GeohexGridAggregationBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *GeohexGridAggregationBuilder) Name(name string) *GeohexGridAggregationBuilder {
-	rb.v.Name = &name
-	return rb
-}
-
-// Precision Integer zoom of the key used to defined cells or buckets
-// in the results. Value should be between 0-15.
-
-func (rb *GeohexGridAggregationBuilder) Precision(precision int) *GeohexGridAggregationBuilder {
-	rb.v.Precision = &precision
-	return rb
-}
-
-// ShardSize Number of buckets returned from each shard.
-
-func (rb *GeohexGridAggregationBuilder) ShardSize(shardsize int) *GeohexGridAggregationBuilder {
-	rb.v.ShardSize = &shardsize
-	return rb
-}
-
-// Size Maximum number of buckets to return.
-
-func (rb *GeohexGridAggregationBuilder) Size(size int) *GeohexGridAggregationBuilder {
-	rb.v.Size = &size
-	return rb
+	return r
 }

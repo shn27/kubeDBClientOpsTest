@@ -15,47 +15,71 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // ResolveIndexAliasItem type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/resolve_index/ResolveIndexResponse.ts#L37-L40
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/resolve_index/ResolveIndexResponse.ts#L37-L40
 type ResolveIndexAliasItem struct {
-	Indices Indices `json:"indices"`
-	Name    Name    `json:"name"`
+	Indices []string `json:"indices"`
+	Name    string   `json:"name"`
 }
 
-// ResolveIndexAliasItemBuilder holds ResolveIndexAliasItem struct and provides a builder API.
-type ResolveIndexAliasItemBuilder struct {
-	v *ResolveIndexAliasItem
-}
+func (s *ResolveIndexAliasItem) UnmarshalJSON(data []byte) error {
 
-// NewResolveIndexAliasItem provides a builder for the ResolveIndexAliasItem struct.
-func NewResolveIndexAliasItemBuilder() *ResolveIndexAliasItemBuilder {
-	r := ResolveIndexAliasItemBuilder{
-		&ResolveIndexAliasItem{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "indices":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Indices", err)
+				}
+
+				s.Indices = append(s.Indices, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Indices); err != nil {
+					return fmt.Errorf("%s | %w", "Indices", err)
+				}
+			}
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ResolveIndexAliasItem struct
-func (rb *ResolveIndexAliasItemBuilder) Build() ResolveIndexAliasItem {
-	return *rb.v
-}
+// NewResolveIndexAliasItem returns a ResolveIndexAliasItem.
+func NewResolveIndexAliasItem() *ResolveIndexAliasItem {
+	r := &ResolveIndexAliasItem{}
 
-func (rb *ResolveIndexAliasItemBuilder) Indices(indices *IndicesBuilder) *ResolveIndexAliasItemBuilder {
-	v := indices.Build()
-	rb.v.Indices = v
-	return rb
-}
-
-func (rb *ResolveIndexAliasItemBuilder) Name(name Name) *ResolveIndexAliasItemBuilder {
-	rb.v.Name = name
-	return rb
+	return r
 }

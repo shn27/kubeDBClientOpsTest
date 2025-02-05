@@ -15,34 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // DurationValueUnitNanos type alias.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Time.ts#L67-L67
-type DurationValueUnitNanos UnitNanos
-
-// DurationValueUnitNanosBuilder holds DurationValueUnitNanos struct and provides a builder API.
-type DurationValueUnitNanosBuilder struct {
-	v DurationValueUnitNanos
-}
-
-// NewDurationValueUnitNanos provides a builder for the DurationValueUnitNanos struct.
-func NewDurationValueUnitNanosBuilder() *DurationValueUnitNanosBuilder {
-	return &DurationValueUnitNanosBuilder{}
-}
-
-// Build finalize the chain and returns the DurationValueUnitNanos struct
-func (b *DurationValueUnitNanosBuilder) Build() DurationValueUnitNanos {
-	return b.v
-}
-
-func (b *DurationValueUnitNanosBuilder) DurationValueUnitNanos(value DurationValueUnitNanos) *DurationValueUnitNanosBuilder {
-	b.v = value
-	return b
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Time.ts#L67-L67
+type DurationValueUnitNanos int64

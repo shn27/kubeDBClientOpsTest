@@ -15,48 +15,76 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // UnmappedRareTermsAggregate type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L440-L446
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L493-L499
 type UnmappedRareTermsAggregate struct {
 	Buckets BucketsVoid `json:"buckets"`
-	Meta    *Metadata   `json:"meta,omitempty"`
+	Meta    Metadata    `json:"meta,omitempty"`
 }
 
-// UnmappedRareTermsAggregateBuilder holds UnmappedRareTermsAggregate struct and provides a builder API.
-type UnmappedRareTermsAggregateBuilder struct {
-	v *UnmappedRareTermsAggregate
-}
+func (s *UnmappedRareTermsAggregate) UnmarshalJSON(data []byte) error {
 
-// NewUnmappedRareTermsAggregate provides a builder for the UnmappedRareTermsAggregate struct.
-func NewUnmappedRareTermsAggregateBuilder() *UnmappedRareTermsAggregateBuilder {
-	r := UnmappedRareTermsAggregateBuilder{
-		&UnmappedRareTermsAggregate{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "buckets":
+
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			source := bytes.NewReader(rawMsg)
+			localDec := json.NewDecoder(source)
+			switch rawMsg[0] {
+			case '{':
+				o := make(map[string]any, 0)
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Buckets", err)
+				}
+				s.Buckets = o
+			case '[':
+				o := []any{}
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Buckets", err)
+				}
+				s.Buckets = o
+			}
+
+		case "meta":
+			if err := dec.Decode(&s.Meta); err != nil {
+				return fmt.Errorf("%s | %w", "Meta", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the UnmappedRareTermsAggregate struct
-func (rb *UnmappedRareTermsAggregateBuilder) Build() UnmappedRareTermsAggregate {
-	return *rb.v
-}
+// NewUnmappedRareTermsAggregate returns a UnmappedRareTermsAggregate.
+func NewUnmappedRareTermsAggregate() *UnmappedRareTermsAggregate {
+	r := &UnmappedRareTermsAggregate{}
 
-func (rb *UnmappedRareTermsAggregateBuilder) Buckets(buckets *BucketsVoidBuilder) *UnmappedRareTermsAggregateBuilder {
-	v := buckets.Build()
-	rb.v.Buckets = v
-	return rb
-}
-
-func (rb *UnmappedRareTermsAggregateBuilder) Meta(meta *MetadataBuilder) *UnmappedRareTermsAggregateBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
+	return r
 }

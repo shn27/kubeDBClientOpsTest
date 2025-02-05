@@ -15,68 +15,97 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // UserProfile type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/_types/UserProfile.ts#L43-L49
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/_types/UserProfile.ts#L41-L47
 type UserProfile struct {
-	Data    map[string]interface{} `json:"data"`
-	Enabled *bool                  `json:"enabled,omitempty"`
-	Labels  map[string]interface{} `json:"labels"`
-	Uid     UserProfileId          `json:"uid"`
-	User    UserProfileUser        `json:"user"`
+	Data    map[string]json.RawMessage `json:"data"`
+	Enabled *bool                      `json:"enabled,omitempty"`
+	Labels  map[string]json.RawMessage `json:"labels"`
+	Uid     string                     `json:"uid"`
+	User    UserProfileUser            `json:"user"`
 }
 
-// UserProfileBuilder holds UserProfile struct and provides a builder API.
-type UserProfileBuilder struct {
-	v *UserProfile
+func (s *UserProfile) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "data":
+			if s.Data == nil {
+				s.Data = make(map[string]json.RawMessage, 0)
+			}
+			if err := dec.Decode(&s.Data); err != nil {
+				return fmt.Errorf("%s | %w", "Data", err)
+			}
+
+		case "enabled":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Enabled", err)
+				}
+				s.Enabled = &value
+			case bool:
+				s.Enabled = &v
+			}
+
+		case "labels":
+			if s.Labels == nil {
+				s.Labels = make(map[string]json.RawMessage, 0)
+			}
+			if err := dec.Decode(&s.Labels); err != nil {
+				return fmt.Errorf("%s | %w", "Labels", err)
+			}
+
+		case "uid":
+			if err := dec.Decode(&s.Uid); err != nil {
+				return fmt.Errorf("%s | %w", "Uid", err)
+			}
+
+		case "user":
+			if err := dec.Decode(&s.User); err != nil {
+				return fmt.Errorf("%s | %w", "User", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewUserProfile provides a builder for the UserProfile struct.
-func NewUserProfileBuilder() *UserProfileBuilder {
-	r := UserProfileBuilder{
-		&UserProfile{
-			Data:   make(map[string]interface{}, 0),
-			Labels: make(map[string]interface{}, 0),
-		},
+// NewUserProfile returns a UserProfile.
+func NewUserProfile() *UserProfile {
+	r := &UserProfile{
+		Data:   make(map[string]json.RawMessage, 0),
+		Labels: make(map[string]json.RawMessage, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the UserProfile struct
-func (rb *UserProfileBuilder) Build() UserProfile {
-	return *rb.v
-}
-
-func (rb *UserProfileBuilder) Data(value map[string]interface{}) *UserProfileBuilder {
-	rb.v.Data = value
-	return rb
-}
-
-func (rb *UserProfileBuilder) Enabled(enabled bool) *UserProfileBuilder {
-	rb.v.Enabled = &enabled
-	return rb
-}
-
-func (rb *UserProfileBuilder) Labels(value map[string]interface{}) *UserProfileBuilder {
-	rb.v.Labels = value
-	return rb
-}
-
-func (rb *UserProfileBuilder) Uid(uid UserProfileId) *UserProfileBuilder {
-	rb.v.Uid = uid
-	return rb
-}
-
-func (rb *UserProfileBuilder) User(user *UserProfileUserBuilder) *UserProfileBuilder {
-	v := user.Build()
-	rb.v.User = v
-	return rb
+	return r
 }

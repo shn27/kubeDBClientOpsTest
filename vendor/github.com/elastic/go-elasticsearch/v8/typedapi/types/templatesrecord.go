@@ -15,79 +15,105 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // TemplatesRecord type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cat/templates/types.ts#L22-L48
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cat/templates/types.ts#L22-L48
 type TemplatesRecord struct {
-	// ComposedOf component templates comprising index template
+	// ComposedOf The component templates that comprise the index template.
 	ComposedOf *string `json:"composed_of,omitempty"`
-	// IndexPatterns template index patterns
+	// IndexPatterns The template index patterns.
 	IndexPatterns *string `json:"index_patterns,omitempty"`
-	// Name template name
-	Name *Name `json:"name,omitempty"`
-	// Order template application order/priority number
+	// Name The template name.
+	Name *string `json:"name,omitempty"`
+	// Order The template application order or priority number.
 	Order *string `json:"order,omitempty"`
-	// Version version
-	Version VersionString `json:"version,omitempty"`
+	// Version The template version.
+	Version *string `json:"version,omitempty"`
 }
 
-// TemplatesRecordBuilder holds TemplatesRecord struct and provides a builder API.
-type TemplatesRecordBuilder struct {
-	v *TemplatesRecord
-}
+func (s *TemplatesRecord) UnmarshalJSON(data []byte) error {
 
-// NewTemplatesRecord provides a builder for the TemplatesRecord struct.
-func NewTemplatesRecordBuilder() *TemplatesRecordBuilder {
-	r := TemplatesRecordBuilder{
-		&TemplatesRecord{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "composed_of", "c":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ComposedOf", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ComposedOf = &o
+
+		case "index_patterns", "t":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "IndexPatterns", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.IndexPatterns = &o
+
+		case "name", "n":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		case "order", "o", "p":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Order", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Order = &o
+
+		case "version", "v":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TemplatesRecord struct
-func (rb *TemplatesRecordBuilder) Build() TemplatesRecord {
-	return *rb.v
-}
+// NewTemplatesRecord returns a TemplatesRecord.
+func NewTemplatesRecord() *TemplatesRecord {
+	r := &TemplatesRecord{}
 
-// ComposedOf component templates comprising index template
-
-func (rb *TemplatesRecordBuilder) ComposedOf(composedof string) *TemplatesRecordBuilder {
-	rb.v.ComposedOf = &composedof
-	return rb
-}
-
-// IndexPatterns template index patterns
-
-func (rb *TemplatesRecordBuilder) IndexPatterns(indexpatterns string) *TemplatesRecordBuilder {
-	rb.v.IndexPatterns = &indexpatterns
-	return rb
-}
-
-// Name template name
-
-func (rb *TemplatesRecordBuilder) Name(name Name) *TemplatesRecordBuilder {
-	rb.v.Name = &name
-	return rb
-}
-
-// Order template application order/priority number
-
-func (rb *TemplatesRecordBuilder) Order(order string) *TemplatesRecordBuilder {
-	rb.v.Order = &order
-	return rb
-}
-
-// Version version
-
-func (rb *TemplatesRecordBuilder) Version(version VersionString) *TemplatesRecordBuilder {
-	rb.v.Version = version
-	return rb
+	return r
 }

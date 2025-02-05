@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // FielddataRecord type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cat/fielddata/types.ts#L20-L48
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cat/fielddata/types.ts#L20-L48
 type FielddataRecord struct {
 	// Field field name
 	Field *string `json:"field,omitempty"`
@@ -40,63 +47,101 @@ type FielddataRecord struct {
 	Size *string `json:"size,omitempty"`
 }
 
-// FielddataRecordBuilder holds FielddataRecord struct and provides a builder API.
-type FielddataRecordBuilder struct {
-	v *FielddataRecord
-}
+func (s *FielddataRecord) UnmarshalJSON(data []byte) error {
 
-// NewFielddataRecord provides a builder for the FielddataRecord struct.
-func NewFielddataRecordBuilder() *FielddataRecordBuilder {
-	r := FielddataRecordBuilder{
-		&FielddataRecord{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "field", "f":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Field = &o
+
+		case "host", "h":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Host", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Host = &o
+
+		case "id":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Id = &o
+
+		case "ip":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Ip", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Ip = &o
+
+		case "node", "n":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Node", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Node = &o
+
+		case "size":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Size", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Size = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the FielddataRecord struct
-func (rb *FielddataRecordBuilder) Build() FielddataRecord {
-	return *rb.v
-}
+// NewFielddataRecord returns a FielddataRecord.
+func NewFielddataRecord() *FielddataRecord {
+	r := &FielddataRecord{}
 
-// Field field name
-
-func (rb *FielddataRecordBuilder) Field(field string) *FielddataRecordBuilder {
-	rb.v.Field = &field
-	return rb
-}
-
-// Host host name
-
-func (rb *FielddataRecordBuilder) Host(host string) *FielddataRecordBuilder {
-	rb.v.Host = &host
-	return rb
-}
-
-// Id node id
-
-func (rb *FielddataRecordBuilder) Id(id string) *FielddataRecordBuilder {
-	rb.v.Id = &id
-	return rb
-}
-
-// Ip ip address
-
-func (rb *FielddataRecordBuilder) Ip(ip string) *FielddataRecordBuilder {
-	rb.v.Ip = &ip
-	return rb
-}
-
-// Node node name
-
-func (rb *FielddataRecordBuilder) Node(node string) *FielddataRecordBuilder {
-	rb.v.Node = &node
-	return rb
-}
-
-// Size field data usage
-
-func (rb *FielddataRecordBuilder) Size(size string) *FielddataRecordBuilder {
-	rb.v.Size = &size
-	return rb
+	return r
 }

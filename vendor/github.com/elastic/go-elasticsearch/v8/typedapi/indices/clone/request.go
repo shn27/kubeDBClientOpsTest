@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package clone
 
@@ -31,31 +29,27 @@ import (
 
 // Request holds the request body struct for the package clone
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/clone/IndicesCloneRequest.ts#L27-L46
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/clone/IndicesCloneRequest.ts#L27-L98
 type Request struct {
-	Aliases map[types.IndexName]types.Alias `json:"aliases,omitempty"`
 
-	Settings map[string]interface{} `json:"settings,omitempty"`
+	// Aliases Aliases for the resulting index.
+	Aliases map[string]types.Alias `json:"aliases,omitempty"`
+	// Settings Configuration options for the target index.
+	Settings map[string]json.RawMessage `json:"settings,omitempty"`
 }
 
-// RequestBuilder is the builder API for the clone.Request
-type RequestBuilder struct {
-	v *Request
-}
-
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{
-			Aliases:  make(map[types.IndexName]types.Alias, 0),
-			Settings: make(map[string]interface{}, 0),
-		},
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{
+		Aliases:  make(map[string]types.Alias, 0),
+		Settings: make(map[string]json.RawMessage, 0),
 	}
-	return &r
+
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -64,23 +58,4 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	}
 
 	return &req, nil
-}
-
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
-
-func (rb *RequestBuilder) Aliases(values map[types.IndexName]*types.AliasBuilder) *RequestBuilder {
-	tmp := make(map[types.IndexName]types.Alias, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Aliases = tmp
-	return rb
-}
-
-func (rb *RequestBuilder) Settings(value map[string]interface{}) *RequestBuilder {
-	rb.v.Settings = value
-	return rb
 }

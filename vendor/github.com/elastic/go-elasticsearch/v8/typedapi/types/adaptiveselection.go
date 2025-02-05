@@ -15,76 +15,151 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // AdaptiveSelection type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/_types/Stats.ts#L163-L171
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/_types/Stats.ts#L439-L468
 type AdaptiveSelection struct {
-	AvgQueueSize      *int64  `json:"avg_queue_size,omitempty"`
-	AvgResponseTime   *int64  `json:"avg_response_time,omitempty"`
-	AvgResponseTimeNs *int64  `json:"avg_response_time_ns,omitempty"`
-	AvgServiceTime    *string `json:"avg_service_time,omitempty"`
-	AvgServiceTimeNs  *int64  `json:"avg_service_time_ns,omitempty"`
-	OutgoingSearches  *int64  `json:"outgoing_searches,omitempty"`
-	Rank              *string `json:"rank,omitempty"`
+	// AvgQueueSize The exponentially weighted moving average queue size of search requests on
+	// the keyed node.
+	AvgQueueSize *int64 `json:"avg_queue_size,omitempty"`
+	// AvgResponseTime The exponentially weighted moving average response time of search requests on
+	// the keyed node.
+	AvgResponseTime Duration `json:"avg_response_time,omitempty"`
+	// AvgResponseTimeNs The exponentially weighted moving average response time, in nanoseconds, of
+	// search requests on the keyed node.
+	AvgResponseTimeNs *int64 `json:"avg_response_time_ns,omitempty"`
+	// AvgServiceTime The exponentially weighted moving average service time of search requests on
+	// the keyed node.
+	AvgServiceTime Duration `json:"avg_service_time,omitempty"`
+	// AvgServiceTimeNs The exponentially weighted moving average service time, in nanoseconds, of
+	// search requests on the keyed node.
+	AvgServiceTimeNs *int64 `json:"avg_service_time_ns,omitempty"`
+	// OutgoingSearches The number of outstanding search requests to the keyed node from the node
+	// these stats are for.
+	OutgoingSearches *int64 `json:"outgoing_searches,omitempty"`
+	// Rank The rank of this node; used for shard selection when routing search requests.
+	Rank *string `json:"rank,omitempty"`
 }
 
-// AdaptiveSelectionBuilder holds AdaptiveSelection struct and provides a builder API.
-type AdaptiveSelectionBuilder struct {
-	v *AdaptiveSelection
-}
+func (s *AdaptiveSelection) UnmarshalJSON(data []byte) error {
 
-// NewAdaptiveSelection provides a builder for the AdaptiveSelection struct.
-func NewAdaptiveSelectionBuilder() *AdaptiveSelectionBuilder {
-	r := AdaptiveSelectionBuilder{
-		&AdaptiveSelection{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "avg_queue_size":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "AvgQueueSize", err)
+				}
+				s.AvgQueueSize = &value
+			case float64:
+				f := int64(v)
+				s.AvgQueueSize = &f
+			}
+
+		case "avg_response_time":
+			if err := dec.Decode(&s.AvgResponseTime); err != nil {
+				return fmt.Errorf("%s | %w", "AvgResponseTime", err)
+			}
+
+		case "avg_response_time_ns":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "AvgResponseTimeNs", err)
+				}
+				s.AvgResponseTimeNs = &value
+			case float64:
+				f := int64(v)
+				s.AvgResponseTimeNs = &f
+			}
+
+		case "avg_service_time":
+			if err := dec.Decode(&s.AvgServiceTime); err != nil {
+				return fmt.Errorf("%s | %w", "AvgServiceTime", err)
+			}
+
+		case "avg_service_time_ns":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "AvgServiceTimeNs", err)
+				}
+				s.AvgServiceTimeNs = &value
+			case float64:
+				f := int64(v)
+				s.AvgServiceTimeNs = &f
+			}
+
+		case "outgoing_searches":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "OutgoingSearches", err)
+				}
+				s.OutgoingSearches = &value
+			case float64:
+				f := int64(v)
+				s.OutgoingSearches = &f
+			}
+
+		case "rank":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Rank", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Rank = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the AdaptiveSelection struct
-func (rb *AdaptiveSelectionBuilder) Build() AdaptiveSelection {
-	return *rb.v
-}
+// NewAdaptiveSelection returns a AdaptiveSelection.
+func NewAdaptiveSelection() *AdaptiveSelection {
+	r := &AdaptiveSelection{}
 
-func (rb *AdaptiveSelectionBuilder) AvgQueueSize(avgqueuesize int64) *AdaptiveSelectionBuilder {
-	rb.v.AvgQueueSize = &avgqueuesize
-	return rb
-}
-
-func (rb *AdaptiveSelectionBuilder) AvgResponseTime(avgresponsetime int64) *AdaptiveSelectionBuilder {
-	rb.v.AvgResponseTime = &avgresponsetime
-	return rb
-}
-
-func (rb *AdaptiveSelectionBuilder) AvgResponseTimeNs(avgresponsetimens int64) *AdaptiveSelectionBuilder {
-	rb.v.AvgResponseTimeNs = &avgresponsetimens
-	return rb
-}
-
-func (rb *AdaptiveSelectionBuilder) AvgServiceTime(avgservicetime string) *AdaptiveSelectionBuilder {
-	rb.v.AvgServiceTime = &avgservicetime
-	return rb
-}
-
-func (rb *AdaptiveSelectionBuilder) AvgServiceTimeNs(avgservicetimens int64) *AdaptiveSelectionBuilder {
-	rb.v.AvgServiceTimeNs = &avgservicetimens
-	return rb
-}
-
-func (rb *AdaptiveSelectionBuilder) OutgoingSearches(outgoingsearches int64) *AdaptiveSelectionBuilder {
-	rb.v.OutgoingSearches = &outgoingsearches
-	return rb
-}
-
-func (rb *AdaptiveSelectionBuilder) Rank(rank string) *AdaptiveSelectionBuilder {
-	rb.v.Rank = &rank
-	return rb
+	return r
 }

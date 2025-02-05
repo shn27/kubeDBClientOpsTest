@@ -15,38 +15,42 @@
 // specific language governing permissions and limitations
 // under the License.
 //
-// Code generated from specification version 8.4.0: DO NOT EDIT
+// Code generated from specification version 8.17.0: DO NOT EDIT
 
 package esapi
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"strings"
 )
 
 func newSecurityGetUserProfileFunc(t Transport) SecurityGetUserProfile {
-	return func(uid string, o ...func(*SecurityGetUserProfileRequest)) (*Response, error) {
+	return func(uid []string, o ...func(*SecurityGetUserProfileRequest)) (*Response, error) {
 		var r = SecurityGetUserProfileRequest{UID: uid}
 		for _, f := range o {
 			f(&r)
 		}
+
+		if transport, ok := t.(Instrumented); ok {
+			r.instrument = transport.InstrumentationEnabled()
+		}
+
 		return r.Do(r.ctx, t)
 	}
 }
 
 // ----- API Definition -------------------------------------------------------
 
-// SecurityGetUserProfile - Retrieves user profile for the given unique ID.
-//
-// This API is experimental.
+// SecurityGetUserProfile - Retrieves user profiles for the given unique ID(s).
 //
 // See full documentation at https://www.elastic.co/guide/en/elasticsearch/reference/current/security-api-get-user-profile.html.
-type SecurityGetUserProfile func(uid string, o ...func(*SecurityGetUserProfileRequest)) (*Response, error)
+type SecurityGetUserProfile func(uid []string, o ...func(*SecurityGetUserProfileRequest)) (*Response, error)
 
 // SecurityGetUserProfileRequest configures the Security Get User Profile API request.
 type SecurityGetUserProfileRequest struct {
-	UID string
+	UID []string
 
 	Data []string
 
@@ -58,26 +62,44 @@ type SecurityGetUserProfileRequest struct {
 	Header http.Header
 
 	ctx context.Context
+
+	instrument Instrumentation
 }
 
 // Do executes the request and returns response or error.
-func (r SecurityGetUserProfileRequest) Do(ctx context.Context, transport Transport) (*Response, error) {
+func (r SecurityGetUserProfileRequest) Do(providedCtx context.Context, transport Transport) (*Response, error) {
 	var (
 		method string
 		path   strings.Builder
 		params map[string]string
+		ctx    context.Context
 	)
+
+	if instrument, ok := r.instrument.(Instrumentation); ok {
+		ctx = instrument.Start(providedCtx, "security.get_user_profile")
+		defer instrument.Close(ctx)
+	}
+	if ctx == nil {
+		ctx = providedCtx
+	}
 
 	method = "GET"
 
-	path.Grow(7 + 1 + len("_security") + 1 + len("profile") + 1 + len(r.UID))
+	if len(r.UID) == 0 {
+		return nil, errors.New("uid is required and cannot be nil or empty")
+	}
+
+	path.Grow(7 + 1 + len("_security") + 1 + len("profile") + 1 + len(strings.Join(r.UID, ",")))
 	path.WriteString("http://")
 	path.WriteString("/")
 	path.WriteString("_security")
 	path.WriteString("/")
 	path.WriteString("profile")
 	path.WriteString("/")
-	path.WriteString(r.UID)
+	path.WriteString(strings.Join(r.UID, ","))
+	if instrument, ok := r.instrument.(Instrumentation); ok {
+		instrument.RecordPathPart(ctx, "uid", strings.Join(r.UID, ","))
+	}
 
 	params = make(map[string]string)
 
@@ -103,6 +125,9 @@ func (r SecurityGetUserProfileRequest) Do(ctx context.Context, transport Transpo
 
 	req, err := newRequest(method, path.String(), nil)
 	if err != nil {
+		if instrument, ok := r.instrument.(Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
 		return nil, err
 	}
 
@@ -130,8 +155,17 @@ func (r SecurityGetUserProfileRequest) Do(ctx context.Context, transport Transpo
 		req = req.WithContext(ctx)
 	}
 
+	if instrument, ok := r.instrument.(Instrumentation); ok {
+		instrument.BeforeRequest(req, "security.get_user_profile")
+	}
 	res, err := transport.Perform(req)
+	if instrument, ok := r.instrument.(Instrumentation); ok {
+		instrument.AfterRequest(req, "elasticsearch", "security.get_user_profile")
+	}
 	if err != nil {
+		if instrument, ok := r.instrument.(Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
 		return nil, err
 	}
 

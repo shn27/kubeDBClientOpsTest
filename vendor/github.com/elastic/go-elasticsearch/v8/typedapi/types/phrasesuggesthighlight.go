@@ -15,46 +15,79 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // PhraseSuggestHighlight type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/suggester.ts#L204-L207
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/suggester.ts#L419-L428
 type PhraseSuggestHighlight struct {
+	// PostTag Use in conjunction with `pre_tag` to define the HTML tags to use for the
+	// highlighted text.
 	PostTag string `json:"post_tag"`
-	PreTag  string `json:"pre_tag"`
+	// PreTag Use in conjunction with `post_tag` to define the HTML tags to use for the
+	// highlighted text.
+	PreTag string `json:"pre_tag"`
 }
 
-// PhraseSuggestHighlightBuilder holds PhraseSuggestHighlight struct and provides a builder API.
-type PhraseSuggestHighlightBuilder struct {
-	v *PhraseSuggestHighlight
-}
+func (s *PhraseSuggestHighlight) UnmarshalJSON(data []byte) error {
 
-// NewPhraseSuggestHighlight provides a builder for the PhraseSuggestHighlight struct.
-func NewPhraseSuggestHighlightBuilder() *PhraseSuggestHighlightBuilder {
-	r := PhraseSuggestHighlightBuilder{
-		&PhraseSuggestHighlight{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "post_tag":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PostTag", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PostTag = o
+
+		case "pre_tag":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PreTag", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PreTag = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the PhraseSuggestHighlight struct
-func (rb *PhraseSuggestHighlightBuilder) Build() PhraseSuggestHighlight {
-	return *rb.v
-}
+// NewPhraseSuggestHighlight returns a PhraseSuggestHighlight.
+func NewPhraseSuggestHighlight() *PhraseSuggestHighlight {
+	r := &PhraseSuggestHighlight{}
 
-func (rb *PhraseSuggestHighlightBuilder) PostTag(posttag string) *PhraseSuggestHighlightBuilder {
-	rb.v.PostTag = posttag
-	return rb
-}
-
-func (rb *PhraseSuggestHighlightBuilder) PreTag(pretag string) *PhraseSuggestHighlightBuilder {
-	rb.v.PreTag = pretag
-	return rb
+	return r
 }

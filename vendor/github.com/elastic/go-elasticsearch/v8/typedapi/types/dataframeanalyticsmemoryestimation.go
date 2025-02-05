@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DataframeAnalyticsMemoryEstimation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/DataframeAnalytics.ts#L70-L75
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/DataframeAnalytics.ts#L70-L75
 type DataframeAnalyticsMemoryEstimation struct {
 	// ExpectedMemoryWithDisk Estimated memory usage under the assumption that overflowing to disk is
 	// allowed during data frame analytics. expected_memory_with_disk is usually
@@ -36,39 +43,53 @@ type DataframeAnalyticsMemoryEstimation struct {
 	ExpectedMemoryWithoutDisk string `json:"expected_memory_without_disk"`
 }
 
-// DataframeAnalyticsMemoryEstimationBuilder holds DataframeAnalyticsMemoryEstimation struct and provides a builder API.
-type DataframeAnalyticsMemoryEstimationBuilder struct {
-	v *DataframeAnalyticsMemoryEstimation
-}
+func (s *DataframeAnalyticsMemoryEstimation) UnmarshalJSON(data []byte) error {
 
-// NewDataframeAnalyticsMemoryEstimation provides a builder for the DataframeAnalyticsMemoryEstimation struct.
-func NewDataframeAnalyticsMemoryEstimationBuilder() *DataframeAnalyticsMemoryEstimationBuilder {
-	r := DataframeAnalyticsMemoryEstimationBuilder{
-		&DataframeAnalyticsMemoryEstimation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "expected_memory_with_disk":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ExpectedMemoryWithDisk", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ExpectedMemoryWithDisk = o
+
+		case "expected_memory_without_disk":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ExpectedMemoryWithoutDisk", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ExpectedMemoryWithoutDisk = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DataframeAnalyticsMemoryEstimation struct
-func (rb *DataframeAnalyticsMemoryEstimationBuilder) Build() DataframeAnalyticsMemoryEstimation {
-	return *rb.v
-}
+// NewDataframeAnalyticsMemoryEstimation returns a DataframeAnalyticsMemoryEstimation.
+func NewDataframeAnalyticsMemoryEstimation() *DataframeAnalyticsMemoryEstimation {
+	r := &DataframeAnalyticsMemoryEstimation{}
 
-// ExpectedMemoryWithDisk Estimated memory usage under the assumption that overflowing to disk is
-// allowed during data frame analytics. expected_memory_with_disk is usually
-// smaller than expected_memory_without_disk as using disk allows to limit the
-// main memory needed to perform data frame analytics.
-
-func (rb *DataframeAnalyticsMemoryEstimationBuilder) ExpectedMemoryWithDisk(expectedmemorywithdisk string) *DataframeAnalyticsMemoryEstimationBuilder {
-	rb.v.ExpectedMemoryWithDisk = expectedmemorywithdisk
-	return rb
-}
-
-// ExpectedMemoryWithoutDisk Estimated memory usage under the assumption that the whole data frame
-// analytics should happen in memory (i.e. without overflowing to disk).
-
-func (rb *DataframeAnalyticsMemoryEstimationBuilder) ExpectedMemoryWithoutDisk(expectedmemorywithoutdisk string) *DataframeAnalyticsMemoryEstimationBuilder {
-	rb.v.ExpectedMemoryWithoutDisk = expectedmemorywithoutdisk
-	return rb
+	return r
 }

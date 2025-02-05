@@ -15,40 +15,55 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // GeoLinePoint type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/metric.ts#L93-L95
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/metric.ts#L158-L163
 type GeoLinePoint struct {
-	Field Field `json:"field"`
+	// Field The name of the geo_point field.
+	Field string `json:"field"`
 }
 
-// GeoLinePointBuilder holds GeoLinePoint struct and provides a builder API.
-type GeoLinePointBuilder struct {
-	v *GeoLinePoint
-}
+func (s *GeoLinePoint) UnmarshalJSON(data []byte) error {
 
-// NewGeoLinePoint provides a builder for the GeoLinePoint struct.
-func NewGeoLinePointBuilder() *GeoLinePointBuilder {
-	r := GeoLinePointBuilder{
-		&GeoLinePoint{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the GeoLinePoint struct
-func (rb *GeoLinePointBuilder) Build() GeoLinePoint {
-	return *rb.v
-}
+// NewGeoLinePoint returns a GeoLinePoint.
+func NewGeoLinePoint() *GeoLinePoint {
+	r := &GeoLinePoint{}
 
-func (rb *GeoLinePointBuilder) Field(field Field) *GeoLinePointBuilder {
-	rb.v.Field = field
-	return rb
+	return r
 }

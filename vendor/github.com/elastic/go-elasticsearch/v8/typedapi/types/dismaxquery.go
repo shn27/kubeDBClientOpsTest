@@ -15,62 +15,113 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DisMaxQuery type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/compound.ts#L46-L50
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/compound.ts#L88-L103
 type DisMaxQuery struct {
-	Boost      *float32         `json:"boost,omitempty"`
-	Queries    []QueryContainer `json:"queries"`
-	QueryName_ *string          `json:"_name,omitempty"`
-	TieBreaker *float64         `json:"tie_breaker,omitempty"`
+	// Boost Floating point number used to decrease or increase the relevance scores of
+	// the query.
+	// Boost values are relative to the default value of 1.0.
+	// A boost value between 0 and 1.0 decreases the relevance score.
+	// A value greater than 1.0 increases the relevance score.
+	Boost *float32 `json:"boost,omitempty"`
+	// Queries One or more query clauses.
+	// Returned documents must match one or more of these queries.
+	// If a document matches multiple queries, Elasticsearch uses the highest
+	// relevance score.
+	Queries    []Query `json:"queries"`
+	QueryName_ *string `json:"_name,omitempty"`
+	// TieBreaker Floating point number between 0 and 1.0 used to increase the relevance scores
+	// of documents matching multiple query clauses.
+	TieBreaker *Float64 `json:"tie_breaker,omitempty"`
 }
 
-// DisMaxQueryBuilder holds DisMaxQuery struct and provides a builder API.
-type DisMaxQueryBuilder struct {
-	v *DisMaxQuery
-}
+func (s *DisMaxQuery) UnmarshalJSON(data []byte) error {
 
-// NewDisMaxQuery provides a builder for the DisMaxQuery struct.
-func NewDisMaxQueryBuilder() *DisMaxQueryBuilder {
-	r := DisMaxQueryBuilder{
-		&DisMaxQuery{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "boost":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Boost", err)
+				}
+				f := float32(value)
+				s.Boost = &f
+			case float64:
+				f := float32(v)
+				s.Boost = &f
+			}
+
+		case "queries":
+			if err := dec.Decode(&s.Queries); err != nil {
+				return fmt.Errorf("%s | %w", "Queries", err)
+			}
+
+		case "_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "QueryName_", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.QueryName_ = &o
+
+		case "tie_breaker":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TieBreaker", err)
+				}
+				f := Float64(value)
+				s.TieBreaker = &f
+			case float64:
+				f := Float64(v)
+				s.TieBreaker = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DisMaxQuery struct
-func (rb *DisMaxQueryBuilder) Build() DisMaxQuery {
-	return *rb.v
-}
+// NewDisMaxQuery returns a DisMaxQuery.
+func NewDisMaxQuery() *DisMaxQuery {
+	r := &DisMaxQuery{}
 
-func (rb *DisMaxQueryBuilder) Boost(boost float32) *DisMaxQueryBuilder {
-	rb.v.Boost = &boost
-	return rb
-}
-
-func (rb *DisMaxQueryBuilder) Queries(queries []QueryContainerBuilder) *DisMaxQueryBuilder {
-	tmp := make([]QueryContainer, len(queries))
-	for _, value := range queries {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Queries = tmp
-	return rb
-}
-
-func (rb *DisMaxQueryBuilder) QueryName_(queryname_ string) *DisMaxQueryBuilder {
-	rb.v.QueryName_ = &queryname_
-	return rb
-}
-
-func (rb *DisMaxQueryBuilder) TieBreaker(tiebreaker float64) *DisMaxQueryBuilder {
-	rb.v.TieBreaker = &tiebreaker
-	return rb
+	return r
 }

@@ -15,100 +15,149 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // GetStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Stats.ts#L88-L99
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Stats.ts#L130-L141
 type GetStats struct {
-	Current             int64                   `json:"current"`
-	ExistsTime          *Duration               `json:"exists_time,omitempty"`
-	ExistsTimeInMillis  DurationValueUnitMillis `json:"exists_time_in_millis"`
-	ExistsTotal         int64                   `json:"exists_total"`
-	MissingTime         *Duration               `json:"missing_time,omitempty"`
-	MissingTimeInMillis DurationValueUnitMillis `json:"missing_time_in_millis"`
-	MissingTotal        int64                   `json:"missing_total"`
-	Time                *Duration               `json:"time,omitempty"`
-	TimeInMillis        DurationValueUnitMillis `json:"time_in_millis"`
-	Total               int64                   `json:"total"`
+	Current             int64    `json:"current"`
+	ExistsTime          Duration `json:"exists_time,omitempty"`
+	ExistsTimeInMillis  int64    `json:"exists_time_in_millis"`
+	ExistsTotal         int64    `json:"exists_total"`
+	MissingTime         Duration `json:"missing_time,omitempty"`
+	MissingTimeInMillis int64    `json:"missing_time_in_millis"`
+	MissingTotal        int64    `json:"missing_total"`
+	Time                Duration `json:"time,omitempty"`
+	TimeInMillis        int64    `json:"time_in_millis"`
+	Total               int64    `json:"total"`
 }
 
-// GetStatsBuilder holds GetStats struct and provides a builder API.
-type GetStatsBuilder struct {
-	v *GetStats
-}
+func (s *GetStats) UnmarshalJSON(data []byte) error {
 
-// NewGetStats provides a builder for the GetStats struct.
-func NewGetStatsBuilder() *GetStatsBuilder {
-	r := GetStatsBuilder{
-		&GetStats{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "current":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Current", err)
+				}
+				s.Current = value
+			case float64:
+				f := int64(v)
+				s.Current = f
+			}
+
+		case "exists_time":
+			if err := dec.Decode(&s.ExistsTime); err != nil {
+				return fmt.Errorf("%s | %w", "ExistsTime", err)
+			}
+
+		case "exists_time_in_millis":
+			if err := dec.Decode(&s.ExistsTimeInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "ExistsTimeInMillis", err)
+			}
+
+		case "exists_total":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ExistsTotal", err)
+				}
+				s.ExistsTotal = value
+			case float64:
+				f := int64(v)
+				s.ExistsTotal = f
+			}
+
+		case "missing_time":
+			if err := dec.Decode(&s.MissingTime); err != nil {
+				return fmt.Errorf("%s | %w", "MissingTime", err)
+			}
+
+		case "missing_time_in_millis":
+			if err := dec.Decode(&s.MissingTimeInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "MissingTimeInMillis", err)
+			}
+
+		case "missing_total":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MissingTotal", err)
+				}
+				s.MissingTotal = value
+			case float64:
+				f := int64(v)
+				s.MissingTotal = f
+			}
+
+		case "time":
+			if err := dec.Decode(&s.Time); err != nil {
+				return fmt.Errorf("%s | %w", "Time", err)
+			}
+
+		case "time_in_millis":
+			if err := dec.Decode(&s.TimeInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "TimeInMillis", err)
+			}
+
+		case "total":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Total", err)
+				}
+				s.Total = value
+			case float64:
+				f := int64(v)
+				s.Total = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the GetStats struct
-func (rb *GetStatsBuilder) Build() GetStats {
-	return *rb.v
-}
+// NewGetStats returns a GetStats.
+func NewGetStats() *GetStats {
+	r := &GetStats{}
 
-func (rb *GetStatsBuilder) Current(current int64) *GetStatsBuilder {
-	rb.v.Current = current
-	return rb
-}
-
-func (rb *GetStatsBuilder) ExistsTime(existstime *DurationBuilder) *GetStatsBuilder {
-	v := existstime.Build()
-	rb.v.ExistsTime = &v
-	return rb
-}
-
-func (rb *GetStatsBuilder) ExistsTimeInMillis(existstimeinmillis *DurationValueUnitMillisBuilder) *GetStatsBuilder {
-	v := existstimeinmillis.Build()
-	rb.v.ExistsTimeInMillis = v
-	return rb
-}
-
-func (rb *GetStatsBuilder) ExistsTotal(existstotal int64) *GetStatsBuilder {
-	rb.v.ExistsTotal = existstotal
-	return rb
-}
-
-func (rb *GetStatsBuilder) MissingTime(missingtime *DurationBuilder) *GetStatsBuilder {
-	v := missingtime.Build()
-	rb.v.MissingTime = &v
-	return rb
-}
-
-func (rb *GetStatsBuilder) MissingTimeInMillis(missingtimeinmillis *DurationValueUnitMillisBuilder) *GetStatsBuilder {
-	v := missingtimeinmillis.Build()
-	rb.v.MissingTimeInMillis = v
-	return rb
-}
-
-func (rb *GetStatsBuilder) MissingTotal(missingtotal int64) *GetStatsBuilder {
-	rb.v.MissingTotal = missingtotal
-	return rb
-}
-
-func (rb *GetStatsBuilder) Time(time *DurationBuilder) *GetStatsBuilder {
-	v := time.Build()
-	rb.v.Time = &v
-	return rb
-}
-
-func (rb *GetStatsBuilder) TimeInMillis(timeinmillis *DurationValueUnitMillisBuilder) *GetStatsBuilder {
-	v := timeinmillis.Build()
-	rb.v.TimeInMillis = v
-	return rb
-}
-
-func (rb *GetStatsBuilder) Total(total int64) *GetStatsBuilder {
-	rb.v.Total = total
-	return rb
+	return r
 }

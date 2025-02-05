@@ -15,49 +15,80 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // AsciiFoldingTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L167-L170
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L169-L172
 type AsciiFoldingTokenFilter struct {
-	PreserveOriginal *bool          `json:"preserve_original,omitempty"`
-	Type             string         `json:"type,omitempty"`
-	Version          *VersionString `json:"version,omitempty"`
+	PreserveOriginal Stringifiedboolean `json:"preserve_original,omitempty"`
+	Type             string             `json:"type,omitempty"`
+	Version          *string            `json:"version,omitempty"`
 }
 
-// AsciiFoldingTokenFilterBuilder holds AsciiFoldingTokenFilter struct and provides a builder API.
-type AsciiFoldingTokenFilterBuilder struct {
-	v *AsciiFoldingTokenFilter
+func (s *AsciiFoldingTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "preserve_original":
+			if err := dec.Decode(&s.PreserveOriginal); err != nil {
+				return fmt.Errorf("%s | %w", "PreserveOriginal", err)
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewAsciiFoldingTokenFilter provides a builder for the AsciiFoldingTokenFilter struct.
-func NewAsciiFoldingTokenFilterBuilder() *AsciiFoldingTokenFilterBuilder {
-	r := AsciiFoldingTokenFilterBuilder{
-		&AsciiFoldingTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s AsciiFoldingTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerAsciiFoldingTokenFilter AsciiFoldingTokenFilter
+	tmp := innerAsciiFoldingTokenFilter{
+		PreserveOriginal: s.PreserveOriginal,
+		Type:             s.Type,
+		Version:          s.Version,
 	}
 
-	r.v.Type = "asciifolding"
+	tmp.Type = "asciifolding"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the AsciiFoldingTokenFilter struct
-func (rb *AsciiFoldingTokenFilterBuilder) Build() AsciiFoldingTokenFilter {
-	return *rb.v
-}
+// NewAsciiFoldingTokenFilter returns a AsciiFoldingTokenFilter.
+func NewAsciiFoldingTokenFilter() *AsciiFoldingTokenFilter {
+	r := &AsciiFoldingTokenFilter{}
 
-func (rb *AsciiFoldingTokenFilterBuilder) PreserveOriginal(preserveoriginal bool) *AsciiFoldingTokenFilterBuilder {
-	rb.v.PreserveOriginal = &preserveoriginal
-	return rb
-}
-
-func (rb *AsciiFoldingTokenFilterBuilder) Version(version VersionString) *AsciiFoldingTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

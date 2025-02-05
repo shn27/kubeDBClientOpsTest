@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ClassificationInferenceOptions type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/inference.ts#L80-L95
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/inference.ts#L93-L108
 type ClassificationInferenceOptions struct {
 	// NumTopClasses Specifies the number of top class predictions to return. Defaults to 0.
 	NumTopClasses *int `json:"num_top_classes,omitempty"`
@@ -42,60 +49,97 @@ type ClassificationInferenceOptions struct {
 	TopClassesResultsField *string `json:"top_classes_results_field,omitempty"`
 }
 
-// ClassificationInferenceOptionsBuilder holds ClassificationInferenceOptions struct and provides a builder API.
-type ClassificationInferenceOptionsBuilder struct {
-	v *ClassificationInferenceOptions
-}
+func (s *ClassificationInferenceOptions) UnmarshalJSON(data []byte) error {
 
-// NewClassificationInferenceOptions provides a builder for the ClassificationInferenceOptions struct.
-func NewClassificationInferenceOptionsBuilder() *ClassificationInferenceOptionsBuilder {
-	r := ClassificationInferenceOptionsBuilder{
-		&ClassificationInferenceOptions{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "num_top_classes":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NumTopClasses", err)
+				}
+				s.NumTopClasses = &value
+			case float64:
+				f := int(v)
+				s.NumTopClasses = &f
+			}
+
+		case "num_top_feature_importance_values":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NumTopFeatureImportanceValues", err)
+				}
+				s.NumTopFeatureImportanceValues = &value
+			case float64:
+				f := int(v)
+				s.NumTopFeatureImportanceValues = &f
+			}
+
+		case "prediction_field_type":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PredictionFieldType", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PredictionFieldType = &o
+
+		case "results_field":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ResultsField", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ResultsField = &o
+
+		case "top_classes_results_field":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "TopClassesResultsField", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.TopClassesResultsField = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ClassificationInferenceOptions struct
-func (rb *ClassificationInferenceOptionsBuilder) Build() ClassificationInferenceOptions {
-	return *rb.v
-}
+// NewClassificationInferenceOptions returns a ClassificationInferenceOptions.
+func NewClassificationInferenceOptions() *ClassificationInferenceOptions {
+	r := &ClassificationInferenceOptions{}
 
-// NumTopClasses Specifies the number of top class predictions to return. Defaults to 0.
-
-func (rb *ClassificationInferenceOptionsBuilder) NumTopClasses(numtopclasses int) *ClassificationInferenceOptionsBuilder {
-	rb.v.NumTopClasses = &numtopclasses
-	return rb
-}
-
-// NumTopFeatureImportanceValues Specifies the maximum number of feature importance values per document.
-
-func (rb *ClassificationInferenceOptionsBuilder) NumTopFeatureImportanceValues(numtopfeatureimportancevalues int) *ClassificationInferenceOptionsBuilder {
-	rb.v.NumTopFeatureImportanceValues = &numtopfeatureimportancevalues
-	return rb
-}
-
-// PredictionFieldType Specifies the type of the predicted field to write. Acceptable values are:
-// string, number, boolean. When boolean is provided 1.0 is transformed to true
-// and 0.0 to false.
-
-func (rb *ClassificationInferenceOptionsBuilder) PredictionFieldType(predictionfieldtype string) *ClassificationInferenceOptionsBuilder {
-	rb.v.PredictionFieldType = &predictionfieldtype
-	return rb
-}
-
-// ResultsField The field that is added to incoming documents to contain the inference
-// prediction. Defaults to predicted_value.
-
-func (rb *ClassificationInferenceOptionsBuilder) ResultsField(resultsfield string) *ClassificationInferenceOptionsBuilder {
-	rb.v.ResultsField = &resultsfield
-	return rb
-}
-
-// TopClassesResultsField Specifies the field to which the top classes are written. Defaults to
-// top_classes.
-
-func (rb *ClassificationInferenceOptionsBuilder) TopClassesResultsField(topclassesresultsfield string) *ClassificationInferenceOptionsBuilder {
-	rb.v.TopClassesResultsField = &topclassesresultsfield
-	return rb
+	return r
 }

@@ -15,44 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // DistanceFeatureQuery holds the union for the following types:
 //
-//	DateDistanceFeatureQuery
+//	UntypedDistanceFeatureQuery
 //	GeoDistanceFeatureQuery
+//	DateDistanceFeatureQuery
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/specialized.ts#L56-L60
-type DistanceFeatureQuery interface{}
-
-// DistanceFeatureQueryBuilder holds DistanceFeatureQuery struct and provides a builder API.
-type DistanceFeatureQueryBuilder struct {
-	v DistanceFeatureQuery
-}
-
-// NewDistanceFeatureQuery provides a builder for the DistanceFeatureQuery struct.
-func NewDistanceFeatureQueryBuilder() *DistanceFeatureQueryBuilder {
-	return &DistanceFeatureQueryBuilder{}
-}
-
-// Build finalize the chain and returns the DistanceFeatureQuery struct
-func (u *DistanceFeatureQueryBuilder) Build() DistanceFeatureQuery {
-	return u.v
-}
-
-func (u *DistanceFeatureQueryBuilder) DateDistanceFeatureQuery(datedistancefeaturequery *DateDistanceFeatureQueryBuilder) *DistanceFeatureQueryBuilder {
-	v := datedistancefeaturequery.Build()
-	u.v = &v
-	return u
-}
-
-func (u *DistanceFeatureQueryBuilder) GeoDistanceFeatureQuery(geodistancefeaturequery *GeoDistanceFeatureQueryBuilder) *DistanceFeatureQueryBuilder {
-	v := geodistancefeaturequery.Build()
-	u.v = &v
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/specialized.ts#L76-L85
+type DistanceFeatureQuery any

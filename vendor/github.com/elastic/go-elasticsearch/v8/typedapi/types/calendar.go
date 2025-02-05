@@ -15,61 +15,77 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // Calendar type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/get_calendars/types.ts#L22-L29
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/get_calendars/types.ts#L22-L29
 type Calendar struct {
 	// CalendarId A string that uniquely identifies a calendar.
-	CalendarId Id `json:"calendar_id"`
+	CalendarId string `json:"calendar_id"`
 	// Description A description of the calendar.
 	Description *string `json:"description,omitempty"`
 	// JobIds An array of anomaly detection job identifiers.
-	JobIds []Id `json:"job_ids"`
+	JobIds []string `json:"job_ids"`
 }
 
-// CalendarBuilder holds Calendar struct and provides a builder API.
-type CalendarBuilder struct {
-	v *Calendar
-}
+func (s *Calendar) UnmarshalJSON(data []byte) error {
 
-// NewCalendar provides a builder for the Calendar struct.
-func NewCalendarBuilder() *CalendarBuilder {
-	r := CalendarBuilder{
-		&Calendar{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "calendar_id":
+			if err := dec.Decode(&s.CalendarId); err != nil {
+				return fmt.Errorf("%s | %w", "CalendarId", err)
+			}
+
+		case "description":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Description", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Description = &o
+
+		case "job_ids":
+			if err := dec.Decode(&s.JobIds); err != nil {
+				return fmt.Errorf("%s | %w", "JobIds", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the Calendar struct
-func (rb *CalendarBuilder) Build() Calendar {
-	return *rb.v
-}
+// NewCalendar returns a Calendar.
+func NewCalendar() *Calendar {
+	r := &Calendar{}
 
-// CalendarId A string that uniquely identifies a calendar.
-
-func (rb *CalendarBuilder) CalendarId(calendarid Id) *CalendarBuilder {
-	rb.v.CalendarId = calendarid
-	return rb
-}
-
-// Description A description of the calendar.
-
-func (rb *CalendarBuilder) Description(description string) *CalendarBuilder {
-	rb.v.Description = &description
-	return rb
-}
-
-// JobIds An array of anomaly detection job identifiers.
-
-func (rb *CalendarBuilder) JobIds(job_ids ...Id) *CalendarBuilder {
-	rb.v.JobIds = job_ids
-	return rb
+	return r
 }

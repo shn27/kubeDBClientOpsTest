@@ -15,48 +15,57 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // IndexSettingsLifecycleStep type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/IndexSettings.ts#L302-L308
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/IndexSettings.ts#L311-L317
 type IndexSettingsLifecycleStep struct {
 	// WaitTimeThreshold Time to wait for the cluster to resolve allocation issues during an ILM
 	// shrink action. Must be greater than 1h (1 hour).
 	// See Shard allocation for shrink.
-	WaitTimeThreshold *Duration `json:"wait_time_threshold,omitempty"`
+	WaitTimeThreshold Duration `json:"wait_time_threshold,omitempty"`
 }
 
-// IndexSettingsLifecycleStepBuilder holds IndexSettingsLifecycleStep struct and provides a builder API.
-type IndexSettingsLifecycleStepBuilder struct {
-	v *IndexSettingsLifecycleStep
-}
+func (s *IndexSettingsLifecycleStep) UnmarshalJSON(data []byte) error {
 
-// NewIndexSettingsLifecycleStep provides a builder for the IndexSettingsLifecycleStep struct.
-func NewIndexSettingsLifecycleStepBuilder() *IndexSettingsLifecycleStepBuilder {
-	r := IndexSettingsLifecycleStepBuilder{
-		&IndexSettingsLifecycleStep{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "wait_time_threshold":
+			if err := dec.Decode(&s.WaitTimeThreshold); err != nil {
+				return fmt.Errorf("%s | %w", "WaitTimeThreshold", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the IndexSettingsLifecycleStep struct
-func (rb *IndexSettingsLifecycleStepBuilder) Build() IndexSettingsLifecycleStep {
-	return *rb.v
-}
+// NewIndexSettingsLifecycleStep returns a IndexSettingsLifecycleStep.
+func NewIndexSettingsLifecycleStep() *IndexSettingsLifecycleStep {
+	r := &IndexSettingsLifecycleStep{}
 
-// WaitTimeThreshold Time to wait for the cluster to resolve allocation issues during an ILM
-// shrink action. Must be greater than 1h (1 hour).
-// See Shard allocation for shrink.
-
-func (rb *IndexSettingsLifecycleStepBuilder) WaitTimeThreshold(waittimethreshold *DurationBuilder) *IndexSettingsLifecycleStepBuilder {
-	v := waittimethreshold.Build()
-	rb.v.WaitTimeThreshold = &v
-	return rb
+	return r
 }

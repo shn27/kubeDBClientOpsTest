@@ -15,40 +15,54 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // TrainedModelLocationIndex type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/TrainedModel.ts#L399-L401
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/TrainedModel.ts#L470-L472
 type TrainedModelLocationIndex struct {
-	Name IndexName `json:"name"`
+	Name string `json:"name"`
 }
 
-// TrainedModelLocationIndexBuilder holds TrainedModelLocationIndex struct and provides a builder API.
-type TrainedModelLocationIndexBuilder struct {
-	v *TrainedModelLocationIndex
-}
+func (s *TrainedModelLocationIndex) UnmarshalJSON(data []byte) error {
 
-// NewTrainedModelLocationIndex provides a builder for the TrainedModelLocationIndex struct.
-func NewTrainedModelLocationIndexBuilder() *TrainedModelLocationIndexBuilder {
-	r := TrainedModelLocationIndexBuilder{
-		&TrainedModelLocationIndex{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TrainedModelLocationIndex struct
-func (rb *TrainedModelLocationIndexBuilder) Build() TrainedModelLocationIndex {
-	return *rb.v
-}
+// NewTrainedModelLocationIndex returns a TrainedModelLocationIndex.
+func NewTrainedModelLocationIndex() *TrainedModelLocationIndex {
+	r := &TrainedModelLocationIndex{}
 
-func (rb *TrainedModelLocationIndexBuilder) Name(name IndexName) *TrainedModelLocationIndexBuilder {
-	rb.v.Name = name
-	return rb
+	return r
 }

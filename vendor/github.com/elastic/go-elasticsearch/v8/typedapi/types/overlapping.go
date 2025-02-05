@@ -15,46 +15,60 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // Overlapping type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/simulate_template/IndicesSimulateTemplateResponse.ts#L39-L42
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/simulate_template/IndicesSimulateTemplateResponse.ts#L39-L42
 type Overlapping struct {
 	IndexPatterns []string `json:"index_patterns"`
-	Name          Name     `json:"name"`
+	Name          string   `json:"name"`
 }
 
-// OverlappingBuilder holds Overlapping struct and provides a builder API.
-type OverlappingBuilder struct {
-	v *Overlapping
-}
+func (s *Overlapping) UnmarshalJSON(data []byte) error {
 
-// NewOverlapping provides a builder for the Overlapping struct.
-func NewOverlappingBuilder() *OverlappingBuilder {
-	r := OverlappingBuilder{
-		&Overlapping{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "index_patterns":
+			if err := dec.Decode(&s.IndexPatterns); err != nil {
+				return fmt.Errorf("%s | %w", "IndexPatterns", err)
+			}
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the Overlapping struct
-func (rb *OverlappingBuilder) Build() Overlapping {
-	return *rb.v
-}
+// NewOverlapping returns a Overlapping.
+func NewOverlapping() *Overlapping {
+	r := &Overlapping{}
 
-func (rb *OverlappingBuilder) IndexPatterns(index_patterns ...string) *OverlappingBuilder {
-	rb.v.IndexPatterns = index_patterns
-	return rb
-}
-
-func (rb *OverlappingBuilder) Name(name Name) *OverlappingBuilder {
-	rb.v.Name = name
-	return rb
+	return r
 }

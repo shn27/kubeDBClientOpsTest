@@ -15,103 +15,108 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // SnapshotLifecycle type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/slm/_types/SnapshotLifecycle.ts#L38-L49
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/slm/_types/SnapshotLifecycle.ts#L38-L49
 type SnapshotLifecycle struct {
-	InProgress          *InProgress         `json:"in_progress,omitempty"`
-	LastFailure         *Invocation         `json:"last_failure,omitempty"`
-	LastSuccess         *Invocation         `json:"last_success,omitempty"`
-	ModifiedDate        *DateTime           `json:"modified_date,omitempty"`
-	ModifiedDateMillis  EpochTimeUnitMillis `json:"modified_date_millis"`
-	NextExecution       *DateTime           `json:"next_execution,omitempty"`
-	NextExecutionMillis EpochTimeUnitMillis `json:"next_execution_millis"`
-	Policy              Policy              `json:"policy"`
-	Stats               Statistics          `json:"stats"`
-	Version             VersionNumber       `json:"version"`
+	InProgress          *InProgress `json:"in_progress,omitempty"`
+	LastFailure         *Invocation `json:"last_failure,omitempty"`
+	LastSuccess         *Invocation `json:"last_success,omitempty"`
+	ModifiedDate        DateTime    `json:"modified_date,omitempty"`
+	ModifiedDateMillis  int64       `json:"modified_date_millis"`
+	NextExecution       DateTime    `json:"next_execution,omitempty"`
+	NextExecutionMillis int64       `json:"next_execution_millis"`
+	Policy              SLMPolicy   `json:"policy"`
+	Stats               Statistics  `json:"stats"`
+	Version             int64       `json:"version"`
 }
 
-// SnapshotLifecycleBuilder holds SnapshotLifecycle struct and provides a builder API.
-type SnapshotLifecycleBuilder struct {
-	v *SnapshotLifecycle
-}
+func (s *SnapshotLifecycle) UnmarshalJSON(data []byte) error {
 
-// NewSnapshotLifecycle provides a builder for the SnapshotLifecycle struct.
-func NewSnapshotLifecycleBuilder() *SnapshotLifecycleBuilder {
-	r := SnapshotLifecycleBuilder{
-		&SnapshotLifecycle{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "in_progress":
+			if err := dec.Decode(&s.InProgress); err != nil {
+				return fmt.Errorf("%s | %w", "InProgress", err)
+			}
+
+		case "last_failure":
+			if err := dec.Decode(&s.LastFailure); err != nil {
+				return fmt.Errorf("%s | %w", "LastFailure", err)
+			}
+
+		case "last_success":
+			if err := dec.Decode(&s.LastSuccess); err != nil {
+				return fmt.Errorf("%s | %w", "LastSuccess", err)
+			}
+
+		case "modified_date":
+			if err := dec.Decode(&s.ModifiedDate); err != nil {
+				return fmt.Errorf("%s | %w", "ModifiedDate", err)
+			}
+
+		case "modified_date_millis":
+			if err := dec.Decode(&s.ModifiedDateMillis); err != nil {
+				return fmt.Errorf("%s | %w", "ModifiedDateMillis", err)
+			}
+
+		case "next_execution":
+			if err := dec.Decode(&s.NextExecution); err != nil {
+				return fmt.Errorf("%s | %w", "NextExecution", err)
+			}
+
+		case "next_execution_millis":
+			if err := dec.Decode(&s.NextExecutionMillis); err != nil {
+				return fmt.Errorf("%s | %w", "NextExecutionMillis", err)
+			}
+
+		case "policy":
+			if err := dec.Decode(&s.Policy); err != nil {
+				return fmt.Errorf("%s | %w", "Policy", err)
+			}
+
+		case "stats":
+			if err := dec.Decode(&s.Stats); err != nil {
+				return fmt.Errorf("%s | %w", "Stats", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SnapshotLifecycle struct
-func (rb *SnapshotLifecycleBuilder) Build() SnapshotLifecycle {
-	return *rb.v
-}
+// NewSnapshotLifecycle returns a SnapshotLifecycle.
+func NewSnapshotLifecycle() *SnapshotLifecycle {
+	r := &SnapshotLifecycle{}
 
-func (rb *SnapshotLifecycleBuilder) InProgress(inprogress *InProgressBuilder) *SnapshotLifecycleBuilder {
-	v := inprogress.Build()
-	rb.v.InProgress = &v
-	return rb
-}
-
-func (rb *SnapshotLifecycleBuilder) LastFailure(lastfailure *InvocationBuilder) *SnapshotLifecycleBuilder {
-	v := lastfailure.Build()
-	rb.v.LastFailure = &v
-	return rb
-}
-
-func (rb *SnapshotLifecycleBuilder) LastSuccess(lastsuccess *InvocationBuilder) *SnapshotLifecycleBuilder {
-	v := lastsuccess.Build()
-	rb.v.LastSuccess = &v
-	return rb
-}
-
-func (rb *SnapshotLifecycleBuilder) ModifiedDate(modifieddate *DateTimeBuilder) *SnapshotLifecycleBuilder {
-	v := modifieddate.Build()
-	rb.v.ModifiedDate = &v
-	return rb
-}
-
-func (rb *SnapshotLifecycleBuilder) ModifiedDateMillis(modifieddatemillis *EpochTimeUnitMillisBuilder) *SnapshotLifecycleBuilder {
-	v := modifieddatemillis.Build()
-	rb.v.ModifiedDateMillis = v
-	return rb
-}
-
-func (rb *SnapshotLifecycleBuilder) NextExecution(nextexecution *DateTimeBuilder) *SnapshotLifecycleBuilder {
-	v := nextexecution.Build()
-	rb.v.NextExecution = &v
-	return rb
-}
-
-func (rb *SnapshotLifecycleBuilder) NextExecutionMillis(nextexecutionmillis *EpochTimeUnitMillisBuilder) *SnapshotLifecycleBuilder {
-	v := nextexecutionmillis.Build()
-	rb.v.NextExecutionMillis = v
-	return rb
-}
-
-func (rb *SnapshotLifecycleBuilder) Policy(policy *PolicyBuilder) *SnapshotLifecycleBuilder {
-	v := policy.Build()
-	rb.v.Policy = v
-	return rb
-}
-
-func (rb *SnapshotLifecycleBuilder) Stats(stats *StatisticsBuilder) *SnapshotLifecycleBuilder {
-	v := stats.Build()
-	rb.v.Stats = v
-	return rb
-}
-
-func (rb *SnapshotLifecycleBuilder) Version(version VersionNumber) *SnapshotLifecycleBuilder {
-	rb.v.Version = version
-	return rb
+	return r
 }

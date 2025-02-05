@@ -15,53 +15,85 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // RateAggregate type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L692-L696
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L847-L854
 type RateAggregate struct {
-	Meta          *Metadata `json:"meta,omitempty"`
-	Value         float64   `json:"value"`
-	ValueAsString *string   `json:"value_as_string,omitempty"`
+	Meta          Metadata `json:"meta,omitempty"`
+	Value         Float64  `json:"value"`
+	ValueAsString *string  `json:"value_as_string,omitempty"`
 }
 
-// RateAggregateBuilder holds RateAggregate struct and provides a builder API.
-type RateAggregateBuilder struct {
-	v *RateAggregate
-}
+func (s *RateAggregate) UnmarshalJSON(data []byte) error {
 
-// NewRateAggregate provides a builder for the RateAggregate struct.
-func NewRateAggregateBuilder() *RateAggregateBuilder {
-	r := RateAggregateBuilder{
-		&RateAggregate{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "meta":
+			if err := dec.Decode(&s.Meta); err != nil {
+				return fmt.Errorf("%s | %w", "Meta", err)
+			}
+
+		case "value":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Value", err)
+				}
+				f := Float64(value)
+				s.Value = f
+			case float64:
+				f := Float64(v)
+				s.Value = f
+			}
+
+		case "value_as_string":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ValueAsString", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ValueAsString = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RateAggregate struct
-func (rb *RateAggregateBuilder) Build() RateAggregate {
-	return *rb.v
-}
+// NewRateAggregate returns a RateAggregate.
+func NewRateAggregate() *RateAggregate {
+	r := &RateAggregate{}
 
-func (rb *RateAggregateBuilder) Meta(meta *MetadataBuilder) *RateAggregateBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *RateAggregateBuilder) Value(value float64) *RateAggregateBuilder {
-	rb.v.Value = value
-	return rb
-}
-
-func (rb *RateAggregateBuilder) ValueAsString(valueasstring string) *RateAggregateBuilder {
-	rb.v.ValueAsString = &valueasstring
-	return rb
+	return r
 }

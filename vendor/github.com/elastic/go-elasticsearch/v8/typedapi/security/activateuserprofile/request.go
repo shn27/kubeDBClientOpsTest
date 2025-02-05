@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package activateuserprofile
 
@@ -31,32 +29,23 @@ import (
 
 // Request holds the request body struct for the package activateuserprofile
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/activate_user_profile/Request.ts#L23-L37
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/activate_user_profile/Request.ts#L23-L39
 type Request struct {
-	AccessToken *string `json:"access_token,omitempty"`
-
-	GrantType granttype.GrantType `json:"grant_type"`
-
-	Password *string `json:"password,omitempty"`
-
-	Username *string `json:"username,omitempty"`
+	AccessToken *string             `json:"access_token,omitempty"`
+	GrantType   granttype.GrantType `json:"grant_type"`
+	Password    *string             `json:"password,omitempty"`
+	Username    *string             `json:"username,omitempty"`
 }
 
-// RequestBuilder is the builder API for the activateuserprofile.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -65,29 +54,4 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	}
 
 	return &req, nil
-}
-
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
-
-func (rb *RequestBuilder) AccessToken(accesstoken string) *RequestBuilder {
-	rb.v.AccessToken = &accesstoken
-	return rb
-}
-
-func (rb *RequestBuilder) GrantType(granttype granttype.GrantType) *RequestBuilder {
-	rb.v.GrantType = granttype
-	return rb
-}
-
-func (rb *RequestBuilder) Password(password string) *RequestBuilder {
-	rb.v.Password = &password
-	return rb
-}
-
-func (rb *RequestBuilder) Username(username string) *RequestBuilder {
-	rb.v.Username = &username
-	return rb
 }

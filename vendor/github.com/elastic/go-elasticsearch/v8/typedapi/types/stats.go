@@ -15,196 +15,267 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
+	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/noderole"
+)
+
 // Stats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/_types/Stats.ts#L30-L53
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/_types/Stats.ts#L30-L114
 type Stats struct {
+	// AdaptiveSelection Statistics about adaptive replica selection.
 	AdaptiveSelection map[string]AdaptiveSelection `json:"adaptive_selection,omitempty"`
-	Attributes        map[Field]string             `json:"attributes,omitempty"`
-	Breakers          map[string]Breaker           `json:"breakers,omitempty"`
-	Discovery         *Discovery                   `json:"discovery,omitempty"`
-	Fs                *FileSystem                  `json:"fs,omitempty"`
-	Host              *Host                        `json:"host,omitempty"`
-	Http              *Http                        `json:"http,omitempty"`
-	IndexingPressure  *IndexingPressure            `json:"indexing_pressure,omitempty"`
-	Indices           *ShardStats                  `json:"indices,omitempty"`
-	Ingest            *Ingest                      `json:"ingest,omitempty"`
-	Ip                []Ip                         `json:"ip,omitempty"`
-	Jvm               *Jvm                         `json:"jvm,omitempty"`
-	Name              *Name                        `json:"name,omitempty"`
-	Os                *OperatingSystem             `json:"os,omitempty"`
-	Process           *Process                     `json:"process,omitempty"`
-	Roles             *NodeRoles                   `json:"roles,omitempty"`
-	Script            *Scripting                   `json:"script,omitempty"`
-	ScriptCache       map[string][]ScriptCache     `json:"script_cache,omitempty"`
-	ThreadPool        map[string]ThreadCount       `json:"thread_pool,omitempty"`
-	Timestamp         *int64                       `json:"timestamp,omitempty"`
-	Transport         *Transport                   `json:"transport,omitempty"`
-	TransportAddress  *TransportAddress            `json:"transport_address,omitempty"`
+	// Attributes Contains a list of attributes for the node.
+	Attributes map[string]string `json:"attributes,omitempty"`
+	// Breakers Statistics about the field data circuit breaker.
+	Breakers map[string]Breaker `json:"breakers,omitempty"`
+	// Discovery Contains node discovery statistics for the node.
+	Discovery *Discovery `json:"discovery,omitempty"`
+	// Fs File system information, data path, free disk space, read/write stats.
+	Fs *FileSystem `json:"fs,omitempty"`
+	// Host Network host for the node, based on the network host setting.
+	Host *string `json:"host,omitempty"`
+	// Http HTTP connection information.
+	Http *Http `json:"http,omitempty"`
+	// IndexingPressure Contains indexing pressure statistics for the node.
+	IndexingPressure *NodesIndexingPressure `json:"indexing_pressure,omitempty"`
+	// Indices Indices stats about size, document count, indexing and deletion times, search
+	// times, field cache size, merges and flushes.
+	Indices *IndicesShardStats `json:"indices,omitempty"`
+	// Ingest Statistics about ingest preprocessing.
+	Ingest *NodesIngest `json:"ingest,omitempty"`
+	// Ip IP address and port for the node.
+	Ip []string `json:"ip,omitempty"`
+	// Jvm JVM stats, memory pool information, garbage collection, buffer pools, number
+	// of loaded/unloaded classes.
+	Jvm *Jvm `json:"jvm,omitempty"`
+	// Name Human-readable identifier for the node.
+	// Based on the node name setting.
+	Name *string `json:"name,omitempty"`
+	// Os Operating system stats, load average, mem, swap.
+	Os *OperatingSystem `json:"os,omitempty"`
+	// Process Process statistics, memory consumption, cpu usage, open file descriptors.
+	Process *Process `json:"process,omitempty"`
+	// Roles Roles assigned to the node.
+	Roles []noderole.NodeRole `json:"roles,omitempty"`
+	// Script Contains script statistics for the node.
+	Script      *Scripting               `json:"script,omitempty"`
+	ScriptCache map[string][]ScriptCache `json:"script_cache,omitempty"`
+	// ThreadPool Statistics about each thread pool, including current size, queue and rejected
+	// tasks.
+	ThreadPool map[string]ThreadCount `json:"thread_pool,omitempty"`
+	Timestamp  *int64                 `json:"timestamp,omitempty"`
+	// Transport Transport statistics about sent and received bytes in cluster communication.
+	Transport *Transport `json:"transport,omitempty"`
+	// TransportAddress Host and port for the transport layer, used for internal communication
+	// between nodes in a cluster.
+	TransportAddress *string `json:"transport_address,omitempty"`
 }
 
-// StatsBuilder holds Stats struct and provides a builder API.
-type StatsBuilder struct {
-	v *Stats
+func (s *Stats) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "adaptive_selection":
+			if s.AdaptiveSelection == nil {
+				s.AdaptiveSelection = make(map[string]AdaptiveSelection, 0)
+			}
+			if err := dec.Decode(&s.AdaptiveSelection); err != nil {
+				return fmt.Errorf("%s | %w", "AdaptiveSelection", err)
+			}
+
+		case "attributes":
+			if s.Attributes == nil {
+				s.Attributes = make(map[string]string, 0)
+			}
+			if err := dec.Decode(&s.Attributes); err != nil {
+				return fmt.Errorf("%s | %w", "Attributes", err)
+			}
+
+		case "breakers":
+			if s.Breakers == nil {
+				s.Breakers = make(map[string]Breaker, 0)
+			}
+			if err := dec.Decode(&s.Breakers); err != nil {
+				return fmt.Errorf("%s | %w", "Breakers", err)
+			}
+
+		case "discovery":
+			if err := dec.Decode(&s.Discovery); err != nil {
+				return fmt.Errorf("%s | %w", "Discovery", err)
+			}
+
+		case "fs":
+			if err := dec.Decode(&s.Fs); err != nil {
+				return fmt.Errorf("%s | %w", "Fs", err)
+			}
+
+		case "host":
+			if err := dec.Decode(&s.Host); err != nil {
+				return fmt.Errorf("%s | %w", "Host", err)
+			}
+
+		case "http":
+			if err := dec.Decode(&s.Http); err != nil {
+				return fmt.Errorf("%s | %w", "Http", err)
+			}
+
+		case "indexing_pressure":
+			if err := dec.Decode(&s.IndexingPressure); err != nil {
+				return fmt.Errorf("%s | %w", "IndexingPressure", err)
+			}
+
+		case "indices":
+			if err := dec.Decode(&s.Indices); err != nil {
+				return fmt.Errorf("%s | %w", "Indices", err)
+			}
+
+		case "ingest":
+			if err := dec.Decode(&s.Ingest); err != nil {
+				return fmt.Errorf("%s | %w", "Ingest", err)
+			}
+
+		case "ip":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Ip", err)
+				}
+
+				s.Ip = append(s.Ip, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Ip); err != nil {
+					return fmt.Errorf("%s | %w", "Ip", err)
+				}
+			}
+
+		case "jvm":
+			if err := dec.Decode(&s.Jvm); err != nil {
+				return fmt.Errorf("%s | %w", "Jvm", err)
+			}
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		case "os":
+			if err := dec.Decode(&s.Os); err != nil {
+				return fmt.Errorf("%s | %w", "Os", err)
+			}
+
+		case "process":
+			if err := dec.Decode(&s.Process); err != nil {
+				return fmt.Errorf("%s | %w", "Process", err)
+			}
+
+		case "roles":
+			if err := dec.Decode(&s.Roles); err != nil {
+				return fmt.Errorf("%s | %w", "Roles", err)
+			}
+
+		case "script":
+			if err := dec.Decode(&s.Script); err != nil {
+				return fmt.Errorf("%s | %w", "Script", err)
+			}
+
+		case "script_cache":
+			if s.ScriptCache == nil {
+				s.ScriptCache = make(map[string][]ScriptCache, 0)
+			}
+			rawMsg := make(map[string]json.RawMessage, 0)
+			dec.Decode(&rawMsg)
+			for key, value := range rawMsg {
+				switch {
+				case bytes.HasPrefix(value, []byte("\"")), bytes.HasPrefix(value, []byte("{")):
+					o := NewScriptCache()
+					err := json.NewDecoder(bytes.NewReader(value)).Decode(&o)
+					if err != nil {
+						return fmt.Errorf("%s | %w", "ScriptCache", err)
+					}
+					s.ScriptCache[key] = append(s.ScriptCache[key], *o)
+				default:
+					o := []ScriptCache{}
+					err := json.NewDecoder(bytes.NewReader(value)).Decode(&o)
+					if err != nil {
+						return fmt.Errorf("%s | %w", "ScriptCache", err)
+					}
+					s.ScriptCache[key] = o
+				}
+			}
+
+		case "thread_pool":
+			if s.ThreadPool == nil {
+				s.ThreadPool = make(map[string]ThreadCount, 0)
+			}
+			if err := dec.Decode(&s.ThreadPool); err != nil {
+				return fmt.Errorf("%s | %w", "ThreadPool", err)
+			}
+
+		case "timestamp":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Timestamp", err)
+				}
+				s.Timestamp = &value
+			case float64:
+				f := int64(v)
+				s.Timestamp = &f
+			}
+
+		case "transport":
+			if err := dec.Decode(&s.Transport); err != nil {
+				return fmt.Errorf("%s | %w", "Transport", err)
+			}
+
+		case "transport_address":
+			if err := dec.Decode(&s.TransportAddress); err != nil {
+				return fmt.Errorf("%s | %w", "TransportAddress", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewStats provides a builder for the Stats struct.
-func NewStatsBuilder() *StatsBuilder {
-	r := StatsBuilder{
-		&Stats{
-			AdaptiveSelection: make(map[string]AdaptiveSelection, 0),
-			Attributes:        make(map[Field]string, 0),
-			Breakers:          make(map[string]Breaker, 0),
-			ScriptCache:       make(map[string][]ScriptCache, 0),
-			ThreadPool:        make(map[string]ThreadCount, 0),
-		},
+// NewStats returns a Stats.
+func NewStats() *Stats {
+	r := &Stats{
+		AdaptiveSelection: make(map[string]AdaptiveSelection, 0),
+		Attributes:        make(map[string]string, 0),
+		Breakers:          make(map[string]Breaker, 0),
+		ScriptCache:       make(map[string][]ScriptCache, 0),
+		ThreadPool:        make(map[string]ThreadCount, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the Stats struct
-func (rb *StatsBuilder) Build() Stats {
-	return *rb.v
-}
-
-func (rb *StatsBuilder) AdaptiveSelection(values map[string]*AdaptiveSelectionBuilder) *StatsBuilder {
-	tmp := make(map[string]AdaptiveSelection, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.AdaptiveSelection = tmp
-	return rb
-}
-
-func (rb *StatsBuilder) Attributes(value map[Field]string) *StatsBuilder {
-	rb.v.Attributes = value
-	return rb
-}
-
-func (rb *StatsBuilder) Breakers(values map[string]*BreakerBuilder) *StatsBuilder {
-	tmp := make(map[string]Breaker, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Breakers = tmp
-	return rb
-}
-
-func (rb *StatsBuilder) Discovery(discovery *DiscoveryBuilder) *StatsBuilder {
-	v := discovery.Build()
-	rb.v.Discovery = &v
-	return rb
-}
-
-func (rb *StatsBuilder) Fs(fs *FileSystemBuilder) *StatsBuilder {
-	v := fs.Build()
-	rb.v.Fs = &v
-	return rb
-}
-
-func (rb *StatsBuilder) Host(host Host) *StatsBuilder {
-	rb.v.Host = &host
-	return rb
-}
-
-func (rb *StatsBuilder) Http(http *HttpBuilder) *StatsBuilder {
-	v := http.Build()
-	rb.v.Http = &v
-	return rb
-}
-
-func (rb *StatsBuilder) IndexingPressure(indexingpressure *IndexingPressureBuilder) *StatsBuilder {
-	v := indexingpressure.Build()
-	rb.v.IndexingPressure = &v
-	return rb
-}
-
-func (rb *StatsBuilder) Indices(indices *ShardStatsBuilder) *StatsBuilder {
-	v := indices.Build()
-	rb.v.Indices = &v
-	return rb
-}
-
-func (rb *StatsBuilder) Ingest(ingest *IngestBuilder) *StatsBuilder {
-	v := ingest.Build()
-	rb.v.Ingest = &v
-	return rb
-}
-
-func (rb *StatsBuilder) Ip(arg []Ip) *StatsBuilder {
-	rb.v.Ip = arg
-	return rb
-}
-
-func (rb *StatsBuilder) Jvm(jvm *JvmBuilder) *StatsBuilder {
-	v := jvm.Build()
-	rb.v.Jvm = &v
-	return rb
-}
-
-func (rb *StatsBuilder) Name(name Name) *StatsBuilder {
-	rb.v.Name = &name
-	return rb
-}
-
-func (rb *StatsBuilder) Os(os *OperatingSystemBuilder) *StatsBuilder {
-	v := os.Build()
-	rb.v.Os = &v
-	return rb
-}
-
-func (rb *StatsBuilder) Process(process *ProcessBuilder) *StatsBuilder {
-	v := process.Build()
-	rb.v.Process = &v
-	return rb
-}
-
-func (rb *StatsBuilder) Roles(roles *NodeRolesBuilder) *StatsBuilder {
-	v := roles.Build()
-	rb.v.Roles = &v
-	return rb
-}
-
-func (rb *StatsBuilder) Script(script *ScriptingBuilder) *StatsBuilder {
-	v := script.Build()
-	rb.v.Script = &v
-	return rb
-}
-
-func (rb *StatsBuilder) ScriptCache(value map[string][]ScriptCache) *StatsBuilder {
-	rb.v.ScriptCache = value
-	return rb
-}
-
-func (rb *StatsBuilder) ThreadPool(values map[string]*ThreadCountBuilder) *StatsBuilder {
-	tmp := make(map[string]ThreadCount, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.ThreadPool = tmp
-	return rb
-}
-
-func (rb *StatsBuilder) Timestamp(timestamp int64) *StatsBuilder {
-	rb.v.Timestamp = &timestamp
-	return rb
-}
-
-func (rb *StatsBuilder) Transport(transport *TransportBuilder) *StatsBuilder {
-	v := transport.Build()
-	rb.v.Transport = &v
-	return rb
-}
-
-func (rb *StatsBuilder) TransportAddress(transportaddress TransportAddress) *StatsBuilder {
-	rb.v.TransportAddress = &transportaddress
-	return rb
+	return r
 }

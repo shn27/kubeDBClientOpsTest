@@ -15,60 +15,90 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/icunormalizationmode"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/icunormalizationtype"
 )
 
 // IcuNormalizationCharFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/icu-plugin.ts#L40-L44
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/icu-plugin.ts#L40-L44
 type IcuNormalizationCharFilter struct {
 	Mode    *icunormalizationmode.IcuNormalizationMode `json:"mode,omitempty"`
 	Name    *icunormalizationtype.IcuNormalizationType `json:"name,omitempty"`
 	Type    string                                     `json:"type,omitempty"`
-	Version *VersionString                             `json:"version,omitempty"`
+	Version *string                                    `json:"version,omitempty"`
 }
 
-// IcuNormalizationCharFilterBuilder holds IcuNormalizationCharFilter struct and provides a builder API.
-type IcuNormalizationCharFilterBuilder struct {
-	v *IcuNormalizationCharFilter
+func (s *IcuNormalizationCharFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "mode":
+			if err := dec.Decode(&s.Mode); err != nil {
+				return fmt.Errorf("%s | %w", "Mode", err)
+			}
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewIcuNormalizationCharFilter provides a builder for the IcuNormalizationCharFilter struct.
-func NewIcuNormalizationCharFilterBuilder() *IcuNormalizationCharFilterBuilder {
-	r := IcuNormalizationCharFilterBuilder{
-		&IcuNormalizationCharFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s IcuNormalizationCharFilter) MarshalJSON() ([]byte, error) {
+	type innerIcuNormalizationCharFilter IcuNormalizationCharFilter
+	tmp := innerIcuNormalizationCharFilter{
+		Mode:    s.Mode,
+		Name:    s.Name,
+		Type:    s.Type,
+		Version: s.Version,
 	}
 
-	r.v.Type = "icu_normalizer"
+	tmp.Type = "icu_normalizer"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the IcuNormalizationCharFilter struct
-func (rb *IcuNormalizationCharFilterBuilder) Build() IcuNormalizationCharFilter {
-	return *rb.v
-}
+// NewIcuNormalizationCharFilter returns a IcuNormalizationCharFilter.
+func NewIcuNormalizationCharFilter() *IcuNormalizationCharFilter {
+	r := &IcuNormalizationCharFilter{}
 
-func (rb *IcuNormalizationCharFilterBuilder) Mode(mode icunormalizationmode.IcuNormalizationMode) *IcuNormalizationCharFilterBuilder {
-	rb.v.Mode = &mode
-	return rb
-}
-
-func (rb *IcuNormalizationCharFilterBuilder) Name(name icunormalizationtype.IcuNormalizationType) *IcuNormalizationCharFilterBuilder {
-	rb.v.Name = &name
-	return rb
-}
-
-func (rb *IcuNormalizationCharFilterBuilder) Version(version VersionString) *IcuNormalizationCharFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

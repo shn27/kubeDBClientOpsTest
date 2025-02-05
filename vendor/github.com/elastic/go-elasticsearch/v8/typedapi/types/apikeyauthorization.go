@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ApiKeyAuthorization type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/Authorization.ts#L20-L29
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/Authorization.ts#L20-L29
 type ApiKeyAuthorization struct {
 	// Id The identifier for the API key.
 	Id string `json:"id"`
@@ -32,35 +39,53 @@ type ApiKeyAuthorization struct {
 	Name string `json:"name"`
 }
 
-// ApiKeyAuthorizationBuilder holds ApiKeyAuthorization struct and provides a builder API.
-type ApiKeyAuthorizationBuilder struct {
-	v *ApiKeyAuthorization
-}
+func (s *ApiKeyAuthorization) UnmarshalJSON(data []byte) error {
 
-// NewApiKeyAuthorization provides a builder for the ApiKeyAuthorization struct.
-func NewApiKeyAuthorizationBuilder() *ApiKeyAuthorizationBuilder {
-	r := ApiKeyAuthorizationBuilder{
-		&ApiKeyAuthorization{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "id":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Id = o
+
+		case "name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Name = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ApiKeyAuthorization struct
-func (rb *ApiKeyAuthorizationBuilder) Build() ApiKeyAuthorization {
-	return *rb.v
-}
+// NewApiKeyAuthorization returns a ApiKeyAuthorization.
+func NewApiKeyAuthorization() *ApiKeyAuthorization {
+	r := &ApiKeyAuthorization{}
 
-// Id The identifier for the API key.
-
-func (rb *ApiKeyAuthorizationBuilder) Id(id string) *ApiKeyAuthorizationBuilder {
-	rb.v.Id = id
-	return rb
-}
-
-// Name The name of the API key.
-
-func (rb *ApiKeyAuthorizationBuilder) Name(name string) *ApiKeyAuthorizationBuilder {
-	rb.v.Name = name
-	return rb
+	return r
 }

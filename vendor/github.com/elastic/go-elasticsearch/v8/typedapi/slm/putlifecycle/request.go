@@ -15,61 +15,53 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package putlifecycle
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"strconv"
 
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 )
 
 // Request holds the request body struct for the package putlifecycle
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/slm/put_lifecycle/PutSnapshotLifecycleRequest.ts#L26-L72
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/slm/put_lifecycle/PutSnapshotLifecycleRequest.ts#L26-L72
 type Request struct {
 
 	// Config Configuration for each snapshot created by the policy.
 	Config *types.Configuration `json:"config,omitempty"`
-
 	// Name Name automatically assigned to each snapshot created by the policy. Date math
 	// is supported. To prevent conflicting snapshot names, a UUID is automatically
 	// appended to each snapshot name.
-	Name *types.Name `json:"name,omitempty"`
-
+	Name *string `json:"name,omitempty"`
 	// Repository Repository used to store snapshots created by this policy. This repository
 	// must exist prior to the policy’s creation. You can create a repository using
 	// the snapshot repository API.
 	Repository *string `json:"repository,omitempty"`
-
 	// Retention Retention rules used to retain and delete snapshots created by the policy.
 	Retention *types.Retention `json:"retention,omitempty"`
-
 	// Schedule Periodic or absolute schedule at which the policy creates snapshots. SLM
 	// applies schedule changes immediately.
-	Schedule *types.CronExpression `json:"schedule,omitempty"`
+	Schedule *string `json:"schedule,omitempty"`
 }
 
-// RequestBuilder is the builder API for the putlifecycle.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -80,34 +72,53 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) Config(config *types.ConfigurationBuilder) *RequestBuilder {
-	v := config.Build()
-	rb.v.Config = &v
-	return rb
-}
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
 
-func (rb *RequestBuilder) Name(name types.Name) *RequestBuilder {
-	rb.v.Name = &name
-	return rb
-}
+		switch t {
 
-func (rb *RequestBuilder) Repository(repository string) *RequestBuilder {
-	rb.v.Repository = &repository
-	return rb
-}
+		case "config":
+			if err := dec.Decode(&s.Config); err != nil {
+				return fmt.Errorf("%s | %w", "Config", err)
+			}
 
-func (rb *RequestBuilder) Retention(retention *types.RetentionBuilder) *RequestBuilder {
-	v := retention.Build()
-	rb.v.Retention = &v
-	return rb
-}
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
 
-func (rb *RequestBuilder) Schedule(schedule types.CronExpression) *RequestBuilder {
-	rb.v.Schedule = &schedule
-	return rb
+		case "repository":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Repository", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Repository = &o
+
+		case "retention":
+			if err := dec.Decode(&s.Retention); err != nil {
+				return fmt.Errorf("%s | %w", "Retention", err)
+			}
+
+		case "schedule":
+			if err := dec.Decode(&s.Schedule); err != nil {
+				return fmt.Errorf("%s | %w", "Schedule", err)
+			}
+
+		}
+	}
+	return nil
 }

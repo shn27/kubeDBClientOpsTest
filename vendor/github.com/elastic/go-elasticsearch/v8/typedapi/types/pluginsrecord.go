@@ -15,88 +15,112 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // PluginsRecord type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cat/plugins/types.ts#L22-L52
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cat/plugins/types.ts#L22-L52
 type PluginsRecord struct {
-	// Component component
+	// Component The component name.
 	Component *string `json:"component,omitempty"`
-	// Description plugin details
+	// Description The plugin details.
 	Description *string `json:"description,omitempty"`
-	// Id unique node id
-	Id *NodeId `json:"id,omitempty"`
-	// Name node name
-	Name *Name `json:"name,omitempty"`
-	// Type plugin type
+	// Id The unique node identifier.
+	Id *string `json:"id,omitempty"`
+	// Name The node name.
+	Name *string `json:"name,omitempty"`
+	// Type The plugin type.
 	Type *string `json:"type,omitempty"`
-	// Version component version
-	Version *VersionString `json:"version,omitempty"`
+	// Version The component version.
+	Version *string `json:"version,omitempty"`
 }
 
-// PluginsRecordBuilder holds PluginsRecord struct and provides a builder API.
-type PluginsRecordBuilder struct {
-	v *PluginsRecord
-}
+func (s *PluginsRecord) UnmarshalJSON(data []byte) error {
 
-// NewPluginsRecord provides a builder for the PluginsRecord struct.
-func NewPluginsRecordBuilder() *PluginsRecordBuilder {
-	r := PluginsRecordBuilder{
-		&PluginsRecord{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "component", "c":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Component", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Component = &o
+
+		case "description", "d":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Description", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Description = &o
+
+		case "id":
+			if err := dec.Decode(&s.Id); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
+
+		case "name", "n":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		case "type", "t":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Type = &o
+
+		case "version", "v":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the PluginsRecord struct
-func (rb *PluginsRecordBuilder) Build() PluginsRecord {
-	return *rb.v
-}
+// NewPluginsRecord returns a PluginsRecord.
+func NewPluginsRecord() *PluginsRecord {
+	r := &PluginsRecord{}
 
-// Component component
-
-func (rb *PluginsRecordBuilder) Component(component string) *PluginsRecordBuilder {
-	rb.v.Component = &component
-	return rb
-}
-
-// Description plugin details
-
-func (rb *PluginsRecordBuilder) Description(description string) *PluginsRecordBuilder {
-	rb.v.Description = &description
-	return rb
-}
-
-// Id unique node id
-
-func (rb *PluginsRecordBuilder) Id(id NodeId) *PluginsRecordBuilder {
-	rb.v.Id = &id
-	return rb
-}
-
-// Name node name
-
-func (rb *PluginsRecordBuilder) Name(name Name) *PluginsRecordBuilder {
-	rb.v.Name = &name
-	return rb
-}
-
-// Type plugin type
-
-func (rb *PluginsRecordBuilder) Type_(type_ string) *PluginsRecordBuilder {
-	rb.v.Type = &type_
-	return rb
-}
-
-// Version component version
-
-func (rb *PluginsRecordBuilder) Version(version VersionString) *PluginsRecordBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

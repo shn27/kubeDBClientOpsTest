@@ -15,48 +15,109 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // SignificantLongTermsAggregate type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L558-L560
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L668-L670
 type SignificantLongTermsAggregate struct {
-	Buckets BucketsSignificantLongTermsBucket `json:"buckets"`
-	Meta    *Metadata                         `json:"meta,omitempty"`
+	BgCount  *int64                            `json:"bg_count,omitempty"`
+	Buckets  BucketsSignificantLongTermsBucket `json:"buckets"`
+	DocCount *int64                            `json:"doc_count,omitempty"`
+	Meta     Metadata                          `json:"meta,omitempty"`
 }
 
-// SignificantLongTermsAggregateBuilder holds SignificantLongTermsAggregate struct and provides a builder API.
-type SignificantLongTermsAggregateBuilder struct {
-	v *SignificantLongTermsAggregate
-}
+func (s *SignificantLongTermsAggregate) UnmarshalJSON(data []byte) error {
 
-// NewSignificantLongTermsAggregate provides a builder for the SignificantLongTermsAggregate struct.
-func NewSignificantLongTermsAggregateBuilder() *SignificantLongTermsAggregateBuilder {
-	r := SignificantLongTermsAggregateBuilder{
-		&SignificantLongTermsAggregate{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "bg_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "BgCount", err)
+				}
+				s.BgCount = &value
+			case float64:
+				f := int64(v)
+				s.BgCount = &f
+			}
+
+		case "buckets":
+
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			source := bytes.NewReader(rawMsg)
+			localDec := json.NewDecoder(source)
+			switch rawMsg[0] {
+			case '{':
+				o := make(map[string]SignificantLongTermsBucket, 0)
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Buckets", err)
+				}
+				s.Buckets = o
+			case '[':
+				o := []SignificantLongTermsBucket{}
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Buckets", err)
+				}
+				s.Buckets = o
+			}
+
+		case "doc_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DocCount", err)
+				}
+				s.DocCount = &value
+			case float64:
+				f := int64(v)
+				s.DocCount = &f
+			}
+
+		case "meta":
+			if err := dec.Decode(&s.Meta); err != nil {
+				return fmt.Errorf("%s | %w", "Meta", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SignificantLongTermsAggregate struct
-func (rb *SignificantLongTermsAggregateBuilder) Build() SignificantLongTermsAggregate {
-	return *rb.v
-}
+// NewSignificantLongTermsAggregate returns a SignificantLongTermsAggregate.
+func NewSignificantLongTermsAggregate() *SignificantLongTermsAggregate {
+	r := &SignificantLongTermsAggregate{}
 
-func (rb *SignificantLongTermsAggregateBuilder) Buckets(buckets *BucketsSignificantLongTermsBucketBuilder) *SignificantLongTermsAggregateBuilder {
-	v := buckets.Build()
-	rb.v.Buckets = v
-	return rb
-}
-
-func (rb *SignificantLongTermsAggregateBuilder) Meta(meta *MetadataBuilder) *SignificantLongTermsAggregateBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
+	return r
 }

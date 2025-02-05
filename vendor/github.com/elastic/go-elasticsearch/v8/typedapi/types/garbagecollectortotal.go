@@ -15,52 +15,97 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // GarbageCollectorTotal type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/_types/Stats.ts#L361-L365
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/_types/Stats.ts#L1001-L1014
 type GarbageCollectorTotal struct {
-	CollectionCount        *int64  `json:"collection_count,omitempty"`
-	CollectionTime         *string `json:"collection_time,omitempty"`
-	CollectionTimeInMillis *int64  `json:"collection_time_in_millis,omitempty"`
+	// CollectionCount Total number of JVM garbage collectors that collect objects.
+	CollectionCount *int64 `json:"collection_count,omitempty"`
+	// CollectionTime Total time spent by JVM collecting objects.
+	CollectionTime *string `json:"collection_time,omitempty"`
+	// CollectionTimeInMillis Total time, in milliseconds, spent by JVM collecting objects.
+	CollectionTimeInMillis *int64 `json:"collection_time_in_millis,omitempty"`
 }
 
-// GarbageCollectorTotalBuilder holds GarbageCollectorTotal struct and provides a builder API.
-type GarbageCollectorTotalBuilder struct {
-	v *GarbageCollectorTotal
-}
+func (s *GarbageCollectorTotal) UnmarshalJSON(data []byte) error {
 
-// NewGarbageCollectorTotal provides a builder for the GarbageCollectorTotal struct.
-func NewGarbageCollectorTotalBuilder() *GarbageCollectorTotalBuilder {
-	r := GarbageCollectorTotalBuilder{
-		&GarbageCollectorTotal{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "collection_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CollectionCount", err)
+				}
+				s.CollectionCount = &value
+			case float64:
+				f := int64(v)
+				s.CollectionCount = &f
+			}
+
+		case "collection_time":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "CollectionTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.CollectionTime = &o
+
+		case "collection_time_in_millis":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CollectionTimeInMillis", err)
+				}
+				s.CollectionTimeInMillis = &value
+			case float64:
+				f := int64(v)
+				s.CollectionTimeInMillis = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the GarbageCollectorTotal struct
-func (rb *GarbageCollectorTotalBuilder) Build() GarbageCollectorTotal {
-	return *rb.v
-}
+// NewGarbageCollectorTotal returns a GarbageCollectorTotal.
+func NewGarbageCollectorTotal() *GarbageCollectorTotal {
+	r := &GarbageCollectorTotal{}
 
-func (rb *GarbageCollectorTotalBuilder) CollectionCount(collectioncount int64) *GarbageCollectorTotalBuilder {
-	rb.v.CollectionCount = &collectioncount
-	return rb
-}
-
-func (rb *GarbageCollectorTotalBuilder) CollectionTime(collectiontime string) *GarbageCollectorTotalBuilder {
-	rb.v.CollectionTime = &collectiontime
-	return rb
-}
-
-func (rb *GarbageCollectorTotalBuilder) CollectionTimeInMillis(collectiontimeinmillis int64) *GarbageCollectorTotalBuilder {
-	rb.v.CollectionTimeInMillis = &collectiontimeinmillis
-	return rb
+	return r
 }

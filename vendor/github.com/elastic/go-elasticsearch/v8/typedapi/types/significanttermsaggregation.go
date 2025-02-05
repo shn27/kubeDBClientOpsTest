@@ -15,150 +15,251 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/termsaggregationexecutionhint"
 )
 
 // SignificantTermsAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/bucket.ts#L338-L354
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/bucket.ts#L817-L884
 type SignificantTermsAggregation struct {
-	BackgroundFilter  *QueryContainer                                              `json:"background_filter,omitempty"`
-	ChiSquare         *ChiSquareHeuristic                                          `json:"chi_square,omitempty"`
-	Exclude           *TermsExclude                                                `json:"exclude,omitempty"`
-	ExecutionHint     *termsaggregationexecutionhint.TermsAggregationExecutionHint `json:"execution_hint,omitempty"`
-	Field             *Field                                                       `json:"field,omitempty"`
-	Gnd               *GoogleNormalizedDistanceHeuristic                           `json:"gnd,omitempty"`
-	Include           *TermsInclude                                                `json:"include,omitempty"`
-	Jlh               *EmptyObject                                                 `json:"jlh,omitempty"`
-	Meta              *Metadata                                                    `json:"meta,omitempty"`
-	MinDocCount       *int64                                                       `json:"min_doc_count,omitempty"`
-	MutualInformation *MutualInformationHeuristic                                  `json:"mutual_information,omitempty"`
-	Name              *string                                                      `json:"name,omitempty"`
-	Percentage        *PercentageScoreHeuristic                                    `json:"percentage,omitempty"`
-	ScriptHeuristic   *ScriptedHeuristic                                           `json:"script_heuristic,omitempty"`
-	ShardMinDocCount  *int64                                                       `json:"shard_min_doc_count,omitempty"`
-	ShardSize         *int                                                         `json:"shard_size,omitempty"`
-	Size              *int                                                         `json:"size,omitempty"`
+	// BackgroundFilter A background filter that can be used to focus in on significant terms within
+	// a narrower context, instead of the entire index.
+	BackgroundFilter *Query `json:"background_filter,omitempty"`
+	// ChiSquare Use Chi square, as described in "Information Retrieval", Manning et al.,
+	// Chapter 13.5.2, as the significance score.
+	ChiSquare *ChiSquareHeuristic `json:"chi_square,omitempty"`
+	// Exclude Terms to exclude.
+	Exclude []string `json:"exclude,omitempty"`
+	// ExecutionHint Mechanism by which the aggregation should be executed: using field values
+	// directly or using global ordinals.
+	ExecutionHint *termsaggregationexecutionhint.TermsAggregationExecutionHint `json:"execution_hint,omitempty"`
+	// Field The field from which to return significant terms.
+	Field *string `json:"field,omitempty"`
+	// Gnd Use Google normalized distance as described in "The Google Similarity
+	// Distance", Cilibrasi and Vitanyi, 2007, as the significance score.
+	Gnd *GoogleNormalizedDistanceHeuristic `json:"gnd,omitempty"`
+	// Include Terms to include.
+	Include TermsInclude `json:"include,omitempty"`
+	// Jlh Use JLH score as the significance score.
+	Jlh *EmptyObject `json:"jlh,omitempty"`
+	// MinDocCount Only return terms that are found in more than `min_doc_count` hits.
+	MinDocCount *int64 `json:"min_doc_count,omitempty"`
+	// MutualInformation Use mutual information as described in "Information Retrieval", Manning et
+	// al., Chapter 13.5.1, as the significance score.
+	MutualInformation *MutualInformationHeuristic `json:"mutual_information,omitempty"`
+	// Percentage A simple calculation of the number of documents in the foreground sample with
+	// a term divided by the number of documents in the background with the term.
+	Percentage *PercentageScoreHeuristic `json:"percentage,omitempty"`
+	// ScriptHeuristic Customized score, implemented via a script.
+	ScriptHeuristic *ScriptedHeuristic `json:"script_heuristic,omitempty"`
+	// ShardMinDocCount Regulates the certainty a shard has if the term should actually be added to
+	// the candidate list or not with respect to the `min_doc_count`.
+	// Terms will only be considered if their local shard frequency within the set
+	// is higher than the `shard_min_doc_count`.
+	ShardMinDocCount *int64 `json:"shard_min_doc_count,omitempty"`
+	// ShardSize Can be used to control the volumes of candidate terms produced by each shard.
+	// By default, `shard_size` will be automatically estimated based on the number
+	// of shards and the `size` parameter.
+	ShardSize *int `json:"shard_size,omitempty"`
+	// Size The number of buckets returned out of the overall terms list.
+	Size *int `json:"size,omitempty"`
 }
 
-// SignificantTermsAggregationBuilder holds SignificantTermsAggregation struct and provides a builder API.
-type SignificantTermsAggregationBuilder struct {
-	v *SignificantTermsAggregation
-}
+func (s *SignificantTermsAggregation) UnmarshalJSON(data []byte) error {
 
-// NewSignificantTermsAggregation provides a builder for the SignificantTermsAggregation struct.
-func NewSignificantTermsAggregationBuilder() *SignificantTermsAggregationBuilder {
-	r := SignificantTermsAggregationBuilder{
-		&SignificantTermsAggregation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "background_filter":
+			if err := dec.Decode(&s.BackgroundFilter); err != nil {
+				return fmt.Errorf("%s | %w", "BackgroundFilter", err)
+			}
+
+		case "chi_square":
+			if err := dec.Decode(&s.ChiSquare); err != nil {
+				return fmt.Errorf("%s | %w", "ChiSquare", err)
+			}
+
+		case "exclude":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Exclude", err)
+				}
+
+				s.Exclude = append(s.Exclude, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Exclude); err != nil {
+					return fmt.Errorf("%s | %w", "Exclude", err)
+				}
+			}
+
+		case "execution_hint":
+			if err := dec.Decode(&s.ExecutionHint); err != nil {
+				return fmt.Errorf("%s | %w", "ExecutionHint", err)
+			}
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "gnd":
+			if err := dec.Decode(&s.Gnd); err != nil {
+				return fmt.Errorf("%s | %w", "Gnd", err)
+			}
+
+		case "include":
+			message := json.RawMessage{}
+			if err := dec.Decode(&message); err != nil {
+				return fmt.Errorf("%s | %w", "Include", err)
+			}
+			keyDec := json.NewDecoder(bytes.NewReader(message))
+		include_field:
+			for {
+				t, err := keyDec.Token()
+				if err != nil {
+					if errors.Is(err, io.EOF) {
+						break
+					}
+					return fmt.Errorf("%s | %w", "Include", err)
+				}
+
+				switch t {
+
+				case "num_partitions", "partition":
+					o := NewTermsPartition()
+					localDec := json.NewDecoder(bytes.NewReader(message))
+					if err := localDec.Decode(&o); err != nil {
+						return fmt.Errorf("%s | %w", "Include", err)
+					}
+					s.Include = o
+					break include_field
+
+				}
+			}
+			if s.Include == nil {
+				localDec := json.NewDecoder(bytes.NewReader(message))
+				if err := localDec.Decode(&s.Include); err != nil {
+					return fmt.Errorf("%s | %w", "Include", err)
+				}
+			}
+
+		case "jlh":
+			if err := dec.Decode(&s.Jlh); err != nil {
+				return fmt.Errorf("%s | %w", "Jlh", err)
+			}
+
+		case "min_doc_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MinDocCount", err)
+				}
+				s.MinDocCount = &value
+			case float64:
+				f := int64(v)
+				s.MinDocCount = &f
+			}
+
+		case "mutual_information":
+			if err := dec.Decode(&s.MutualInformation); err != nil {
+				return fmt.Errorf("%s | %w", "MutualInformation", err)
+			}
+
+		case "percentage":
+			if err := dec.Decode(&s.Percentage); err != nil {
+				return fmt.Errorf("%s | %w", "Percentage", err)
+			}
+
+		case "script_heuristic":
+			if err := dec.Decode(&s.ScriptHeuristic); err != nil {
+				return fmt.Errorf("%s | %w", "ScriptHeuristic", err)
+			}
+
+		case "shard_min_doc_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ShardMinDocCount", err)
+				}
+				s.ShardMinDocCount = &value
+			case float64:
+				f := int64(v)
+				s.ShardMinDocCount = &f
+			}
+
+		case "shard_size":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ShardSize", err)
+				}
+				s.ShardSize = &value
+			case float64:
+				f := int(v)
+				s.ShardSize = &f
+			}
+
+		case "size":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Size", err)
+				}
+				s.Size = &value
+			case float64:
+				f := int(v)
+				s.Size = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SignificantTermsAggregation struct
-func (rb *SignificantTermsAggregationBuilder) Build() SignificantTermsAggregation {
-	return *rb.v
-}
+// NewSignificantTermsAggregation returns a SignificantTermsAggregation.
+func NewSignificantTermsAggregation() *SignificantTermsAggregation {
+	r := &SignificantTermsAggregation{}
 
-func (rb *SignificantTermsAggregationBuilder) BackgroundFilter(backgroundfilter *QueryContainerBuilder) *SignificantTermsAggregationBuilder {
-	v := backgroundfilter.Build()
-	rb.v.BackgroundFilter = &v
-	return rb
-}
-
-func (rb *SignificantTermsAggregationBuilder) ChiSquare(chisquare *ChiSquareHeuristicBuilder) *SignificantTermsAggregationBuilder {
-	v := chisquare.Build()
-	rb.v.ChiSquare = &v
-	return rb
-}
-
-func (rb *SignificantTermsAggregationBuilder) Exclude(exclude *TermsExcludeBuilder) *SignificantTermsAggregationBuilder {
-	v := exclude.Build()
-	rb.v.Exclude = &v
-	return rb
-}
-
-func (rb *SignificantTermsAggregationBuilder) ExecutionHint(executionhint termsaggregationexecutionhint.TermsAggregationExecutionHint) *SignificantTermsAggregationBuilder {
-	rb.v.ExecutionHint = &executionhint
-	return rb
-}
-
-func (rb *SignificantTermsAggregationBuilder) Field(field Field) *SignificantTermsAggregationBuilder {
-	rb.v.Field = &field
-	return rb
-}
-
-func (rb *SignificantTermsAggregationBuilder) Gnd(gnd *GoogleNormalizedDistanceHeuristicBuilder) *SignificantTermsAggregationBuilder {
-	v := gnd.Build()
-	rb.v.Gnd = &v
-	return rb
-}
-
-func (rb *SignificantTermsAggregationBuilder) Include(include *TermsIncludeBuilder) *SignificantTermsAggregationBuilder {
-	v := include.Build()
-	rb.v.Include = &v
-	return rb
-}
-
-func (rb *SignificantTermsAggregationBuilder) Jlh(jlh *EmptyObjectBuilder) *SignificantTermsAggregationBuilder {
-	v := jlh.Build()
-	rb.v.Jlh = &v
-	return rb
-}
-
-func (rb *SignificantTermsAggregationBuilder) Meta(meta *MetadataBuilder) *SignificantTermsAggregationBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *SignificantTermsAggregationBuilder) MinDocCount(mindoccount int64) *SignificantTermsAggregationBuilder {
-	rb.v.MinDocCount = &mindoccount
-	return rb
-}
-
-func (rb *SignificantTermsAggregationBuilder) MutualInformation(mutualinformation *MutualInformationHeuristicBuilder) *SignificantTermsAggregationBuilder {
-	v := mutualinformation.Build()
-	rb.v.MutualInformation = &v
-	return rb
-}
-
-func (rb *SignificantTermsAggregationBuilder) Name(name string) *SignificantTermsAggregationBuilder {
-	rb.v.Name = &name
-	return rb
-}
-
-func (rb *SignificantTermsAggregationBuilder) Percentage(percentage *PercentageScoreHeuristicBuilder) *SignificantTermsAggregationBuilder {
-	v := percentage.Build()
-	rb.v.Percentage = &v
-	return rb
-}
-
-func (rb *SignificantTermsAggregationBuilder) ScriptHeuristic(scriptheuristic *ScriptedHeuristicBuilder) *SignificantTermsAggregationBuilder {
-	v := scriptheuristic.Build()
-	rb.v.ScriptHeuristic = &v
-	return rb
-}
-
-func (rb *SignificantTermsAggregationBuilder) ShardMinDocCount(shardmindoccount int64) *SignificantTermsAggregationBuilder {
-	rb.v.ShardMinDocCount = &shardmindoccount
-	return rb
-}
-
-func (rb *SignificantTermsAggregationBuilder) ShardSize(shardsize int) *SignificantTermsAggregationBuilder {
-	rb.v.ShardSize = &shardsize
-	return rb
-}
-
-func (rb *SignificantTermsAggregationBuilder) Size(size int) *SignificantTermsAggregationBuilder {
-	rb.v.Size = &size
-	return rb
+	return r
 }

@@ -15,52 +15,101 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // Limits type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/info/types.ts#L34-L38
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/info/types.ts#L34-L40
 type Limits struct {
-	EffectiveMaxModelMemoryLimit string  `json:"effective_max_model_memory_limit"`
-	MaxModelMemoryLimit          *string `json:"max_model_memory_limit,omitempty"`
-	TotalMlMemory                string  `json:"total_ml_memory"`
+	EffectiveMaxModelMemoryLimit ByteSize `json:"effective_max_model_memory_limit,omitempty"`
+	MaxModelMemoryLimit          ByteSize `json:"max_model_memory_limit,omitempty"`
+	MaxSingleMlNodeProcessors    *int     `json:"max_single_ml_node_processors,omitempty"`
+	TotalMlMemory                ByteSize `json:"total_ml_memory"`
+	TotalMlProcessors            *int     `json:"total_ml_processors,omitempty"`
 }
 
-// LimitsBuilder holds Limits struct and provides a builder API.
-type LimitsBuilder struct {
-	v *Limits
-}
+func (s *Limits) UnmarshalJSON(data []byte) error {
 
-// NewLimits provides a builder for the Limits struct.
-func NewLimitsBuilder() *LimitsBuilder {
-	r := LimitsBuilder{
-		&Limits{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "effective_max_model_memory_limit":
+			if err := dec.Decode(&s.EffectiveMaxModelMemoryLimit); err != nil {
+				return fmt.Errorf("%s | %w", "EffectiveMaxModelMemoryLimit", err)
+			}
+
+		case "max_model_memory_limit":
+			if err := dec.Decode(&s.MaxModelMemoryLimit); err != nil {
+				return fmt.Errorf("%s | %w", "MaxModelMemoryLimit", err)
+			}
+
+		case "max_single_ml_node_processors":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxSingleMlNodeProcessors", err)
+				}
+				s.MaxSingleMlNodeProcessors = &value
+			case float64:
+				f := int(v)
+				s.MaxSingleMlNodeProcessors = &f
+			}
+
+		case "total_ml_memory":
+			if err := dec.Decode(&s.TotalMlMemory); err != nil {
+				return fmt.Errorf("%s | %w", "TotalMlMemory", err)
+			}
+
+		case "total_ml_processors":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TotalMlProcessors", err)
+				}
+				s.TotalMlProcessors = &value
+			case float64:
+				f := int(v)
+				s.TotalMlProcessors = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the Limits struct
-func (rb *LimitsBuilder) Build() Limits {
-	return *rb.v
-}
+// NewLimits returns a Limits.
+func NewLimits() *Limits {
+	r := &Limits{}
 
-func (rb *LimitsBuilder) EffectiveMaxModelMemoryLimit(effectivemaxmodelmemorylimit string) *LimitsBuilder {
-	rb.v.EffectiveMaxModelMemoryLimit = effectivemaxmodelmemorylimit
-	return rb
-}
-
-func (rb *LimitsBuilder) MaxModelMemoryLimit(maxmodelmemorylimit string) *LimitsBuilder {
-	rb.v.MaxModelMemoryLimit = &maxmodelmemorylimit
-	return rb
-}
-
-func (rb *LimitsBuilder) TotalMlMemory(totalmlmemory string) *LimitsBuilder {
-	rb.v.TotalMlMemory = totalmlmemory
-	return rb
+	return r
 }

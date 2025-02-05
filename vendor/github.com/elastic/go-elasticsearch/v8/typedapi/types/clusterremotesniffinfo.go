@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ClusterRemoteSniffInfo type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/remote_info/ClusterRemoteInfoResponse.ts#L31-L39
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/remote_info/ClusterRemoteInfoResponse.ts#L32-L40
 type ClusterRemoteSniffInfo struct {
 	Connected                bool     `json:"connected"`
 	InitialConnectTimeout    Duration `json:"initial_connect_timeout"`
@@ -35,54 +42,121 @@ type ClusterRemoteSniffInfo struct {
 	SkipUnavailable          bool     `json:"skip_unavailable"`
 }
 
-// ClusterRemoteSniffInfoBuilder holds ClusterRemoteSniffInfo struct and provides a builder API.
-type ClusterRemoteSniffInfoBuilder struct {
-	v *ClusterRemoteSniffInfo
+func (s *ClusterRemoteSniffInfo) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "connected":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Connected", err)
+				}
+				s.Connected = value
+			case bool:
+				s.Connected = v
+			}
+
+		case "initial_connect_timeout":
+			if err := dec.Decode(&s.InitialConnectTimeout); err != nil {
+				return fmt.Errorf("%s | %w", "InitialConnectTimeout", err)
+			}
+
+		case "max_connections_per_cluster":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxConnectionsPerCluster", err)
+				}
+				s.MaxConnectionsPerCluster = value
+			case float64:
+				f := int(v)
+				s.MaxConnectionsPerCluster = f
+			}
+
+		case "mode":
+			if err := dec.Decode(&s.Mode); err != nil {
+				return fmt.Errorf("%s | %w", "Mode", err)
+			}
+
+		case "num_nodes_connected":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NumNodesConnected", err)
+				}
+				s.NumNodesConnected = value
+			case float64:
+				f := int64(v)
+				s.NumNodesConnected = f
+			}
+
+		case "seeds":
+			if err := dec.Decode(&s.Seeds); err != nil {
+				return fmt.Errorf("%s | %w", "Seeds", err)
+			}
+
+		case "skip_unavailable":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "SkipUnavailable", err)
+				}
+				s.SkipUnavailable = value
+			case bool:
+				s.SkipUnavailable = v
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewClusterRemoteSniffInfo provides a builder for the ClusterRemoteSniffInfo struct.
-func NewClusterRemoteSniffInfoBuilder() *ClusterRemoteSniffInfoBuilder {
-	r := ClusterRemoteSniffInfoBuilder{
-		&ClusterRemoteSniffInfo{},
+// MarshalJSON override marshalling to include literal value
+func (s ClusterRemoteSniffInfo) MarshalJSON() ([]byte, error) {
+	type innerClusterRemoteSniffInfo ClusterRemoteSniffInfo
+	tmp := innerClusterRemoteSniffInfo{
+		Connected:                s.Connected,
+		InitialConnectTimeout:    s.InitialConnectTimeout,
+		MaxConnectionsPerCluster: s.MaxConnectionsPerCluster,
+		Mode:                     s.Mode,
+		NumNodesConnected:        s.NumNodesConnected,
+		Seeds:                    s.Seeds,
+		SkipUnavailable:          s.SkipUnavailable,
 	}
 
-	r.v.Mode = "sniff"
+	tmp.Mode = "sniff"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the ClusterRemoteSniffInfo struct
-func (rb *ClusterRemoteSniffInfoBuilder) Build() ClusterRemoteSniffInfo {
-	return *rb.v
-}
+// NewClusterRemoteSniffInfo returns a ClusterRemoteSniffInfo.
+func NewClusterRemoteSniffInfo() *ClusterRemoteSniffInfo {
+	r := &ClusterRemoteSniffInfo{}
 
-func (rb *ClusterRemoteSniffInfoBuilder) Connected(connected bool) *ClusterRemoteSniffInfoBuilder {
-	rb.v.Connected = connected
-	return rb
-}
-
-func (rb *ClusterRemoteSniffInfoBuilder) InitialConnectTimeout(initialconnecttimeout *DurationBuilder) *ClusterRemoteSniffInfoBuilder {
-	v := initialconnecttimeout.Build()
-	rb.v.InitialConnectTimeout = v
-	return rb
-}
-
-func (rb *ClusterRemoteSniffInfoBuilder) MaxConnectionsPerCluster(maxconnectionspercluster int) *ClusterRemoteSniffInfoBuilder {
-	rb.v.MaxConnectionsPerCluster = maxconnectionspercluster
-	return rb
-}
-
-func (rb *ClusterRemoteSniffInfoBuilder) NumNodesConnected(numnodesconnected int64) *ClusterRemoteSniffInfoBuilder {
-	rb.v.NumNodesConnected = numnodesconnected
-	return rb
-}
-
-func (rb *ClusterRemoteSniffInfoBuilder) Seeds(seeds ...string) *ClusterRemoteSniffInfoBuilder {
-	rb.v.Seeds = seeds
-	return rb
-}
-
-func (rb *ClusterRemoteSniffInfoBuilder) SkipUnavailable(skipunavailable bool) *ClusterRemoteSniffInfoBuilder {
-	rb.v.SkipUnavailable = skipunavailable
-	return rb
+	return r
 }

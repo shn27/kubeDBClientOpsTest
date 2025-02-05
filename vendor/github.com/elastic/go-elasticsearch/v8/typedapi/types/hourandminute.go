@@ -15,46 +15,22 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // HourAndMinute type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Schedule.ts#L110-L113
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Schedule.ts#L105-L108
 type HourAndMinute struct {
 	Hour   []int `json:"hour"`
 	Minute []int `json:"minute"`
 }
 
-// HourAndMinuteBuilder holds HourAndMinute struct and provides a builder API.
-type HourAndMinuteBuilder struct {
-	v *HourAndMinute
-}
+// NewHourAndMinute returns a HourAndMinute.
+func NewHourAndMinute() *HourAndMinute {
+	r := &HourAndMinute{}
 
-// NewHourAndMinute provides a builder for the HourAndMinute struct.
-func NewHourAndMinuteBuilder() *HourAndMinuteBuilder {
-	r := HourAndMinuteBuilder{
-		&HourAndMinute{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the HourAndMinute struct
-func (rb *HourAndMinuteBuilder) Build() HourAndMinute {
-	return *rb.v
-}
-
-func (rb *HourAndMinuteBuilder) Hour(hour ...int) *HourAndMinuteBuilder {
-	rb.v.Hour = hour
-	return rb
-}
-
-func (rb *HourAndMinuteBuilder) Minute(minute ...int) *HourAndMinuteBuilder {
-	rb.v.Minute = minute
-	return rb
+	return r
 }

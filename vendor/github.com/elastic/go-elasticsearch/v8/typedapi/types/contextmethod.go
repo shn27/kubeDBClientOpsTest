@@ -15,56 +15,74 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ContextMethod type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/get_script_context/types.ts#L27-L31
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/get_script_context/types.ts#L27-L31
 type ContextMethod struct {
-	Name       Name                 `json:"name"`
+	Name       string               `json:"name"`
 	Params     []ContextMethodParam `json:"params"`
 	ReturnType string               `json:"return_type"`
 }
 
-// ContextMethodBuilder holds ContextMethod struct and provides a builder API.
-type ContextMethodBuilder struct {
-	v *ContextMethod
-}
+func (s *ContextMethod) UnmarshalJSON(data []byte) error {
 
-// NewContextMethod provides a builder for the ContextMethod struct.
-func NewContextMethodBuilder() *ContextMethodBuilder {
-	r := ContextMethodBuilder{
-		&ContextMethod{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		case "params":
+			if err := dec.Decode(&s.Params); err != nil {
+				return fmt.Errorf("%s | %w", "Params", err)
+			}
+
+		case "return_type":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ReturnType", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ReturnType = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ContextMethod struct
-func (rb *ContextMethodBuilder) Build() ContextMethod {
-	return *rb.v
-}
+// NewContextMethod returns a ContextMethod.
+func NewContextMethod() *ContextMethod {
+	r := &ContextMethod{}
 
-func (rb *ContextMethodBuilder) Name(name Name) *ContextMethodBuilder {
-	rb.v.Name = name
-	return rb
-}
-
-func (rb *ContextMethodBuilder) Params(params []ContextMethodParamBuilder) *ContextMethodBuilder {
-	tmp := make([]ContextMethodParam, len(params))
-	for _, value := range params {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Params = tmp
-	return rb
-}
-
-func (rb *ContextMethodBuilder) ReturnType(returntype string) *ContextMethodBuilder {
-	rb.v.ReturnType = returntype
-	return rb
+	return r
 }

@@ -15,20 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
 )
 
 // Suggester type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/suggester.ts#L98-L101
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/suggester.ts#L101-L107
 type Suggester struct {
 	Suggesters map[string]FieldSuggester `json:"-"`
 	// Text Global suggest text, to avoid repetition when the same text is used in
@@ -36,11 +39,56 @@ type Suggester struct {
 	Text *string `json:"text,omitempty"`
 }
 
+func (s *Suggester) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "text":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Text", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Text = &o
+
+		default:
+
+			if key, ok := t.(string); ok {
+				if s.Suggesters == nil {
+					s.Suggesters = make(map[string]FieldSuggester, 0)
+				}
+				raw := NewFieldSuggester()
+				if err := dec.Decode(&raw); err != nil {
+					return fmt.Errorf("%s | %w", "Suggesters", err)
+				}
+				s.Suggesters[key] = *raw
+			}
+
+		}
+	}
+	return nil
+}
+
 // MarhsalJSON overrides marshalling for types with additional properties
 func (s Suggester) MarshalJSON() ([]byte, error) {
 	type opt Suggester
 	// We transform the struct to a map without the embedded additional properties map
-	tmp := make(map[string]interface{}, 0)
+	tmp := make(map[string]any, 0)
 
 	data, err := json.Marshal(opt(s))
 	if err != nil {
@@ -53,8 +101,9 @@ func (s Suggester) MarshalJSON() ([]byte, error) {
 
 	// We inline the additional fields from the underlying map
 	for key, value := range s.Suggesters {
-		tmp[string(key)] = value
+		tmp[fmt.Sprintf("%s", key)] = value
 	}
+	delete(tmp, "Suggesters")
 
 	data, err = json.Marshal(tmp)
 	if err != nil {
@@ -64,40 +113,11 @@ func (s Suggester) MarshalJSON() ([]byte, error) {
 	return data, nil
 }
 
-// SuggesterBuilder holds Suggester struct and provides a builder API.
-type SuggesterBuilder struct {
-	v *Suggester
-}
-
-// NewSuggester provides a builder for the Suggester struct.
-func NewSuggesterBuilder() *SuggesterBuilder {
-	r := SuggesterBuilder{
-		&Suggester{
-			Suggesters: make(map[string]FieldSuggester, 0),
-		},
+// NewSuggester returns a Suggester.
+func NewSuggester() *Suggester {
+	r := &Suggester{
+		Suggesters: make(map[string]FieldSuggester, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the Suggester struct
-func (rb *SuggesterBuilder) Build() Suggester {
-	return *rb.v
-}
-
-func (rb *SuggesterBuilder) Suggesters(values map[string]*FieldSuggesterBuilder) *SuggesterBuilder {
-	tmp := make(map[string]FieldSuggester, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Suggesters = tmp
-	return rb
-}
-
-// Text Global suggest text, to avoid repetition when the same text is used in
-// several suggesters
-
-func (rb *SuggesterBuilder) Text(text string) *SuggesterBuilder {
-	rb.v.Text = &text
-	return rb
+	return r
 }

@@ -15,32 +15,33 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/multivaluemode"
 )
 
 // GeoDecayFunction type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/compound.ts#L96-L98
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/compound.ts#L210-L213
 type GeoDecayFunction struct {
-	GeoDecayFunction map[Field]DecayPlacementGeoLocationDistance `json:"-"`
-	MultiValueMode   *multivaluemode.MultiValueMode              `json:"multi_value_mode,omitempty"`
+	DecayFunctionBaseGeoLocationDistance map[string]DecayPlacementGeoLocationDistance `json:"-"`
+	// MultiValueMode Determines how the distance is calculated when a field used for computing the
+	// decay contains multiple values.
+	MultiValueMode *multivaluemode.MultiValueMode `json:"multi_value_mode,omitempty"`
 }
 
 // MarhsalJSON overrides marshalling for types with additional properties
 func (s GeoDecayFunction) MarshalJSON() ([]byte, error) {
 	type opt GeoDecayFunction
 	// We transform the struct to a map without the embedded additional properties map
-	tmp := make(map[string]interface{}, 0)
+	tmp := make(map[string]any, 0)
 
 	data, err := json.Marshal(opt(s))
 	if err != nil {
@@ -52,9 +53,10 @@ func (s GeoDecayFunction) MarshalJSON() ([]byte, error) {
 	}
 
 	// We inline the additional fields from the underlying map
-	for key, value := range s.GeoDecayFunction {
-		tmp[string(key)] = value
+	for key, value := range s.DecayFunctionBaseGeoLocationDistance {
+		tmp[fmt.Sprintf("%s", key)] = value
 	}
+	delete(tmp, "DecayFunctionBaseGeoLocationDistance")
 
 	data, err = json.Marshal(tmp)
 	if err != nil {
@@ -64,37 +66,11 @@ func (s GeoDecayFunction) MarshalJSON() ([]byte, error) {
 	return data, nil
 }
 
-// GeoDecayFunctionBuilder holds GeoDecayFunction struct and provides a builder API.
-type GeoDecayFunctionBuilder struct {
-	v *GeoDecayFunction
-}
-
-// NewGeoDecayFunction provides a builder for the GeoDecayFunction struct.
-func NewGeoDecayFunctionBuilder() *GeoDecayFunctionBuilder {
-	r := GeoDecayFunctionBuilder{
-		&GeoDecayFunction{
-			GeoDecayFunction: make(map[Field]DecayPlacementGeoLocationDistance, 0),
-		},
+// NewGeoDecayFunction returns a GeoDecayFunction.
+func NewGeoDecayFunction() *GeoDecayFunction {
+	r := &GeoDecayFunction{
+		DecayFunctionBaseGeoLocationDistance: make(map[string]DecayPlacementGeoLocationDistance, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the GeoDecayFunction struct
-func (rb *GeoDecayFunctionBuilder) Build() GeoDecayFunction {
-	return *rb.v
-}
-
-func (rb *GeoDecayFunctionBuilder) GeoDecayFunction(values map[Field]*DecayPlacementGeoLocationDistanceBuilder) *GeoDecayFunctionBuilder {
-	tmp := make(map[Field]DecayPlacementGeoLocationDistance, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.GeoDecayFunction = tmp
-	return rb
-}
-
-func (rb *GeoDecayFunctionBuilder) MultiValueMode(multivaluemode multivaluemode.MultiValueMode) *GeoDecayFunctionBuilder {
-	rb.v.MultiValueMode = &multivaluemode
-	return rb
+	return r
 }

@@ -15,97 +15,102 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // RecoveryBytes type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/recovery/types.ts#L38-L48
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/recovery/types.ts#L38-L48
 type RecoveryBytes struct {
 	Percent                      Percentage `json:"percent"`
-	Recovered                    *ByteSize  `json:"recovered,omitempty"`
-	RecoveredFromSnapshot        *ByteSize  `json:"recovered_from_snapshot,omitempty"`
-	RecoveredFromSnapshotInBytes *ByteSize  `json:"recovered_from_snapshot_in_bytes,omitempty"`
+	Recovered                    ByteSize   `json:"recovered,omitempty"`
+	RecoveredFromSnapshot        ByteSize   `json:"recovered_from_snapshot,omitempty"`
+	RecoveredFromSnapshotInBytes ByteSize   `json:"recovered_from_snapshot_in_bytes,omitempty"`
 	RecoveredInBytes             ByteSize   `json:"recovered_in_bytes"`
-	Reused                       *ByteSize  `json:"reused,omitempty"`
+	Reused                       ByteSize   `json:"reused,omitempty"`
 	ReusedInBytes                ByteSize   `json:"reused_in_bytes"`
-	Total                        *ByteSize  `json:"total,omitempty"`
+	Total                        ByteSize   `json:"total,omitempty"`
 	TotalInBytes                 ByteSize   `json:"total_in_bytes"`
 }
 
-// RecoveryBytesBuilder holds RecoveryBytes struct and provides a builder API.
-type RecoveryBytesBuilder struct {
-	v *RecoveryBytes
-}
+func (s *RecoveryBytes) UnmarshalJSON(data []byte) error {
 
-// NewRecoveryBytes provides a builder for the RecoveryBytes struct.
-func NewRecoveryBytesBuilder() *RecoveryBytesBuilder {
-	r := RecoveryBytesBuilder{
-		&RecoveryBytes{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "percent":
+			if err := dec.Decode(&s.Percent); err != nil {
+				return fmt.Errorf("%s | %w", "Percent", err)
+			}
+
+		case "recovered":
+			if err := dec.Decode(&s.Recovered); err != nil {
+				return fmt.Errorf("%s | %w", "Recovered", err)
+			}
+
+		case "recovered_from_snapshot":
+			if err := dec.Decode(&s.RecoveredFromSnapshot); err != nil {
+				return fmt.Errorf("%s | %w", "RecoveredFromSnapshot", err)
+			}
+
+		case "recovered_from_snapshot_in_bytes":
+			if err := dec.Decode(&s.RecoveredFromSnapshotInBytes); err != nil {
+				return fmt.Errorf("%s | %w", "RecoveredFromSnapshotInBytes", err)
+			}
+
+		case "recovered_in_bytes":
+			if err := dec.Decode(&s.RecoveredInBytes); err != nil {
+				return fmt.Errorf("%s | %w", "RecoveredInBytes", err)
+			}
+
+		case "reused":
+			if err := dec.Decode(&s.Reused); err != nil {
+				return fmt.Errorf("%s | %w", "Reused", err)
+			}
+
+		case "reused_in_bytes":
+			if err := dec.Decode(&s.ReusedInBytes); err != nil {
+				return fmt.Errorf("%s | %w", "ReusedInBytes", err)
+			}
+
+		case "total":
+			if err := dec.Decode(&s.Total); err != nil {
+				return fmt.Errorf("%s | %w", "Total", err)
+			}
+
+		case "total_in_bytes":
+			if err := dec.Decode(&s.TotalInBytes); err != nil {
+				return fmt.Errorf("%s | %w", "TotalInBytes", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RecoveryBytes struct
-func (rb *RecoveryBytesBuilder) Build() RecoveryBytes {
-	return *rb.v
-}
+// NewRecoveryBytes returns a RecoveryBytes.
+func NewRecoveryBytes() *RecoveryBytes {
+	r := &RecoveryBytes{}
 
-func (rb *RecoveryBytesBuilder) Percent(percent *PercentageBuilder) *RecoveryBytesBuilder {
-	v := percent.Build()
-	rb.v.Percent = v
-	return rb
-}
-
-func (rb *RecoveryBytesBuilder) Recovered(recovered *ByteSizeBuilder) *RecoveryBytesBuilder {
-	v := recovered.Build()
-	rb.v.Recovered = &v
-	return rb
-}
-
-func (rb *RecoveryBytesBuilder) RecoveredFromSnapshot(recoveredfromsnapshot *ByteSizeBuilder) *RecoveryBytesBuilder {
-	v := recoveredfromsnapshot.Build()
-	rb.v.RecoveredFromSnapshot = &v
-	return rb
-}
-
-func (rb *RecoveryBytesBuilder) RecoveredFromSnapshotInBytes(recoveredfromsnapshotinbytes *ByteSizeBuilder) *RecoveryBytesBuilder {
-	v := recoveredfromsnapshotinbytes.Build()
-	rb.v.RecoveredFromSnapshotInBytes = &v
-	return rb
-}
-
-func (rb *RecoveryBytesBuilder) RecoveredInBytes(recoveredinbytes *ByteSizeBuilder) *RecoveryBytesBuilder {
-	v := recoveredinbytes.Build()
-	rb.v.RecoveredInBytes = v
-	return rb
-}
-
-func (rb *RecoveryBytesBuilder) Reused(reused *ByteSizeBuilder) *RecoveryBytesBuilder {
-	v := reused.Build()
-	rb.v.Reused = &v
-	return rb
-}
-
-func (rb *RecoveryBytesBuilder) ReusedInBytes(reusedinbytes *ByteSizeBuilder) *RecoveryBytesBuilder {
-	v := reusedinbytes.Build()
-	rb.v.ReusedInBytes = v
-	return rb
-}
-
-func (rb *RecoveryBytesBuilder) Total(total *ByteSizeBuilder) *RecoveryBytesBuilder {
-	v := total.Build()
-	rb.v.Total = &v
-	return rb
-}
-
-func (rb *RecoveryBytesBuilder) TotalInBytes(totalinbytes *ByteSizeBuilder) *RecoveryBytesBuilder {
-	v := totalinbytes.Build()
-	rb.v.TotalInBytes = v
-	return rb
+	return r
 }

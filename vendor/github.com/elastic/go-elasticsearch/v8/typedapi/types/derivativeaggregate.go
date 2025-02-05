@@ -15,72 +15,107 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DerivativeAggregate type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L216-L220
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L241-L248
 type DerivativeAggregate struct {
-	Meta                    *Metadata `json:"meta,omitempty"`
-	NormalizedValue         *float64  `json:"normalized_value,omitempty"`
-	NormalizedValueAsString *string   `json:"normalized_value_as_string,omitempty"`
+	Meta                    Metadata `json:"meta,omitempty"`
+	NormalizedValue         *Float64 `json:"normalized_value,omitempty"`
+	NormalizedValueAsString *string  `json:"normalized_value_as_string,omitempty"`
 	// Value The metric value. A missing value generally means that there was no data to
 	// aggregate,
 	// unless specified otherwise.
-	Value         float64 `json:"value,omitempty"`
-	ValueAsString *string `json:"value_as_string,omitempty"`
+	Value         *Float64 `json:"value,omitempty"`
+	ValueAsString *string  `json:"value_as_string,omitempty"`
 }
 
-// DerivativeAggregateBuilder holds DerivativeAggregate struct and provides a builder API.
-type DerivativeAggregateBuilder struct {
-	v *DerivativeAggregate
-}
+func (s *DerivativeAggregate) UnmarshalJSON(data []byte) error {
 
-// NewDerivativeAggregate provides a builder for the DerivativeAggregate struct.
-func NewDerivativeAggregateBuilder() *DerivativeAggregateBuilder {
-	r := DerivativeAggregateBuilder{
-		&DerivativeAggregate{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "meta":
+			if err := dec.Decode(&s.Meta); err != nil {
+				return fmt.Errorf("%s | %w", "Meta", err)
+			}
+
+		case "normalized_value":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NormalizedValue", err)
+				}
+				f := Float64(value)
+				s.NormalizedValue = &f
+			case float64:
+				f := Float64(v)
+				s.NormalizedValue = &f
+			}
+
+		case "normalized_value_as_string":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "NormalizedValueAsString", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.NormalizedValueAsString = &o
+
+		case "value":
+			if err := dec.Decode(&s.Value); err != nil {
+				return fmt.Errorf("%s | %w", "Value", err)
+			}
+
+		case "value_as_string":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ValueAsString", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ValueAsString = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DerivativeAggregate struct
-func (rb *DerivativeAggregateBuilder) Build() DerivativeAggregate {
-	return *rb.v
-}
+// NewDerivativeAggregate returns a DerivativeAggregate.
+func NewDerivativeAggregate() *DerivativeAggregate {
+	r := &DerivativeAggregate{}
 
-func (rb *DerivativeAggregateBuilder) Meta(meta *MetadataBuilder) *DerivativeAggregateBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *DerivativeAggregateBuilder) NormalizedValue(normalizedvalue float64) *DerivativeAggregateBuilder {
-	rb.v.NormalizedValue = &normalizedvalue
-	return rb
-}
-
-func (rb *DerivativeAggregateBuilder) NormalizedValueAsString(normalizedvalueasstring string) *DerivativeAggregateBuilder {
-	rb.v.NormalizedValueAsString = &normalizedvalueasstring
-	return rb
-}
-
-// Value The metric value. A missing value generally means that there was no data to
-// aggregate,
-// unless specified otherwise.
-
-func (rb *DerivativeAggregateBuilder) Value(value float64) *DerivativeAggregateBuilder {
-	rb.v.Value = value
-	return rb
-}
-
-func (rb *DerivativeAggregateBuilder) ValueAsString(valueasstring string) *DerivativeAggregateBuilder {
-	rb.v.ValueAsString = &valueasstring
-	return rb
+	return r
 }

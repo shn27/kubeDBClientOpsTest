@@ -15,62 +15,98 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/shardroutingstate"
 )
 
 // ShardRouting type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/stats/types.ts#L150-L155
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/stats/types.ts#L162-L167
 type ShardRouting struct {
 	Node           string                              `json:"node"`
 	Primary        bool                                `json:"primary"`
-	RelocatingNode string                              `json:"relocating_node,omitempty"`
+	RelocatingNode *string                             `json:"relocating_node,omitempty"`
 	State          shardroutingstate.ShardRoutingState `json:"state"`
 }
 
-// ShardRoutingBuilder holds ShardRouting struct and provides a builder API.
-type ShardRoutingBuilder struct {
-	v *ShardRouting
-}
+func (s *ShardRouting) UnmarshalJSON(data []byte) error {
 
-// NewShardRouting provides a builder for the ShardRouting struct.
-func NewShardRoutingBuilder() *ShardRoutingBuilder {
-	r := ShardRoutingBuilder{
-		&ShardRouting{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "node":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Node", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Node = o
+
+		case "primary":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Primary", err)
+				}
+				s.Primary = value
+			case bool:
+				s.Primary = v
+			}
+
+		case "relocating_node":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "RelocatingNode", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.RelocatingNode = &o
+
+		case "state":
+			if err := dec.Decode(&s.State); err != nil {
+				return fmt.Errorf("%s | %w", "State", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ShardRouting struct
-func (rb *ShardRoutingBuilder) Build() ShardRouting {
-	return *rb.v
-}
+// NewShardRouting returns a ShardRouting.
+func NewShardRouting() *ShardRouting {
+	r := &ShardRouting{}
 
-func (rb *ShardRoutingBuilder) Node(node string) *ShardRoutingBuilder {
-	rb.v.Node = node
-	return rb
-}
-
-func (rb *ShardRoutingBuilder) Primary(primary bool) *ShardRoutingBuilder {
-	rb.v.Primary = primary
-	return rb
-}
-
-func (rb *ShardRoutingBuilder) RelocatingNode(relocatingnode string) *ShardRoutingBuilder {
-	rb.v.RelocatingNode = relocatingnode
-	return rb
-}
-
-func (rb *ShardRoutingBuilder) State(state shardroutingstate.ShardRoutingState) *ShardRoutingBuilder {
-	rb.v.State = state
-	return rb
+	return r
 }

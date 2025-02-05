@@ -15,65 +15,98 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // FielddataStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Stats.ts#L69-L74
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Stats.ts#L111-L116
 type FielddataStats struct {
-	Evictions         *int64                     `json:"evictions,omitempty"`
-	Fields            map[Field]FieldMemoryUsage `json:"fields,omitempty"`
-	MemorySize        *ByteSize                  `json:"memory_size,omitempty"`
-	MemorySizeInBytes int64                      `json:"memory_size_in_bytes"`
+	Evictions         *int64                      `json:"evictions,omitempty"`
+	Fields            map[string]FieldMemoryUsage `json:"fields,omitempty"`
+	MemorySize        ByteSize                    `json:"memory_size,omitempty"`
+	MemorySizeInBytes int64                       `json:"memory_size_in_bytes"`
 }
 
-// FielddataStatsBuilder holds FielddataStats struct and provides a builder API.
-type FielddataStatsBuilder struct {
-	v *FielddataStats
+func (s *FielddataStats) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "evictions":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Evictions", err)
+				}
+				s.Evictions = &value
+			case float64:
+				f := int64(v)
+				s.Evictions = &f
+			}
+
+		case "fields":
+			if s.Fields == nil {
+				s.Fields = make(map[string]FieldMemoryUsage, 0)
+			}
+			if err := dec.Decode(&s.Fields); err != nil {
+				return fmt.Errorf("%s | %w", "Fields", err)
+			}
+
+		case "memory_size":
+			if err := dec.Decode(&s.MemorySize); err != nil {
+				return fmt.Errorf("%s | %w", "MemorySize", err)
+			}
+
+		case "memory_size_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MemorySizeInBytes", err)
+				}
+				s.MemorySizeInBytes = value
+			case float64:
+				f := int64(v)
+				s.MemorySizeInBytes = f
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewFielddataStats provides a builder for the FielddataStats struct.
-func NewFielddataStatsBuilder() *FielddataStatsBuilder {
-	r := FielddataStatsBuilder{
-		&FielddataStats{
-			Fields: make(map[Field]FieldMemoryUsage, 0),
-		},
+// NewFielddataStats returns a FielddataStats.
+func NewFielddataStats() *FielddataStats {
+	r := &FielddataStats{
+		Fields: make(map[string]FieldMemoryUsage, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the FielddataStats struct
-func (rb *FielddataStatsBuilder) Build() FielddataStats {
-	return *rb.v
-}
-
-func (rb *FielddataStatsBuilder) Evictions(evictions int64) *FielddataStatsBuilder {
-	rb.v.Evictions = &evictions
-	return rb
-}
-
-func (rb *FielddataStatsBuilder) Fields(values map[Field]*FieldMemoryUsageBuilder) *FielddataStatsBuilder {
-	tmp := make(map[Field]FieldMemoryUsage, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Fields = tmp
-	return rb
-}
-
-func (rb *FielddataStatsBuilder) MemorySize(memorysize *ByteSizeBuilder) *FielddataStatsBuilder {
-	v := memorysize.Build()
-	rb.v.MemorySize = &v
-	return rb
-}
-
-func (rb *FielddataStatsBuilder) MemorySizeInBytes(memorysizeinbytes int64) *FielddataStatsBuilder {
-	rb.v.MemorySizeInBytes = memorysizeinbytes
-	return rb
+	return r
 }

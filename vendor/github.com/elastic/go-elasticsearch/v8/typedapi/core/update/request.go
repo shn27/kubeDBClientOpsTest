@@ -15,67 +15,57 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package update
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"strconv"
 
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 )
 
 // Request holds the request body struct for the package update
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/update/UpdateRequest.ts#L38-L151
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/update/UpdateRequest.ts#L38-L154
 type Request struct {
 
 	// DetectNoop Set to false to disable setting 'result' in the response
 	// to 'noop' if no change to the document occurred.
 	DetectNoop *bool `json:"detect_noop,omitempty"`
-
 	// Doc A partial update to an existing document.
-	Doc interface{} `json:"doc,omitempty"`
-
+	Doc json.RawMessage `json:"doc,omitempty"`
 	// DocAsUpsert Set to true to use the contents of 'doc' as the value of 'upsert'
 	DocAsUpsert *bool `json:"doc_as_upsert,omitempty"`
-
 	// Script Script to execute to update the document.
 	Script *types.Script `json:"script,omitempty"`
-
 	// ScriptedUpsert Set to true to execute the script whether or not the document exists.
 	ScriptedUpsert *bool `json:"scripted_upsert,omitempty"`
-
 	// Source_ Set to false to disable source retrieval. You can also specify a
 	// comma-separated
 	// list of the fields you want to retrieve.
-	Source_ *types.SourceConfig `json:"_source,omitempty"`
-
+	Source_ types.SourceConfig `json:"_source,omitempty"`
 	// Upsert If the document does not already exist, the contents of 'upsert' are inserted
 	// as a
 	// new document. If the document exists, the 'script' is executed.
-	Upsert interface{} `json:"upsert,omitempty"`
+	Upsert json.RawMessage `json:"upsert,omitempty"`
 }
 
-// RequestBuilder is the builder API for the update.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -86,44 +76,114 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) DetectNoop(detectnoop bool) *RequestBuilder {
-	rb.v.DetectNoop = &detectnoop
-	return rb
-}
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
 
-func (rb *RequestBuilder) Doc(doc interface{}) *RequestBuilder {
-	rb.v.Doc = doc
-	return rb
-}
+		switch t {
 
-func (rb *RequestBuilder) DocAsUpsert(docasupsert bool) *RequestBuilder {
-	rb.v.DocAsUpsert = &docasupsert
-	return rb
-}
+		case "detect_noop":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DetectNoop", err)
+				}
+				s.DetectNoop = &value
+			case bool:
+				s.DetectNoop = &v
+			}
 
-func (rb *RequestBuilder) Script(script *types.ScriptBuilder) *RequestBuilder {
-	v := script.Build()
-	rb.v.Script = &v
-	return rb
-}
+		case "doc":
+			if err := dec.Decode(&s.Doc); err != nil {
+				return fmt.Errorf("%s | %w", "Doc", err)
+			}
 
-func (rb *RequestBuilder) ScriptedUpsert(scriptedupsert bool) *RequestBuilder {
-	rb.v.ScriptedUpsert = &scriptedupsert
-	return rb
-}
+		case "doc_as_upsert":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DocAsUpsert", err)
+				}
+				s.DocAsUpsert = &value
+			case bool:
+				s.DocAsUpsert = &v
+			}
 
-func (rb *RequestBuilder) Source_(source_ *types.SourceConfigBuilder) *RequestBuilder {
-	v := source_.Build()
-	rb.v.Source_ = &v
-	return rb
-}
+		case "script":
+			if err := dec.Decode(&s.Script); err != nil {
+				return fmt.Errorf("%s | %w", "Script", err)
+			}
 
-func (rb *RequestBuilder) Upsert(upsert interface{}) *RequestBuilder {
-	rb.v.Upsert = upsert
-	return rb
+		case "scripted_upsert":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ScriptedUpsert", err)
+				}
+				s.ScriptedUpsert = &value
+			case bool:
+				s.ScriptedUpsert = &v
+			}
+
+		case "_source":
+			message := json.RawMessage{}
+			if err := dec.Decode(&message); err != nil {
+				return fmt.Errorf("%s | %w", "Source_", err)
+			}
+			keyDec := json.NewDecoder(bytes.NewReader(message))
+		source__field:
+			for {
+				t, err := keyDec.Token()
+				if err != nil {
+					if errors.Is(err, io.EOF) {
+						break
+					}
+					return fmt.Errorf("%s | %w", "Source_", err)
+				}
+
+				switch t {
+
+				case "excludes", "includes":
+					o := types.NewSourceFilter()
+					localDec := json.NewDecoder(bytes.NewReader(message))
+					if err := localDec.Decode(&o); err != nil {
+						return fmt.Errorf("%s | %w", "Source_", err)
+					}
+					s.Source_ = o
+					break source__field
+
+				}
+			}
+			if s.Source_ == nil {
+				localDec := json.NewDecoder(bytes.NewReader(message))
+				if err := localDec.Decode(&s.Source_); err != nil {
+					return fmt.Errorf("%s | %w", "Source_", err)
+				}
+			}
+
+		case "upsert":
+			if err := dec.Decode(&s.Upsert); err != nil {
+				return fmt.Errorf("%s | %w", "Upsert", err)
+			}
+
+		}
+	}
+	return nil
 }

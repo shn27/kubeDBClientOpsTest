@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DataTiers type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/usage/types.ts#L322-L329
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/xpack/usage/types.ts#L337-L347
 type DataTiers struct {
 	Available   bool                     `json:"available"`
 	DataCold    DataTierPhaseStatistics  `json:"data_cold"`
@@ -35,61 +42,82 @@ type DataTiers struct {
 	Enabled     bool                     `json:"enabled"`
 }
 
-// DataTiersBuilder holds DataTiers struct and provides a builder API.
-type DataTiersBuilder struct {
-	v *DataTiers
-}
+func (s *DataTiers) UnmarshalJSON(data []byte) error {
 
-// NewDataTiers provides a builder for the DataTiers struct.
-func NewDataTiersBuilder() *DataTiersBuilder {
-	r := DataTiersBuilder{
-		&DataTiers{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "available":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Available", err)
+				}
+				s.Available = value
+			case bool:
+				s.Available = v
+			}
+
+		case "data_cold":
+			if err := dec.Decode(&s.DataCold); err != nil {
+				return fmt.Errorf("%s | %w", "DataCold", err)
+			}
+
+		case "data_content":
+			if err := dec.Decode(&s.DataContent); err != nil {
+				return fmt.Errorf("%s | %w", "DataContent", err)
+			}
+
+		case "data_frozen":
+			if err := dec.Decode(&s.DataFrozen); err != nil {
+				return fmt.Errorf("%s | %w", "DataFrozen", err)
+			}
+
+		case "data_hot":
+			if err := dec.Decode(&s.DataHot); err != nil {
+				return fmt.Errorf("%s | %w", "DataHot", err)
+			}
+
+		case "data_warm":
+			if err := dec.Decode(&s.DataWarm); err != nil {
+				return fmt.Errorf("%s | %w", "DataWarm", err)
+			}
+
+		case "enabled":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Enabled", err)
+				}
+				s.Enabled = value
+			case bool:
+				s.Enabled = v
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DataTiers struct
-func (rb *DataTiersBuilder) Build() DataTiers {
-	return *rb.v
-}
+// NewDataTiers returns a DataTiers.
+func NewDataTiers() *DataTiers {
+	r := &DataTiers{}
 
-func (rb *DataTiersBuilder) Available(available bool) *DataTiersBuilder {
-	rb.v.Available = available
-	return rb
-}
-
-func (rb *DataTiersBuilder) DataCold(datacold *DataTierPhaseStatisticsBuilder) *DataTiersBuilder {
-	v := datacold.Build()
-	rb.v.DataCold = v
-	return rb
-}
-
-func (rb *DataTiersBuilder) DataContent(datacontent *DataTierPhaseStatisticsBuilder) *DataTiersBuilder {
-	v := datacontent.Build()
-	rb.v.DataContent = v
-	return rb
-}
-
-func (rb *DataTiersBuilder) DataFrozen(datafrozen *DataTierPhaseStatisticsBuilder) *DataTiersBuilder {
-	v := datafrozen.Build()
-	rb.v.DataFrozen = &v
-	return rb
-}
-
-func (rb *DataTiersBuilder) DataHot(datahot *DataTierPhaseStatisticsBuilder) *DataTiersBuilder {
-	v := datahot.Build()
-	rb.v.DataHot = v
-	return rb
-}
-
-func (rb *DataTiersBuilder) DataWarm(datawarm *DataTierPhaseStatisticsBuilder) *DataTiersBuilder {
-	v := datawarm.Build()
-	rb.v.DataWarm = v
-	return rb
-}
-
-func (rb *DataTiersBuilder) Enabled(enabled bool) *DataTiersBuilder {
-	rb.v.Enabled = enabled
-	return rb
+	return r
 }

@@ -15,14 +15,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/icucollationalternate"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/icucollationcasefirst"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/icucollationdecomposition"
@@ -31,100 +36,204 @@ import (
 
 // IcuCollationTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/icu-plugin.ts#L51-L64
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/icu-plugin.ts#L51-L65
 type IcuCollationTokenFilter struct {
-	Alternate              icucollationalternate.IcuCollationAlternate         `json:"alternate"`
-	CaseFirst              icucollationcasefirst.IcuCollationCaseFirst         `json:"caseFirst"`
-	CaseLevel              bool                                                `json:"caseLevel"`
-	Country                string                                              `json:"country"`
-	Decomposition          icucollationdecomposition.IcuCollationDecomposition `json:"decomposition"`
-	HiraganaQuaternaryMode bool                                                `json:"hiraganaQuaternaryMode"`
-	Language               string                                              `json:"language"`
-	Numeric                bool                                                `json:"numeric"`
-	Strength               icucollationstrength.IcuCollationStrength           `json:"strength"`
-	Type                   string                                              `json:"type,omitempty"`
-	VariableTop            *string                                             `json:"variableTop,omitempty"`
-	Variant                string                                              `json:"variant"`
-	Version                *VersionString                                      `json:"version,omitempty"`
+	Alternate              *icucollationalternate.IcuCollationAlternate         `json:"alternate,omitempty"`
+	CaseFirst              *icucollationcasefirst.IcuCollationCaseFirst         `json:"case_first,omitempty"`
+	CaseLevel              *bool                                                `json:"case_level,omitempty"`
+	Country                *string                                              `json:"country,omitempty"`
+	Decomposition          *icucollationdecomposition.IcuCollationDecomposition `json:"decomposition,omitempty"`
+	HiraganaQuaternaryMode *bool                                                `json:"hiragana_quaternary_mode,omitempty"`
+	Language               *string                                              `json:"language,omitempty"`
+	Numeric                *bool                                                `json:"numeric,omitempty"`
+	Rules                  *string                                              `json:"rules,omitempty"`
+	Strength               *icucollationstrength.IcuCollationStrength           `json:"strength,omitempty"`
+	Type                   string                                               `json:"type,omitempty"`
+	VariableTop            *string                                              `json:"variable_top,omitempty"`
+	Variant                *string                                              `json:"variant,omitempty"`
+	Version                *string                                              `json:"version,omitempty"`
 }
 
-// IcuCollationTokenFilterBuilder holds IcuCollationTokenFilter struct and provides a builder API.
-type IcuCollationTokenFilterBuilder struct {
-	v *IcuCollationTokenFilter
+func (s *IcuCollationTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "alternate":
+			if err := dec.Decode(&s.Alternate); err != nil {
+				return fmt.Errorf("%s | %w", "Alternate", err)
+			}
+
+		case "case_first":
+			if err := dec.Decode(&s.CaseFirst); err != nil {
+				return fmt.Errorf("%s | %w", "CaseFirst", err)
+			}
+
+		case "case_level":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CaseLevel", err)
+				}
+				s.CaseLevel = &value
+			case bool:
+				s.CaseLevel = &v
+			}
+
+		case "country":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Country", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Country = &o
+
+		case "decomposition":
+			if err := dec.Decode(&s.Decomposition); err != nil {
+				return fmt.Errorf("%s | %w", "Decomposition", err)
+			}
+
+		case "hiragana_quaternary_mode":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "HiraganaQuaternaryMode", err)
+				}
+				s.HiraganaQuaternaryMode = &value
+			case bool:
+				s.HiraganaQuaternaryMode = &v
+			}
+
+		case "language":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Language", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Language = &o
+
+		case "numeric":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Numeric", err)
+				}
+				s.Numeric = &value
+			case bool:
+				s.Numeric = &v
+			}
+
+		case "rules":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Rules", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Rules = &o
+
+		case "strength":
+			if err := dec.Decode(&s.Strength); err != nil {
+				return fmt.Errorf("%s | %w", "Strength", err)
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "variable_top":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "VariableTop", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.VariableTop = &o
+
+		case "variant":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Variant", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Variant = &o
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewIcuCollationTokenFilter provides a builder for the IcuCollationTokenFilter struct.
-func NewIcuCollationTokenFilterBuilder() *IcuCollationTokenFilterBuilder {
-	r := IcuCollationTokenFilterBuilder{
-		&IcuCollationTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s IcuCollationTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerIcuCollationTokenFilter IcuCollationTokenFilter
+	tmp := innerIcuCollationTokenFilter{
+		Alternate:              s.Alternate,
+		CaseFirst:              s.CaseFirst,
+		CaseLevel:              s.CaseLevel,
+		Country:                s.Country,
+		Decomposition:          s.Decomposition,
+		HiraganaQuaternaryMode: s.HiraganaQuaternaryMode,
+		Language:               s.Language,
+		Numeric:                s.Numeric,
+		Rules:                  s.Rules,
+		Strength:               s.Strength,
+		Type:                   s.Type,
+		VariableTop:            s.VariableTop,
+		Variant:                s.Variant,
+		Version:                s.Version,
 	}
 
-	r.v.Type = "icu_collation"
+	tmp.Type = "icu_collation"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the IcuCollationTokenFilter struct
-func (rb *IcuCollationTokenFilterBuilder) Build() IcuCollationTokenFilter {
-	return *rb.v
-}
+// NewIcuCollationTokenFilter returns a IcuCollationTokenFilter.
+func NewIcuCollationTokenFilter() *IcuCollationTokenFilter {
+	r := &IcuCollationTokenFilter{}
 
-func (rb *IcuCollationTokenFilterBuilder) Alternate(alternate icucollationalternate.IcuCollationAlternate) *IcuCollationTokenFilterBuilder {
-	rb.v.Alternate = alternate
-	return rb
-}
-
-func (rb *IcuCollationTokenFilterBuilder) CaseFirst(casefirst icucollationcasefirst.IcuCollationCaseFirst) *IcuCollationTokenFilterBuilder {
-	rb.v.CaseFirst = casefirst
-	return rb
-}
-
-func (rb *IcuCollationTokenFilterBuilder) CaseLevel(caselevel bool) *IcuCollationTokenFilterBuilder {
-	rb.v.CaseLevel = caselevel
-	return rb
-}
-
-func (rb *IcuCollationTokenFilterBuilder) Country(country string) *IcuCollationTokenFilterBuilder {
-	rb.v.Country = country
-	return rb
-}
-
-func (rb *IcuCollationTokenFilterBuilder) Decomposition(decomposition icucollationdecomposition.IcuCollationDecomposition) *IcuCollationTokenFilterBuilder {
-	rb.v.Decomposition = decomposition
-	return rb
-}
-
-func (rb *IcuCollationTokenFilterBuilder) HiraganaQuaternaryMode(hiraganaquaternarymode bool) *IcuCollationTokenFilterBuilder {
-	rb.v.HiraganaQuaternaryMode = hiraganaquaternarymode
-	return rb
-}
-
-func (rb *IcuCollationTokenFilterBuilder) Language(language string) *IcuCollationTokenFilterBuilder {
-	rb.v.Language = language
-	return rb
-}
-
-func (rb *IcuCollationTokenFilterBuilder) Numeric(numeric bool) *IcuCollationTokenFilterBuilder {
-	rb.v.Numeric = numeric
-	return rb
-}
-
-func (rb *IcuCollationTokenFilterBuilder) Strength(strength icucollationstrength.IcuCollationStrength) *IcuCollationTokenFilterBuilder {
-	rb.v.Strength = strength
-	return rb
-}
-
-func (rb *IcuCollationTokenFilterBuilder) VariableTop(variabletop string) *IcuCollationTokenFilterBuilder {
-	rb.v.VariableTop = &variabletop
-	return rb
-}
-
-func (rb *IcuCollationTokenFilterBuilder) Variant(variant string) *IcuCollationTokenFilterBuilder {
-	rb.v.Variant = variant
-	return rb
-}
-
-func (rb *IcuCollationTokenFilterBuilder) Version(version VersionString) *IcuCollationTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

@@ -15,53 +15,78 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ReadException type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ccr/_types/FollowIndexStats.ts#L71-L75
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ccr/_types/FollowIndexStats.ts#L71-L75
 type ReadException struct {
-	Exception ErrorCause     `json:"exception"`
-	FromSeqNo SequenceNumber `json:"from_seq_no"`
-	Retries   int            `json:"retries"`
+	Exception ErrorCause `json:"exception"`
+	FromSeqNo int64      `json:"from_seq_no"`
+	Retries   int        `json:"retries"`
 }
 
-// ReadExceptionBuilder holds ReadException struct and provides a builder API.
-type ReadExceptionBuilder struct {
-	v *ReadException
-}
+func (s *ReadException) UnmarshalJSON(data []byte) error {
 
-// NewReadException provides a builder for the ReadException struct.
-func NewReadExceptionBuilder() *ReadExceptionBuilder {
-	r := ReadExceptionBuilder{
-		&ReadException{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "exception":
+			if err := dec.Decode(&s.Exception); err != nil {
+				return fmt.Errorf("%s | %w", "Exception", err)
+			}
+
+		case "from_seq_no":
+			if err := dec.Decode(&s.FromSeqNo); err != nil {
+				return fmt.Errorf("%s | %w", "FromSeqNo", err)
+			}
+
+		case "retries":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Retries", err)
+				}
+				s.Retries = value
+			case float64:
+				f := int(v)
+				s.Retries = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ReadException struct
-func (rb *ReadExceptionBuilder) Build() ReadException {
-	return *rb.v
-}
+// NewReadException returns a ReadException.
+func NewReadException() *ReadException {
+	r := &ReadException{}
 
-func (rb *ReadExceptionBuilder) Exception(exception *ErrorCauseBuilder) *ReadExceptionBuilder {
-	v := exception.Build()
-	rb.v.Exception = v
-	return rb
-}
-
-func (rb *ReadExceptionBuilder) FromSeqNo(fromseqno SequenceNumber) *ReadExceptionBuilder {
-	rb.v.FromSeqNo = fromseqno
-	return rb
-}
-
-func (rb *ReadExceptionBuilder) Retries(retries int) *ReadExceptionBuilder {
-	rb.v.Retries = retries
-	return rb
+	return r
 }

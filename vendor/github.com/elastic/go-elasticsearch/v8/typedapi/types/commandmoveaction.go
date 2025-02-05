@@ -15,64 +15,100 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // CommandMoveAction type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/reroute/types.ts#L60-L67
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/reroute/types.ts#L60-L67
 type CommandMoveAction struct {
 	// FromNode The node to move the shard from
-	FromNode string    `json:"from_node"`
-	Index    IndexName `json:"index"`
-	Shard    int       `json:"shard"`
+	FromNode string `json:"from_node"`
+	Index    string `json:"index"`
+	Shard    int    `json:"shard"`
 	// ToNode The node to move the shard to
 	ToNode string `json:"to_node"`
 }
 
-// CommandMoveActionBuilder holds CommandMoveAction struct and provides a builder API.
-type CommandMoveActionBuilder struct {
-	v *CommandMoveAction
-}
+func (s *CommandMoveAction) UnmarshalJSON(data []byte) error {
 
-// NewCommandMoveAction provides a builder for the CommandMoveAction struct.
-func NewCommandMoveActionBuilder() *CommandMoveActionBuilder {
-	r := CommandMoveActionBuilder{
-		&CommandMoveAction{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "from_node":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "FromNode", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.FromNode = o
+
+		case "index":
+			if err := dec.Decode(&s.Index); err != nil {
+				return fmt.Errorf("%s | %w", "Index", err)
+			}
+
+		case "shard":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Shard", err)
+				}
+				s.Shard = value
+			case float64:
+				f := int(v)
+				s.Shard = f
+			}
+
+		case "to_node":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ToNode", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ToNode = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the CommandMoveAction struct
-func (rb *CommandMoveActionBuilder) Build() CommandMoveAction {
-	return *rb.v
-}
+// NewCommandMoveAction returns a CommandMoveAction.
+func NewCommandMoveAction() *CommandMoveAction {
+	r := &CommandMoveAction{}
 
-// FromNode The node to move the shard from
-
-func (rb *CommandMoveActionBuilder) FromNode(fromnode string) *CommandMoveActionBuilder {
-	rb.v.FromNode = fromnode
-	return rb
-}
-
-func (rb *CommandMoveActionBuilder) Index(index IndexName) *CommandMoveActionBuilder {
-	rb.v.Index = index
-	return rb
-}
-
-func (rb *CommandMoveActionBuilder) Shard(shard int) *CommandMoveActionBuilder {
-	rb.v.Shard = shard
-	return rb
-}
-
-// ToNode The node to move the shard to
-
-func (rb *CommandMoveActionBuilder) ToNode(tonode string) *CommandMoveActionBuilder {
-	rb.v.ToNode = tonode
-	return rb
+	return r
 }

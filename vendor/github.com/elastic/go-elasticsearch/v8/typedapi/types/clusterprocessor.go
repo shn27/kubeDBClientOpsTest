@@ -15,66 +15,109 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ClusterProcessor type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/stats/types.ts#L262-L268
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/stats/types.ts#L503-L509
 type ClusterProcessor struct {
-	Count        int64                   `json:"count"`
-	Current      int64                   `json:"current"`
-	Failed       int64                   `json:"failed"`
-	Time         *Duration               `json:"time,omitempty"`
-	TimeInMillis DurationValueUnitMillis `json:"time_in_millis"`
+	Count        int64    `json:"count"`
+	Current      int64    `json:"current"`
+	Failed       int64    `json:"failed"`
+	Time         Duration `json:"time,omitempty"`
+	TimeInMillis int64    `json:"time_in_millis"`
 }
 
-// ClusterProcessorBuilder holds ClusterProcessor struct and provides a builder API.
-type ClusterProcessorBuilder struct {
-	v *ClusterProcessor
-}
+func (s *ClusterProcessor) UnmarshalJSON(data []byte) error {
 
-// NewClusterProcessor provides a builder for the ClusterProcessor struct.
-func NewClusterProcessorBuilder() *ClusterProcessorBuilder {
-	r := ClusterProcessorBuilder{
-		&ClusterProcessor{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Count", err)
+				}
+				s.Count = value
+			case float64:
+				f := int64(v)
+				s.Count = f
+			}
+
+		case "current":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Current", err)
+				}
+				s.Current = value
+			case float64:
+				f := int64(v)
+				s.Current = f
+			}
+
+		case "failed":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Failed", err)
+				}
+				s.Failed = value
+			case float64:
+				f := int64(v)
+				s.Failed = f
+			}
+
+		case "time":
+			if err := dec.Decode(&s.Time); err != nil {
+				return fmt.Errorf("%s | %w", "Time", err)
+			}
+
+		case "time_in_millis":
+			if err := dec.Decode(&s.TimeInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "TimeInMillis", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ClusterProcessor struct
-func (rb *ClusterProcessorBuilder) Build() ClusterProcessor {
-	return *rb.v
-}
+// NewClusterProcessor returns a ClusterProcessor.
+func NewClusterProcessor() *ClusterProcessor {
+	r := &ClusterProcessor{}
 
-func (rb *ClusterProcessorBuilder) Count(count int64) *ClusterProcessorBuilder {
-	rb.v.Count = count
-	return rb
-}
-
-func (rb *ClusterProcessorBuilder) Current(current int64) *ClusterProcessorBuilder {
-	rb.v.Current = current
-	return rb
-}
-
-func (rb *ClusterProcessorBuilder) Failed(failed int64) *ClusterProcessorBuilder {
-	rb.v.Failed = failed
-	return rb
-}
-
-func (rb *ClusterProcessorBuilder) Time(time *DurationBuilder) *ClusterProcessorBuilder {
-	v := time.Build()
-	rb.v.Time = &v
-	return rb
-}
-
-func (rb *ClusterProcessorBuilder) TimeInMillis(timeinmillis *DurationValueUnitMillisBuilder) *ClusterProcessorBuilder {
-	v := timeinmillis.Build()
-	rb.v.TimeInMillis = v
-	return rb
+	return r
 }

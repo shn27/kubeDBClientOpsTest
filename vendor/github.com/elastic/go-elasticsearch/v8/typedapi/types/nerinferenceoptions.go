@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // NerInferenceOptions type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/inference.ts#L225-L233
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/inference.ts#L242-L251
 type NerInferenceOptions struct {
 	// ClassificationLabels The token classification labels. Must be IOB formatted tags
 	ClassificationLabels []string `json:"classification_labels,omitempty"`
@@ -33,46 +40,59 @@ type NerInferenceOptions struct {
 	ResultsField *string `json:"results_field,omitempty"`
 	// Tokenization The tokenization options
 	Tokenization *TokenizationConfigContainer `json:"tokenization,omitempty"`
+	Vocabulary   *Vocabulary                  `json:"vocabulary,omitempty"`
 }
 
-// NerInferenceOptionsBuilder holds NerInferenceOptions struct and provides a builder API.
-type NerInferenceOptionsBuilder struct {
-	v *NerInferenceOptions
-}
+func (s *NerInferenceOptions) UnmarshalJSON(data []byte) error {
 
-// NewNerInferenceOptions provides a builder for the NerInferenceOptions struct.
-func NewNerInferenceOptionsBuilder() *NerInferenceOptionsBuilder {
-	r := NerInferenceOptionsBuilder{
-		&NerInferenceOptions{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "classification_labels":
+			if err := dec.Decode(&s.ClassificationLabels); err != nil {
+				return fmt.Errorf("%s | %w", "ClassificationLabels", err)
+			}
+
+		case "results_field":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ResultsField", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ResultsField = &o
+
+		case "tokenization":
+			if err := dec.Decode(&s.Tokenization); err != nil {
+				return fmt.Errorf("%s | %w", "Tokenization", err)
+			}
+
+		case "vocabulary":
+			if err := dec.Decode(&s.Vocabulary); err != nil {
+				return fmt.Errorf("%s | %w", "Vocabulary", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the NerInferenceOptions struct
-func (rb *NerInferenceOptionsBuilder) Build() NerInferenceOptions {
-	return *rb.v
-}
+// NewNerInferenceOptions returns a NerInferenceOptions.
+func NewNerInferenceOptions() *NerInferenceOptions {
+	r := &NerInferenceOptions{}
 
-// ClassificationLabels The token classification labels. Must be IOB formatted tags
-
-func (rb *NerInferenceOptionsBuilder) ClassificationLabels(classification_labels ...string) *NerInferenceOptionsBuilder {
-	rb.v.ClassificationLabels = classification_labels
-	return rb
-}
-
-// ResultsField The field that is added to incoming documents to contain the inference
-// prediction. Defaults to predicted_value.
-
-func (rb *NerInferenceOptionsBuilder) ResultsField(resultsfield string) *NerInferenceOptionsBuilder {
-	rb.v.ResultsField = &resultsfield
-	return rb
-}
-
-// Tokenization The tokenization options
-
-func (rb *NerInferenceOptionsBuilder) Tokenization(tokenization *TokenizationConfigContainerBuilder) *NerInferenceOptionsBuilder {
-	v := tokenization.Build()
-	rb.v.Tokenization = &v
-	return rb
+	return r
 }

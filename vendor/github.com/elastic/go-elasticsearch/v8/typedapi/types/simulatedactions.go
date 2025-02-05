@@ -15,53 +15,76 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // SimulatedActions type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Action.ts#L93-L97
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Action.ts#L90-L94
 type SimulatedActions struct {
 	Actions []string          `json:"actions"`
 	All     *SimulatedActions `json:"all,omitempty"`
 	UseAll  bool              `json:"use_all"`
 }
 
-// SimulatedActionsBuilder holds SimulatedActions struct and provides a builder API.
-type SimulatedActionsBuilder struct {
-	v *SimulatedActions
-}
+func (s *SimulatedActions) UnmarshalJSON(data []byte) error {
 
-// NewSimulatedActions provides a builder for the SimulatedActions struct.
-func NewSimulatedActionsBuilder() *SimulatedActionsBuilder {
-	r := SimulatedActionsBuilder{
-		&SimulatedActions{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "actions":
+			if err := dec.Decode(&s.Actions); err != nil {
+				return fmt.Errorf("%s | %w", "Actions", err)
+			}
+
+		case "all":
+			if err := dec.Decode(&s.All); err != nil {
+				return fmt.Errorf("%s | %w", "All", err)
+			}
+
+		case "use_all":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "UseAll", err)
+				}
+				s.UseAll = value
+			case bool:
+				s.UseAll = v
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SimulatedActions struct
-func (rb *SimulatedActionsBuilder) Build() SimulatedActions {
-	return *rb.v
-}
+// NewSimulatedActions returns a SimulatedActions.
+func NewSimulatedActions() *SimulatedActions {
+	r := &SimulatedActions{}
 
-func (rb *SimulatedActionsBuilder) Actions(actions ...string) *SimulatedActionsBuilder {
-	rb.v.Actions = actions
-	return rb
-}
-
-func (rb *SimulatedActionsBuilder) All(all *SimulatedActionsBuilder) *SimulatedActionsBuilder {
-	v := all.Build()
-	rb.v.All = &v
-	return rb
-}
-
-func (rb *SimulatedActionsBuilder) UseAll(useall bool) *SimulatedActionsBuilder {
-	rb.v.UseAll = useall
-	return rb
+	return r
 }

@@ -15,115 +15,182 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // AllocationRecord type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cat/allocation/types.ts#L24-L69
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cat/allocation/types.ts#L25-L99
 type AllocationRecord struct {
-	// DiskAvail disk available
-	DiskAvail ByteSize `json:"disk.avail,omitempty"`
-	// DiskIndices disk used by ES indices
-	DiskIndices ByteSize `json:"disk.indices,omitempty"`
-	// DiskPercent percent disk used
-	DiskPercent Percentage `json:"disk.percent,omitempty"`
-	// DiskTotal total capacity of all volumes
-	DiskTotal ByteSize `json:"disk.total,omitempty"`
-	// DiskUsed disk used (total, not just ES)
-	DiskUsed ByteSize `json:"disk.used,omitempty"`
-	// Host host of node
-	Host Host `json:"host,omitempty"`
-	// Ip ip of node
-	Ip Ip `json:"ip,omitempty"`
-	// Node name of node
+	// DiskAvail Free disk space available to Elasticsearch.
+	// Elasticsearch retrieves this metric from the node’s operating system.
+	// Disk-based shard allocation uses this metric to assign shards to nodes based
+	// on available disk space.
+	DiskAvail *ByteSize `json:"disk.avail,omitempty"`
+	// DiskIndices Disk space used by the node’s shards. Does not include disk space for the
+	// translog or unassigned shards.
+	// IMPORTANT: This metric double-counts disk space for hard-linked files, such
+	// as those created when shrinking, splitting, or cloning an index.
+	DiskIndices *ByteSize `json:"disk.indices,omitempty"`
+	// DiskIndicesForecast Sum of shard size forecasts
+	DiskIndicesForecast *ByteSize `json:"disk.indices.forecast,omitempty"`
+	// DiskPercent Total percentage of disk space in use. Calculated as `disk.used /
+	// disk.total`.
+	DiskPercent *Percentage `json:"disk.percent,omitempty"`
+	// DiskTotal Total disk space for the node, including in-use and available space.
+	DiskTotal *ByteSize `json:"disk.total,omitempty"`
+	// DiskUsed Total disk space in use.
+	// Elasticsearch retrieves this metric from the node’s operating system (OS).
+	// The metric includes disk space for: Elasticsearch, including the translog and
+	// unassigned shards; the node’s operating system; any other applications or
+	// files on the node.
+	// Unlike `disk.indices`, this metric does not double-count disk space for
+	// hard-linked files.
+	DiskUsed *ByteSize `json:"disk.used,omitempty"`
+	// Host Network host for the node. Set using the `network.host` setting.
+	Host *string `json:"host,omitempty"`
+	// Ip IP address and port for the node.
+	Ip *string `json:"ip,omitempty"`
+	// Node Name for the node. Set using the `node.name` setting.
 	Node *string `json:"node,omitempty"`
-	// Shards number of shards on node
+	// NodeRole Node roles
+	NodeRole *string `json:"node.role,omitempty"`
+	// Shards Number of primary and replica shards assigned to the node.
 	Shards *string `json:"shards,omitempty"`
+	// ShardsUndesired Amount of shards that are scheduled to be moved elsewhere in the cluster or
+	// -1 other than desired balance allocator is used
+	ShardsUndesired *string `json:"shards.undesired,omitempty"`
+	// WriteLoadForecast Sum of index write load forecasts
+	WriteLoadForecast *Stringifieddouble `json:"write_load.forecast,omitempty"`
 }
 
-// AllocationRecordBuilder holds AllocationRecord struct and provides a builder API.
-type AllocationRecordBuilder struct {
-	v *AllocationRecord
-}
+func (s *AllocationRecord) UnmarshalJSON(data []byte) error {
 
-// NewAllocationRecord provides a builder for the AllocationRecord struct.
-func NewAllocationRecordBuilder() *AllocationRecordBuilder {
-	r := AllocationRecordBuilder{
-		&AllocationRecord{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "disk.avail", "da", "diskAvail":
+			if err := dec.Decode(&s.DiskAvail); err != nil {
+				return fmt.Errorf("%s | %w", "DiskAvail", err)
+			}
+
+		case "disk.indices", "di", "diskIndices":
+			if err := dec.Decode(&s.DiskIndices); err != nil {
+				return fmt.Errorf("%s | %w", "DiskIndices", err)
+			}
+
+		case "disk.indices.forecast", "dif", "diskIndicesForecast":
+			if err := dec.Decode(&s.DiskIndicesForecast); err != nil {
+				return fmt.Errorf("%s | %w", "DiskIndicesForecast", err)
+			}
+
+		case "disk.percent", "dp", "diskPercent":
+			if err := dec.Decode(&s.DiskPercent); err != nil {
+				return fmt.Errorf("%s | %w", "DiskPercent", err)
+			}
+
+		case "disk.total", "dt", "diskTotal":
+			if err := dec.Decode(&s.DiskTotal); err != nil {
+				return fmt.Errorf("%s | %w", "DiskTotal", err)
+			}
+
+		case "disk.used", "du", "diskUsed":
+			if err := dec.Decode(&s.DiskUsed); err != nil {
+				return fmt.Errorf("%s | %w", "DiskUsed", err)
+			}
+
+		case "host", "h":
+			if err := dec.Decode(&s.Host); err != nil {
+				return fmt.Errorf("%s | %w", "Host", err)
+			}
+
+		case "ip":
+			if err := dec.Decode(&s.Ip); err != nil {
+				return fmt.Errorf("%s | %w", "Ip", err)
+			}
+
+		case "node", "n":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Node", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Node = &o
+
+		case "node.role", "r", "role", "nodeRole":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "NodeRole", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.NodeRole = &o
+
+		case "shards", "s":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Shards", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Shards = &o
+
+		case "shards.undesired":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ShardsUndesired", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ShardsUndesired = &o
+
+		case "write_load.forecast", "wlf", "writeLoadForecast":
+			if err := dec.Decode(&s.WriteLoadForecast); err != nil {
+				return fmt.Errorf("%s | %w", "WriteLoadForecast", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the AllocationRecord struct
-func (rb *AllocationRecordBuilder) Build() AllocationRecord {
-	return *rb.v
-}
+// NewAllocationRecord returns a AllocationRecord.
+func NewAllocationRecord() *AllocationRecord {
+	r := &AllocationRecord{}
 
-// DiskAvail disk available
-
-func (rb *AllocationRecordBuilder) DiskAvail(diskavail ByteSize) *AllocationRecordBuilder {
-	rb.v.DiskAvail = diskavail
-	return rb
-}
-
-// DiskIndices disk used by ES indices
-
-func (rb *AllocationRecordBuilder) DiskIndices(diskindices ByteSize) *AllocationRecordBuilder {
-	rb.v.DiskIndices = diskindices
-	return rb
-}
-
-// DiskPercent percent disk used
-
-func (rb *AllocationRecordBuilder) DiskPercent(diskpercent Percentage) *AllocationRecordBuilder {
-	rb.v.DiskPercent = diskpercent
-	return rb
-}
-
-// DiskTotal total capacity of all volumes
-
-func (rb *AllocationRecordBuilder) DiskTotal(disktotal ByteSize) *AllocationRecordBuilder {
-	rb.v.DiskTotal = disktotal
-	return rb
-}
-
-// DiskUsed disk used (total, not just ES)
-
-func (rb *AllocationRecordBuilder) DiskUsed(diskused ByteSize) *AllocationRecordBuilder {
-	rb.v.DiskUsed = diskused
-	return rb
-}
-
-// Host host of node
-
-func (rb *AllocationRecordBuilder) Host(host Host) *AllocationRecordBuilder {
-	rb.v.Host = host
-	return rb
-}
-
-// Ip ip of node
-
-func (rb *AllocationRecordBuilder) Ip(ip Ip) *AllocationRecordBuilder {
-	rb.v.Ip = ip
-	return rb
-}
-
-// Node name of node
-
-func (rb *AllocationRecordBuilder) Node(node string) *AllocationRecordBuilder {
-	rb.v.Node = &node
-	return rb
-}
-
-// Shards number of shards on node
-
-func (rb *AllocationRecordBuilder) Shards(shards string) *AllocationRecordBuilder {
-	rb.v.Shards = &shards
-	return rb
+	return r
 }

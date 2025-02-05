@@ -15,65 +15,96 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // Eql type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/usage/types.ts#L331-L334
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/xpack/usage/types.ts#L349-L352
 type Eql struct {
-	Available bool             `json:"available"`
-	Enabled   bool             `json:"enabled"`
-	Features  EqlFeatures      `json:"features"`
-	Queries   map[string]Query `json:"queries"`
+	Available bool                  `json:"available"`
+	Enabled   bool                  `json:"enabled"`
+	Features  EqlFeatures           `json:"features"`
+	Queries   map[string]XpackQuery `json:"queries"`
 }
 
-// EqlBuilder holds Eql struct and provides a builder API.
-type EqlBuilder struct {
-	v *Eql
+func (s *Eql) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "available":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Available", err)
+				}
+				s.Available = value
+			case bool:
+				s.Available = v
+			}
+
+		case "enabled":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Enabled", err)
+				}
+				s.Enabled = value
+			case bool:
+				s.Enabled = v
+			}
+
+		case "features":
+			if err := dec.Decode(&s.Features); err != nil {
+				return fmt.Errorf("%s | %w", "Features", err)
+			}
+
+		case "queries":
+			if s.Queries == nil {
+				s.Queries = make(map[string]XpackQuery, 0)
+			}
+			if err := dec.Decode(&s.Queries); err != nil {
+				return fmt.Errorf("%s | %w", "Queries", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewEql provides a builder for the Eql struct.
-func NewEqlBuilder() *EqlBuilder {
-	r := EqlBuilder{
-		&Eql{
-			Queries: make(map[string]Query, 0),
-		},
+// NewEql returns a Eql.
+func NewEql() *Eql {
+	r := &Eql{
+		Queries: make(map[string]XpackQuery, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the Eql struct
-func (rb *EqlBuilder) Build() Eql {
-	return *rb.v
-}
-
-func (rb *EqlBuilder) Available(available bool) *EqlBuilder {
-	rb.v.Available = available
-	return rb
-}
-
-func (rb *EqlBuilder) Enabled(enabled bool) *EqlBuilder {
-	rb.v.Enabled = enabled
-	return rb
-}
-
-func (rb *EqlBuilder) Features(features *EqlFeaturesBuilder) *EqlBuilder {
-	v := features.Build()
-	rb.v.Features = v
-	return rb
-}
-
-func (rb *EqlBuilder) Queries(values map[string]*QueryBuilder) *EqlBuilder {
-	tmp := make(map[string]Query, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Queries = tmp
-	return rb
+	return r
 }

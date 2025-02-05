@@ -15,46 +15,75 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // InferenceConfigRegression type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ingest/_types/Processors.ts#L252-L255
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ingest/_types/Processors.ts#L1062-L1073
 type InferenceConfigRegression struct {
-	NumTopFeatureImportanceValues *int   `json:"num_top_feature_importance_values,omitempty"`
-	ResultsField                  *Field `json:"results_field,omitempty"`
+	// NumTopFeatureImportanceValues Specifies the maximum number of feature importance values per document.
+	NumTopFeatureImportanceValues *int `json:"num_top_feature_importance_values,omitempty"`
+	// ResultsField The field that is added to incoming documents to contain the inference
+	// prediction.
+	ResultsField *string `json:"results_field,omitempty"`
 }
 
-// InferenceConfigRegressionBuilder holds InferenceConfigRegression struct and provides a builder API.
-type InferenceConfigRegressionBuilder struct {
-	v *InferenceConfigRegression
-}
+func (s *InferenceConfigRegression) UnmarshalJSON(data []byte) error {
 
-// NewInferenceConfigRegression provides a builder for the InferenceConfigRegression struct.
-func NewInferenceConfigRegressionBuilder() *InferenceConfigRegressionBuilder {
-	r := InferenceConfigRegressionBuilder{
-		&InferenceConfigRegression{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "num_top_feature_importance_values":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NumTopFeatureImportanceValues", err)
+				}
+				s.NumTopFeatureImportanceValues = &value
+			case float64:
+				f := int(v)
+				s.NumTopFeatureImportanceValues = &f
+			}
+
+		case "results_field":
+			if err := dec.Decode(&s.ResultsField); err != nil {
+				return fmt.Errorf("%s | %w", "ResultsField", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the InferenceConfigRegression struct
-func (rb *InferenceConfigRegressionBuilder) Build() InferenceConfigRegression {
-	return *rb.v
-}
+// NewInferenceConfigRegression returns a InferenceConfigRegression.
+func NewInferenceConfigRegression() *InferenceConfigRegression {
+	r := &InferenceConfigRegression{}
 
-func (rb *InferenceConfigRegressionBuilder) NumTopFeatureImportanceValues(numtopfeatureimportancevalues int) *InferenceConfigRegressionBuilder {
-	rb.v.NumTopFeatureImportanceValues = &numtopfeatureimportancevalues
-	return rb
-}
-
-func (rb *InferenceConfigRegressionBuilder) ResultsField(resultsfield Field) *InferenceConfigRegressionBuilder {
-	rb.v.ResultsField = &resultsfield
-	return rb
+	return r
 }

@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // RequestCounts type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/_types/RepositoryMeteringInformation.ts#L76-L103
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/_types/RepositoryMeteringInformation.ts#L76-L103
 type RequestCounts struct {
 	// GetBlob Number of Get Blob requests (Azure)
 	GetBlob *int64 `json:"GetBlob,omitempty"`
@@ -55,103 +62,194 @@ type RequestCounts struct {
 	PutObject *int64 `json:"PutObject,omitempty"`
 }
 
-// RequestCountsBuilder holds RequestCounts struct and provides a builder API.
-type RequestCountsBuilder struct {
-	v *RequestCounts
-}
+func (s *RequestCounts) UnmarshalJSON(data []byte) error {
 
-// NewRequestCounts provides a builder for the RequestCounts struct.
-func NewRequestCountsBuilder() *RequestCountsBuilder {
-	r := RequestCountsBuilder{
-		&RequestCounts{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "GetBlob":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "GetBlob", err)
+				}
+				s.GetBlob = &value
+			case float64:
+				f := int64(v)
+				s.GetBlob = &f
+			}
+
+		case "GetBlobProperties":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "GetBlobProperties", err)
+				}
+				s.GetBlobProperties = &value
+			case float64:
+				f := int64(v)
+				s.GetBlobProperties = &f
+			}
+
+		case "GetObject":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "GetObject", err)
+				}
+				s.GetObject = &value
+			case float64:
+				f := int64(v)
+				s.GetObject = &f
+			}
+
+		case "InsertObject":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "InsertObject", err)
+				}
+				s.InsertObject = &value
+			case float64:
+				f := int64(v)
+				s.InsertObject = &f
+			}
+
+		case "ListBlobs":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ListBlobs", err)
+				}
+				s.ListBlobs = &value
+			case float64:
+				f := int64(v)
+				s.ListBlobs = &f
+			}
+
+		case "ListObjects":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ListObjects", err)
+				}
+				s.ListObjects = &value
+			case float64:
+				f := int64(v)
+				s.ListObjects = &f
+			}
+
+		case "PutBlob":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PutBlob", err)
+				}
+				s.PutBlob = &value
+			case float64:
+				f := int64(v)
+				s.PutBlob = &f
+			}
+
+		case "PutBlock":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PutBlock", err)
+				}
+				s.PutBlock = &value
+			case float64:
+				f := int64(v)
+				s.PutBlock = &f
+			}
+
+		case "PutBlockList":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PutBlockList", err)
+				}
+				s.PutBlockList = &value
+			case float64:
+				f := int64(v)
+				s.PutBlockList = &f
+			}
+
+		case "PutMultipartObject":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PutMultipartObject", err)
+				}
+				s.PutMultipartObject = &value
+			case float64:
+				f := int64(v)
+				s.PutMultipartObject = &f
+			}
+
+		case "PutObject":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PutObject", err)
+				}
+				s.PutObject = &value
+			case float64:
+				f := int64(v)
+				s.PutObject = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RequestCounts struct
-func (rb *RequestCountsBuilder) Build() RequestCounts {
-	return *rb.v
-}
+// NewRequestCounts returns a RequestCounts.
+func NewRequestCounts() *RequestCounts {
+	r := &RequestCounts{}
 
-// GetBlob Number of Get Blob requests (Azure)
-
-func (rb *RequestCountsBuilder) GetBlob(getblob int64) *RequestCountsBuilder {
-	rb.v.GetBlob = &getblob
-	return rb
-}
-
-// GetBlobProperties Number of Get Blob Properties requests (Azure)
-
-func (rb *RequestCountsBuilder) GetBlobProperties(getblobproperties int64) *RequestCountsBuilder {
-	rb.v.GetBlobProperties = &getblobproperties
-	return rb
-}
-
-// GetObject Number of get object requests (GCP, S3)
-
-func (rb *RequestCountsBuilder) GetObject(getobject int64) *RequestCountsBuilder {
-	rb.v.GetObject = &getobject
-	return rb
-}
-
-// InsertObject Number of insert object requests, including simple, multipart and resumable
-// uploads. Resumable uploads
-// can perform multiple http requests to insert a single object but they are
-// considered as a single request
-// since they are billed as an individual operation. (GCP)
-
-func (rb *RequestCountsBuilder) InsertObject(insertobject int64) *RequestCountsBuilder {
-	rb.v.InsertObject = &insertobject
-	return rb
-}
-
-// ListBlobs Number of List Blobs requests (Azure)
-
-func (rb *RequestCountsBuilder) ListBlobs(listblobs int64) *RequestCountsBuilder {
-	rb.v.ListBlobs = &listblobs
-	return rb
-}
-
-// ListObjects Number of list objects requests (GCP, S3)
-
-func (rb *RequestCountsBuilder) ListObjects(listobjects int64) *RequestCountsBuilder {
-	rb.v.ListObjects = &listobjects
-	return rb
-}
-
-// PutBlob Number of Put Blob requests (Azure)
-
-func (rb *RequestCountsBuilder) PutBlob(putblob int64) *RequestCountsBuilder {
-	rb.v.PutBlob = &putblob
-	return rb
-}
-
-// PutBlock Number of Put Block (Azure)
-
-func (rb *RequestCountsBuilder) PutBlock(putblock int64) *RequestCountsBuilder {
-	rb.v.PutBlock = &putblock
-	return rb
-}
-
-// PutBlockList Number of Put Block List requests
-
-func (rb *RequestCountsBuilder) PutBlockList(putblocklist int64) *RequestCountsBuilder {
-	rb.v.PutBlockList = &putblocklist
-	return rb
-}
-
-// PutMultipartObject Number of Multipart requests, including CreateMultipartUpload, UploadPart and
-// CompleteMultipartUpload requests (S3)
-
-func (rb *RequestCountsBuilder) PutMultipartObject(putmultipartobject int64) *RequestCountsBuilder {
-	rb.v.PutMultipartObject = &putmultipartobject
-	return rb
-}
-
-// PutObject Number of PutObject requests (S3)
-
-func (rb *RequestCountsBuilder) PutObject(putobject int64) *RequestCountsBuilder {
-	rb.v.PutObject = &putobject
-	return rb
+	return r
 }

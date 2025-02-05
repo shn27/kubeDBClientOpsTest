@@ -15,44 +15,106 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DutchAnalyzer type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/analyzers.ts#L61-L64
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/analyzers.ts#L134-L139
 type DutchAnalyzer struct {
-	Stopwords *StopWords `json:"stopwords,omitempty"`
-	Type      string     `json:"type,omitempty"`
+	StemExclusion []string `json:"stem_exclusion,omitempty"`
+	Stopwords     []string `json:"stopwords,omitempty"`
+	StopwordsPath *string  `json:"stopwords_path,omitempty"`
+	Type          string   `json:"type,omitempty"`
 }
 
-// DutchAnalyzerBuilder holds DutchAnalyzer struct and provides a builder API.
-type DutchAnalyzerBuilder struct {
-	v *DutchAnalyzer
+func (s *DutchAnalyzer) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "stem_exclusion":
+			if err := dec.Decode(&s.StemExclusion); err != nil {
+				return fmt.Errorf("%s | %w", "StemExclusion", err)
+			}
+
+		case "stopwords":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Stopwords", err)
+				}
+
+				s.Stopwords = append(s.Stopwords, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Stopwords); err != nil {
+					return fmt.Errorf("%s | %w", "Stopwords", err)
+				}
+			}
+
+		case "stopwords_path":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "StopwordsPath", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.StopwordsPath = &o
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewDutchAnalyzer provides a builder for the DutchAnalyzer struct.
-func NewDutchAnalyzerBuilder() *DutchAnalyzerBuilder {
-	r := DutchAnalyzerBuilder{
-		&DutchAnalyzer{},
+// MarshalJSON override marshalling to include literal value
+func (s DutchAnalyzer) MarshalJSON() ([]byte, error) {
+	type innerDutchAnalyzer DutchAnalyzer
+	tmp := innerDutchAnalyzer{
+		StemExclusion: s.StemExclusion,
+		Stopwords:     s.Stopwords,
+		StopwordsPath: s.StopwordsPath,
+		Type:          s.Type,
 	}
 
-	r.v.Type = "dutch"
+	tmp.Type = "dutch"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the DutchAnalyzer struct
-func (rb *DutchAnalyzerBuilder) Build() DutchAnalyzer {
-	return *rb.v
-}
+// NewDutchAnalyzer returns a DutchAnalyzer.
+func NewDutchAnalyzer() *DutchAnalyzer {
+	r := &DutchAnalyzer{}
 
-func (rb *DutchAnalyzerBuilder) Stopwords(stopwords *StopWordsBuilder) *DutchAnalyzerBuilder {
-	v := stopwords.Build()
-	rb.v.Stopwords = &v
-	return rb
+	return r
 }

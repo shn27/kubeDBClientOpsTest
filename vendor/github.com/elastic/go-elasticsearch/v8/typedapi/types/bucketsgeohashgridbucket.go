@@ -15,50 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // BucketsGeoHashGridBucket holds the union for the following types:
 //
-//	[]GeoHashGridBucket
 //	map[string]GeoHashGridBucket
+//	[]GeoHashGridBucket
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L303-L312
-type BucketsGeoHashGridBucket interface{}
-
-// BucketsGeoHashGridBucketBuilder holds BucketsGeoHashGridBucket struct and provides a builder API.
-type BucketsGeoHashGridBucketBuilder struct {
-	v BucketsGeoHashGridBucket
-}
-
-// NewBucketsGeoHashGridBucket provides a builder for the BucketsGeoHashGridBucket struct.
-func NewBucketsGeoHashGridBucketBuilder() *BucketsGeoHashGridBucketBuilder {
-	return &BucketsGeoHashGridBucketBuilder{}
-}
-
-// Build finalize the chain and returns the BucketsGeoHashGridBucket struct
-func (u *BucketsGeoHashGridBucketBuilder) Build() BucketsGeoHashGridBucket {
-	return u.v
-}
-
-func (u *BucketsGeoHashGridBucketBuilder) GeoHashGridBuckets(geohashgridbuckets []GeoHashGridBucketBuilder) *BucketsGeoHashGridBucketBuilder {
-	tmp := make([]GeoHashGridBucket, len(geohashgridbuckets))
-	for _, value := range geohashgridbuckets {
-		tmp = append(tmp, value.Build())
-	}
-	u.v = tmp
-	return u
-}
-
-func (u *BucketsGeoHashGridBucketBuilder) Map(values map[string]*GeoHashGridBucketBuilder) *BucketsGeoHashGridBucketBuilder {
-	tmp := make(map[string]GeoHashGridBucket, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	u.v = tmp
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L346-L355
+type BucketsGeoHashGridBucket any

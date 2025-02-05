@@ -15,41 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // Merge type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/IndexSettings.ts#L323-L325
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/IndexSettings.ts#L332-L334
 type Merge struct {
 	Scheduler *MergeScheduler `json:"scheduler,omitempty"`
 }
 
-// MergeBuilder holds Merge struct and provides a builder API.
-type MergeBuilder struct {
-	v *Merge
-}
+// NewMerge returns a Merge.
+func NewMerge() *Merge {
+	r := &Merge{}
 
-// NewMerge provides a builder for the Merge struct.
-func NewMergeBuilder() *MergeBuilder {
-	r := MergeBuilder{
-		&Merge{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the Merge struct
-func (rb *MergeBuilder) Build() Merge {
-	return *rb.v
-}
-
-func (rb *MergeBuilder) Scheduler(scheduler *MergeSchedulerBuilder) *MergeBuilder {
-	v := scheduler.Build()
-	rb.v.Scheduler = &v
-	return rb
+	return r
 }

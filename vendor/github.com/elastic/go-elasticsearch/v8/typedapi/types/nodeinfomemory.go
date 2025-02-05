@@ -15,46 +15,78 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // NodeInfoMemory type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/info/types.ts#L315-L318
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/info/types.ts#L331-L334
 type NodeInfoMemory struct {
 	Total        string `json:"total"`
 	TotalInBytes int64  `json:"total_in_bytes"`
 }
 
-// NodeInfoMemoryBuilder holds NodeInfoMemory struct and provides a builder API.
-type NodeInfoMemoryBuilder struct {
-	v *NodeInfoMemory
-}
+func (s *NodeInfoMemory) UnmarshalJSON(data []byte) error {
 
-// NewNodeInfoMemory provides a builder for the NodeInfoMemory struct.
-func NewNodeInfoMemoryBuilder() *NodeInfoMemoryBuilder {
-	r := NodeInfoMemoryBuilder{
-		&NodeInfoMemory{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "total":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Total", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Total = o
+
+		case "total_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TotalInBytes", err)
+				}
+				s.TotalInBytes = value
+			case float64:
+				f := int64(v)
+				s.TotalInBytes = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the NodeInfoMemory struct
-func (rb *NodeInfoMemoryBuilder) Build() NodeInfoMemory {
-	return *rb.v
-}
+// NewNodeInfoMemory returns a NodeInfoMemory.
+func NewNodeInfoMemory() *NodeInfoMemory {
+	r := &NodeInfoMemory{}
 
-func (rb *NodeInfoMemoryBuilder) Total(total string) *NodeInfoMemoryBuilder {
-	rb.v.Total = total
-	return rb
-}
-
-func (rb *NodeInfoMemoryBuilder) TotalInBytes(totalinbytes int64) *NodeInfoMemoryBuilder {
-	rb.v.TotalInBytes = totalinbytes
-	return rb
+	return r
 }

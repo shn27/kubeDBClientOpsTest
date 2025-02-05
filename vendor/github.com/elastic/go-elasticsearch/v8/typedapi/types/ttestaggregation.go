@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
@@ -28,58 +26,19 @@ import (
 
 // TTestAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/metric.ts#L153-L157
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/metric.ts#L303-L317
 type TTestAggregation struct {
-	A    *TestPopulation      `json:"a,omitempty"`
-	B    *TestPopulation      `json:"b,omitempty"`
-	Meta *Metadata            `json:"meta,omitempty"`
-	Name *string              `json:"name,omitempty"`
+	// A Test population A.
+	A *TestPopulation `json:"a,omitempty"`
+	// B Test population B.
+	B *TestPopulation `json:"b,omitempty"`
+	// Type The type of test.
 	Type *ttesttype.TTestType `json:"type,omitempty"`
 }
 
-// TTestAggregationBuilder holds TTestAggregation struct and provides a builder API.
-type TTestAggregationBuilder struct {
-	v *TTestAggregation
-}
+// NewTTestAggregation returns a TTestAggregation.
+func NewTTestAggregation() *TTestAggregation {
+	r := &TTestAggregation{}
 
-// NewTTestAggregation provides a builder for the TTestAggregation struct.
-func NewTTestAggregationBuilder() *TTestAggregationBuilder {
-	r := TTestAggregationBuilder{
-		&TTestAggregation{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the TTestAggregation struct
-func (rb *TTestAggregationBuilder) Build() TTestAggregation {
-	return *rb.v
-}
-
-func (rb *TTestAggregationBuilder) A(a *TestPopulationBuilder) *TTestAggregationBuilder {
-	v := a.Build()
-	rb.v.A = &v
-	return rb
-}
-
-func (rb *TTestAggregationBuilder) B(b *TestPopulationBuilder) *TTestAggregationBuilder {
-	v := b.Build()
-	rb.v.B = &v
-	return rb
-}
-
-func (rb *TTestAggregationBuilder) Meta(meta *MetadataBuilder) *TTestAggregationBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *TTestAggregationBuilder) Name(name string) *TTestAggregationBuilder {
-	rb.v.Name = &name
-	return rb
-}
-
-func (rb *TTestAggregationBuilder) Type_(type_ ttesttype.TTestType) *TTestAggregationBuilder {
-	rb.v.Type = &type_
-	return rb
+	return r
 }

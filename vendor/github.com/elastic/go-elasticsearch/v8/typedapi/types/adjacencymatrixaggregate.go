@@ -15,48 +15,76 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // AdjacencyMatrixAggregate type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L552-L554
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L647-L652
 type AdjacencyMatrixAggregate struct {
 	Buckets BucketsAdjacencyMatrixBucket `json:"buckets"`
-	Meta    *Metadata                    `json:"meta,omitempty"`
+	Meta    Metadata                     `json:"meta,omitempty"`
 }
 
-// AdjacencyMatrixAggregateBuilder holds AdjacencyMatrixAggregate struct and provides a builder API.
-type AdjacencyMatrixAggregateBuilder struct {
-	v *AdjacencyMatrixAggregate
-}
+func (s *AdjacencyMatrixAggregate) UnmarshalJSON(data []byte) error {
 
-// NewAdjacencyMatrixAggregate provides a builder for the AdjacencyMatrixAggregate struct.
-func NewAdjacencyMatrixAggregateBuilder() *AdjacencyMatrixAggregateBuilder {
-	r := AdjacencyMatrixAggregateBuilder{
-		&AdjacencyMatrixAggregate{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "buckets":
+
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			source := bytes.NewReader(rawMsg)
+			localDec := json.NewDecoder(source)
+			switch rawMsg[0] {
+			case '{':
+				o := make(map[string]AdjacencyMatrixBucket, 0)
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Buckets", err)
+				}
+				s.Buckets = o
+			case '[':
+				o := []AdjacencyMatrixBucket{}
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Buckets", err)
+				}
+				s.Buckets = o
+			}
+
+		case "meta":
+			if err := dec.Decode(&s.Meta); err != nil {
+				return fmt.Errorf("%s | %w", "Meta", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the AdjacencyMatrixAggregate struct
-func (rb *AdjacencyMatrixAggregateBuilder) Build() AdjacencyMatrixAggregate {
-	return *rb.v
-}
+// NewAdjacencyMatrixAggregate returns a AdjacencyMatrixAggregate.
+func NewAdjacencyMatrixAggregate() *AdjacencyMatrixAggregate {
+	r := &AdjacencyMatrixAggregate{}
 
-func (rb *AdjacencyMatrixAggregateBuilder) Buckets(buckets *BucketsAdjacencyMatrixBucketBuilder) *AdjacencyMatrixAggregateBuilder {
-	v := buckets.Build()
-	rb.v.Buckets = v
-	return rb
-}
-
-func (rb *AdjacencyMatrixAggregateBuilder) Meta(meta *MetadataBuilder) *AdjacencyMatrixAggregateBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
+	return r
 }

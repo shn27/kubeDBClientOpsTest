@@ -15,43 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // CategorizeTextAnalyzer holds the union for the following types:
 //
-//	CustomCategorizeTextAnalyzer
 //	string
+//	CustomCategorizeTextAnalyzer
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/bucket.ts#L499-L502
-type CategorizeTextAnalyzer interface{}
-
-// CategorizeTextAnalyzerBuilder holds CategorizeTextAnalyzer struct and provides a builder API.
-type CategorizeTextAnalyzerBuilder struct {
-	v CategorizeTextAnalyzer
-}
-
-// NewCategorizeTextAnalyzer provides a builder for the CategorizeTextAnalyzer struct.
-func NewCategorizeTextAnalyzerBuilder() *CategorizeTextAnalyzerBuilder {
-	return &CategorizeTextAnalyzerBuilder{}
-}
-
-// Build finalize the chain and returns the CategorizeTextAnalyzer struct
-func (u *CategorizeTextAnalyzerBuilder) Build() CategorizeTextAnalyzer {
-	return u.v
-}
-
-func (u *CategorizeTextAnalyzerBuilder) CustomCategorizeTextAnalyzer(customcategorizetextanalyzer *CustomCategorizeTextAnalyzerBuilder) *CategorizeTextAnalyzerBuilder {
-	v := customcategorizetextanalyzer.Build()
-	u.v = &v
-	return u
-}
-
-func (u *CategorizeTextAnalyzerBuilder) String(string string) *CategorizeTextAnalyzerBuilder {
-	u.v = &string
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/bucket.ts#L1184-L1187
+type CategorizeTextAnalyzer any

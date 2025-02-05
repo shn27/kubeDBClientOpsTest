@@ -15,70 +15,73 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // DataframeEvaluationOutlierDetection type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/DataframeEvaluation.ts#L46-L53
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/DataframeEvaluation.ts#L46-L53
 type DataframeEvaluationOutlierDetection struct {
 	// ActualField The field of the index which contains the ground truth. The data type of this
 	// field can be boolean or integer. If the data type is integer, the value has
 	// to be either 0 (false) or 1 (true).
-	ActualField Field `json:"actual_field"`
+	ActualField string `json:"actual_field"`
 	// Metrics Specifies the metrics that are used for the evaluation.
 	Metrics *DataframeEvaluationOutlierDetectionMetrics `json:"metrics,omitempty"`
 	// PredictedProbabilityField The field of the index that defines the probability of whether the item
 	// belongs to the class in question or not. It’s the field that contains the
 	// results of the analysis.
-	PredictedProbabilityField Field `json:"predicted_probability_field"`
+	PredictedProbabilityField string `json:"predicted_probability_field"`
 }
 
-// DataframeEvaluationOutlierDetectionBuilder holds DataframeEvaluationOutlierDetection struct and provides a builder API.
-type DataframeEvaluationOutlierDetectionBuilder struct {
-	v *DataframeEvaluationOutlierDetection
-}
+func (s *DataframeEvaluationOutlierDetection) UnmarshalJSON(data []byte) error {
 
-// NewDataframeEvaluationOutlierDetection provides a builder for the DataframeEvaluationOutlierDetection struct.
-func NewDataframeEvaluationOutlierDetectionBuilder() *DataframeEvaluationOutlierDetectionBuilder {
-	r := DataframeEvaluationOutlierDetectionBuilder{
-		&DataframeEvaluationOutlierDetection{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "actual_field":
+			if err := dec.Decode(&s.ActualField); err != nil {
+				return fmt.Errorf("%s | %w", "ActualField", err)
+			}
+
+		case "metrics":
+			if err := dec.Decode(&s.Metrics); err != nil {
+				return fmt.Errorf("%s | %w", "Metrics", err)
+			}
+
+		case "predicted_probability_field":
+			if err := dec.Decode(&s.PredictedProbabilityField); err != nil {
+				return fmt.Errorf("%s | %w", "PredictedProbabilityField", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DataframeEvaluationOutlierDetection struct
-func (rb *DataframeEvaluationOutlierDetectionBuilder) Build() DataframeEvaluationOutlierDetection {
-	return *rb.v
-}
+// NewDataframeEvaluationOutlierDetection returns a DataframeEvaluationOutlierDetection.
+func NewDataframeEvaluationOutlierDetection() *DataframeEvaluationOutlierDetection {
+	r := &DataframeEvaluationOutlierDetection{}
 
-// ActualField The field of the index which contains the ground truth. The data type of this
-// field can be boolean or integer. If the data type is integer, the value has
-// to be either 0 (false) or 1 (true).
-
-func (rb *DataframeEvaluationOutlierDetectionBuilder) ActualField(actualfield Field) *DataframeEvaluationOutlierDetectionBuilder {
-	rb.v.ActualField = actualfield
-	return rb
-}
-
-// Metrics Specifies the metrics that are used for the evaluation.
-
-func (rb *DataframeEvaluationOutlierDetectionBuilder) Metrics(metrics *DataframeEvaluationOutlierDetectionMetricsBuilder) *DataframeEvaluationOutlierDetectionBuilder {
-	v := metrics.Build()
-	rb.v.Metrics = &v
-	return rb
-}
-
-// PredictedProbabilityField The field of the index that defines the probability of whether the item
-// belongs to the class in question or not. It’s the field that contains the
-// results of the analysis.
-
-func (rb *DataframeEvaluationOutlierDetectionBuilder) PredictedProbabilityField(predictedprobabilityfield Field) *DataframeEvaluationOutlierDetectionBuilder {
-	rb.v.PredictedProbabilityField = predictedprobabilityfield
-	return rb
+	return r
 }

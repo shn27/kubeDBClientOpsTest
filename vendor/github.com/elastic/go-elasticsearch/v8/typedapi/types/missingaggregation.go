@@ -15,60 +15,61 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // MissingAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/bucket.ts#L257-L260
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/bucket.ts#L593-L599
 type MissingAggregation struct {
-	Field   *Field    `json:"field,omitempty"`
-	Meta    *Metadata `json:"meta,omitempty"`
-	Missing *Missing  `json:"missing,omitempty"`
-	Name    *string   `json:"name,omitempty"`
+	// Field The name of the field.
+	Field   *string `json:"field,omitempty"`
+	Missing Missing `json:"missing,omitempty"`
 }
 
-// MissingAggregationBuilder holds MissingAggregation struct and provides a builder API.
-type MissingAggregationBuilder struct {
-	v *MissingAggregation
-}
+func (s *MissingAggregation) UnmarshalJSON(data []byte) error {
 
-// NewMissingAggregation provides a builder for the MissingAggregation struct.
-func NewMissingAggregationBuilder() *MissingAggregationBuilder {
-	r := MissingAggregationBuilder{
-		&MissingAggregation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "missing":
+			if err := dec.Decode(&s.Missing); err != nil {
+				return fmt.Errorf("%s | %w", "Missing", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the MissingAggregation struct
-func (rb *MissingAggregationBuilder) Build() MissingAggregation {
-	return *rb.v
-}
+// NewMissingAggregation returns a MissingAggregation.
+func NewMissingAggregation() *MissingAggregation {
+	r := &MissingAggregation{}
 
-func (rb *MissingAggregationBuilder) Field(field Field) *MissingAggregationBuilder {
-	rb.v.Field = &field
-	return rb
-}
-
-func (rb *MissingAggregationBuilder) Meta(meta *MetadataBuilder) *MissingAggregationBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *MissingAggregationBuilder) Missing(missing *MissingBuilder) *MissingAggregationBuilder {
-	v := missing.Build()
-	rb.v.Missing = &v
-	return rb
-}
-
-func (rb *MissingAggregationBuilder) Name(name string) *MissingAggregationBuilder {
-	rb.v.Name = &name
-	return rb
+	return r
 }

@@ -15,16 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
+	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/expandwildcard"
+)
+
 // IndicesOptions type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/common.ts#L290-L317
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/common.ts#L336-L363
 type IndicesOptions struct {
 	// AllowNoIndices If false, the request returns an error if any wildcard expression, index
 	// alias, or `_all` value targets only
@@ -38,66 +47,94 @@ type IndicesOptions struct {
 	// determines whether wildcard expressions match hidden data streams. Supports
 	// comma-separated values,
 	// such as `open,hidden`.
-	ExpandWildcards *ExpandWildcards `json:"expand_wildcards,omitempty"`
+	ExpandWildcards []expandwildcard.ExpandWildcard `json:"expand_wildcards,omitempty"`
 	// IgnoreThrottled If true, concrete, expanded or aliased indices are ignored when frozen.
 	IgnoreThrottled *bool `json:"ignore_throttled,omitempty"`
 	// IgnoreUnavailable If true, missing or closed indices are not included in the response.
 	IgnoreUnavailable *bool `json:"ignore_unavailable,omitempty"`
 }
 
-// IndicesOptionsBuilder holds IndicesOptions struct and provides a builder API.
-type IndicesOptionsBuilder struct {
-	v *IndicesOptions
-}
+func (s *IndicesOptions) UnmarshalJSON(data []byte) error {
 
-// NewIndicesOptions provides a builder for the IndicesOptions struct.
-func NewIndicesOptionsBuilder() *IndicesOptionsBuilder {
-	r := IndicesOptionsBuilder{
-		&IndicesOptions{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "allow_no_indices":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "AllowNoIndices", err)
+				}
+				s.AllowNoIndices = &value
+			case bool:
+				s.AllowNoIndices = &v
+			}
+
+		case "expand_wildcards":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := &expandwildcard.ExpandWildcard{}
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "ExpandWildcards", err)
+				}
+
+				s.ExpandWildcards = append(s.ExpandWildcards, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.ExpandWildcards); err != nil {
+					return fmt.Errorf("%s | %w", "ExpandWildcards", err)
+				}
+			}
+
+		case "ignore_throttled":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IgnoreThrottled", err)
+				}
+				s.IgnoreThrottled = &value
+			case bool:
+				s.IgnoreThrottled = &v
+			}
+
+		case "ignore_unavailable":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IgnoreUnavailable", err)
+				}
+				s.IgnoreUnavailable = &value
+			case bool:
+				s.IgnoreUnavailable = &v
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the IndicesOptions struct
-func (rb *IndicesOptionsBuilder) Build() IndicesOptions {
-	return *rb.v
-}
+// NewIndicesOptions returns a IndicesOptions.
+func NewIndicesOptions() *IndicesOptions {
+	r := &IndicesOptions{}
 
-// AllowNoIndices If false, the request returns an error if any wildcard expression, index
-// alias, or `_all` value targets only
-// missing or closed indices. This behavior applies even if the request targets
-// other open indices. For example,
-// a request targeting `foo*,bar*` returns an error if an index starts with
-// `foo` but no index starts with `bar`.
-
-func (rb *IndicesOptionsBuilder) AllowNoIndices(allownoindices bool) *IndicesOptionsBuilder {
-	rb.v.AllowNoIndices = &allownoindices
-	return rb
-}
-
-// ExpandWildcards Type of index that wildcard patterns can match. If the request can target
-// data streams, this argument
-// determines whether wildcard expressions match hidden data streams. Supports
-// comma-separated values,
-// such as `open,hidden`.
-
-func (rb *IndicesOptionsBuilder) ExpandWildcards(expandwildcards *ExpandWildcardsBuilder) *IndicesOptionsBuilder {
-	v := expandwildcards.Build()
-	rb.v.ExpandWildcards = &v
-	return rb
-}
-
-// IgnoreThrottled If true, concrete, expanded or aliased indices are ignored when frozen.
-
-func (rb *IndicesOptionsBuilder) IgnoreThrottled(ignorethrottled bool) *IndicesOptionsBuilder {
-	rb.v.IgnoreThrottled = &ignorethrottled
-	return rb
-}
-
-// IgnoreUnavailable If true, missing or closed indices are not included in the response.
-
-func (rb *IndicesOptionsBuilder) IgnoreUnavailable(ignoreunavailable bool) *IndicesOptionsBuilder {
-	rb.v.IgnoreUnavailable = &ignoreunavailable
-	return rb
+	return r
 }

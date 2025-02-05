@@ -15,121 +15,251 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // WordDelimiterTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L131-L146
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L133-L148
 type WordDelimiterTokenFilter struct {
-	CatenateAll           *bool          `json:"catenate_all,omitempty"`
-	CatenateNumbers       *bool          `json:"catenate_numbers,omitempty"`
-	CatenateWords         *bool          `json:"catenate_words,omitempty"`
-	GenerateNumberParts   *bool          `json:"generate_number_parts,omitempty"`
-	GenerateWordParts     *bool          `json:"generate_word_parts,omitempty"`
-	PreserveOriginal      *bool          `json:"preserve_original,omitempty"`
-	ProtectedWords        []string       `json:"protected_words,omitempty"`
-	ProtectedWordsPath    *string        `json:"protected_words_path,omitempty"`
-	SplitOnCaseChange     *bool          `json:"split_on_case_change,omitempty"`
-	SplitOnNumerics       *bool          `json:"split_on_numerics,omitempty"`
-	StemEnglishPossessive *bool          `json:"stem_english_possessive,omitempty"`
-	Type                  string         `json:"type,omitempty"`
-	TypeTable             []string       `json:"type_table,omitempty"`
-	TypeTablePath         *string        `json:"type_table_path,omitempty"`
-	Version               *VersionString `json:"version,omitempty"`
+	CatenateAll           *bool              `json:"catenate_all,omitempty"`
+	CatenateNumbers       *bool              `json:"catenate_numbers,omitempty"`
+	CatenateWords         *bool              `json:"catenate_words,omitempty"`
+	GenerateNumberParts   *bool              `json:"generate_number_parts,omitempty"`
+	GenerateWordParts     *bool              `json:"generate_word_parts,omitempty"`
+	PreserveOriginal      Stringifiedboolean `json:"preserve_original,omitempty"`
+	ProtectedWords        []string           `json:"protected_words,omitempty"`
+	ProtectedWordsPath    *string            `json:"protected_words_path,omitempty"`
+	SplitOnCaseChange     *bool              `json:"split_on_case_change,omitempty"`
+	SplitOnNumerics       *bool              `json:"split_on_numerics,omitempty"`
+	StemEnglishPossessive *bool              `json:"stem_english_possessive,omitempty"`
+	Type                  string             `json:"type,omitempty"`
+	TypeTable             []string           `json:"type_table,omitempty"`
+	TypeTablePath         *string            `json:"type_table_path,omitempty"`
+	Version               *string            `json:"version,omitempty"`
 }
 
-// WordDelimiterTokenFilterBuilder holds WordDelimiterTokenFilter struct and provides a builder API.
-type WordDelimiterTokenFilterBuilder struct {
-	v *WordDelimiterTokenFilter
+func (s *WordDelimiterTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "catenate_all":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CatenateAll", err)
+				}
+				s.CatenateAll = &value
+			case bool:
+				s.CatenateAll = &v
+			}
+
+		case "catenate_numbers":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CatenateNumbers", err)
+				}
+				s.CatenateNumbers = &value
+			case bool:
+				s.CatenateNumbers = &v
+			}
+
+		case "catenate_words":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CatenateWords", err)
+				}
+				s.CatenateWords = &value
+			case bool:
+				s.CatenateWords = &v
+			}
+
+		case "generate_number_parts":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "GenerateNumberParts", err)
+				}
+				s.GenerateNumberParts = &value
+			case bool:
+				s.GenerateNumberParts = &v
+			}
+
+		case "generate_word_parts":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "GenerateWordParts", err)
+				}
+				s.GenerateWordParts = &value
+			case bool:
+				s.GenerateWordParts = &v
+			}
+
+		case "preserve_original":
+			if err := dec.Decode(&s.PreserveOriginal); err != nil {
+				return fmt.Errorf("%s | %w", "PreserveOriginal", err)
+			}
+
+		case "protected_words":
+			if err := dec.Decode(&s.ProtectedWords); err != nil {
+				return fmt.Errorf("%s | %w", "ProtectedWords", err)
+			}
+
+		case "protected_words_path":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ProtectedWordsPath", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ProtectedWordsPath = &o
+
+		case "split_on_case_change":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "SplitOnCaseChange", err)
+				}
+				s.SplitOnCaseChange = &value
+			case bool:
+				s.SplitOnCaseChange = &v
+			}
+
+		case "split_on_numerics":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "SplitOnNumerics", err)
+				}
+				s.SplitOnNumerics = &value
+			case bool:
+				s.SplitOnNumerics = &v
+			}
+
+		case "stem_english_possessive":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "StemEnglishPossessive", err)
+				}
+				s.StemEnglishPossessive = &value
+			case bool:
+				s.StemEnglishPossessive = &v
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "type_table":
+			if err := dec.Decode(&s.TypeTable); err != nil {
+				return fmt.Errorf("%s | %w", "TypeTable", err)
+			}
+
+		case "type_table_path":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "TypeTablePath", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.TypeTablePath = &o
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewWordDelimiterTokenFilter provides a builder for the WordDelimiterTokenFilter struct.
-func NewWordDelimiterTokenFilterBuilder() *WordDelimiterTokenFilterBuilder {
-	r := WordDelimiterTokenFilterBuilder{
-		&WordDelimiterTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s WordDelimiterTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerWordDelimiterTokenFilter WordDelimiterTokenFilter
+	tmp := innerWordDelimiterTokenFilter{
+		CatenateAll:           s.CatenateAll,
+		CatenateNumbers:       s.CatenateNumbers,
+		CatenateWords:         s.CatenateWords,
+		GenerateNumberParts:   s.GenerateNumberParts,
+		GenerateWordParts:     s.GenerateWordParts,
+		PreserveOriginal:      s.PreserveOriginal,
+		ProtectedWords:        s.ProtectedWords,
+		ProtectedWordsPath:    s.ProtectedWordsPath,
+		SplitOnCaseChange:     s.SplitOnCaseChange,
+		SplitOnNumerics:       s.SplitOnNumerics,
+		StemEnglishPossessive: s.StemEnglishPossessive,
+		Type:                  s.Type,
+		TypeTable:             s.TypeTable,
+		TypeTablePath:         s.TypeTablePath,
+		Version:               s.Version,
 	}
 
-	r.v.Type = "word_delimiter"
+	tmp.Type = "word_delimiter"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the WordDelimiterTokenFilter struct
-func (rb *WordDelimiterTokenFilterBuilder) Build() WordDelimiterTokenFilter {
-	return *rb.v
-}
+// NewWordDelimiterTokenFilter returns a WordDelimiterTokenFilter.
+func NewWordDelimiterTokenFilter() *WordDelimiterTokenFilter {
+	r := &WordDelimiterTokenFilter{}
 
-func (rb *WordDelimiterTokenFilterBuilder) CatenateAll(catenateall bool) *WordDelimiterTokenFilterBuilder {
-	rb.v.CatenateAll = &catenateall
-	return rb
-}
-
-func (rb *WordDelimiterTokenFilterBuilder) CatenateNumbers(catenatenumbers bool) *WordDelimiterTokenFilterBuilder {
-	rb.v.CatenateNumbers = &catenatenumbers
-	return rb
-}
-
-func (rb *WordDelimiterTokenFilterBuilder) CatenateWords(catenatewords bool) *WordDelimiterTokenFilterBuilder {
-	rb.v.CatenateWords = &catenatewords
-	return rb
-}
-
-func (rb *WordDelimiterTokenFilterBuilder) GenerateNumberParts(generatenumberparts bool) *WordDelimiterTokenFilterBuilder {
-	rb.v.GenerateNumberParts = &generatenumberparts
-	return rb
-}
-
-func (rb *WordDelimiterTokenFilterBuilder) GenerateWordParts(generatewordparts bool) *WordDelimiterTokenFilterBuilder {
-	rb.v.GenerateWordParts = &generatewordparts
-	return rb
-}
-
-func (rb *WordDelimiterTokenFilterBuilder) PreserveOriginal(preserveoriginal bool) *WordDelimiterTokenFilterBuilder {
-	rb.v.PreserveOriginal = &preserveoriginal
-	return rb
-}
-
-func (rb *WordDelimiterTokenFilterBuilder) ProtectedWords(protected_words ...string) *WordDelimiterTokenFilterBuilder {
-	rb.v.ProtectedWords = protected_words
-	return rb
-}
-
-func (rb *WordDelimiterTokenFilterBuilder) ProtectedWordsPath(protectedwordspath string) *WordDelimiterTokenFilterBuilder {
-	rb.v.ProtectedWordsPath = &protectedwordspath
-	return rb
-}
-
-func (rb *WordDelimiterTokenFilterBuilder) SplitOnCaseChange(splitoncasechange bool) *WordDelimiterTokenFilterBuilder {
-	rb.v.SplitOnCaseChange = &splitoncasechange
-	return rb
-}
-
-func (rb *WordDelimiterTokenFilterBuilder) SplitOnNumerics(splitonnumerics bool) *WordDelimiterTokenFilterBuilder {
-	rb.v.SplitOnNumerics = &splitonnumerics
-	return rb
-}
-
-func (rb *WordDelimiterTokenFilterBuilder) StemEnglishPossessive(stemenglishpossessive bool) *WordDelimiterTokenFilterBuilder {
-	rb.v.StemEnglishPossessive = &stemenglishpossessive
-	return rb
-}
-
-func (rb *WordDelimiterTokenFilterBuilder) TypeTable(type_table ...string) *WordDelimiterTokenFilterBuilder {
-	rb.v.TypeTable = type_table
-	return rb
-}
-
-func (rb *WordDelimiterTokenFilterBuilder) TypeTablePath(typetablepath string) *WordDelimiterTokenFilterBuilder {
-	rb.v.TypeTablePath = &typetablepath
-	return rb
-}
-
-func (rb *WordDelimiterTokenFilterBuilder) Version(version VersionString) *WordDelimiterTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

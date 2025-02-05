@@ -15,56 +15,30 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"encoding/json"
+)
+
 // NodeInfoXpack type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/info/types.ts#L228-L232
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/info/types.ts#L239-L244
 type NodeInfoXpack struct {
-	License      *NodeInfoXpackLicense  `json:"license,omitempty"`
-	Notification map[string]interface{} `json:"notification,omitempty"`
-	Security     NodeInfoXpackSecurity  `json:"security"`
+	License      *NodeInfoXpackLicense      `json:"license,omitempty"`
+	Ml           *NodeInfoXpackMl           `json:"ml,omitempty"`
+	Notification map[string]json.RawMessage `json:"notification,omitempty"`
+	Security     NodeInfoXpackSecurity      `json:"security"`
 }
 
-// NodeInfoXpackBuilder holds NodeInfoXpack struct and provides a builder API.
-type NodeInfoXpackBuilder struct {
-	v *NodeInfoXpack
-}
-
-// NewNodeInfoXpack provides a builder for the NodeInfoXpack struct.
-func NewNodeInfoXpackBuilder() *NodeInfoXpackBuilder {
-	r := NodeInfoXpackBuilder{
-		&NodeInfoXpack{
-			Notification: make(map[string]interface{}, 0),
-		},
+// NewNodeInfoXpack returns a NodeInfoXpack.
+func NewNodeInfoXpack() *NodeInfoXpack {
+	r := &NodeInfoXpack{
+		Notification: make(map[string]json.RawMessage, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the NodeInfoXpack struct
-func (rb *NodeInfoXpackBuilder) Build() NodeInfoXpack {
-	return *rb.v
-}
-
-func (rb *NodeInfoXpackBuilder) License(license *NodeInfoXpackLicenseBuilder) *NodeInfoXpackBuilder {
-	v := license.Build()
-	rb.v.License = &v
-	return rb
-}
-
-func (rb *NodeInfoXpackBuilder) Notification(value map[string]interface{}) *NodeInfoXpackBuilder {
-	rb.v.Notification = value
-	return rb
-}
-
-func (rb *NodeInfoXpackBuilder) Security(security *NodeInfoXpackSecurityBuilder) *NodeInfoXpackBuilder {
-	v := security.Build()
-	rb.v.Security = v
-	return rb
+	return r
 }

@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
@@ -28,51 +26,16 @@ import (
 
 // HttpInput type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Input.ts#L45-L50
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Input.ts#L44-L48
 type HttpInput struct {
 	Extract             []string                                 `json:"extract,omitempty"`
-	Http                *HttpInput                               `json:"http,omitempty"`
 	Request             *HttpInputRequestDefinition              `json:"request,omitempty"`
 	ResponseContentType *responsecontenttype.ResponseContentType `json:"response_content_type,omitempty"`
 }
 
-// HttpInputBuilder holds HttpInput struct and provides a builder API.
-type HttpInputBuilder struct {
-	v *HttpInput
-}
+// NewHttpInput returns a HttpInput.
+func NewHttpInput() *HttpInput {
+	r := &HttpInput{}
 
-// NewHttpInput provides a builder for the HttpInput struct.
-func NewHttpInputBuilder() *HttpInputBuilder {
-	r := HttpInputBuilder{
-		&HttpInput{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the HttpInput struct
-func (rb *HttpInputBuilder) Build() HttpInput {
-	return *rb.v
-}
-
-func (rb *HttpInputBuilder) Extract(extract ...string) *HttpInputBuilder {
-	rb.v.Extract = extract
-	return rb
-}
-
-func (rb *HttpInputBuilder) Http(http *HttpInputBuilder) *HttpInputBuilder {
-	v := http.Build()
-	rb.v.Http = &v
-	return rb
-}
-
-func (rb *HttpInputBuilder) Request(request *HttpInputRequestDefinitionBuilder) *HttpInputBuilder {
-	v := request.Build()
-	rb.v.Request = &v
-	return rb
-}
-
-func (rb *HttpInputBuilder) ResponseContentType(responsecontenttype responsecontenttype.ResponseContentType) *HttpInputBuilder {
-	rb.v.ResponseContentType = &responsecontenttype
-	return rb
+	return r
 }

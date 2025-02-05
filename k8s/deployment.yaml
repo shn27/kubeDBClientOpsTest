@@ -17,8 +17,8 @@ spec:
       serviceAccountName: super-admin
       containers:
         - name: my-app-container
-          image: my-app-image:latest # Replace this with your actual image name and tag
-          imagePullPolicy: IfNotPresent
+          image: shn27/my-app-image:latest # Replace this with your actual image name and tag
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080 # Change this based on your app's port
 ---

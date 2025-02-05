@@ -15,46 +15,60 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // HttpInputBasicAuthentication type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Input.ts#L56-L59
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Input.ts#L54-L57
 type HttpInputBasicAuthentication struct {
-	Password Password `json:"password"`
-	Username Username `json:"username"`
+	Password string `json:"password"`
+	Username string `json:"username"`
 }
 
-// HttpInputBasicAuthenticationBuilder holds HttpInputBasicAuthentication struct and provides a builder API.
-type HttpInputBasicAuthenticationBuilder struct {
-	v *HttpInputBasicAuthentication
-}
+func (s *HttpInputBasicAuthentication) UnmarshalJSON(data []byte) error {
 
-// NewHttpInputBasicAuthentication provides a builder for the HttpInputBasicAuthentication struct.
-func NewHttpInputBasicAuthenticationBuilder() *HttpInputBasicAuthenticationBuilder {
-	r := HttpInputBasicAuthenticationBuilder{
-		&HttpInputBasicAuthentication{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "password":
+			if err := dec.Decode(&s.Password); err != nil {
+				return fmt.Errorf("%s | %w", "Password", err)
+			}
+
+		case "username":
+			if err := dec.Decode(&s.Username); err != nil {
+				return fmt.Errorf("%s | %w", "Username", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the HttpInputBasicAuthentication struct
-func (rb *HttpInputBasicAuthenticationBuilder) Build() HttpInputBasicAuthentication {
-	return *rb.v
-}
+// NewHttpInputBasicAuthentication returns a HttpInputBasicAuthentication.
+func NewHttpInputBasicAuthentication() *HttpInputBasicAuthentication {
+	r := &HttpInputBasicAuthentication{}
 
-func (rb *HttpInputBasicAuthenticationBuilder) Password(password Password) *HttpInputBasicAuthenticationBuilder {
-	rb.v.Password = password
-	return rb
-}
-
-func (rb *HttpInputBasicAuthenticationBuilder) Username(username Username) *HttpInputBasicAuthenticationBuilder {
-	rb.v.Username = username
-	return rb
+	return r
 }

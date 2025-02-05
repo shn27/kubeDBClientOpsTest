@@ -15,184 +15,246 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // LifecycleExplainManaged type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ilm/explain_lifecycle/types.ts#L26-L52
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ilm/explain_lifecycle/types.ts#L26-L52
 type LifecycleExplainManaged struct {
-	Action                  *Name                           `json:"action,omitempty"`
-	ActionTime              *DateTime                       `json:"action_time,omitempty"`
-	ActionTimeMillis        *EpochTimeUnitMillis            `json:"action_time_millis,omitempty"`
-	Age                     *Duration                       `json:"age,omitempty"`
-	FailedStep              *Name                           `json:"failed_step,omitempty"`
+	Action                  *string                         `json:"action,omitempty"`
+	ActionTime              DateTime                        `json:"action_time,omitempty"`
+	ActionTimeMillis        *int64                          `json:"action_time_millis,omitempty"`
+	Age                     Duration                        `json:"age,omitempty"`
+	FailedStep              *string                         `json:"failed_step,omitempty"`
 	FailedStepRetryCount    *int                            `json:"failed_step_retry_count,omitempty"`
-	Index                   *IndexName                      `json:"index,omitempty"`
-	IndexCreationDate       *DateTime                       `json:"index_creation_date,omitempty"`
-	IndexCreationDateMillis *EpochTimeUnitMillis            `json:"index_creation_date_millis,omitempty"`
+	Index                   *string                         `json:"index,omitempty"`
+	IndexCreationDate       DateTime                        `json:"index_creation_date,omitempty"`
+	IndexCreationDateMillis *int64                          `json:"index_creation_date_millis,omitempty"`
 	IsAutoRetryableError    *bool                           `json:"is_auto_retryable_error,omitempty"`
-	LifecycleDate           *DateTime                       `json:"lifecycle_date,omitempty"`
-	LifecycleDateMillis     *EpochTimeUnitMillis            `json:"lifecycle_date_millis,omitempty"`
-	Managed                 string                          `json:"managed,omitempty"`
-	Phase                   Name                            `json:"phase"`
+	LifecycleDate           DateTime                        `json:"lifecycle_date,omitempty"`
+	LifecycleDateMillis     *int64                          `json:"lifecycle_date_millis,omitempty"`
+	Managed                 bool                            `json:"managed,omitempty"`
+	Phase                   string                          `json:"phase"`
 	PhaseExecution          *LifecycleExplainPhaseExecution `json:"phase_execution,omitempty"`
-	PhaseTime               *DateTime                       `json:"phase_time,omitempty"`
-	PhaseTimeMillis         *EpochTimeUnitMillis            `json:"phase_time_millis,omitempty"`
-	Policy                  Name                            `json:"policy"`
-	Step                    *Name                           `json:"step,omitempty"`
-	StepInfo                map[string]interface{}          `json:"step_info,omitempty"`
-	StepTime                *DateTime                       `json:"step_time,omitempty"`
-	StepTimeMillis          *EpochTimeUnitMillis            `json:"step_time_millis,omitempty"`
-	TimeSinceIndexCreation  *Duration                       `json:"time_since_index_creation,omitempty"`
+	PhaseTime               DateTime                        `json:"phase_time,omitempty"`
+	PhaseTimeMillis         *int64                          `json:"phase_time_millis,omitempty"`
+	Policy                  string                          `json:"policy"`
+	Step                    *string                         `json:"step,omitempty"`
+	StepInfo                map[string]json.RawMessage      `json:"step_info,omitempty"`
+	StepTime                DateTime                        `json:"step_time,omitempty"`
+	StepTimeMillis          *int64                          `json:"step_time_millis,omitempty"`
+	TimeSinceIndexCreation  Duration                        `json:"time_since_index_creation,omitempty"`
 }
 
-// LifecycleExplainManagedBuilder holds LifecycleExplainManaged struct and provides a builder API.
-type LifecycleExplainManagedBuilder struct {
-	v *LifecycleExplainManaged
+func (s *LifecycleExplainManaged) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "action":
+			if err := dec.Decode(&s.Action); err != nil {
+				return fmt.Errorf("%s | %w", "Action", err)
+			}
+
+		case "action_time":
+			if err := dec.Decode(&s.ActionTime); err != nil {
+				return fmt.Errorf("%s | %w", "ActionTime", err)
+			}
+
+		case "action_time_millis":
+			if err := dec.Decode(&s.ActionTimeMillis); err != nil {
+				return fmt.Errorf("%s | %w", "ActionTimeMillis", err)
+			}
+
+		case "age":
+			if err := dec.Decode(&s.Age); err != nil {
+				return fmt.Errorf("%s | %w", "Age", err)
+			}
+
+		case "failed_step":
+			if err := dec.Decode(&s.FailedStep); err != nil {
+				return fmt.Errorf("%s | %w", "FailedStep", err)
+			}
+
+		case "failed_step_retry_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "FailedStepRetryCount", err)
+				}
+				s.FailedStepRetryCount = &value
+			case float64:
+				f := int(v)
+				s.FailedStepRetryCount = &f
+			}
+
+		case "index":
+			if err := dec.Decode(&s.Index); err != nil {
+				return fmt.Errorf("%s | %w", "Index", err)
+			}
+
+		case "index_creation_date":
+			if err := dec.Decode(&s.IndexCreationDate); err != nil {
+				return fmt.Errorf("%s | %w", "IndexCreationDate", err)
+			}
+
+		case "index_creation_date_millis":
+			if err := dec.Decode(&s.IndexCreationDateMillis); err != nil {
+				return fmt.Errorf("%s | %w", "IndexCreationDateMillis", err)
+			}
+
+		case "is_auto_retryable_error":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IsAutoRetryableError", err)
+				}
+				s.IsAutoRetryableError = &value
+			case bool:
+				s.IsAutoRetryableError = &v
+			}
+
+		case "lifecycle_date":
+			if err := dec.Decode(&s.LifecycleDate); err != nil {
+				return fmt.Errorf("%s | %w", "LifecycleDate", err)
+			}
+
+		case "lifecycle_date_millis":
+			if err := dec.Decode(&s.LifecycleDateMillis); err != nil {
+				return fmt.Errorf("%s | %w", "LifecycleDateMillis", err)
+			}
+
+		case "managed":
+			if err := dec.Decode(&s.Managed); err != nil {
+				return fmt.Errorf("%s | %w", "Managed", err)
+			}
+
+		case "phase":
+			if err := dec.Decode(&s.Phase); err != nil {
+				return fmt.Errorf("%s | %w", "Phase", err)
+			}
+
+		case "phase_execution":
+			if err := dec.Decode(&s.PhaseExecution); err != nil {
+				return fmt.Errorf("%s | %w", "PhaseExecution", err)
+			}
+
+		case "phase_time":
+			if err := dec.Decode(&s.PhaseTime); err != nil {
+				return fmt.Errorf("%s | %w", "PhaseTime", err)
+			}
+
+		case "phase_time_millis":
+			if err := dec.Decode(&s.PhaseTimeMillis); err != nil {
+				return fmt.Errorf("%s | %w", "PhaseTimeMillis", err)
+			}
+
+		case "policy":
+			if err := dec.Decode(&s.Policy); err != nil {
+				return fmt.Errorf("%s | %w", "Policy", err)
+			}
+
+		case "step":
+			if err := dec.Decode(&s.Step); err != nil {
+				return fmt.Errorf("%s | %w", "Step", err)
+			}
+
+		case "step_info":
+			if s.StepInfo == nil {
+				s.StepInfo = make(map[string]json.RawMessage, 0)
+			}
+			if err := dec.Decode(&s.StepInfo); err != nil {
+				return fmt.Errorf("%s | %w", "StepInfo", err)
+			}
+
+		case "step_time":
+			if err := dec.Decode(&s.StepTime); err != nil {
+				return fmt.Errorf("%s | %w", "StepTime", err)
+			}
+
+		case "step_time_millis":
+			if err := dec.Decode(&s.StepTimeMillis); err != nil {
+				return fmt.Errorf("%s | %w", "StepTimeMillis", err)
+			}
+
+		case "time_since_index_creation":
+			if err := dec.Decode(&s.TimeSinceIndexCreation); err != nil {
+				return fmt.Errorf("%s | %w", "TimeSinceIndexCreation", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewLifecycleExplainManaged provides a builder for the LifecycleExplainManaged struct.
-func NewLifecycleExplainManagedBuilder() *LifecycleExplainManagedBuilder {
-	r := LifecycleExplainManagedBuilder{
-		&LifecycleExplainManaged{
-			StepInfo: make(map[string]interface{}, 0),
-		},
+// MarshalJSON override marshalling to include literal value
+func (s LifecycleExplainManaged) MarshalJSON() ([]byte, error) {
+	type innerLifecycleExplainManaged LifecycleExplainManaged
+	tmp := innerLifecycleExplainManaged{
+		Action:                  s.Action,
+		ActionTime:              s.ActionTime,
+		ActionTimeMillis:        s.ActionTimeMillis,
+		Age:                     s.Age,
+		FailedStep:              s.FailedStep,
+		FailedStepRetryCount:    s.FailedStepRetryCount,
+		Index:                   s.Index,
+		IndexCreationDate:       s.IndexCreationDate,
+		IndexCreationDateMillis: s.IndexCreationDateMillis,
+		IsAutoRetryableError:    s.IsAutoRetryableError,
+		LifecycleDate:           s.LifecycleDate,
+		LifecycleDateMillis:     s.LifecycleDateMillis,
+		Managed:                 s.Managed,
+		Phase:                   s.Phase,
+		PhaseExecution:          s.PhaseExecution,
+		PhaseTime:               s.PhaseTime,
+		PhaseTimeMillis:         s.PhaseTimeMillis,
+		Policy:                  s.Policy,
+		Step:                    s.Step,
+		StepInfo:                s.StepInfo,
+		StepTime:                s.StepTime,
+		StepTimeMillis:          s.StepTimeMillis,
+		TimeSinceIndexCreation:  s.TimeSinceIndexCreation,
 	}
 
-	r.v.Managed = "true"
+	tmp.Managed = true
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the LifecycleExplainManaged struct
-func (rb *LifecycleExplainManagedBuilder) Build() LifecycleExplainManaged {
-	return *rb.v
-}
+// NewLifecycleExplainManaged returns a LifecycleExplainManaged.
+func NewLifecycleExplainManaged() *LifecycleExplainManaged {
+	r := &LifecycleExplainManaged{
+		StepInfo: make(map[string]json.RawMessage, 0),
+	}
 
-func (rb *LifecycleExplainManagedBuilder) Action(action Name) *LifecycleExplainManagedBuilder {
-	rb.v.Action = &action
-	return rb
-}
-
-func (rb *LifecycleExplainManagedBuilder) ActionTime(actiontime *DateTimeBuilder) *LifecycleExplainManagedBuilder {
-	v := actiontime.Build()
-	rb.v.ActionTime = &v
-	return rb
-}
-
-func (rb *LifecycleExplainManagedBuilder) ActionTimeMillis(actiontimemillis *EpochTimeUnitMillisBuilder) *LifecycleExplainManagedBuilder {
-	v := actiontimemillis.Build()
-	rb.v.ActionTimeMillis = &v
-	return rb
-}
-
-func (rb *LifecycleExplainManagedBuilder) Age(age *DurationBuilder) *LifecycleExplainManagedBuilder {
-	v := age.Build()
-	rb.v.Age = &v
-	return rb
-}
-
-func (rb *LifecycleExplainManagedBuilder) FailedStep(failedstep Name) *LifecycleExplainManagedBuilder {
-	rb.v.FailedStep = &failedstep
-	return rb
-}
-
-func (rb *LifecycleExplainManagedBuilder) FailedStepRetryCount(failedstepretrycount int) *LifecycleExplainManagedBuilder {
-	rb.v.FailedStepRetryCount = &failedstepretrycount
-	return rb
-}
-
-func (rb *LifecycleExplainManagedBuilder) Index(index IndexName) *LifecycleExplainManagedBuilder {
-	rb.v.Index = &index
-	return rb
-}
-
-func (rb *LifecycleExplainManagedBuilder) IndexCreationDate(indexcreationdate *DateTimeBuilder) *LifecycleExplainManagedBuilder {
-	v := indexcreationdate.Build()
-	rb.v.IndexCreationDate = &v
-	return rb
-}
-
-func (rb *LifecycleExplainManagedBuilder) IndexCreationDateMillis(indexcreationdatemillis *EpochTimeUnitMillisBuilder) *LifecycleExplainManagedBuilder {
-	v := indexcreationdatemillis.Build()
-	rb.v.IndexCreationDateMillis = &v
-	return rb
-}
-
-func (rb *LifecycleExplainManagedBuilder) IsAutoRetryableError(isautoretryableerror bool) *LifecycleExplainManagedBuilder {
-	rb.v.IsAutoRetryableError = &isautoretryableerror
-	return rb
-}
-
-func (rb *LifecycleExplainManagedBuilder) LifecycleDate(lifecycledate *DateTimeBuilder) *LifecycleExplainManagedBuilder {
-	v := lifecycledate.Build()
-	rb.v.LifecycleDate = &v
-	return rb
-}
-
-func (rb *LifecycleExplainManagedBuilder) LifecycleDateMillis(lifecycledatemillis *EpochTimeUnitMillisBuilder) *LifecycleExplainManagedBuilder {
-	v := lifecycledatemillis.Build()
-	rb.v.LifecycleDateMillis = &v
-	return rb
-}
-
-func (rb *LifecycleExplainManagedBuilder) Phase(phase Name) *LifecycleExplainManagedBuilder {
-	rb.v.Phase = phase
-	return rb
-}
-
-func (rb *LifecycleExplainManagedBuilder) PhaseExecution(phaseexecution *LifecycleExplainPhaseExecutionBuilder) *LifecycleExplainManagedBuilder {
-	v := phaseexecution.Build()
-	rb.v.PhaseExecution = &v
-	return rb
-}
-
-func (rb *LifecycleExplainManagedBuilder) PhaseTime(phasetime *DateTimeBuilder) *LifecycleExplainManagedBuilder {
-	v := phasetime.Build()
-	rb.v.PhaseTime = &v
-	return rb
-}
-
-func (rb *LifecycleExplainManagedBuilder) PhaseTimeMillis(phasetimemillis *EpochTimeUnitMillisBuilder) *LifecycleExplainManagedBuilder {
-	v := phasetimemillis.Build()
-	rb.v.PhaseTimeMillis = &v
-	return rb
-}
-
-func (rb *LifecycleExplainManagedBuilder) Policy(policy Name) *LifecycleExplainManagedBuilder {
-	rb.v.Policy = policy
-	return rb
-}
-
-func (rb *LifecycleExplainManagedBuilder) Step(step Name) *LifecycleExplainManagedBuilder {
-	rb.v.Step = &step
-	return rb
-}
-
-func (rb *LifecycleExplainManagedBuilder) StepInfo(value map[string]interface{}) *LifecycleExplainManagedBuilder {
-	rb.v.StepInfo = value
-	return rb
-}
-
-func (rb *LifecycleExplainManagedBuilder) StepTime(steptime *DateTimeBuilder) *LifecycleExplainManagedBuilder {
-	v := steptime.Build()
-	rb.v.StepTime = &v
-	return rb
-}
-
-func (rb *LifecycleExplainManagedBuilder) StepTimeMillis(steptimemillis *EpochTimeUnitMillisBuilder) *LifecycleExplainManagedBuilder {
-	v := steptimemillis.Build()
-	rb.v.StepTimeMillis = &v
-	return rb
-}
-
-func (rb *LifecycleExplainManagedBuilder) TimeSinceIndexCreation(timesinceindexcreation *DurationBuilder) *LifecycleExplainManagedBuilder {
-	v := timesinceindexcreation.Build()
-	rb.v.TimeSinceIndexCreation = &v
-	return rb
+	return r
 }

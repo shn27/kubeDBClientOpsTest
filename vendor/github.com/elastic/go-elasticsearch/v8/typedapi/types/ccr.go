@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // Ccr type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/usage/types.ts#L317-L320
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/xpack/usage/types.ts#L332-L335
 type Ccr struct {
 	AutoFollowPatternsCount int  `json:"auto_follow_patterns_count"`
 	Available               bool `json:"available"`
@@ -32,41 +39,89 @@ type Ccr struct {
 	FollowerIndicesCount    int  `json:"follower_indices_count"`
 }
 
-// CcrBuilder holds Ccr struct and provides a builder API.
-type CcrBuilder struct {
-	v *Ccr
-}
+func (s *Ccr) UnmarshalJSON(data []byte) error {
 
-// NewCcr provides a builder for the Ccr struct.
-func NewCcrBuilder() *CcrBuilder {
-	r := CcrBuilder{
-		&Ccr{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "auto_follow_patterns_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "AutoFollowPatternsCount", err)
+				}
+				s.AutoFollowPatternsCount = value
+			case float64:
+				f := int(v)
+				s.AutoFollowPatternsCount = f
+			}
+
+		case "available":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Available", err)
+				}
+				s.Available = value
+			case bool:
+				s.Available = v
+			}
+
+		case "enabled":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Enabled", err)
+				}
+				s.Enabled = value
+			case bool:
+				s.Enabled = v
+			}
+
+		case "follower_indices_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "FollowerIndicesCount", err)
+				}
+				s.FollowerIndicesCount = value
+			case float64:
+				f := int(v)
+				s.FollowerIndicesCount = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the Ccr struct
-func (rb *CcrBuilder) Build() Ccr {
-	return *rb.v
-}
+// NewCcr returns a Ccr.
+func NewCcr() *Ccr {
+	r := &Ccr{}
 
-func (rb *CcrBuilder) AutoFollowPatternsCount(autofollowpatternscount int) *CcrBuilder {
-	rb.v.AutoFollowPatternsCount = autofollowpatternscount
-	return rb
-}
-
-func (rb *CcrBuilder) Available(available bool) *CcrBuilder {
-	rb.v.Available = available
-	return rb
-}
-
-func (rb *CcrBuilder) Enabled(enabled bool) *CcrBuilder {
-	rb.v.Enabled = enabled
-	return rb
-}
-
-func (rb *CcrBuilder) FollowerIndicesCount(followerindicescount int) *CcrBuilder {
-	rb.v.FollowerIndicesCount = followerindicescount
-	return rb
+	return r
 }

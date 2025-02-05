@@ -15,66 +15,112 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DataStreamsStatsItem type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/data_streams_stats/IndicesDataStreamsStatsResponse.ts#L36-L42
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/data_streams_stats/IndicesDataStreamsStatsResponse.ts#L45-L65
 type DataStreamsStatsItem struct {
-	BackingIndices   int                 `json:"backing_indices"`
-	DataStream       Name                `json:"data_stream"`
-	MaximumTimestamp EpochTimeUnitMillis `json:"maximum_timestamp"`
-	StoreSize        *ByteSize           `json:"store_size,omitempty"`
-	StoreSizeBytes   int                 `json:"store_size_bytes"`
+	// BackingIndices Current number of backing indices for the data stream.
+	BackingIndices int `json:"backing_indices"`
+	// DataStream Name of the data stream.
+	DataStream string `json:"data_stream"`
+	// MaximumTimestamp The data stream’s highest `@timestamp` value, converted to milliseconds since
+	// the Unix epoch.
+	// NOTE: This timestamp is provided as a best effort.
+	// The data stream may contain `@timestamp` values higher than this if one or
+	// more of the following conditions are met:
+	// The stream contains closed backing indices;
+	// Backing indices with a lower generation contain higher `@timestamp` values.
+	MaximumTimestamp int64 `json:"maximum_timestamp"`
+	// StoreSize Total size of all shards for the data stream’s backing indices.
+	// This parameter is only returned if the `human` query parameter is `true`.
+	StoreSize ByteSize `json:"store_size,omitempty"`
+	// StoreSizeBytes Total size, in bytes, of all shards for the data stream’s backing indices.
+	StoreSizeBytes int64 `json:"store_size_bytes"`
 }
 
-// DataStreamsStatsItemBuilder holds DataStreamsStatsItem struct and provides a builder API.
-type DataStreamsStatsItemBuilder struct {
-	v *DataStreamsStatsItem
-}
+func (s *DataStreamsStatsItem) UnmarshalJSON(data []byte) error {
 
-// NewDataStreamsStatsItem provides a builder for the DataStreamsStatsItem struct.
-func NewDataStreamsStatsItemBuilder() *DataStreamsStatsItemBuilder {
-	r := DataStreamsStatsItemBuilder{
-		&DataStreamsStatsItem{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "backing_indices":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "BackingIndices", err)
+				}
+				s.BackingIndices = value
+			case float64:
+				f := int(v)
+				s.BackingIndices = f
+			}
+
+		case "data_stream":
+			if err := dec.Decode(&s.DataStream); err != nil {
+				return fmt.Errorf("%s | %w", "DataStream", err)
+			}
+
+		case "maximum_timestamp":
+			if err := dec.Decode(&s.MaximumTimestamp); err != nil {
+				return fmt.Errorf("%s | %w", "MaximumTimestamp", err)
+			}
+
+		case "store_size":
+			if err := dec.Decode(&s.StoreSize); err != nil {
+				return fmt.Errorf("%s | %w", "StoreSize", err)
+			}
+
+		case "store_size_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "StoreSizeBytes", err)
+				}
+				s.StoreSizeBytes = value
+			case float64:
+				f := int64(v)
+				s.StoreSizeBytes = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DataStreamsStatsItem struct
-func (rb *DataStreamsStatsItemBuilder) Build() DataStreamsStatsItem {
-	return *rb.v
-}
+// NewDataStreamsStatsItem returns a DataStreamsStatsItem.
+func NewDataStreamsStatsItem() *DataStreamsStatsItem {
+	r := &DataStreamsStatsItem{}
 
-func (rb *DataStreamsStatsItemBuilder) BackingIndices(backingindices int) *DataStreamsStatsItemBuilder {
-	rb.v.BackingIndices = backingindices
-	return rb
-}
-
-func (rb *DataStreamsStatsItemBuilder) DataStream(datastream Name) *DataStreamsStatsItemBuilder {
-	rb.v.DataStream = datastream
-	return rb
-}
-
-func (rb *DataStreamsStatsItemBuilder) MaximumTimestamp(maximumtimestamp *EpochTimeUnitMillisBuilder) *DataStreamsStatsItemBuilder {
-	v := maximumtimestamp.Build()
-	rb.v.MaximumTimestamp = v
-	return rb
-}
-
-func (rb *DataStreamsStatsItemBuilder) StoreSize(storesize *ByteSizeBuilder) *DataStreamsStatsItemBuilder {
-	v := storesize.Build()
-	rb.v.StoreSize = &v
-	return rb
-}
-
-func (rb *DataStreamsStatsItemBuilder) StoreSizeBytes(storesizebytes int) *DataStreamsStatsItemBuilder {
-	rb.v.StoreSizeBytes = storesizebytes
-	return rb
+	return r
 }

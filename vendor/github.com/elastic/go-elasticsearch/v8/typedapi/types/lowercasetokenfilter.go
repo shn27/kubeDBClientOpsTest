@@ -15,49 +15,88 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // LowercaseTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L254-L257
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L256-L259
 type LowercaseTokenFilter struct {
-	Language *string        `json:"language,omitempty"`
-	Type     string         `json:"type,omitempty"`
-	Version  *VersionString `json:"version,omitempty"`
+	Language *string `json:"language,omitempty"`
+	Type     string  `json:"type,omitempty"`
+	Version  *string `json:"version,omitempty"`
 }
 
-// LowercaseTokenFilterBuilder holds LowercaseTokenFilter struct and provides a builder API.
-type LowercaseTokenFilterBuilder struct {
-	v *LowercaseTokenFilter
+func (s *LowercaseTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "language":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Language", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Language = &o
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewLowercaseTokenFilter provides a builder for the LowercaseTokenFilter struct.
-func NewLowercaseTokenFilterBuilder() *LowercaseTokenFilterBuilder {
-	r := LowercaseTokenFilterBuilder{
-		&LowercaseTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s LowercaseTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerLowercaseTokenFilter LowercaseTokenFilter
+	tmp := innerLowercaseTokenFilter{
+		Language: s.Language,
+		Type:     s.Type,
+		Version:  s.Version,
 	}
 
-	r.v.Type = "lowercase"
+	tmp.Type = "lowercase"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the LowercaseTokenFilter struct
-func (rb *LowercaseTokenFilterBuilder) Build() LowercaseTokenFilter {
-	return *rb.v
-}
+// NewLowercaseTokenFilter returns a LowercaseTokenFilter.
+func NewLowercaseTokenFilter() *LowercaseTokenFilter {
+	r := &LowercaseTokenFilter{}
 
-func (rb *LowercaseTokenFilterBuilder) Language(language string) *LowercaseTokenFilterBuilder {
-	rb.v.Language = &language
-	return rb
-}
-
-func (rb *LowercaseTokenFilterBuilder) Version(version VersionString) *LowercaseTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

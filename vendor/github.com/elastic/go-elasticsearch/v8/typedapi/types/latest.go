@@ -15,52 +15,62 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // Latest type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/transform/_types/Transform.ts#L47-L52
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/transform/_types/Transform.ts#L47-L52
 type Latest struct {
 	// Sort Specifies the date field that is used to identify the latest documents.
-	Sort Field `json:"sort"`
+	Sort string `json:"sort"`
 	// UniqueKey Specifies an array of one or more fields that are used to group the data.
-	UniqueKey []Field `json:"unique_key"`
+	UniqueKey []string `json:"unique_key"`
 }
 
-// LatestBuilder holds Latest struct and provides a builder API.
-type LatestBuilder struct {
-	v *Latest
-}
+func (s *Latest) UnmarshalJSON(data []byte) error {
 
-// NewLatest provides a builder for the Latest struct.
-func NewLatestBuilder() *LatestBuilder {
-	r := LatestBuilder{
-		&Latest{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "sort":
+			if err := dec.Decode(&s.Sort); err != nil {
+				return fmt.Errorf("%s | %w", "Sort", err)
+			}
+
+		case "unique_key":
+			if err := dec.Decode(&s.UniqueKey); err != nil {
+				return fmt.Errorf("%s | %w", "UniqueKey", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the Latest struct
-func (rb *LatestBuilder) Build() Latest {
-	return *rb.v
-}
+// NewLatest returns a Latest.
+func NewLatest() *Latest {
+	r := &Latest{}
 
-// Sort Specifies the date field that is used to identify the latest documents.
-
-func (rb *LatestBuilder) Sort(sort Field) *LatestBuilder {
-	rb.v.Sort = sort
-	return rb
-}
-
-// UniqueKey Specifies an array of one or more fields that are used to group the data.
-
-func (rb *LatestBuilder) UniqueKey(unique_key ...Field) *LatestBuilder {
-	rb.v.UniqueKey = unique_key
-	return rb
+	return r
 }

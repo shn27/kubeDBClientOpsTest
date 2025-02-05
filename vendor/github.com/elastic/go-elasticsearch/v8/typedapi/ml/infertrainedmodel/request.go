@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package infertrainedmodel
 
@@ -31,7 +29,7 @@ import (
 
 // Request holds the request body struct for the package infertrainedmodel
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/infer_trained_model/MlInferTrainedModelRequest.ts#L27-L59
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/infer_trained_model/MlInferTrainedModelRequest.ts#L27-L60
 type Request struct {
 
 	// Docs An array of objects to pass to the model for inference. The objects should
@@ -39,27 +37,20 @@ type Request struct {
 	// configured trained model input. Typically, for NLP models, the field name is
 	// `text_field`.
 	// Currently, for NLP models, only a single value is allowed.
-	Docs []map[string]interface{} `json:"docs"`
-
+	Docs []map[string]json.RawMessage `json:"docs"`
 	// InferenceConfig The inference configuration updates to apply on the API call
 	InferenceConfig *types.InferenceConfigUpdateContainer `json:"inference_config,omitempty"`
 }
 
-// RequestBuilder is the builder API for the infertrainedmodel.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -68,20 +59,4 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	}
 
 	return &req, nil
-}
-
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
-
-func (rb *RequestBuilder) Docs(value ...map[string]interface{}) *RequestBuilder {
-	rb.v.Docs = value
-	return rb
-}
-
-func (rb *RequestBuilder) InferenceConfig(inferenceconfig *types.InferenceConfigUpdateContainerBuilder) *RequestBuilder {
-	v := inferenceconfig.Build()
-	rb.v.InferenceConfig = &v
-	return rb
 }

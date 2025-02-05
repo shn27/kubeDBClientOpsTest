@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
@@ -27,31 +25,5 @@ package types
 //	string
 //	TokenFilterDefinition
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L342-L344
-type TokenFilter interface{}
-
-// TokenFilterBuilder holds TokenFilter struct and provides a builder API.
-type TokenFilterBuilder struct {
-	v TokenFilter
-}
-
-// NewTokenFilter provides a builder for the TokenFilter struct.
-func NewTokenFilterBuilder() *TokenFilterBuilder {
-	return &TokenFilterBuilder{}
-}
-
-// Build finalize the chain and returns the TokenFilter struct
-func (u *TokenFilterBuilder) Build() TokenFilter {
-	return u.v
-}
-
-func (u *TokenFilterBuilder) String(string string) *TokenFilterBuilder {
-	u.v = &string
-	return u
-}
-
-func (u *TokenFilterBuilder) TokenFilterDefinition(tokenfilterdefinition *TokenFilterDefinitionBuilder) *TokenFilterBuilder {
-	v := tokenfilterdefinition.Build()
-	u.v = &v
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L345-L350
+type TokenFilter any

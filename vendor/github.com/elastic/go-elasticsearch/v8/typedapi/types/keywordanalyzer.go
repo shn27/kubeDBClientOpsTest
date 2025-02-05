@@ -15,43 +15,73 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // KeywordAnalyzer type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/analyzers.ts#L47-L50
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/analyzers.ts#L47-L50
 type KeywordAnalyzer struct {
-	Type    string         `json:"type,omitempty"`
-	Version *VersionString `json:"version,omitempty"`
+	Type    string  `json:"type,omitempty"`
+	Version *string `json:"version,omitempty"`
 }
 
-// KeywordAnalyzerBuilder holds KeywordAnalyzer struct and provides a builder API.
-type KeywordAnalyzerBuilder struct {
-	v *KeywordAnalyzer
+func (s *KeywordAnalyzer) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewKeywordAnalyzer provides a builder for the KeywordAnalyzer struct.
-func NewKeywordAnalyzerBuilder() *KeywordAnalyzerBuilder {
-	r := KeywordAnalyzerBuilder{
-		&KeywordAnalyzer{},
+// MarshalJSON override marshalling to include literal value
+func (s KeywordAnalyzer) MarshalJSON() ([]byte, error) {
+	type innerKeywordAnalyzer KeywordAnalyzer
+	tmp := innerKeywordAnalyzer{
+		Type:    s.Type,
+		Version: s.Version,
 	}
 
-	r.v.Type = "keyword"
+	tmp.Type = "keyword"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the KeywordAnalyzer struct
-func (rb *KeywordAnalyzerBuilder) Build() KeywordAnalyzer {
-	return *rb.v
-}
+// NewKeywordAnalyzer returns a KeywordAnalyzer.
+func NewKeywordAnalyzer() *KeywordAnalyzer {
+	r := &KeywordAnalyzer{}
 
-func (rb *KeywordAnalyzerBuilder) Version(version VersionString) *KeywordAnalyzerBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

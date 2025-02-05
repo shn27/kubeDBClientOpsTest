@@ -15,40 +15,67 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // RankFeatureFunctionSaturation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/specialized.ts#L145-L147
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/specialized.ts#L291-L296
 type RankFeatureFunctionSaturation struct {
+	// Pivot Configurable pivot value so that the result will be less than 0.5.
 	Pivot *float32 `json:"pivot,omitempty"`
 }
 
-// RankFeatureFunctionSaturationBuilder holds RankFeatureFunctionSaturation struct and provides a builder API.
-type RankFeatureFunctionSaturationBuilder struct {
-	v *RankFeatureFunctionSaturation
-}
+func (s *RankFeatureFunctionSaturation) UnmarshalJSON(data []byte) error {
 
-// NewRankFeatureFunctionSaturation provides a builder for the RankFeatureFunctionSaturation struct.
-func NewRankFeatureFunctionSaturationBuilder() *RankFeatureFunctionSaturationBuilder {
-	r := RankFeatureFunctionSaturationBuilder{
-		&RankFeatureFunctionSaturation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "pivot":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Pivot", err)
+				}
+				f := float32(value)
+				s.Pivot = &f
+			case float64:
+				f := float32(v)
+				s.Pivot = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RankFeatureFunctionSaturation struct
-func (rb *RankFeatureFunctionSaturationBuilder) Build() RankFeatureFunctionSaturation {
-	return *rb.v
-}
+// NewRankFeatureFunctionSaturation returns a RankFeatureFunctionSaturation.
+func NewRankFeatureFunctionSaturation() *RankFeatureFunctionSaturation {
+	r := &RankFeatureFunctionSaturation{}
 
-func (rb *RankFeatureFunctionSaturationBuilder) Pivot(pivot float32) *RankFeatureFunctionSaturationBuilder {
-	rb.v.Pivot = &pivot
-	return rb
+	return r
 }

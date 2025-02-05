@@ -15,49 +15,80 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // NoriPartOfSpeechTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L272-L275
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L274-L277
 type NoriPartOfSpeechTokenFilter struct {
-	Stoptags []string       `json:"stoptags,omitempty"`
-	Type     string         `json:"type,omitempty"`
-	Version  *VersionString `json:"version,omitempty"`
+	Stoptags []string `json:"stoptags,omitempty"`
+	Type     string   `json:"type,omitempty"`
+	Version  *string  `json:"version,omitempty"`
 }
 
-// NoriPartOfSpeechTokenFilterBuilder holds NoriPartOfSpeechTokenFilter struct and provides a builder API.
-type NoriPartOfSpeechTokenFilterBuilder struct {
-	v *NoriPartOfSpeechTokenFilter
+func (s *NoriPartOfSpeechTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "stoptags":
+			if err := dec.Decode(&s.Stoptags); err != nil {
+				return fmt.Errorf("%s | %w", "Stoptags", err)
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewNoriPartOfSpeechTokenFilter provides a builder for the NoriPartOfSpeechTokenFilter struct.
-func NewNoriPartOfSpeechTokenFilterBuilder() *NoriPartOfSpeechTokenFilterBuilder {
-	r := NoriPartOfSpeechTokenFilterBuilder{
-		&NoriPartOfSpeechTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s NoriPartOfSpeechTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerNoriPartOfSpeechTokenFilter NoriPartOfSpeechTokenFilter
+	tmp := innerNoriPartOfSpeechTokenFilter{
+		Stoptags: s.Stoptags,
+		Type:     s.Type,
+		Version:  s.Version,
 	}
 
-	r.v.Type = "nori_part_of_speech"
+	tmp.Type = "nori_part_of_speech"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the NoriPartOfSpeechTokenFilter struct
-func (rb *NoriPartOfSpeechTokenFilterBuilder) Build() NoriPartOfSpeechTokenFilter {
-	return *rb.v
-}
+// NewNoriPartOfSpeechTokenFilter returns a NoriPartOfSpeechTokenFilter.
+func NewNoriPartOfSpeechTokenFilter() *NoriPartOfSpeechTokenFilter {
+	r := &NoriPartOfSpeechTokenFilter{}
 
-func (rb *NoriPartOfSpeechTokenFilterBuilder) Stoptags(stoptags ...string) *NoriPartOfSpeechTokenFilterBuilder {
-	rb.v.Stoptags = stoptags
-	return rb
-}
-
-func (rb *NoriPartOfSpeechTokenFilterBuilder) Version(version VersionString) *NoriPartOfSpeechTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

@@ -15,76 +15,168 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // RegexpQuery type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/term.ts#L102-L114
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/term.ts#L203-L236
 type RegexpQuery struct {
-	Boost                 *float32               `json:"boost,omitempty"`
-	CaseInsensitive       *bool                  `json:"case_insensitive,omitempty"`
-	Flags                 *string                `json:"flags,omitempty"`
-	MaxDeterminizedStates *int                   `json:"max_determinized_states,omitempty"`
-	QueryName_            *string                `json:"_name,omitempty"`
-	Rewrite               *MultiTermQueryRewrite `json:"rewrite,omitempty"`
-	Value                 string                 `json:"value"`
+	// Boost Floating point number used to decrease or increase the relevance scores of
+	// the query.
+	// Boost values are relative to the default value of 1.0.
+	// A boost value between 0 and 1.0 decreases the relevance score.
+	// A value greater than 1.0 increases the relevance score.
+	Boost *float32 `json:"boost,omitempty"`
+	// CaseInsensitive Allows case insensitive matching of the regular expression value with the
+	// indexed field values when set to `true`.
+	// When `false`, case sensitivity of matching depends on the underlying field’s
+	// mapping.
+	CaseInsensitive *bool `json:"case_insensitive,omitempty"`
+	// Flags Enables optional operators for the regular expression.
+	Flags *string `json:"flags,omitempty"`
+	// MaxDeterminizedStates Maximum number of automaton states required for the query.
+	MaxDeterminizedStates *int    `json:"max_determinized_states,omitempty"`
+	QueryName_            *string `json:"_name,omitempty"`
+	// Rewrite Method used to rewrite the query.
+	Rewrite *string `json:"rewrite,omitempty"`
+	// Value Regular expression for terms you wish to find in the provided field.
+	Value string `json:"value"`
 }
 
-// RegexpQueryBuilder holds RegexpQuery struct and provides a builder API.
-type RegexpQueryBuilder struct {
-	v *RegexpQuery
-}
+func (s *RegexpQuery) UnmarshalJSON(data []byte) error {
 
-// NewRegexpQuery provides a builder for the RegexpQuery struct.
-func NewRegexpQueryBuilder() *RegexpQueryBuilder {
-	r := RegexpQueryBuilder{
-		&RegexpQuery{},
+	if !bytes.HasPrefix(data, []byte(`{`)) {
+		if !bytes.HasPrefix(data, []byte(`"`)) {
+			data = append([]byte{'"'}, data...)
+			data = append(data, []byte{'"'}...)
+		}
+		err := json.NewDecoder(bytes.NewReader(data)).Decode(&s.Value)
+		if err != nil {
+			return err
+		}
+		return nil
 	}
 
-	return &r
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "boost":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Boost", err)
+				}
+				f := float32(value)
+				s.Boost = &f
+			case float64:
+				f := float32(v)
+				s.Boost = &f
+			}
+
+		case "case_insensitive":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CaseInsensitive", err)
+				}
+				s.CaseInsensitive = &value
+			case bool:
+				s.CaseInsensitive = &v
+			}
+
+		case "flags":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Flags", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Flags = &o
+
+		case "max_determinized_states":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxDeterminizedStates", err)
+				}
+				s.MaxDeterminizedStates = &value
+			case float64:
+				f := int(v)
+				s.MaxDeterminizedStates = &f
+			}
+
+		case "_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "QueryName_", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.QueryName_ = &o
+
+		case "rewrite":
+			if err := dec.Decode(&s.Rewrite); err != nil {
+				return fmt.Errorf("%s | %w", "Rewrite", err)
+			}
+
+		case "value":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Value", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Value = o
+
+		}
+	}
+	return nil
 }
 
-// Build finalize the chain and returns the RegexpQuery struct
-func (rb *RegexpQueryBuilder) Build() RegexpQuery {
-	return *rb.v
-}
+// NewRegexpQuery returns a RegexpQuery.
+func NewRegexpQuery() *RegexpQuery {
+	r := &RegexpQuery{}
 
-func (rb *RegexpQueryBuilder) Boost(boost float32) *RegexpQueryBuilder {
-	rb.v.Boost = &boost
-	return rb
-}
-
-func (rb *RegexpQueryBuilder) CaseInsensitive(caseinsensitive bool) *RegexpQueryBuilder {
-	rb.v.CaseInsensitive = &caseinsensitive
-	return rb
-}
-
-func (rb *RegexpQueryBuilder) Flags(flags string) *RegexpQueryBuilder {
-	rb.v.Flags = &flags
-	return rb
-}
-
-func (rb *RegexpQueryBuilder) MaxDeterminizedStates(maxdeterminizedstates int) *RegexpQueryBuilder {
-	rb.v.MaxDeterminizedStates = &maxdeterminizedstates
-	return rb
-}
-
-func (rb *RegexpQueryBuilder) QueryName_(queryname_ string) *RegexpQueryBuilder {
-	rb.v.QueryName_ = &queryname_
-	return rb
-}
-
-func (rb *RegexpQueryBuilder) Rewrite(rewrite MultiTermQueryRewrite) *RegexpQueryBuilder {
-	rb.v.Rewrite = &rewrite
-	return rb
-}
-
-func (rb *RegexpQueryBuilder) Value(value string) *RegexpQueryBuilder {
-	rb.v.Value = value
-	return rb
+	return r
 }

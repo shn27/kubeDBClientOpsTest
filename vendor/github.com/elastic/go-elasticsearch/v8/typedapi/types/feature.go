@@ -15,59 +15,75 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // Feature type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/info/types.ts#L74-L79
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/features/_types/Feature.ts#L20-L23
 type Feature struct {
-	Available      bool                   `json:"available"`
-	Description    *string                `json:"description,omitempty"`
-	Enabled        bool                   `json:"enabled"`
-	NativeCodeInfo *NativeCodeInformation `json:"native_code_info,omitempty"`
+	Description string `json:"description"`
+	Name        string `json:"name"`
 }
 
-// FeatureBuilder holds Feature struct and provides a builder API.
-type FeatureBuilder struct {
-	v *Feature
-}
+func (s *Feature) UnmarshalJSON(data []byte) error {
 
-// NewFeature provides a builder for the Feature struct.
-func NewFeatureBuilder() *FeatureBuilder {
-	r := FeatureBuilder{
-		&Feature{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "description":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Description", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Description = o
+
+		case "name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Name = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the Feature struct
-func (rb *FeatureBuilder) Build() Feature {
-	return *rb.v
-}
+// NewFeature returns a Feature.
+func NewFeature() *Feature {
+	r := &Feature{}
 
-func (rb *FeatureBuilder) Available(available bool) *FeatureBuilder {
-	rb.v.Available = available
-	return rb
-}
-
-func (rb *FeatureBuilder) Description(description string) *FeatureBuilder {
-	rb.v.Description = &description
-	return rb
-}
-
-func (rb *FeatureBuilder) Enabled(enabled bool) *FeatureBuilder {
-	rb.v.Enabled = enabled
-	return rb
-}
-
-func (rb *FeatureBuilder) NativeCodeInfo(nativecodeinfo *NativeCodeInformationBuilder) *FeatureBuilder {
-	v := nativecodeinfo.Build()
-	rb.v.NativeCodeInfo = &v
-	return rb
+	return r
 }

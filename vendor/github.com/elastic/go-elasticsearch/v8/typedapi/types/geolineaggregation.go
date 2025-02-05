@@ -15,70 +15,111 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/sortorder"
 )
 
 // GeoLineAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/metric.ts#L81-L87
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/metric.ts#L124-L149
 type GeoLineAggregation struct {
-	IncludeSort *bool                `json:"include_sort,omitempty"`
-	Point       GeoLinePoint         `json:"point"`
-	Size        *int                 `json:"size,omitempty"`
-	Sort        GeoLineSort          `json:"sort"`
-	SortOrder   *sortorder.SortOrder `json:"sort_order,omitempty"`
+	// IncludeSort When `true`, returns an additional array of the sort values in the feature
+	// properties.
+	IncludeSort *bool `json:"include_sort,omitempty"`
+	// Point The name of the geo_point field.
+	Point GeoLinePoint `json:"point"`
+	// Size The maximum length of the line represented in the aggregation.
+	// Valid sizes are between 1 and 10000.
+	Size *int `json:"size,omitempty"`
+	// Sort The name of the numeric field to use as the sort key for ordering the points.
+	// When the `geo_line` aggregation is nested inside a `time_series` aggregation,
+	// this field defaults to `@timestamp`, and any other value will result in
+	// error.
+	Sort GeoLineSort `json:"sort"`
+	// SortOrder The order in which the line is sorted (ascending or descending).
+	SortOrder *sortorder.SortOrder `json:"sort_order,omitempty"`
 }
 
-// GeoLineAggregationBuilder holds GeoLineAggregation struct and provides a builder API.
-type GeoLineAggregationBuilder struct {
-	v *GeoLineAggregation
-}
+func (s *GeoLineAggregation) UnmarshalJSON(data []byte) error {
 
-// NewGeoLineAggregation provides a builder for the GeoLineAggregation struct.
-func NewGeoLineAggregationBuilder() *GeoLineAggregationBuilder {
-	r := GeoLineAggregationBuilder{
-		&GeoLineAggregation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "include_sort":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IncludeSort", err)
+				}
+				s.IncludeSort = &value
+			case bool:
+				s.IncludeSort = &v
+			}
+
+		case "point":
+			if err := dec.Decode(&s.Point); err != nil {
+				return fmt.Errorf("%s | %w", "Point", err)
+			}
+
+		case "size":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Size", err)
+				}
+				s.Size = &value
+			case float64:
+				f := int(v)
+				s.Size = &f
+			}
+
+		case "sort":
+			if err := dec.Decode(&s.Sort); err != nil {
+				return fmt.Errorf("%s | %w", "Sort", err)
+			}
+
+		case "sort_order":
+			if err := dec.Decode(&s.SortOrder); err != nil {
+				return fmt.Errorf("%s | %w", "SortOrder", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the GeoLineAggregation struct
-func (rb *GeoLineAggregationBuilder) Build() GeoLineAggregation {
-	return *rb.v
-}
+// NewGeoLineAggregation returns a GeoLineAggregation.
+func NewGeoLineAggregation() *GeoLineAggregation {
+	r := &GeoLineAggregation{}
 
-func (rb *GeoLineAggregationBuilder) IncludeSort(includesort bool) *GeoLineAggregationBuilder {
-	rb.v.IncludeSort = &includesort
-	return rb
-}
-
-func (rb *GeoLineAggregationBuilder) Point(point *GeoLinePointBuilder) *GeoLineAggregationBuilder {
-	v := point.Build()
-	rb.v.Point = v
-	return rb
-}
-
-func (rb *GeoLineAggregationBuilder) Size(size int) *GeoLineAggregationBuilder {
-	rb.v.Size = &size
-	return rb
-}
-
-func (rb *GeoLineAggregationBuilder) Sort(sort *GeoLineSortBuilder) *GeoLineAggregationBuilder {
-	v := sort.Build()
-	rb.v.Sort = v
-	return rb
-}
-
-func (rb *GeoLineAggregationBuilder) SortOrder(sortorder sortorder.SortOrder) *GeoLineAggregationBuilder {
-	rb.v.SortOrder = &sortorder
-	return rb
+	return r
 }

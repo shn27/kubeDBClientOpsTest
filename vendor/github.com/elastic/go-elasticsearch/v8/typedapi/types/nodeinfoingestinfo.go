@@ -15,41 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // NodeInfoIngestInfo type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/info/types.ts#L123-L125
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/info/types.ts#L124-L126
 type NodeInfoIngestInfo struct {
 	Downloader NodeInfoIngestDownloader `json:"downloader"`
 }
 
-// NodeInfoIngestInfoBuilder holds NodeInfoIngestInfo struct and provides a builder API.
-type NodeInfoIngestInfoBuilder struct {
-	v *NodeInfoIngestInfo
-}
+// NewNodeInfoIngestInfo returns a NodeInfoIngestInfo.
+func NewNodeInfoIngestInfo() *NodeInfoIngestInfo {
+	r := &NodeInfoIngestInfo{}
 
-// NewNodeInfoIngestInfo provides a builder for the NodeInfoIngestInfo struct.
-func NewNodeInfoIngestInfoBuilder() *NodeInfoIngestInfoBuilder {
-	r := NodeInfoIngestInfoBuilder{
-		&NodeInfoIngestInfo{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the NodeInfoIngestInfo struct
-func (rb *NodeInfoIngestInfoBuilder) Build() NodeInfoIngestInfo {
-	return *rb.v
-}
-
-func (rb *NodeInfoIngestInfoBuilder) Downloader(downloader *NodeInfoIngestDownloaderBuilder) *NodeInfoIngestInfoBuilder {
-	v := downloader.Build()
-	rb.v.Downloader = v
-	return rb
+	return r
 }

@@ -15,53 +15,89 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // InferenceTopClassEntry type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L623-L627
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L772-L776
 type InferenceTopClassEntry struct {
 	ClassName        FieldValue `json:"class_name"`
-	ClassProbability float64    `json:"class_probability"`
-	ClassScore       float64    `json:"class_score"`
+	ClassProbability Float64    `json:"class_probability"`
+	ClassScore       Float64    `json:"class_score"`
 }
 
-// InferenceTopClassEntryBuilder holds InferenceTopClassEntry struct and provides a builder API.
-type InferenceTopClassEntryBuilder struct {
-	v *InferenceTopClassEntry
-}
+func (s *InferenceTopClassEntry) UnmarshalJSON(data []byte) error {
 
-// NewInferenceTopClassEntry provides a builder for the InferenceTopClassEntry struct.
-func NewInferenceTopClassEntryBuilder() *InferenceTopClassEntryBuilder {
-	r := InferenceTopClassEntryBuilder{
-		&InferenceTopClassEntry{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "class_name":
+			if err := dec.Decode(&s.ClassName); err != nil {
+				return fmt.Errorf("%s | %w", "ClassName", err)
+			}
+
+		case "class_probability":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ClassProbability", err)
+				}
+				f := Float64(value)
+				s.ClassProbability = f
+			case float64:
+				f := Float64(v)
+				s.ClassProbability = f
+			}
+
+		case "class_score":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ClassScore", err)
+				}
+				f := Float64(value)
+				s.ClassScore = f
+			case float64:
+				f := Float64(v)
+				s.ClassScore = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the InferenceTopClassEntry struct
-func (rb *InferenceTopClassEntryBuilder) Build() InferenceTopClassEntry {
-	return *rb.v
-}
+// NewInferenceTopClassEntry returns a InferenceTopClassEntry.
+func NewInferenceTopClassEntry() *InferenceTopClassEntry {
+	r := &InferenceTopClassEntry{}
 
-func (rb *InferenceTopClassEntryBuilder) ClassName(classname *FieldValueBuilder) *InferenceTopClassEntryBuilder {
-	v := classname.Build()
-	rb.v.ClassName = v
-	return rb
-}
-
-func (rb *InferenceTopClassEntryBuilder) ClassProbability(classprobability float64) *InferenceTopClassEntryBuilder {
-	rb.v.ClassProbability = classprobability
-	return rb
-}
-
-func (rb *InferenceTopClassEntryBuilder) ClassScore(classscore float64) *InferenceTopClassEntryBuilder {
-	rb.v.ClassScore = classscore
-	return rb
+	return r
 }

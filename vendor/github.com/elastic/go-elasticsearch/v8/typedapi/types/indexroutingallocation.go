@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
@@ -28,7 +26,7 @@ import (
 
 // IndexRoutingAllocation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/IndexRouting.ts#L27-L32
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/IndexRouting.ts#L27-L32
 type IndexRoutingAllocation struct {
 	Disk            *IndexRoutingAllocationDisk                                  `json:"disk,omitempty"`
 	Enable          *indexroutingallocationoptions.IndexRoutingAllocationOptions `json:"enable,omitempty"`
@@ -36,44 +34,9 @@ type IndexRoutingAllocation struct {
 	InitialRecovery *IndexRoutingAllocationInitialRecovery                       `json:"initial_recovery,omitempty"`
 }
 
-// IndexRoutingAllocationBuilder holds IndexRoutingAllocation struct and provides a builder API.
-type IndexRoutingAllocationBuilder struct {
-	v *IndexRoutingAllocation
-}
+// NewIndexRoutingAllocation returns a IndexRoutingAllocation.
+func NewIndexRoutingAllocation() *IndexRoutingAllocation {
+	r := &IndexRoutingAllocation{}
 
-// NewIndexRoutingAllocation provides a builder for the IndexRoutingAllocation struct.
-func NewIndexRoutingAllocationBuilder() *IndexRoutingAllocationBuilder {
-	r := IndexRoutingAllocationBuilder{
-		&IndexRoutingAllocation{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the IndexRoutingAllocation struct
-func (rb *IndexRoutingAllocationBuilder) Build() IndexRoutingAllocation {
-	return *rb.v
-}
-
-func (rb *IndexRoutingAllocationBuilder) Disk(disk *IndexRoutingAllocationDiskBuilder) *IndexRoutingAllocationBuilder {
-	v := disk.Build()
-	rb.v.Disk = &v
-	return rb
-}
-
-func (rb *IndexRoutingAllocationBuilder) Enable(enable indexroutingallocationoptions.IndexRoutingAllocationOptions) *IndexRoutingAllocationBuilder {
-	rb.v.Enable = &enable
-	return rb
-}
-
-func (rb *IndexRoutingAllocationBuilder) Include(include *IndexRoutingAllocationIncludeBuilder) *IndexRoutingAllocationBuilder {
-	v := include.Build()
-	rb.v.Include = &v
-	return rb
-}
-
-func (rb *IndexRoutingAllocationBuilder) InitialRecovery(initialrecovery *IndexRoutingAllocationInitialRecoveryBuilder) *IndexRoutingAllocationBuilder {
-	v := initialrecovery.Build()
-	rb.v.InitialRecovery = &v
-	return rb
+	return r
 }

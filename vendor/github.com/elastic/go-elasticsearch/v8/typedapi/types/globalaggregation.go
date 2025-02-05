@@ -15,47 +15,20 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // GlobalAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/bucket.ts#L225-L225
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/bucket.ts#L506-L506
 type GlobalAggregation struct {
-	Meta *Metadata `json:"meta,omitempty"`
-	Name *string   `json:"name,omitempty"`
 }
 
-// GlobalAggregationBuilder holds GlobalAggregation struct and provides a builder API.
-type GlobalAggregationBuilder struct {
-	v *GlobalAggregation
-}
+// NewGlobalAggregation returns a GlobalAggregation.
+func NewGlobalAggregation() *GlobalAggregation {
+	r := &GlobalAggregation{}
 
-// NewGlobalAggregation provides a builder for the GlobalAggregation struct.
-func NewGlobalAggregationBuilder() *GlobalAggregationBuilder {
-	r := GlobalAggregationBuilder{
-		&GlobalAggregation{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the GlobalAggregation struct
-func (rb *GlobalAggregationBuilder) Build() GlobalAggregation {
-	return *rb.v
-}
-
-func (rb *GlobalAggregationBuilder) Meta(meta *MetadataBuilder) *GlobalAggregationBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *GlobalAggregationBuilder) Name(name string) *GlobalAggregationBuilder {
-	rb.v.Name = &name
-	return rb
+	return r
 }

@@ -15,20 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/unassignedinformationreason"
 )
 
 // UnassignedInformation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/allocation_explain/types.ts#L117-L125
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/allocation_explain/types.ts#L128-L136
 type UnassignedInformation struct {
 	AllocationStatus         *string                                                 `json:"allocation_status,omitempty"`
 	At                       DateTime                                                `json:"at"`
@@ -39,57 +44,105 @@ type UnassignedInformation struct {
 	Reason                   unassignedinformationreason.UnassignedInformationReason `json:"reason"`
 }
 
-// UnassignedInformationBuilder holds UnassignedInformation struct and provides a builder API.
-type UnassignedInformationBuilder struct {
-	v *UnassignedInformation
-}
+func (s *UnassignedInformation) UnmarshalJSON(data []byte) error {
 
-// NewUnassignedInformation provides a builder for the UnassignedInformation struct.
-func NewUnassignedInformationBuilder() *UnassignedInformationBuilder {
-	r := UnassignedInformationBuilder{
-		&UnassignedInformation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "allocation_status":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "AllocationStatus", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.AllocationStatus = &o
+
+		case "at":
+			if err := dec.Decode(&s.At); err != nil {
+				return fmt.Errorf("%s | %w", "At", err)
+			}
+
+		case "delayed":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Delayed", err)
+				}
+				s.Delayed = &value
+			case bool:
+				s.Delayed = &v
+			}
+
+		case "details":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Details", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Details = &o
+
+		case "failed_allocation_attempts":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "FailedAllocationAttempts", err)
+				}
+				s.FailedAllocationAttempts = &value
+			case float64:
+				f := int(v)
+				s.FailedAllocationAttempts = &f
+			}
+
+		case "last_allocation_status":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "LastAllocationStatus", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.LastAllocationStatus = &o
+
+		case "reason":
+			if err := dec.Decode(&s.Reason); err != nil {
+				return fmt.Errorf("%s | %w", "Reason", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the UnassignedInformation struct
-func (rb *UnassignedInformationBuilder) Build() UnassignedInformation {
-	return *rb.v
-}
+// NewUnassignedInformation returns a UnassignedInformation.
+func NewUnassignedInformation() *UnassignedInformation {
+	r := &UnassignedInformation{}
 
-func (rb *UnassignedInformationBuilder) AllocationStatus(allocationstatus string) *UnassignedInformationBuilder {
-	rb.v.AllocationStatus = &allocationstatus
-	return rb
-}
-
-func (rb *UnassignedInformationBuilder) At(at *DateTimeBuilder) *UnassignedInformationBuilder {
-	v := at.Build()
-	rb.v.At = v
-	return rb
-}
-
-func (rb *UnassignedInformationBuilder) Delayed(delayed bool) *UnassignedInformationBuilder {
-	rb.v.Delayed = &delayed
-	return rb
-}
-
-func (rb *UnassignedInformationBuilder) Details(details string) *UnassignedInformationBuilder {
-	rb.v.Details = &details
-	return rb
-}
-
-func (rb *UnassignedInformationBuilder) FailedAllocationAttempts(failedallocationattempts int) *UnassignedInformationBuilder {
-	rb.v.FailedAllocationAttempts = &failedallocationattempts
-	return rb
-}
-
-func (rb *UnassignedInformationBuilder) LastAllocationStatus(lastallocationstatus string) *UnassignedInformationBuilder {
-	rb.v.LastAllocationStatus = &lastallocationstatus
-	return rb
-}
-
-func (rb *UnassignedInformationBuilder) Reason(reason unassignedinformationreason.UnassignedInformationReason) *UnassignedInformationBuilder {
-	rb.v.Reason = reason
-	return rb
+	return r
 }

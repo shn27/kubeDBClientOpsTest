@@ -15,49 +15,43 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package mget
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 )
 
 // Request holds the request body struct for the package mget
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/mget/MultiGetRequest.ts#L25-L91
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/mget/MultiGetRequest.ts#L25-L104
 type Request struct {
 
 	// Docs The documents you want to retrieve. Required if no index is specified in the
 	// request URI.
-	Docs []types.Operation `json:"docs,omitempty"`
-
+	Docs []types.MgetOperation `json:"docs,omitempty"`
 	// Ids The IDs of the documents you want to retrieve. Allowed when the index is
 	// specified in the request URI.
-	Ids *types.Ids `json:"ids,omitempty"`
+	Ids []string `json:"ids,omitempty"`
 }
 
-// RequestBuilder is the builder API for the mget.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -68,22 +62,42 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) Docs(docs []types.OperationBuilder) *RequestBuilder {
-	tmp := make([]types.Operation, len(docs))
-	for _, value := range docs {
-		tmp = append(tmp, value.Build())
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "docs":
+			if err := dec.Decode(&s.Docs); err != nil {
+				return fmt.Errorf("%s | %w", "Docs", err)
+			}
+
+		case "ids":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Ids", err)
+				}
+
+				s.Ids = append(s.Ids, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Ids); err != nil {
+					return fmt.Errorf("%s | %w", "Ids", err)
+				}
+			}
+
+		}
 	}
-	rb.v.Docs = tmp
-	return rb
-}
-
-func (rb *RequestBuilder) Ids(ids *types.IdsBuilder) *RequestBuilder {
-	v := ids.Build()
-	rb.v.Ids = &v
-	return rb
+	return nil
 }

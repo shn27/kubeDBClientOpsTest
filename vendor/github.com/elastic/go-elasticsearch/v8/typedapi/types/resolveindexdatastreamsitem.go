@@ -15,53 +15,77 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // ResolveIndexDataStreamsItem type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/resolve_index/ResolveIndexResponse.ts#L42-L46
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/resolve_index/ResolveIndexResponse.ts#L42-L46
 type ResolveIndexDataStreamsItem struct {
-	BackingIndices Indices        `json:"backing_indices"`
-	Name           DataStreamName `json:"name"`
-	TimestampField Field          `json:"timestamp_field"`
+	BackingIndices []string `json:"backing_indices"`
+	Name           string   `json:"name"`
+	TimestampField string   `json:"timestamp_field"`
 }
 
-// ResolveIndexDataStreamsItemBuilder holds ResolveIndexDataStreamsItem struct and provides a builder API.
-type ResolveIndexDataStreamsItemBuilder struct {
-	v *ResolveIndexDataStreamsItem
-}
+func (s *ResolveIndexDataStreamsItem) UnmarshalJSON(data []byte) error {
 
-// NewResolveIndexDataStreamsItem provides a builder for the ResolveIndexDataStreamsItem struct.
-func NewResolveIndexDataStreamsItemBuilder() *ResolveIndexDataStreamsItemBuilder {
-	r := ResolveIndexDataStreamsItemBuilder{
-		&ResolveIndexDataStreamsItem{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "backing_indices":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "BackingIndices", err)
+				}
+
+				s.BackingIndices = append(s.BackingIndices, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.BackingIndices); err != nil {
+					return fmt.Errorf("%s | %w", "BackingIndices", err)
+				}
+			}
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		case "timestamp_field":
+			if err := dec.Decode(&s.TimestampField); err != nil {
+				return fmt.Errorf("%s | %w", "TimestampField", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ResolveIndexDataStreamsItem struct
-func (rb *ResolveIndexDataStreamsItemBuilder) Build() ResolveIndexDataStreamsItem {
-	return *rb.v
-}
+// NewResolveIndexDataStreamsItem returns a ResolveIndexDataStreamsItem.
+func NewResolveIndexDataStreamsItem() *ResolveIndexDataStreamsItem {
+	r := &ResolveIndexDataStreamsItem{}
 
-func (rb *ResolveIndexDataStreamsItemBuilder) BackingIndices(backingindices *IndicesBuilder) *ResolveIndexDataStreamsItemBuilder {
-	v := backingindices.Build()
-	rb.v.BackingIndices = v
-	return rb
-}
-
-func (rb *ResolveIndexDataStreamsItemBuilder) Name(name DataStreamName) *ResolveIndexDataStreamsItemBuilder {
-	rb.v.Name = name
-	return rb
-}
-
-func (rb *ResolveIndexDataStreamsItemBuilder) TimestampField(timestampfield Field) *ResolveIndexDataStreamsItemBuilder {
-	rb.v.TimestampField = timestampfield
-	return rb
+	return r
 }

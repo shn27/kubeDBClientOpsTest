@@ -15,40 +15,54 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // NodeInfoSettingsClusterElection type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/info/types.ts#L144-L146
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/info/types.ts#L148-L150
 type NodeInfoSettingsClusterElection struct {
-	Strategy Name `json:"strategy"`
+	Strategy string `json:"strategy"`
 }
 
-// NodeInfoSettingsClusterElectionBuilder holds NodeInfoSettingsClusterElection struct and provides a builder API.
-type NodeInfoSettingsClusterElectionBuilder struct {
-	v *NodeInfoSettingsClusterElection
-}
+func (s *NodeInfoSettingsClusterElection) UnmarshalJSON(data []byte) error {
 
-// NewNodeInfoSettingsClusterElection provides a builder for the NodeInfoSettingsClusterElection struct.
-func NewNodeInfoSettingsClusterElectionBuilder() *NodeInfoSettingsClusterElectionBuilder {
-	r := NodeInfoSettingsClusterElectionBuilder{
-		&NodeInfoSettingsClusterElection{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "strategy":
+			if err := dec.Decode(&s.Strategy); err != nil {
+				return fmt.Errorf("%s | %w", "Strategy", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the NodeInfoSettingsClusterElection struct
-func (rb *NodeInfoSettingsClusterElectionBuilder) Build() NodeInfoSettingsClusterElection {
-	return *rb.v
-}
+// NewNodeInfoSettingsClusterElection returns a NodeInfoSettingsClusterElection.
+func NewNodeInfoSettingsClusterElection() *NodeInfoSettingsClusterElection {
+	r := &NodeInfoSettingsClusterElection{}
 
-func (rb *NodeInfoSettingsClusterElectionBuilder) Strategy(strategy Name) *NodeInfoSettingsClusterElectionBuilder {
-	rb.v.Strategy = strategy
-	return rb
+	return r
 }

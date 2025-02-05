@@ -15,52 +15,87 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ShardSequenceNumber type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/stats/types.ts#L164-L168
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/stats/types.ts#L176-L180
 type ShardSequenceNumber struct {
-	GlobalCheckpoint int64          `json:"global_checkpoint"`
-	LocalCheckpoint  int64          `json:"local_checkpoint"`
-	MaxSeqNo         SequenceNumber `json:"max_seq_no"`
+	GlobalCheckpoint int64 `json:"global_checkpoint"`
+	LocalCheckpoint  int64 `json:"local_checkpoint"`
+	MaxSeqNo         int64 `json:"max_seq_no"`
 }
 
-// ShardSequenceNumberBuilder holds ShardSequenceNumber struct and provides a builder API.
-type ShardSequenceNumberBuilder struct {
-	v *ShardSequenceNumber
-}
+func (s *ShardSequenceNumber) UnmarshalJSON(data []byte) error {
 
-// NewShardSequenceNumber provides a builder for the ShardSequenceNumber struct.
-func NewShardSequenceNumberBuilder() *ShardSequenceNumberBuilder {
-	r := ShardSequenceNumberBuilder{
-		&ShardSequenceNumber{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "global_checkpoint":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "GlobalCheckpoint", err)
+				}
+				s.GlobalCheckpoint = value
+			case float64:
+				f := int64(v)
+				s.GlobalCheckpoint = f
+			}
+
+		case "local_checkpoint":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "LocalCheckpoint", err)
+				}
+				s.LocalCheckpoint = value
+			case float64:
+				f := int64(v)
+				s.LocalCheckpoint = f
+			}
+
+		case "max_seq_no":
+			if err := dec.Decode(&s.MaxSeqNo); err != nil {
+				return fmt.Errorf("%s | %w", "MaxSeqNo", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ShardSequenceNumber struct
-func (rb *ShardSequenceNumberBuilder) Build() ShardSequenceNumber {
-	return *rb.v
-}
+// NewShardSequenceNumber returns a ShardSequenceNumber.
+func NewShardSequenceNumber() *ShardSequenceNumber {
+	r := &ShardSequenceNumber{}
 
-func (rb *ShardSequenceNumberBuilder) GlobalCheckpoint(globalcheckpoint int64) *ShardSequenceNumberBuilder {
-	rb.v.GlobalCheckpoint = globalcheckpoint
-	return rb
-}
-
-func (rb *ShardSequenceNumberBuilder) LocalCheckpoint(localcheckpoint int64) *ShardSequenceNumberBuilder {
-	rb.v.LocalCheckpoint = localcheckpoint
-	return rb
-}
-
-func (rb *ShardSequenceNumberBuilder) MaxSeqNo(maxseqno SequenceNumber) *ShardSequenceNumberBuilder {
-	rb.v.MaxSeqNo = maxseqno
-	return rb
+	return r
 }

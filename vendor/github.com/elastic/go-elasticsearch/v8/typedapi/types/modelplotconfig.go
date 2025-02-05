@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ModelPlotConfig type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/ModelPlot.ts#L23-L41
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/ModelPlot.ts#L23-L42
 type ModelPlotConfig struct {
 	// AnnotationsEnabled If true, enables calculation and storage of the model change annotations for
 	// each entity that is being analyzed.
@@ -36,50 +43,65 @@ type ModelPlotConfig struct {
 	// values. If terms are not specified or it is an empty string, no filtering is
 	// applied. Wildcards are not supported. Only the specified terms can be viewed
 	// when using the Single Metric Viewer.
-	Terms *Field `json:"terms,omitempty"`
+	Terms *string `json:"terms,omitempty"`
 }
 
-// ModelPlotConfigBuilder holds ModelPlotConfig struct and provides a builder API.
-type ModelPlotConfigBuilder struct {
-	v *ModelPlotConfig
-}
+func (s *ModelPlotConfig) UnmarshalJSON(data []byte) error {
 
-// NewModelPlotConfig provides a builder for the ModelPlotConfig struct.
-func NewModelPlotConfigBuilder() *ModelPlotConfigBuilder {
-	r := ModelPlotConfigBuilder{
-		&ModelPlotConfig{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "annotations_enabled":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "AnnotationsEnabled", err)
+				}
+				s.AnnotationsEnabled = &value
+			case bool:
+				s.AnnotationsEnabled = &v
+			}
+
+		case "enabled":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Enabled", err)
+				}
+				s.Enabled = &value
+			case bool:
+				s.Enabled = &v
+			}
+
+		case "terms":
+			if err := dec.Decode(&s.Terms); err != nil {
+				return fmt.Errorf("%s | %w", "Terms", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ModelPlotConfig struct
-func (rb *ModelPlotConfigBuilder) Build() ModelPlotConfig {
-	return *rb.v
-}
+// NewModelPlotConfig returns a ModelPlotConfig.
+func NewModelPlotConfig() *ModelPlotConfig {
+	r := &ModelPlotConfig{}
 
-// AnnotationsEnabled If true, enables calculation and storage of the model change annotations for
-// each entity that is being analyzed.
-
-func (rb *ModelPlotConfigBuilder) AnnotationsEnabled(annotationsenabled bool) *ModelPlotConfigBuilder {
-	rb.v.AnnotationsEnabled = &annotationsenabled
-	return rb
-}
-
-// Enabled If true, enables calculation and storage of the model bounds for each entity
-// that is being analyzed.
-
-func (rb *ModelPlotConfigBuilder) Enabled(enabled bool) *ModelPlotConfigBuilder {
-	rb.v.Enabled = &enabled
-	return rb
-}
-
-// Terms Limits data collection to this comma separated list of partition or by field
-// values. If terms are not specified or it is an empty string, no filtering is
-// applied. Wildcards are not supported. Only the specified terms can be viewed
-// when using the Single Metric Viewer.
-
-func (rb *ModelPlotConfigBuilder) Terms(terms Field) *ModelPlotConfigBuilder {
-	rb.v.Terms = &terms
-	return rb
+	return r
 }

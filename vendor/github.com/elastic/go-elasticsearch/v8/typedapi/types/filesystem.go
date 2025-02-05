@@ -15,64 +15,88 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // FileSystem type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/_types/Stats.ts#L280-L285
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/_types/Stats.ts#L769-L787
 type FileSystem struct {
-	Data      []DataPathStats  `json:"data,omitempty"`
-	IoStats   *IoStats         `json:"io_stats,omitempty"`
-	Timestamp *int64           `json:"timestamp,omitempty"`
-	Total     *FileSystemTotal `json:"total,omitempty"`
+	// Data List of all file stores.
+	Data []DataPathStats `json:"data,omitempty"`
+	// IoStats Contains I/O statistics for the node.
+	IoStats *IoStats `json:"io_stats,omitempty"`
+	// Timestamp Last time the file stores statistics were refreshed.
+	// Recorded in milliseconds since the Unix Epoch.
+	Timestamp *int64 `json:"timestamp,omitempty"`
+	// Total Contains statistics for all file stores of the node.
+	Total *FileSystemTotal `json:"total,omitempty"`
 }
 
-// FileSystemBuilder holds FileSystem struct and provides a builder API.
-type FileSystemBuilder struct {
-	v *FileSystem
-}
+func (s *FileSystem) UnmarshalJSON(data []byte) error {
 
-// NewFileSystem provides a builder for the FileSystem struct.
-func NewFileSystemBuilder() *FileSystemBuilder {
-	r := FileSystemBuilder{
-		&FileSystem{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "data":
+			if err := dec.Decode(&s.Data); err != nil {
+				return fmt.Errorf("%s | %w", "Data", err)
+			}
+
+		case "io_stats":
+			if err := dec.Decode(&s.IoStats); err != nil {
+				return fmt.Errorf("%s | %w", "IoStats", err)
+			}
+
+		case "timestamp":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Timestamp", err)
+				}
+				s.Timestamp = &value
+			case float64:
+				f := int64(v)
+				s.Timestamp = &f
+			}
+
+		case "total":
+			if err := dec.Decode(&s.Total); err != nil {
+				return fmt.Errorf("%s | %w", "Total", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the FileSystem struct
-func (rb *FileSystemBuilder) Build() FileSystem {
-	return *rb.v
-}
+// NewFileSystem returns a FileSystem.
+func NewFileSystem() *FileSystem {
+	r := &FileSystem{}
 
-func (rb *FileSystemBuilder) Data(data []DataPathStatsBuilder) *FileSystemBuilder {
-	tmp := make([]DataPathStats, len(data))
-	for _, value := range data {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Data = tmp
-	return rb
-}
-
-func (rb *FileSystemBuilder) IoStats(iostats *IoStatsBuilder) *FileSystemBuilder {
-	v := iostats.Build()
-	rb.v.IoStats = &v
-	return rb
-}
-
-func (rb *FileSystemBuilder) Timestamp(timestamp int64) *FileSystemBuilder {
-	rb.v.Timestamp = &timestamp
-	return rb
-}
-
-func (rb *FileSystemBuilder) Total(total *FileSystemTotalBuilder) *FileSystemBuilder {
-	v := total.Build()
-	rb.v.Total = &v
-	return rb
+	return r
 }

@@ -15,87 +15,126 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/distanceunit"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/geodistancetype"
 )
 
 // GeoDistanceAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/bucket.ts#L173-L179
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/bucket.ts#L396-L419
 type GeoDistanceAggregation struct {
+	// DistanceType The distance calculation type.
 	DistanceType *geodistancetype.GeoDistanceType `json:"distance_type,omitempty"`
-	Field        *Field                           `json:"field,omitempty"`
-	Meta         *Metadata                        `json:"meta,omitempty"`
-	Name         *string                          `json:"name,omitempty"`
-	Origin       *GeoLocation                     `json:"origin,omitempty"`
-	Ranges       []AggregationRange               `json:"ranges,omitempty"`
-	Unit         *distanceunit.DistanceUnit       `json:"unit,omitempty"`
+	// Field A field of type `geo_point` used to evaluate the distance.
+	Field *string `json:"field,omitempty"`
+	// Origin The origin  used to evaluate the distance.
+	Origin GeoLocation `json:"origin,omitempty"`
+	// Ranges An array of ranges used to bucket documents.
+	Ranges []AggregationRange `json:"ranges,omitempty"`
+	// Unit The distance unit.
+	Unit *distanceunit.DistanceUnit `json:"unit,omitempty"`
 }
 
-// GeoDistanceAggregationBuilder holds GeoDistanceAggregation struct and provides a builder API.
-type GeoDistanceAggregationBuilder struct {
-	v *GeoDistanceAggregation
-}
+func (s *GeoDistanceAggregation) UnmarshalJSON(data []byte) error {
 
-// NewGeoDistanceAggregation provides a builder for the GeoDistanceAggregation struct.
-func NewGeoDistanceAggregationBuilder() *GeoDistanceAggregationBuilder {
-	r := GeoDistanceAggregationBuilder{
-		&GeoDistanceAggregation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "distance_type":
+			if err := dec.Decode(&s.DistanceType); err != nil {
+				return fmt.Errorf("%s | %w", "DistanceType", err)
+			}
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "origin":
+			message := json.RawMessage{}
+			if err := dec.Decode(&message); err != nil {
+				return fmt.Errorf("%s | %w", "Origin", err)
+			}
+			keyDec := json.NewDecoder(bytes.NewReader(message))
+		origin_field:
+			for {
+				t, err := keyDec.Token()
+				if err != nil {
+					if errors.Is(err, io.EOF) {
+						break
+					}
+					return fmt.Errorf("%s | %w", "Origin", err)
+				}
+
+				switch t {
+
+				case "lat", "lon":
+					o := NewLatLonGeoLocation()
+					localDec := json.NewDecoder(bytes.NewReader(message))
+					if err := localDec.Decode(&o); err != nil {
+						return fmt.Errorf("%s | %w", "Origin", err)
+					}
+					s.Origin = o
+					break origin_field
+
+				case "geohash":
+					o := NewGeoHashLocation()
+					localDec := json.NewDecoder(bytes.NewReader(message))
+					if err := localDec.Decode(&o); err != nil {
+						return fmt.Errorf("%s | %w", "Origin", err)
+					}
+					s.Origin = o
+					break origin_field
+
+				}
+			}
+			if s.Origin == nil {
+				localDec := json.NewDecoder(bytes.NewReader(message))
+				if err := localDec.Decode(&s.Origin); err != nil {
+					return fmt.Errorf("%s | %w", "Origin", err)
+				}
+			}
+
+		case "ranges":
+			if err := dec.Decode(&s.Ranges); err != nil {
+				return fmt.Errorf("%s | %w", "Ranges", err)
+			}
+
+		case "unit":
+			if err := dec.Decode(&s.Unit); err != nil {
+				return fmt.Errorf("%s | %w", "Unit", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the GeoDistanceAggregation struct
-func (rb *GeoDistanceAggregationBuilder) Build() GeoDistanceAggregation {
-	return *rb.v
-}
+// NewGeoDistanceAggregation returns a GeoDistanceAggregation.
+func NewGeoDistanceAggregation() *GeoDistanceAggregation {
+	r := &GeoDistanceAggregation{}
 
-func (rb *GeoDistanceAggregationBuilder) DistanceType(distancetype geodistancetype.GeoDistanceType) *GeoDistanceAggregationBuilder {
-	rb.v.DistanceType = &distancetype
-	return rb
-}
-
-func (rb *GeoDistanceAggregationBuilder) Field(field Field) *GeoDistanceAggregationBuilder {
-	rb.v.Field = &field
-	return rb
-}
-
-func (rb *GeoDistanceAggregationBuilder) Meta(meta *MetadataBuilder) *GeoDistanceAggregationBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *GeoDistanceAggregationBuilder) Name(name string) *GeoDistanceAggregationBuilder {
-	rb.v.Name = &name
-	return rb
-}
-
-func (rb *GeoDistanceAggregationBuilder) Origin(origin *GeoLocationBuilder) *GeoDistanceAggregationBuilder {
-	v := origin.Build()
-	rb.v.Origin = &v
-	return rb
-}
-
-func (rb *GeoDistanceAggregationBuilder) Ranges(ranges []AggregationRangeBuilder) *GeoDistanceAggregationBuilder {
-	tmp := make([]AggregationRange, len(ranges))
-	for _, value := range ranges {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Ranges = tmp
-	return rb
-}
-
-func (rb *GeoDistanceAggregationBuilder) Unit(unit distanceunit.DistanceUnit) *GeoDistanceAggregationBuilder {
-	rb.v.Unit = &unit
-	return rb
+	return r
 }

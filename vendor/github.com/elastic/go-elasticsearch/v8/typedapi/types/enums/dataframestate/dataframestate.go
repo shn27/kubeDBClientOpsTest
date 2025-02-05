@@ -15,19 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package dataframestate
 package dataframestate
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/Dataframe.ts#L20-L26
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/Dataframe.ts#L20-L26
 type DataframeState struct {
-	name string
+	Name string
 }
 
 var (
@@ -47,7 +45,7 @@ func (d DataframeState) MarshalText() (text []byte, err error) {
 }
 
 func (d *DataframeState) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
 	case "started":
 		*d = Started
@@ -67,5 +65,5 @@ func (d *DataframeState) UnmarshalText(text []byte) error {
 }
 
 func (d DataframeState) String() string {
-	return d.name
+	return d.Name
 }

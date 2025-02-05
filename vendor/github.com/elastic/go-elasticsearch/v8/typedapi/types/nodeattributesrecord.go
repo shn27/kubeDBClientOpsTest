@@ -15,106 +15,161 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // NodeAttributesRecord type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cat/nodeattrs/types.ts#L20-L55
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cat/nodeattrs/types.ts#L20-L55
 type NodeAttributesRecord struct {
-	// Attr attribute description
+	// Attr The attribute name.
 	Attr *string `json:"attr,omitempty"`
-	// Host host name
+	// Host The host name.
 	Host *string `json:"host,omitempty"`
-	// Id unique node id
+	// Id The unique node identifier.
 	Id *string `json:"id,omitempty"`
-	// Ip ip address
+	// Ip The IP address.
 	Ip *string `json:"ip,omitempty"`
-	// Node node name
+	// Node The node name.
 	Node *string `json:"node,omitempty"`
-	// Pid process id
+	// Pid The process identifier.
 	Pid *string `json:"pid,omitempty"`
-	// Port bound transport port
+	// Port The bound transport port.
 	Port *string `json:"port,omitempty"`
-	// Value attribute value
+	// Value The attribute value.
 	Value *string `json:"value,omitempty"`
 }
 
-// NodeAttributesRecordBuilder holds NodeAttributesRecord struct and provides a builder API.
-type NodeAttributesRecordBuilder struct {
-	v *NodeAttributesRecord
-}
+func (s *NodeAttributesRecord) UnmarshalJSON(data []byte) error {
 
-// NewNodeAttributesRecord provides a builder for the NodeAttributesRecord struct.
-func NewNodeAttributesRecordBuilder() *NodeAttributesRecordBuilder {
-	r := NodeAttributesRecordBuilder{
-		&NodeAttributesRecord{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "attr":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Attr", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Attr = &o
+
+		case "host", "h":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Host", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Host = &o
+
+		case "id":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Id = &o
+
+		case "ip", "i":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Ip", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Ip = &o
+
+		case "node":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Node", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Node = &o
+
+		case "pid":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Pid", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Pid = &o
+
+		case "port":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Port", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Port = &o
+
+		case "value":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Value", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Value = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the NodeAttributesRecord struct
-func (rb *NodeAttributesRecordBuilder) Build() NodeAttributesRecord {
-	return *rb.v
-}
+// NewNodeAttributesRecord returns a NodeAttributesRecord.
+func NewNodeAttributesRecord() *NodeAttributesRecord {
+	r := &NodeAttributesRecord{}
 
-// Attr attribute description
-
-func (rb *NodeAttributesRecordBuilder) Attr(attr string) *NodeAttributesRecordBuilder {
-	rb.v.Attr = &attr
-	return rb
-}
-
-// Host host name
-
-func (rb *NodeAttributesRecordBuilder) Host(host string) *NodeAttributesRecordBuilder {
-	rb.v.Host = &host
-	return rb
-}
-
-// Id unique node id
-
-func (rb *NodeAttributesRecordBuilder) Id(id string) *NodeAttributesRecordBuilder {
-	rb.v.Id = &id
-	return rb
-}
-
-// Ip ip address
-
-func (rb *NodeAttributesRecordBuilder) Ip(ip string) *NodeAttributesRecordBuilder {
-	rb.v.Ip = &ip
-	return rb
-}
-
-// Node node name
-
-func (rb *NodeAttributesRecordBuilder) Node(node string) *NodeAttributesRecordBuilder {
-	rb.v.Node = &node
-	return rb
-}
-
-// Pid process id
-
-func (rb *NodeAttributesRecordBuilder) Pid(pid string) *NodeAttributesRecordBuilder {
-	rb.v.Pid = &pid
-	return rb
-}
-
-// Port bound transport port
-
-func (rb *NodeAttributesRecordBuilder) Port(port string) *NodeAttributesRecordBuilder {
-	rb.v.Port = &port
-	return rb
-}
-
-// Value attribute value
-
-func (rb *NodeAttributesRecordBuilder) Value(value string) *NodeAttributesRecordBuilder {
-	rb.v.Value = &value
-	return rb
+	return r
 }

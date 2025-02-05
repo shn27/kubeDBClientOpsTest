@@ -15,57 +15,99 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // WrapperQuery type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/abstractions.ts#L197-L200
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/abstractions.ts#L501-L510
 type WrapperQuery struct {
+	// Boost Floating point number used to decrease or increase the relevance scores of
+	// the query.
+	// Boost values are relative to the default value of 1.0.
+	// A boost value between 0 and 1.0 decreases the relevance score.
+	// A value greater than 1.0 increases the relevance score.
 	Boost *float32 `json:"boost,omitempty"`
-	// Query A base64 encoded query. The binary data format can be any of JSON, YAML, CBOR
-	// or SMILE encodings
+	// Query A base64 encoded query.
+	// The binary data format can be any of JSON, YAML, CBOR or SMILE encodings
 	Query      string  `json:"query"`
 	QueryName_ *string `json:"_name,omitempty"`
 }
 
-// WrapperQueryBuilder holds WrapperQuery struct and provides a builder API.
-type WrapperQueryBuilder struct {
-	v *WrapperQuery
-}
+func (s *WrapperQuery) UnmarshalJSON(data []byte) error {
 
-// NewWrapperQuery provides a builder for the WrapperQuery struct.
-func NewWrapperQueryBuilder() *WrapperQueryBuilder {
-	r := WrapperQueryBuilder{
-		&WrapperQuery{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "boost":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Boost", err)
+				}
+				f := float32(value)
+				s.Boost = &f
+			case float64:
+				f := float32(v)
+				s.Boost = &f
+			}
+
+		case "query":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Query", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Query = o
+
+		case "_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "QueryName_", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.QueryName_ = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the WrapperQuery struct
-func (rb *WrapperQueryBuilder) Build() WrapperQuery {
-	return *rb.v
-}
+// NewWrapperQuery returns a WrapperQuery.
+func NewWrapperQuery() *WrapperQuery {
+	r := &WrapperQuery{}
 
-func (rb *WrapperQueryBuilder) Boost(boost float32) *WrapperQueryBuilder {
-	rb.v.Boost = &boost
-	return rb
-}
-
-// Query A base64 encoded query. The binary data format can be any of JSON, YAML, CBOR
-// or SMILE encodings
-
-func (rb *WrapperQueryBuilder) Query(query string) *WrapperQueryBuilder {
-	rb.v.Query = query
-	return rb
-}
-
-func (rb *WrapperQueryBuilder) QueryName_(queryname_ string) *WrapperQueryBuilder {
-	rb.v.QueryName_ = &queryname_
-	return rb
+	return r
 }

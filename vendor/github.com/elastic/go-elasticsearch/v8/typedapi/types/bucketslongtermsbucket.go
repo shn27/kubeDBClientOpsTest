@@ -15,50 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // BucketsLongTermsBucket holds the union for the following types:
 //
-//	[]LongTermsBucket
 //	map[string]LongTermsBucket
+//	[]LongTermsBucket
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L303-L312
-type BucketsLongTermsBucket interface{}
-
-// BucketsLongTermsBucketBuilder holds BucketsLongTermsBucket struct and provides a builder API.
-type BucketsLongTermsBucketBuilder struct {
-	v BucketsLongTermsBucket
-}
-
-// NewBucketsLongTermsBucket provides a builder for the BucketsLongTermsBucket struct.
-func NewBucketsLongTermsBucketBuilder() *BucketsLongTermsBucketBuilder {
-	return &BucketsLongTermsBucketBuilder{}
-}
-
-// Build finalize the chain and returns the BucketsLongTermsBucket struct
-func (u *BucketsLongTermsBucketBuilder) Build() BucketsLongTermsBucket {
-	return u.v
-}
-
-func (u *BucketsLongTermsBucketBuilder) LongTermsBuckets(longtermsbuckets []LongTermsBucketBuilder) *BucketsLongTermsBucketBuilder {
-	tmp := make([]LongTermsBucket, len(longtermsbuckets))
-	for _, value := range longtermsbuckets {
-		tmp = append(tmp, value.Build())
-	}
-	u.v = tmp
-	return u
-}
-
-func (u *BucketsLongTermsBucketBuilder) Map(values map[string]*LongTermsBucketBuilder) *BucketsLongTermsBucketBuilder {
-	tmp := make(map[string]LongTermsBucket, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	u.v = tmp
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L346-L355
+type BucketsLongTermsBucket any

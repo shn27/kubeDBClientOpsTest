@@ -15,19 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package cardinalityexecutionmode
 package cardinalityexecutionmode
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/metric.ts#L54-L60
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/metric.ts#L64-L85
 type CardinalityExecutionMode struct {
-	name string
+	Name string
 }
 
 var (
@@ -47,7 +45,7 @@ func (c CardinalityExecutionMode) MarshalText() (text []byte, err error) {
 }
 
 func (c *CardinalityExecutionMode) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
 	case "global_ordinals":
 		*c = Globalordinals
@@ -67,5 +65,5 @@ func (c *CardinalityExecutionMode) UnmarshalText(text []byte) error {
 }
 
 func (c CardinalityExecutionMode) String() string {
-	return c.name
+	return c.Name
 }

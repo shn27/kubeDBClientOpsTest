@@ -15,55 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // SecurityRoles type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/usage/types.ts#L279-L283
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/xpack/usage/types.ts#L294-L298
 type SecurityRoles struct {
 	Dls    SecurityRolesDls    `json:"dls"`
 	File   SecurityRolesFile   `json:"file"`
 	Native SecurityRolesNative `json:"native"`
 }
 
-// SecurityRolesBuilder holds SecurityRoles struct and provides a builder API.
-type SecurityRolesBuilder struct {
-	v *SecurityRoles
-}
+// NewSecurityRoles returns a SecurityRoles.
+func NewSecurityRoles() *SecurityRoles {
+	r := &SecurityRoles{}
 
-// NewSecurityRoles provides a builder for the SecurityRoles struct.
-func NewSecurityRolesBuilder() *SecurityRolesBuilder {
-	r := SecurityRolesBuilder{
-		&SecurityRoles{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the SecurityRoles struct
-func (rb *SecurityRolesBuilder) Build() SecurityRoles {
-	return *rb.v
-}
-
-func (rb *SecurityRolesBuilder) Dls(dls *SecurityRolesDlsBuilder) *SecurityRolesBuilder {
-	v := dls.Build()
-	rb.v.Dls = v
-	return rb
-}
-
-func (rb *SecurityRolesBuilder) File(file *SecurityRolesFileBuilder) *SecurityRolesBuilder {
-	v := file.Build()
-	rb.v.File = v
-	return rb
-}
-
-func (rb *SecurityRolesBuilder) Native(native *SecurityRolesNativeBuilder) *SecurityRolesBuilder {
-	v := native.Build()
-	rb.v.Native = v
-	return rb
+	return r
 }

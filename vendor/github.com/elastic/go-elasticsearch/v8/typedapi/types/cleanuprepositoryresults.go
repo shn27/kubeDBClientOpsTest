@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // CleanupRepositoryResults type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/snapshot/cleanup_repository/SnapshotCleanupRepositoryResponse.ts#L29-L34
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/snapshot/cleanup_repository/SnapshotCleanupRepositoryResponse.ts#L29-L34
 type CleanupRepositoryResults struct {
 	// DeletedBlobs Number of binary large objects (blobs) removed during cleanup.
 	DeletedBlobs int64 `json:"deleted_blobs"`
@@ -32,35 +39,59 @@ type CleanupRepositoryResults struct {
 	DeletedBytes int64 `json:"deleted_bytes"`
 }
 
-// CleanupRepositoryResultsBuilder holds CleanupRepositoryResults struct and provides a builder API.
-type CleanupRepositoryResultsBuilder struct {
-	v *CleanupRepositoryResults
-}
+func (s *CleanupRepositoryResults) UnmarshalJSON(data []byte) error {
 
-// NewCleanupRepositoryResults provides a builder for the CleanupRepositoryResults struct.
-func NewCleanupRepositoryResultsBuilder() *CleanupRepositoryResultsBuilder {
-	r := CleanupRepositoryResultsBuilder{
-		&CleanupRepositoryResults{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "deleted_blobs":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DeletedBlobs", err)
+				}
+				s.DeletedBlobs = value
+			case float64:
+				f := int64(v)
+				s.DeletedBlobs = f
+			}
+
+		case "deleted_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DeletedBytes", err)
+				}
+				s.DeletedBytes = value
+			case float64:
+				f := int64(v)
+				s.DeletedBytes = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the CleanupRepositoryResults struct
-func (rb *CleanupRepositoryResultsBuilder) Build() CleanupRepositoryResults {
-	return *rb.v
-}
+// NewCleanupRepositoryResults returns a CleanupRepositoryResults.
+func NewCleanupRepositoryResults() *CleanupRepositoryResults {
+	r := &CleanupRepositoryResults{}
 
-// DeletedBlobs Number of binary large objects (blobs) removed during cleanup.
-
-func (rb *CleanupRepositoryResultsBuilder) DeletedBlobs(deletedblobs int64) *CleanupRepositoryResultsBuilder {
-	rb.v.DeletedBlobs = deletedblobs
-	return rb
-}
-
-// DeletedBytes Number of bytes freed by cleanup operations.
-
-func (rb *CleanupRepositoryResultsBuilder) DeletedBytes(deletedbytes int64) *CleanupRepositoryResultsBuilder {
-	rb.v.DeletedBytes = deletedbytes
-	return rb
+	return r
 }

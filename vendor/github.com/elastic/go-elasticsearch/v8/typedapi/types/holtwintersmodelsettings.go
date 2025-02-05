@@ -15,20 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/holtwinterstype"
 )
 
 // HoltWintersModelSettings type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/pipeline.ts#L223-L230
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/pipeline.ts#L301-L308
 type HoltWintersModelSettings struct {
 	Alpha  *float32                         `json:"alpha,omitempty"`
 	Beta   *float32                         `json:"beta,omitempty"`
@@ -38,51 +43,112 @@ type HoltWintersModelSettings struct {
 	Type   *holtwinterstype.HoltWintersType `json:"type,omitempty"`
 }
 
-// HoltWintersModelSettingsBuilder holds HoltWintersModelSettings struct and provides a builder API.
-type HoltWintersModelSettingsBuilder struct {
-	v *HoltWintersModelSettings
-}
+func (s *HoltWintersModelSettings) UnmarshalJSON(data []byte) error {
 
-// NewHoltWintersModelSettings provides a builder for the HoltWintersModelSettings struct.
-func NewHoltWintersModelSettingsBuilder() *HoltWintersModelSettingsBuilder {
-	r := HoltWintersModelSettingsBuilder{
-		&HoltWintersModelSettings{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "alpha":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Alpha", err)
+				}
+				f := float32(value)
+				s.Alpha = &f
+			case float64:
+				f := float32(v)
+				s.Alpha = &f
+			}
+
+		case "beta":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Beta", err)
+				}
+				f := float32(value)
+				s.Beta = &f
+			case float64:
+				f := float32(v)
+				s.Beta = &f
+			}
+
+		case "gamma":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Gamma", err)
+				}
+				f := float32(value)
+				s.Gamma = &f
+			case float64:
+				f := float32(v)
+				s.Gamma = &f
+			}
+
+		case "pad":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Pad", err)
+				}
+				s.Pad = &value
+			case bool:
+				s.Pad = &v
+			}
+
+		case "period":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Period", err)
+				}
+				s.Period = &value
+			case float64:
+				f := int(v)
+				s.Period = &f
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the HoltWintersModelSettings struct
-func (rb *HoltWintersModelSettingsBuilder) Build() HoltWintersModelSettings {
-	return *rb.v
-}
+// NewHoltWintersModelSettings returns a HoltWintersModelSettings.
+func NewHoltWintersModelSettings() *HoltWintersModelSettings {
+	r := &HoltWintersModelSettings{}
 
-func (rb *HoltWintersModelSettingsBuilder) Alpha(alpha float32) *HoltWintersModelSettingsBuilder {
-	rb.v.Alpha = &alpha
-	return rb
-}
-
-func (rb *HoltWintersModelSettingsBuilder) Beta(beta float32) *HoltWintersModelSettingsBuilder {
-	rb.v.Beta = &beta
-	return rb
-}
-
-func (rb *HoltWintersModelSettingsBuilder) Gamma(gamma float32) *HoltWintersModelSettingsBuilder {
-	rb.v.Gamma = &gamma
-	return rb
-}
-
-func (rb *HoltWintersModelSettingsBuilder) Pad(pad bool) *HoltWintersModelSettingsBuilder {
-	rb.v.Pad = &pad
-	return rb
-}
-
-func (rb *HoltWintersModelSettingsBuilder) Period(period int) *HoltWintersModelSettingsBuilder {
-	rb.v.Period = &period
-	return rb
-}
-
-func (rb *HoltWintersModelSettingsBuilder) Type_(type_ holtwinterstype.HoltWintersType) *HoltWintersModelSettingsBuilder {
-	rb.v.Type = &type_
-	return rb
+	return r
 }

@@ -15,48 +15,76 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // DateHistogramAggregate type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L335-L336
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L383-L386
 type DateHistogramAggregate struct {
 	Buckets BucketsDateHistogramBucket `json:"buckets"`
-	Meta    *Metadata                  `json:"meta,omitempty"`
+	Meta    Metadata                   `json:"meta,omitempty"`
 }
 
-// DateHistogramAggregateBuilder holds DateHistogramAggregate struct and provides a builder API.
-type DateHistogramAggregateBuilder struct {
-	v *DateHistogramAggregate
-}
+func (s *DateHistogramAggregate) UnmarshalJSON(data []byte) error {
 
-// NewDateHistogramAggregate provides a builder for the DateHistogramAggregate struct.
-func NewDateHistogramAggregateBuilder() *DateHistogramAggregateBuilder {
-	r := DateHistogramAggregateBuilder{
-		&DateHistogramAggregate{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "buckets":
+
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			source := bytes.NewReader(rawMsg)
+			localDec := json.NewDecoder(source)
+			switch rawMsg[0] {
+			case '{':
+				o := make(map[string]DateHistogramBucket, 0)
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Buckets", err)
+				}
+				s.Buckets = o
+			case '[':
+				o := []DateHistogramBucket{}
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Buckets", err)
+				}
+				s.Buckets = o
+			}
+
+		case "meta":
+			if err := dec.Decode(&s.Meta); err != nil {
+				return fmt.Errorf("%s | %w", "Meta", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DateHistogramAggregate struct
-func (rb *DateHistogramAggregateBuilder) Build() DateHistogramAggregate {
-	return *rb.v
-}
+// NewDateHistogramAggregate returns a DateHistogramAggregate.
+func NewDateHistogramAggregate() *DateHistogramAggregate {
+	r := &DateHistogramAggregate{}
 
-func (rb *DateHistogramAggregateBuilder) Buckets(buckets *BucketsDateHistogramBucketBuilder) *DateHistogramAggregateBuilder {
-	v := buckets.Build()
-	rb.v.Buckets = v
-	return rb
-}
-
-func (rb *DateHistogramAggregateBuilder) Meta(meta *MetadataBuilder) *DateHistogramAggregateBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
+	return r
 }

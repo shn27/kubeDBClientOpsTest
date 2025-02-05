@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // CustomAnalyzer type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/analyzers.ts#L28-L35
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/analyzers.ts#L28-L35
 type CustomAnalyzer struct {
 	CharFilter           []string `json:"char_filter,omitempty"`
 	Filter               []string `json:"filter,omitempty"`
@@ -34,48 +41,127 @@ type CustomAnalyzer struct {
 	Type                 string   `json:"type,omitempty"`
 }
 
-// CustomAnalyzerBuilder holds CustomAnalyzer struct and provides a builder API.
-type CustomAnalyzerBuilder struct {
-	v *CustomAnalyzer
+func (s *CustomAnalyzer) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "char_filter":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "CharFilter", err)
+				}
+
+				s.CharFilter = append(s.CharFilter, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.CharFilter); err != nil {
+					return fmt.Errorf("%s | %w", "CharFilter", err)
+				}
+			}
+
+		case "filter":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Filter", err)
+				}
+
+				s.Filter = append(s.Filter, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Filter); err != nil {
+					return fmt.Errorf("%s | %w", "Filter", err)
+				}
+			}
+
+		case "position_increment_gap":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PositionIncrementGap", err)
+				}
+				s.PositionIncrementGap = &value
+			case float64:
+				f := int(v)
+				s.PositionIncrementGap = &f
+			}
+
+		case "position_offset_gap":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PositionOffsetGap", err)
+				}
+				s.PositionOffsetGap = &value
+			case float64:
+				f := int(v)
+				s.PositionOffsetGap = &f
+			}
+
+		case "tokenizer":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Tokenizer", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Tokenizer = o
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewCustomAnalyzer provides a builder for the CustomAnalyzer struct.
-func NewCustomAnalyzerBuilder() *CustomAnalyzerBuilder {
-	r := CustomAnalyzerBuilder{
-		&CustomAnalyzer{},
+// MarshalJSON override marshalling to include literal value
+func (s CustomAnalyzer) MarshalJSON() ([]byte, error) {
+	type innerCustomAnalyzer CustomAnalyzer
+	tmp := innerCustomAnalyzer{
+		CharFilter:           s.CharFilter,
+		Filter:               s.Filter,
+		PositionIncrementGap: s.PositionIncrementGap,
+		PositionOffsetGap:    s.PositionOffsetGap,
+		Tokenizer:            s.Tokenizer,
+		Type:                 s.Type,
 	}
 
-	r.v.Type = "custom"
+	tmp.Type = "custom"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the CustomAnalyzer struct
-func (rb *CustomAnalyzerBuilder) Build() CustomAnalyzer {
-	return *rb.v
-}
+// NewCustomAnalyzer returns a CustomAnalyzer.
+func NewCustomAnalyzer() *CustomAnalyzer {
+	r := &CustomAnalyzer{}
 
-func (rb *CustomAnalyzerBuilder) CharFilter(char_filter ...string) *CustomAnalyzerBuilder {
-	rb.v.CharFilter = char_filter
-	return rb
-}
-
-func (rb *CustomAnalyzerBuilder) Filter(filter ...string) *CustomAnalyzerBuilder {
-	rb.v.Filter = filter
-	return rb
-}
-
-func (rb *CustomAnalyzerBuilder) PositionIncrementGap(positionincrementgap int) *CustomAnalyzerBuilder {
-	rb.v.PositionIncrementGap = &positionincrementgap
-	return rb
-}
-
-func (rb *CustomAnalyzerBuilder) PositionOffsetGap(positionoffsetgap int) *CustomAnalyzerBuilder {
-	rb.v.PositionOffsetGap = &positionoffsetgap
-	return rb
-}
-
-func (rb *CustomAnalyzerBuilder) Tokenizer(tokenizer string) *CustomAnalyzerBuilder {
-	rb.v.Tokenizer = tokenizer
-	return rb
+	return r
 }

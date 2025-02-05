@@ -15,58 +15,49 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package samlcompletelogout
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
-
-	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
+	"io"
+	"strconv"
 )
 
 // Request holds the request body struct for the package samlcompletelogout
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/saml_complete_logout/Request.ts#L23-L40
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/saml_complete_logout/Request.ts#L23-L42
 type Request struct {
 
 	// Content If the SAML IdP sends the logout response with the HTTP-Post binding, this
 	// field must be set to the value of the SAMLResponse form parameter from the
 	// logout response.
 	Content *string `json:"content,omitempty"`
-
 	// Ids A json array with all the valid SAML Request Ids that the caller of the API
 	// has for the current user.
-	Ids types.Ids `json:"ids"`
-
+	Ids []string `json:"ids"`
 	// QueryString If the SAML IdP sends the logout response with the HTTP-Redirect binding,
 	// this field must be set to the query string of the redirect URI.
 	QueryString *string `json:"query_string,omitempty"`
-
 	// Realm The name of the SAML realm in Elasticsearch for which the configuration is
 	// used to verify the logout response.
 	Realm string `json:"realm"`
 }
 
-// RequestBuilder is the builder API for the samlcompletelogout.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -77,28 +68,73 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) Content(content string) *RequestBuilder {
-	rb.v.Content = &content
-	return rb
-}
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
 
-func (rb *RequestBuilder) Ids(ids *types.IdsBuilder) *RequestBuilder {
-	v := ids.Build()
-	rb.v.Ids = v
-	return rb
-}
+		switch t {
 
-func (rb *RequestBuilder) QueryString(querystring string) *RequestBuilder {
-	rb.v.QueryString = &querystring
-	return rb
-}
+		case "content":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Content", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Content = &o
 
-func (rb *RequestBuilder) Realm(realm string) *RequestBuilder {
-	rb.v.Realm = realm
-	return rb
+		case "ids":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Ids", err)
+				}
+
+				s.Ids = append(s.Ids, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Ids); err != nil {
+					return fmt.Errorf("%s | %w", "Ids", err)
+				}
+			}
+
+		case "query_string":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "QueryString", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.QueryString = &o
+
+		case "realm":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Realm", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Realm = o
+
+		}
+	}
+	return nil
 }

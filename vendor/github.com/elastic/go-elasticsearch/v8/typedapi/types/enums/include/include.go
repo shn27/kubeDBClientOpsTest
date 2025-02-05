@@ -15,19 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package include
 package include
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/Include.ts#L20-L42
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/Include.ts#L20-L47
 type Include struct {
-	name string
+	Name string
 }
 
 var (
@@ -38,6 +36,8 @@ var (
 	Hyperparameters = Include{"hyperparameters"}
 
 	Totalfeatureimportance = Include{"total_feature_importance"}
+
+	Definitionstatus = Include{"definition_status"}
 )
 
 func (i Include) MarshalText() (text []byte, err error) {
@@ -45,7 +45,7 @@ func (i Include) MarshalText() (text []byte, err error) {
 }
 
 func (i *Include) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
 	case "definition":
 		*i = Definition
@@ -55,6 +55,8 @@ func (i *Include) UnmarshalText(text []byte) error {
 		*i = Hyperparameters
 	case "total_feature_importance":
 		*i = Totalfeatureimportance
+	case "definition_status":
+		*i = Definitionstatus
 	default:
 		*i = Include{string(text)}
 	}
@@ -63,5 +65,5 @@ func (i *Include) UnmarshalText(text []byte) error {
 }
 
 func (i Include) String() string {
-	return i.name
+	return i.Name
 }

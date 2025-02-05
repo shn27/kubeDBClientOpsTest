@@ -15,48 +15,76 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // PercentilesBucketAggregate type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L167-L168
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L180-L181
 type PercentilesBucketAggregate struct {
-	Meta   *Metadata   `json:"meta,omitempty"`
+	Meta   Metadata    `json:"meta,omitempty"`
 	Values Percentiles `json:"values"`
 }
 
-// PercentilesBucketAggregateBuilder holds PercentilesBucketAggregate struct and provides a builder API.
-type PercentilesBucketAggregateBuilder struct {
-	v *PercentilesBucketAggregate
-}
+func (s *PercentilesBucketAggregate) UnmarshalJSON(data []byte) error {
 
-// NewPercentilesBucketAggregate provides a builder for the PercentilesBucketAggregate struct.
-func NewPercentilesBucketAggregateBuilder() *PercentilesBucketAggregateBuilder {
-	r := PercentilesBucketAggregateBuilder{
-		&PercentilesBucketAggregate{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "meta":
+			if err := dec.Decode(&s.Meta); err != nil {
+				return fmt.Errorf("%s | %w", "Meta", err)
+			}
+
+		case "values":
+
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			source := bytes.NewReader(rawMsg)
+			localDec := json.NewDecoder(source)
+			switch rawMsg[0] {
+			case '{':
+				o := make(KeyedPercentiles, 0)
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Values", err)
+				}
+				s.Values = o
+			case '[':
+				o := []ArrayPercentilesItem{}
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Values", err)
+				}
+				s.Values = o
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the PercentilesBucketAggregate struct
-func (rb *PercentilesBucketAggregateBuilder) Build() PercentilesBucketAggregate {
-	return *rb.v
-}
+// NewPercentilesBucketAggregate returns a PercentilesBucketAggregate.
+func NewPercentilesBucketAggregate() *PercentilesBucketAggregate {
+	r := &PercentilesBucketAggregate{}
 
-func (rb *PercentilesBucketAggregateBuilder) Meta(meta *MetadataBuilder) *PercentilesBucketAggregateBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *PercentilesBucketAggregateBuilder) Values(values *PercentilesBuilder) *PercentilesBucketAggregateBuilder {
-	v := values.Build()
-	rb.v.Values = v
-	return rb
+	return r
 }

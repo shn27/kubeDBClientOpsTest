@@ -15,77 +15,99 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // FetchProfile type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/profile.ts#L137-L144
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/profile.ts#L230-L237
 type FetchProfile struct {
-	Breakdown   FetchProfileBreakdown  `json:"breakdown"`
-	Children    []FetchProfile         `json:"children,omitempty"`
-	Debug       *FetchProfileDebug     `json:"debug,omitempty"`
-	Description string                 `json:"description"`
-	TimeInNanos DurationValueUnitNanos `json:"time_in_nanos"`
-	Type        string                 `json:"type"`
+	Breakdown   FetchProfileBreakdown `json:"breakdown"`
+	Children    []FetchProfile        `json:"children,omitempty"`
+	Debug       *FetchProfileDebug    `json:"debug,omitempty"`
+	Description string                `json:"description"`
+	TimeInNanos int64                 `json:"time_in_nanos"`
+	Type        string                `json:"type"`
 }
 
-// FetchProfileBuilder holds FetchProfile struct and provides a builder API.
-type FetchProfileBuilder struct {
-	v *FetchProfile
-}
+func (s *FetchProfile) UnmarshalJSON(data []byte) error {
 
-// NewFetchProfile provides a builder for the FetchProfile struct.
-func NewFetchProfileBuilder() *FetchProfileBuilder {
-	r := FetchProfileBuilder{
-		&FetchProfile{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "breakdown":
+			if err := dec.Decode(&s.Breakdown); err != nil {
+				return fmt.Errorf("%s | %w", "Breakdown", err)
+			}
+
+		case "children":
+			if err := dec.Decode(&s.Children); err != nil {
+				return fmt.Errorf("%s | %w", "Children", err)
+			}
+
+		case "debug":
+			if err := dec.Decode(&s.Debug); err != nil {
+				return fmt.Errorf("%s | %w", "Debug", err)
+			}
+
+		case "description":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Description", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Description = o
+
+		case "time_in_nanos":
+			if err := dec.Decode(&s.TimeInNanos); err != nil {
+				return fmt.Errorf("%s | %w", "TimeInNanos", err)
+			}
+
+		case "type":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Type = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the FetchProfile struct
-func (rb *FetchProfileBuilder) Build() FetchProfile {
-	return *rb.v
-}
+// NewFetchProfile returns a FetchProfile.
+func NewFetchProfile() *FetchProfile {
+	r := &FetchProfile{}
 
-func (rb *FetchProfileBuilder) Breakdown(breakdown *FetchProfileBreakdownBuilder) *FetchProfileBuilder {
-	v := breakdown.Build()
-	rb.v.Breakdown = v
-	return rb
-}
-
-func (rb *FetchProfileBuilder) Children(children []FetchProfileBuilder) *FetchProfileBuilder {
-	tmp := make([]FetchProfile, len(children))
-	for _, value := range children {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Children = tmp
-	return rb
-}
-
-func (rb *FetchProfileBuilder) Debug(debug *FetchProfileDebugBuilder) *FetchProfileBuilder {
-	v := debug.Build()
-	rb.v.Debug = &v
-	return rb
-}
-
-func (rb *FetchProfileBuilder) Description(description string) *FetchProfileBuilder {
-	rb.v.Description = description
-	return rb
-}
-
-func (rb *FetchProfileBuilder) TimeInNanos(timeinnanos *DurationValueUnitNanosBuilder) *FetchProfileBuilder {
-	v := timeinnanos.Build()
-	rb.v.TimeInNanos = v
-	return rb
-}
-
-func (rb *FetchProfileBuilder) Type_(type_ string) *FetchProfileBuilder {
-	rb.v.Type = type_
-	return rb
+	return r
 }

@@ -15,43 +15,73 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // LifecycleExplainUnmanaged type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ilm/explain_lifecycle/types.ts#L54-L57
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ilm/explain_lifecycle/types.ts#L54-L57
 type LifecycleExplainUnmanaged struct {
-	Index   IndexName `json:"index"`
-	Managed string    `json:"managed,omitempty"`
+	Index   string `json:"index"`
+	Managed bool   `json:"managed,omitempty"`
 }
 
-// LifecycleExplainUnmanagedBuilder holds LifecycleExplainUnmanaged struct and provides a builder API.
-type LifecycleExplainUnmanagedBuilder struct {
-	v *LifecycleExplainUnmanaged
+func (s *LifecycleExplainUnmanaged) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "index":
+			if err := dec.Decode(&s.Index); err != nil {
+				return fmt.Errorf("%s | %w", "Index", err)
+			}
+
+		case "managed":
+			if err := dec.Decode(&s.Managed); err != nil {
+				return fmt.Errorf("%s | %w", "Managed", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewLifecycleExplainUnmanaged provides a builder for the LifecycleExplainUnmanaged struct.
-func NewLifecycleExplainUnmanagedBuilder() *LifecycleExplainUnmanagedBuilder {
-	r := LifecycleExplainUnmanagedBuilder{
-		&LifecycleExplainUnmanaged{},
+// MarshalJSON override marshalling to include literal value
+func (s LifecycleExplainUnmanaged) MarshalJSON() ([]byte, error) {
+	type innerLifecycleExplainUnmanaged LifecycleExplainUnmanaged
+	tmp := innerLifecycleExplainUnmanaged{
+		Index:   s.Index,
+		Managed: s.Managed,
 	}
 
-	r.v.Managed = "false"
+	tmp.Managed = false
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the LifecycleExplainUnmanaged struct
-func (rb *LifecycleExplainUnmanagedBuilder) Build() LifecycleExplainUnmanaged {
-	return *rb.v
-}
+// NewLifecycleExplainUnmanaged returns a LifecycleExplainUnmanaged.
+func NewLifecycleExplainUnmanaged() *LifecycleExplainUnmanaged {
+	r := &LifecycleExplainUnmanaged{}
 
-func (rb *LifecycleExplainUnmanagedBuilder) Index(index IndexName) *LifecycleExplainUnmanagedBuilder {
-	rb.v.Index = index
-	return rb
+	return r
 }

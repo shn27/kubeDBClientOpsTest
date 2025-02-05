@@ -15,53 +15,78 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // NestedIdentity type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/hits.ts#L84-L88
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/hits.ts#L90-L94
 type NestedIdentity struct {
-	Field   Field           `json:"field"`
+	Field   string          `json:"field"`
 	Nested_ *NestedIdentity `json:"_nested,omitempty"`
 	Offset  int             `json:"offset"`
 }
 
-// NestedIdentityBuilder holds NestedIdentity struct and provides a builder API.
-type NestedIdentityBuilder struct {
-	v *NestedIdentity
-}
+func (s *NestedIdentity) UnmarshalJSON(data []byte) error {
 
-// NewNestedIdentity provides a builder for the NestedIdentity struct.
-func NewNestedIdentityBuilder() *NestedIdentityBuilder {
-	r := NestedIdentityBuilder{
-		&NestedIdentity{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "_nested":
+			if err := dec.Decode(&s.Nested_); err != nil {
+				return fmt.Errorf("%s | %w", "Nested_", err)
+			}
+
+		case "offset":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Offset", err)
+				}
+				s.Offset = value
+			case float64:
+				f := int(v)
+				s.Offset = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the NestedIdentity struct
-func (rb *NestedIdentityBuilder) Build() NestedIdentity {
-	return *rb.v
-}
+// NewNestedIdentity returns a NestedIdentity.
+func NewNestedIdentity() *NestedIdentity {
+	r := &NestedIdentity{}
 
-func (rb *NestedIdentityBuilder) Field(field Field) *NestedIdentityBuilder {
-	rb.v.Field = field
-	return rb
-}
-
-func (rb *NestedIdentityBuilder) Nested_(nested_ *NestedIdentityBuilder) *NestedIdentityBuilder {
-	v := nested_.Build()
-	rb.v.Nested_ = &v
-	return rb
-}
-
-func (rb *NestedIdentityBuilder) Offset(offset int) *NestedIdentityBuilder {
-	rb.v.Offset = offset
-	return rb
+	return r
 }

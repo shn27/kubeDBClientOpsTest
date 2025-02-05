@@ -15,46 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // IndicesShardStores type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/shard_stores/types.ts#L25-L27
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/shard_stores/types.ts#L25-L27
 type IndicesShardStores struct {
 	Shards map[string]ShardStoreWrapper `json:"shards"`
 }
 
-// IndicesShardStoresBuilder holds IndicesShardStores struct and provides a builder API.
-type IndicesShardStoresBuilder struct {
-	v *IndicesShardStores
-}
-
-// NewIndicesShardStores provides a builder for the IndicesShardStores struct.
-func NewIndicesShardStoresBuilder() *IndicesShardStoresBuilder {
-	r := IndicesShardStoresBuilder{
-		&IndicesShardStores{
-			Shards: make(map[string]ShardStoreWrapper, 0),
-		},
+// NewIndicesShardStores returns a IndicesShardStores.
+func NewIndicesShardStores() *IndicesShardStores {
+	r := &IndicesShardStores{
+		Shards: make(map[string]ShardStoreWrapper, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the IndicesShardStores struct
-func (rb *IndicesShardStoresBuilder) Build() IndicesShardStores {
-	return *rb.v
-}
-
-func (rb *IndicesShardStoresBuilder) Shards(values map[string]*ShardStoreWrapperBuilder) *IndicesShardStoresBuilder {
-	tmp := make(map[string]ShardStoreWrapper, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Shards = tmp
-	return rb
+	return r
 }

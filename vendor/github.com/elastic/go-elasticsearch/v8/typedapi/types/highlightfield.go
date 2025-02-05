@@ -15,14 +15,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/boundaryscanner"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/highlighterfragmenter"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/highlighterorder"
@@ -32,167 +37,367 @@ import (
 
 // HighlightField type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/highlighting.ts#L87-L90
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/highlighting.ts#L192-L195
 type HighlightField struct {
-	BoundaryChars         *string                                      `json:"boundary_chars,omitempty"`
-	BoundaryMaxScan       *int                                         `json:"boundary_max_scan,omitempty"`
-	BoundaryScanner       *boundaryscanner.BoundaryScanner             `json:"boundary_scanner,omitempty"`
-	BoundaryScannerLocale *string                                      `json:"boundary_scanner_locale,omitempty"`
-	ForceSource           *bool                                        `json:"force_source,omitempty"`
-	FragmentOffset        *int                                         `json:"fragment_offset,omitempty"`
-	FragmentSize          *int                                         `json:"fragment_size,omitempty"`
-	Fragmenter            *highlighterfragmenter.HighlighterFragmenter `json:"fragmenter,omitempty"`
-	HighlightFilter       *bool                                        `json:"highlight_filter,omitempty"`
-	HighlightQuery        *QueryContainer                              `json:"highlight_query,omitempty"`
-	MatchedFields         *Fields                                      `json:"matched_fields,omitempty"`
-	MaxAnalyzedOffset     *int                                         `json:"max_analyzed_offset,omitempty"`
-	MaxFragmentLength     *int                                         `json:"max_fragment_length,omitempty"`
-	NoMatchSize           *int                                         `json:"no_match_size,omitempty"`
-	NumberOfFragments     *int                                         `json:"number_of_fragments,omitempty"`
-	Options               map[string]interface{}                       `json:"options,omitempty"`
-	Order                 *highlighterorder.HighlighterOrder           `json:"order,omitempty"`
-	PhraseLimit           *int                                         `json:"phrase_limit,omitempty"`
-	PostTags              []string                                     `json:"post_tags,omitempty"`
-	PreTags               []string                                     `json:"pre_tags,omitempty"`
-	RequireFieldMatch     *bool                                        `json:"require_field_match,omitempty"`
-	TagsSchema            *highlightertagsschema.HighlighterTagsSchema `json:"tags_schema,omitempty"`
-	Type                  *highlightertype.HighlighterType             `json:"type,omitempty"`
+	// BoundaryChars A string that contains each boundary character.
+	BoundaryChars *string `json:"boundary_chars,omitempty"`
+	// BoundaryMaxScan How far to scan for boundary characters.
+	BoundaryMaxScan *int `json:"boundary_max_scan,omitempty"`
+	// BoundaryScanner Specifies how to break the highlighted fragments: chars, sentence, or word.
+	// Only valid for the unified and fvh highlighters.
+	// Defaults to `sentence` for the `unified` highlighter. Defaults to `chars` for
+	// the `fvh` highlighter.
+	BoundaryScanner *boundaryscanner.BoundaryScanner `json:"boundary_scanner,omitempty"`
+	// BoundaryScannerLocale Controls which locale is used to search for sentence and word boundaries.
+	// This parameter takes a form of a language tag, for example: `"en-US"`,
+	// `"fr-FR"`, `"ja-JP"`.
+	BoundaryScannerLocale *string `json:"boundary_scanner_locale,omitempty"`
+	ForceSource           *bool   `json:"force_source,omitempty"`
+	FragmentOffset        *int    `json:"fragment_offset,omitempty"`
+	// FragmentSize The size of the highlighted fragment in characters.
+	FragmentSize *int `json:"fragment_size,omitempty"`
+	// Fragmenter Specifies how text should be broken up in highlight snippets: `simple` or
+	// `span`.
+	// Only valid for the `plain` highlighter.
+	Fragmenter      *highlighterfragmenter.HighlighterFragmenter `json:"fragmenter,omitempty"`
+	HighlightFilter *bool                                        `json:"highlight_filter,omitempty"`
+	// HighlightQuery Highlight matches for a query other than the search query.
+	// This is especially useful if you use a rescore query because those are not
+	// taken into account by highlighting by default.
+	HighlightQuery *Query   `json:"highlight_query,omitempty"`
+	MatchedFields  []string `json:"matched_fields,omitempty"`
+	// MaxAnalyzedOffset If set to a non-negative value, highlighting stops at this defined maximum
+	// limit.
+	// The rest of the text is not processed, thus not highlighted and no error is
+	// returned
+	// The `max_analyzed_offset` query setting does not override the
+	// `index.highlight.max_analyzed_offset` setting, which prevails when it’s set
+	// to lower value than the query setting.
+	MaxAnalyzedOffset *int `json:"max_analyzed_offset,omitempty"`
+	MaxFragmentLength *int `json:"max_fragment_length,omitempty"`
+	// NoMatchSize The amount of text you want to return from the beginning of the field if
+	// there are no matching fragments to highlight.
+	NoMatchSize *int `json:"no_match_size,omitempty"`
+	// NumberOfFragments The maximum number of fragments to return.
+	// If the number of fragments is set to `0`, no fragments are returned.
+	// Instead, the entire field contents are highlighted and returned.
+	// This can be handy when you need to highlight short texts such as a title or
+	// address, but fragmentation is not required.
+	// If `number_of_fragments` is `0`, `fragment_size` is ignored.
+	NumberOfFragments *int                       `json:"number_of_fragments,omitempty"`
+	Options           map[string]json.RawMessage `json:"options,omitempty"`
+	// Order Sorts highlighted fragments by score when set to `score`.
+	// By default, fragments will be output in the order they appear in the field
+	// (order: `none`).
+	// Setting this option to `score` will output the most relevant fragments first.
+	// Each highlighter applies its own logic to compute relevancy scores.
+	Order *highlighterorder.HighlighterOrder `json:"order,omitempty"`
+	// PhraseLimit Controls the number of matching phrases in a document that are considered.
+	// Prevents the `fvh` highlighter from analyzing too many phrases and consuming
+	// too much memory.
+	// When using `matched_fields`, `phrase_limit` phrases per matched field are
+	// considered. Raising the limit increases query time and consumes more memory.
+	// Only supported by the `fvh` highlighter.
+	PhraseLimit *int `json:"phrase_limit,omitempty"`
+	// PostTags Use in conjunction with `pre_tags` to define the HTML tags to use for the
+	// highlighted text.
+	// By default, highlighted text is wrapped in `<em>` and `</em>` tags.
+	PostTags []string `json:"post_tags,omitempty"`
+	// PreTags Use in conjunction with `post_tags` to define the HTML tags to use for the
+	// highlighted text.
+	// By default, highlighted text is wrapped in `<em>` and `</em>` tags.
+	PreTags []string `json:"pre_tags,omitempty"`
+	// RequireFieldMatch By default, only fields that contains a query match are highlighted.
+	// Set to `false` to highlight all fields.
+	RequireFieldMatch *bool `json:"require_field_match,omitempty"`
+	// TagsSchema Set to `styled` to use the built-in tag schema.
+	TagsSchema *highlightertagsschema.HighlighterTagsSchema `json:"tags_schema,omitempty"`
+	Type       *highlightertype.HighlighterType             `json:"type,omitempty"`
 }
 
-// HighlightFieldBuilder holds HighlightField struct and provides a builder API.
-type HighlightFieldBuilder struct {
-	v *HighlightField
+func (s *HighlightField) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "boundary_chars":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "BoundaryChars", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.BoundaryChars = &o
+
+		case "boundary_max_scan":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "BoundaryMaxScan", err)
+				}
+				s.BoundaryMaxScan = &value
+			case float64:
+				f := int(v)
+				s.BoundaryMaxScan = &f
+			}
+
+		case "boundary_scanner":
+			if err := dec.Decode(&s.BoundaryScanner); err != nil {
+				return fmt.Errorf("%s | %w", "BoundaryScanner", err)
+			}
+
+		case "boundary_scanner_locale":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "BoundaryScannerLocale", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.BoundaryScannerLocale = &o
+
+		case "force_source":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ForceSource", err)
+				}
+				s.ForceSource = &value
+			case bool:
+				s.ForceSource = &v
+			}
+
+		case "fragment_offset":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "FragmentOffset", err)
+				}
+				s.FragmentOffset = &value
+			case float64:
+				f := int(v)
+				s.FragmentOffset = &f
+			}
+
+		case "fragment_size":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "FragmentSize", err)
+				}
+				s.FragmentSize = &value
+			case float64:
+				f := int(v)
+				s.FragmentSize = &f
+			}
+
+		case "fragmenter":
+			if err := dec.Decode(&s.Fragmenter); err != nil {
+				return fmt.Errorf("%s | %w", "Fragmenter", err)
+			}
+
+		case "highlight_filter":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "HighlightFilter", err)
+				}
+				s.HighlightFilter = &value
+			case bool:
+				s.HighlightFilter = &v
+			}
+
+		case "highlight_query":
+			if err := dec.Decode(&s.HighlightQuery); err != nil {
+				return fmt.Errorf("%s | %w", "HighlightQuery", err)
+			}
+
+		case "matched_fields":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "MatchedFields", err)
+				}
+
+				s.MatchedFields = append(s.MatchedFields, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.MatchedFields); err != nil {
+					return fmt.Errorf("%s | %w", "MatchedFields", err)
+				}
+			}
+
+		case "max_analyzed_offset":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxAnalyzedOffset", err)
+				}
+				s.MaxAnalyzedOffset = &value
+			case float64:
+				f := int(v)
+				s.MaxAnalyzedOffset = &f
+			}
+
+		case "max_fragment_length":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxFragmentLength", err)
+				}
+				s.MaxFragmentLength = &value
+			case float64:
+				f := int(v)
+				s.MaxFragmentLength = &f
+			}
+
+		case "no_match_size":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NoMatchSize", err)
+				}
+				s.NoMatchSize = &value
+			case float64:
+				f := int(v)
+				s.NoMatchSize = &f
+			}
+
+		case "number_of_fragments":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NumberOfFragments", err)
+				}
+				s.NumberOfFragments = &value
+			case float64:
+				f := int(v)
+				s.NumberOfFragments = &f
+			}
+
+		case "options":
+			if s.Options == nil {
+				s.Options = make(map[string]json.RawMessage, 0)
+			}
+			if err := dec.Decode(&s.Options); err != nil {
+				return fmt.Errorf("%s | %w", "Options", err)
+			}
+
+		case "order":
+			if err := dec.Decode(&s.Order); err != nil {
+				return fmt.Errorf("%s | %w", "Order", err)
+			}
+
+		case "phrase_limit":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PhraseLimit", err)
+				}
+				s.PhraseLimit = &value
+			case float64:
+				f := int(v)
+				s.PhraseLimit = &f
+			}
+
+		case "post_tags":
+			if err := dec.Decode(&s.PostTags); err != nil {
+				return fmt.Errorf("%s | %w", "PostTags", err)
+			}
+
+		case "pre_tags":
+			if err := dec.Decode(&s.PreTags); err != nil {
+				return fmt.Errorf("%s | %w", "PreTags", err)
+			}
+
+		case "require_field_match":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "RequireFieldMatch", err)
+				}
+				s.RequireFieldMatch = &value
+			case bool:
+				s.RequireFieldMatch = &v
+			}
+
+		case "tags_schema":
+			if err := dec.Decode(&s.TagsSchema); err != nil {
+				return fmt.Errorf("%s | %w", "TagsSchema", err)
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewHighlightField provides a builder for the HighlightField struct.
-func NewHighlightFieldBuilder() *HighlightFieldBuilder {
-	r := HighlightFieldBuilder{
-		&HighlightField{
-			Options: make(map[string]interface{}, 0),
-		},
+// NewHighlightField returns a HighlightField.
+func NewHighlightField() *HighlightField {
+	r := &HighlightField{
+		Options: make(map[string]json.RawMessage, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the HighlightField struct
-func (rb *HighlightFieldBuilder) Build() HighlightField {
-	return *rb.v
-}
-
-func (rb *HighlightFieldBuilder) BoundaryChars(boundarychars string) *HighlightFieldBuilder {
-	rb.v.BoundaryChars = &boundarychars
-	return rb
-}
-
-func (rb *HighlightFieldBuilder) BoundaryMaxScan(boundarymaxscan int) *HighlightFieldBuilder {
-	rb.v.BoundaryMaxScan = &boundarymaxscan
-	return rb
-}
-
-func (rb *HighlightFieldBuilder) BoundaryScanner(boundaryscanner boundaryscanner.BoundaryScanner) *HighlightFieldBuilder {
-	rb.v.BoundaryScanner = &boundaryscanner
-	return rb
-}
-
-func (rb *HighlightFieldBuilder) BoundaryScannerLocale(boundaryscannerlocale string) *HighlightFieldBuilder {
-	rb.v.BoundaryScannerLocale = &boundaryscannerlocale
-	return rb
-}
-
-func (rb *HighlightFieldBuilder) ForceSource(forcesource bool) *HighlightFieldBuilder {
-	rb.v.ForceSource = &forcesource
-	return rb
-}
-
-func (rb *HighlightFieldBuilder) FragmentOffset(fragmentoffset int) *HighlightFieldBuilder {
-	rb.v.FragmentOffset = &fragmentoffset
-	return rb
-}
-
-func (rb *HighlightFieldBuilder) FragmentSize(fragmentsize int) *HighlightFieldBuilder {
-	rb.v.FragmentSize = &fragmentsize
-	return rb
-}
-
-func (rb *HighlightFieldBuilder) Fragmenter(fragmenter highlighterfragmenter.HighlighterFragmenter) *HighlightFieldBuilder {
-	rb.v.Fragmenter = &fragmenter
-	return rb
-}
-
-func (rb *HighlightFieldBuilder) HighlightFilter(highlightfilter bool) *HighlightFieldBuilder {
-	rb.v.HighlightFilter = &highlightfilter
-	return rb
-}
-
-func (rb *HighlightFieldBuilder) HighlightQuery(highlightquery *QueryContainerBuilder) *HighlightFieldBuilder {
-	v := highlightquery.Build()
-	rb.v.HighlightQuery = &v
-	return rb
-}
-
-func (rb *HighlightFieldBuilder) MatchedFields(matchedfields *FieldsBuilder) *HighlightFieldBuilder {
-	v := matchedfields.Build()
-	rb.v.MatchedFields = &v
-	return rb
-}
-
-func (rb *HighlightFieldBuilder) MaxAnalyzedOffset(maxanalyzedoffset int) *HighlightFieldBuilder {
-	rb.v.MaxAnalyzedOffset = &maxanalyzedoffset
-	return rb
-}
-
-func (rb *HighlightFieldBuilder) MaxFragmentLength(maxfragmentlength int) *HighlightFieldBuilder {
-	rb.v.MaxFragmentLength = &maxfragmentlength
-	return rb
-}
-
-func (rb *HighlightFieldBuilder) NoMatchSize(nomatchsize int) *HighlightFieldBuilder {
-	rb.v.NoMatchSize = &nomatchsize
-	return rb
-}
-
-func (rb *HighlightFieldBuilder) NumberOfFragments(numberoffragments int) *HighlightFieldBuilder {
-	rb.v.NumberOfFragments = &numberoffragments
-	return rb
-}
-
-func (rb *HighlightFieldBuilder) Options(value map[string]interface{}) *HighlightFieldBuilder {
-	rb.v.Options = value
-	return rb
-}
-
-func (rb *HighlightFieldBuilder) Order(order highlighterorder.HighlighterOrder) *HighlightFieldBuilder {
-	rb.v.Order = &order
-	return rb
-}
-
-func (rb *HighlightFieldBuilder) PhraseLimit(phraselimit int) *HighlightFieldBuilder {
-	rb.v.PhraseLimit = &phraselimit
-	return rb
-}
-
-func (rb *HighlightFieldBuilder) PostTags(post_tags ...string) *HighlightFieldBuilder {
-	rb.v.PostTags = post_tags
-	return rb
-}
-
-func (rb *HighlightFieldBuilder) PreTags(pre_tags ...string) *HighlightFieldBuilder {
-	rb.v.PreTags = pre_tags
-	return rb
-}
-
-func (rb *HighlightFieldBuilder) RequireFieldMatch(requirefieldmatch bool) *HighlightFieldBuilder {
-	rb.v.RequireFieldMatch = &requirefieldmatch
-	return rb
-}
-
-func (rb *HighlightFieldBuilder) TagsSchema(tagsschema highlightertagsschema.HighlighterTagsSchema) *HighlightFieldBuilder {
-	rb.v.TagsSchema = &tagsschema
-	return rb
-}
-
-func (rb *HighlightFieldBuilder) Type_(type_ highlightertype.HighlighterType) *HighlightFieldBuilder {
-	rb.v.Type = &type_
-	return rb
+	return r
 }

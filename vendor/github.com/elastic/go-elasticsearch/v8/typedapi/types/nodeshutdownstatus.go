@@ -15,91 +15,107 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/shutdownstatus"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/shutdowntype"
 )
 
 // NodeShutdownStatus type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/shutdown/get_node/ShutdownGetNodeResponse.ts#L29-L38
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/shutdown/get_node/ShutdownGetNodeResponse.ts#L29-L38
 type NodeShutdownStatus struct {
-	NodeId                NodeId                        `json:"node_id"`
+	NodeId                string                        `json:"node_id"`
 	PersistentTasks       PersistentTaskStatus          `json:"persistent_tasks"`
 	Plugins               PluginsStatus                 `json:"plugins"`
 	Reason                string                        `json:"reason"`
 	ShardMigration        ShardMigrationStatus          `json:"shard_migration"`
-	ShutdownStartedmillis EpochTimeUnitMillis           `json:"shutdown_startedmillis"`
+	ShutdownStartedmillis int64                         `json:"shutdown_startedmillis"`
 	Status                shutdownstatus.ShutdownStatus `json:"status"`
 	Type                  shutdowntype.ShutdownType     `json:"type"`
 }
 
-// NodeShutdownStatusBuilder holds NodeShutdownStatus struct and provides a builder API.
-type NodeShutdownStatusBuilder struct {
-	v *NodeShutdownStatus
-}
+func (s *NodeShutdownStatus) UnmarshalJSON(data []byte) error {
 
-// NewNodeShutdownStatus provides a builder for the NodeShutdownStatus struct.
-func NewNodeShutdownStatusBuilder() *NodeShutdownStatusBuilder {
-	r := NodeShutdownStatusBuilder{
-		&NodeShutdownStatus{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "node_id":
+			if err := dec.Decode(&s.NodeId); err != nil {
+				return fmt.Errorf("%s | %w", "NodeId", err)
+			}
+
+		case "persistent_tasks":
+			if err := dec.Decode(&s.PersistentTasks); err != nil {
+				return fmt.Errorf("%s | %w", "PersistentTasks", err)
+			}
+
+		case "plugins":
+			if err := dec.Decode(&s.Plugins); err != nil {
+				return fmt.Errorf("%s | %w", "Plugins", err)
+			}
+
+		case "reason":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Reason", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Reason = o
+
+		case "shard_migration":
+			if err := dec.Decode(&s.ShardMigration); err != nil {
+				return fmt.Errorf("%s | %w", "ShardMigration", err)
+			}
+
+		case "shutdown_startedmillis":
+			if err := dec.Decode(&s.ShutdownStartedmillis); err != nil {
+				return fmt.Errorf("%s | %w", "ShutdownStartedmillis", err)
+			}
+
+		case "status":
+			if err := dec.Decode(&s.Status); err != nil {
+				return fmt.Errorf("%s | %w", "Status", err)
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the NodeShutdownStatus struct
-func (rb *NodeShutdownStatusBuilder) Build() NodeShutdownStatus {
-	return *rb.v
-}
+// NewNodeShutdownStatus returns a NodeShutdownStatus.
+func NewNodeShutdownStatus() *NodeShutdownStatus {
+	r := &NodeShutdownStatus{}
 
-func (rb *NodeShutdownStatusBuilder) NodeId(nodeid NodeId) *NodeShutdownStatusBuilder {
-	rb.v.NodeId = nodeid
-	return rb
-}
-
-func (rb *NodeShutdownStatusBuilder) PersistentTasks(persistenttasks *PersistentTaskStatusBuilder) *NodeShutdownStatusBuilder {
-	v := persistenttasks.Build()
-	rb.v.PersistentTasks = v
-	return rb
-}
-
-func (rb *NodeShutdownStatusBuilder) Plugins(plugins *PluginsStatusBuilder) *NodeShutdownStatusBuilder {
-	v := plugins.Build()
-	rb.v.Plugins = v
-	return rb
-}
-
-func (rb *NodeShutdownStatusBuilder) Reason(reason string) *NodeShutdownStatusBuilder {
-	rb.v.Reason = reason
-	return rb
-}
-
-func (rb *NodeShutdownStatusBuilder) ShardMigration(shardmigration *ShardMigrationStatusBuilder) *NodeShutdownStatusBuilder {
-	v := shardmigration.Build()
-	rb.v.ShardMigration = v
-	return rb
-}
-
-func (rb *NodeShutdownStatusBuilder) ShutdownStartedmillis(shutdownstartedmillis *EpochTimeUnitMillisBuilder) *NodeShutdownStatusBuilder {
-	v := shutdownstartedmillis.Build()
-	rb.v.ShutdownStartedmillis = v
-	return rb
-}
-
-func (rb *NodeShutdownStatusBuilder) Status(status shutdownstatus.ShutdownStatus) *NodeShutdownStatusBuilder {
-	rb.v.Status = status
-	return rb
-}
-
-func (rb *NodeShutdownStatusBuilder) Type_(type_ shutdowntype.ShutdownType) *NodeShutdownStatusBuilder {
-	rb.v.Type = type_
-	return rb
+	return r
 }

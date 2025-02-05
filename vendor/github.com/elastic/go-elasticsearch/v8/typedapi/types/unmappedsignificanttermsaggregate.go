@@ -15,48 +15,109 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // UnmappedSignificantTermsAggregate type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L580-L586
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L690-L696
 type UnmappedSignificantTermsAggregate struct {
-	Buckets BucketsVoid `json:"buckets"`
-	Meta    *Metadata   `json:"meta,omitempty"`
+	BgCount  *int64      `json:"bg_count,omitempty"`
+	Buckets  BucketsVoid `json:"buckets"`
+	DocCount *int64      `json:"doc_count,omitempty"`
+	Meta     Metadata    `json:"meta,omitempty"`
 }
 
-// UnmappedSignificantTermsAggregateBuilder holds UnmappedSignificantTermsAggregate struct and provides a builder API.
-type UnmappedSignificantTermsAggregateBuilder struct {
-	v *UnmappedSignificantTermsAggregate
-}
+func (s *UnmappedSignificantTermsAggregate) UnmarshalJSON(data []byte) error {
 
-// NewUnmappedSignificantTermsAggregate provides a builder for the UnmappedSignificantTermsAggregate struct.
-func NewUnmappedSignificantTermsAggregateBuilder() *UnmappedSignificantTermsAggregateBuilder {
-	r := UnmappedSignificantTermsAggregateBuilder{
-		&UnmappedSignificantTermsAggregate{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "bg_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "BgCount", err)
+				}
+				s.BgCount = &value
+			case float64:
+				f := int64(v)
+				s.BgCount = &f
+			}
+
+		case "buckets":
+
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			source := bytes.NewReader(rawMsg)
+			localDec := json.NewDecoder(source)
+			switch rawMsg[0] {
+			case '{':
+				o := make(map[string]any, 0)
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Buckets", err)
+				}
+				s.Buckets = o
+			case '[':
+				o := []any{}
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Buckets", err)
+				}
+				s.Buckets = o
+			}
+
+		case "doc_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DocCount", err)
+				}
+				s.DocCount = &value
+			case float64:
+				f := int64(v)
+				s.DocCount = &f
+			}
+
+		case "meta":
+			if err := dec.Decode(&s.Meta); err != nil {
+				return fmt.Errorf("%s | %w", "Meta", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the UnmappedSignificantTermsAggregate struct
-func (rb *UnmappedSignificantTermsAggregateBuilder) Build() UnmappedSignificantTermsAggregate {
-	return *rb.v
-}
+// NewUnmappedSignificantTermsAggregate returns a UnmappedSignificantTermsAggregate.
+func NewUnmappedSignificantTermsAggregate() *UnmappedSignificantTermsAggregate {
+	r := &UnmappedSignificantTermsAggregate{}
 
-func (rb *UnmappedSignificantTermsAggregateBuilder) Buckets(buckets *BucketsVoidBuilder) *UnmappedSignificantTermsAggregateBuilder {
-	v := buckets.Build()
-	rb.v.Buckets = v
-	return rb
-}
-
-func (rb *UnmappedSignificantTermsAggregateBuilder) Meta(meta *MetadataBuilder) *UnmappedSignificantTermsAggregateBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
+	return r
 }

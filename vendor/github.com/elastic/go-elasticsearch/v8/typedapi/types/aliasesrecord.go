@@ -15,23 +15,30 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // AliasesRecord type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cat/aliases/types.ts#L22-L53
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cat/aliases/types.ts#L22-L53
 type AliasesRecord struct {
 	// Alias alias name
 	Alias *string `json:"alias,omitempty"`
 	// Filter filter
 	Filter *string `json:"filter,omitempty"`
 	// Index index alias points to
-	Index *IndexName `json:"index,omitempty"`
+	Index *string `json:"index,omitempty"`
 	// IsWriteIndex write index
 	IsWriteIndex *string `json:"is_write_index,omitempty"`
 	// RoutingIndex index routing
@@ -40,63 +47,94 @@ type AliasesRecord struct {
 	RoutingSearch *string `json:"routing.search,omitempty"`
 }
 
-// AliasesRecordBuilder holds AliasesRecord struct and provides a builder API.
-type AliasesRecordBuilder struct {
-	v *AliasesRecord
-}
+func (s *AliasesRecord) UnmarshalJSON(data []byte) error {
 
-// NewAliasesRecord provides a builder for the AliasesRecord struct.
-func NewAliasesRecordBuilder() *AliasesRecordBuilder {
-	r := AliasesRecordBuilder{
-		&AliasesRecord{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "alias", "a":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Alias", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Alias = &o
+
+		case "filter", "f", "fi":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Filter", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Filter = &o
+
+		case "index", "i", "idx":
+			if err := dec.Decode(&s.Index); err != nil {
+				return fmt.Errorf("%s | %w", "Index", err)
+			}
+
+		case "is_write_index", "w", "isWriteIndex":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "IsWriteIndex", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.IsWriteIndex = &o
+
+		case "routing.index", "ri", "routingIndex":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "RoutingIndex", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.RoutingIndex = &o
+
+		case "routing.search", "rs", "routingSearch":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "RoutingSearch", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.RoutingSearch = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the AliasesRecord struct
-func (rb *AliasesRecordBuilder) Build() AliasesRecord {
-	return *rb.v
-}
+// NewAliasesRecord returns a AliasesRecord.
+func NewAliasesRecord() *AliasesRecord {
+	r := &AliasesRecord{}
 
-// Alias alias name
-
-func (rb *AliasesRecordBuilder) Alias(alias string) *AliasesRecordBuilder {
-	rb.v.Alias = &alias
-	return rb
-}
-
-// Filter filter
-
-func (rb *AliasesRecordBuilder) Filter(filter string) *AliasesRecordBuilder {
-	rb.v.Filter = &filter
-	return rb
-}
-
-// Index index alias points to
-
-func (rb *AliasesRecordBuilder) Index(index IndexName) *AliasesRecordBuilder {
-	rb.v.Index = &index
-	return rb
-}
-
-// IsWriteIndex write index
-
-func (rb *AliasesRecordBuilder) IsWriteIndex(iswriteindex string) *AliasesRecordBuilder {
-	rb.v.IsWriteIndex = &iswriteindex
-	return rb
-}
-
-// RoutingIndex index routing
-
-func (rb *AliasesRecordBuilder) RoutingIndex(routingindex string) *AliasesRecordBuilder {
-	rb.v.RoutingIndex = &routingindex
-	return rb
-}
-
-// RoutingSearch search routing
-
-func (rb *AliasesRecordBuilder) RoutingSearch(routingsearch string) *AliasesRecordBuilder {
-	rb.v.RoutingSearch = &routingsearch
-	return rb
+	return r
 }

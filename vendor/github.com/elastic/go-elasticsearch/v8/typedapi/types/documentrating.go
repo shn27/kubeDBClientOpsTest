@@ -15,63 +15,82 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DocumentRating type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/rank_eval/types.ts#L116-L123
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/rank_eval/types.ts#L119-L126
 type DocumentRating struct {
 	// Id_ The document ID.
-	Id_ Id `json:"_id"`
+	Id_ string `json:"_id"`
 	// Index_ The document’s index. For data streams, this should be the document’s backing
 	// index.
-	Index_ IndexName `json:"_index"`
+	Index_ string `json:"_index"`
 	// Rating The document’s relevance with regard to this search request.
 	Rating int `json:"rating"`
 }
 
-// DocumentRatingBuilder holds DocumentRating struct and provides a builder API.
-type DocumentRatingBuilder struct {
-	v *DocumentRating
-}
+func (s *DocumentRating) UnmarshalJSON(data []byte) error {
 
-// NewDocumentRating provides a builder for the DocumentRating struct.
-func NewDocumentRatingBuilder() *DocumentRatingBuilder {
-	r := DocumentRatingBuilder{
-		&DocumentRating{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "_id":
+			if err := dec.Decode(&s.Id_); err != nil {
+				return fmt.Errorf("%s | %w", "Id_", err)
+			}
+
+		case "_index":
+			if err := dec.Decode(&s.Index_); err != nil {
+				return fmt.Errorf("%s | %w", "Index_", err)
+			}
+
+		case "rating":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Rating", err)
+				}
+				s.Rating = value
+			case float64:
+				f := int(v)
+				s.Rating = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DocumentRating struct
-func (rb *DocumentRatingBuilder) Build() DocumentRating {
-	return *rb.v
-}
+// NewDocumentRating returns a DocumentRating.
+func NewDocumentRating() *DocumentRating {
+	r := &DocumentRating{}
 
-// Id_ The document ID.
-
-func (rb *DocumentRatingBuilder) Id_(id_ Id) *DocumentRatingBuilder {
-	rb.v.Id_ = id_
-	return rb
-}
-
-// Index_ The document’s index. For data streams, this should be the document’s backing
-// index.
-
-func (rb *DocumentRatingBuilder) Index_(index_ IndexName) *DocumentRatingBuilder {
-	rb.v.Index_ = index_
-	return rb
-}
-
-// Rating The document’s relevance with regard to this search request.
-
-func (rb *DocumentRatingBuilder) Rating(rating int) *DocumentRatingBuilder {
-	rb.v.Rating = rating
-	return rb
+	return r
 }

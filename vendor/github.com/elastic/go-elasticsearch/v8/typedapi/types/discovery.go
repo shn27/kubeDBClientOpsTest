@@ -15,74 +15,36 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // Discovery type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/_types/Stats.ts#L76-L82
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/_types/Stats.ts#L201-L219
 type Discovery struct {
-	ClusterApplierStats     *ClusterAppliedStats          `json:"cluster_applier_stats,omitempty"`
-	ClusterStateQueue       *ClusterStateQueue            `json:"cluster_state_queue,omitempty"`
-	ClusterStateUpdate      map[string]ClusterStateUpdate `json:"cluster_state_update,omitempty"`
-	PublishedClusterStates  *PublishedClusterStates       `json:"published_cluster_states,omitempty"`
-	SerializedClusterStates *SerializedClusterState       `json:"serialized_cluster_states,omitempty"`
+	ClusterApplierStats *ClusterAppliedStats `json:"cluster_applier_stats,omitempty"`
+	// ClusterStateQueue Contains statistics for the cluster state queue of the node.
+	ClusterStateQueue *ClusterStateQueue `json:"cluster_state_queue,omitempty"`
+	// ClusterStateUpdate Contains low-level statistics about how long various activities took during
+	// cluster state updates while the node was the elected master.
+	// Omitted if the node is not master-eligible.
+	// Every field whose name ends in `_time` within this object is also represented
+	// as a raw number of milliseconds in a field whose name ends in `_time_millis`.
+	// The human-readable fields with a `_time` suffix are only returned if
+	// requested with the `?human=true` query parameter.
+	ClusterStateUpdate map[string]ClusterStateUpdate `json:"cluster_state_update,omitempty"`
+	// PublishedClusterStates Contains statistics for the published cluster states of the node.
+	PublishedClusterStates  *PublishedClusterStates `json:"published_cluster_states,omitempty"`
+	SerializedClusterStates *SerializedClusterState `json:"serialized_cluster_states,omitempty"`
 }
 
-// DiscoveryBuilder holds Discovery struct and provides a builder API.
-type DiscoveryBuilder struct {
-	v *Discovery
-}
-
-// NewDiscovery provides a builder for the Discovery struct.
-func NewDiscoveryBuilder() *DiscoveryBuilder {
-	r := DiscoveryBuilder{
-		&Discovery{
-			ClusterStateUpdate: make(map[string]ClusterStateUpdate, 0),
-		},
+// NewDiscovery returns a Discovery.
+func NewDiscovery() *Discovery {
+	r := &Discovery{
+		ClusterStateUpdate: make(map[string]ClusterStateUpdate, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the Discovery struct
-func (rb *DiscoveryBuilder) Build() Discovery {
-	return *rb.v
-}
-
-func (rb *DiscoveryBuilder) ClusterApplierStats(clusterapplierstats *ClusterAppliedStatsBuilder) *DiscoveryBuilder {
-	v := clusterapplierstats.Build()
-	rb.v.ClusterApplierStats = &v
-	return rb
-}
-
-func (rb *DiscoveryBuilder) ClusterStateQueue(clusterstatequeue *ClusterStateQueueBuilder) *DiscoveryBuilder {
-	v := clusterstatequeue.Build()
-	rb.v.ClusterStateQueue = &v
-	return rb
-}
-
-func (rb *DiscoveryBuilder) ClusterStateUpdate(values map[string]*ClusterStateUpdateBuilder) *DiscoveryBuilder {
-	tmp := make(map[string]ClusterStateUpdate, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.ClusterStateUpdate = tmp
-	return rb
-}
-
-func (rb *DiscoveryBuilder) PublishedClusterStates(publishedclusterstates *PublishedClusterStatesBuilder) *DiscoveryBuilder {
-	v := publishedclusterstates.Build()
-	rb.v.PublishedClusterStates = &v
-	return rb
-}
-
-func (rb *DiscoveryBuilder) SerializedClusterStates(serializedclusterstates *SerializedClusterStateBuilder) *DiscoveryBuilder {
-	v := serializedclusterstates.Build()
-	rb.v.SerializedClusterStates = &v
-	return rb
+	return r
 }

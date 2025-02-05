@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ApplicationPrivileges type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/_types/Privileges.ts#L26-L39
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/_types/Privileges.ts#L27-L40
 type ApplicationPrivileges struct {
 	// Application The name of the application to which this entry applies.
 	Application string `json:"application"`
@@ -35,43 +42,51 @@ type ApplicationPrivileges struct {
 	Resources []string `json:"resources"`
 }
 
-// ApplicationPrivilegesBuilder holds ApplicationPrivileges struct and provides a builder API.
-type ApplicationPrivilegesBuilder struct {
-	v *ApplicationPrivileges
-}
+func (s *ApplicationPrivileges) UnmarshalJSON(data []byte) error {
 
-// NewApplicationPrivileges provides a builder for the ApplicationPrivileges struct.
-func NewApplicationPrivilegesBuilder() *ApplicationPrivilegesBuilder {
-	r := ApplicationPrivilegesBuilder{
-		&ApplicationPrivileges{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "application":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Application", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Application = o
+
+		case "privileges":
+			if err := dec.Decode(&s.Privileges); err != nil {
+				return fmt.Errorf("%s | %w", "Privileges", err)
+			}
+
+		case "resources":
+			if err := dec.Decode(&s.Resources); err != nil {
+				return fmt.Errorf("%s | %w", "Resources", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ApplicationPrivileges struct
-func (rb *ApplicationPrivilegesBuilder) Build() ApplicationPrivileges {
-	return *rb.v
-}
+// NewApplicationPrivileges returns a ApplicationPrivileges.
+func NewApplicationPrivileges() *ApplicationPrivileges {
+	r := &ApplicationPrivileges{}
 
-// Application The name of the application to which this entry applies.
-
-func (rb *ApplicationPrivilegesBuilder) Application(application string) *ApplicationPrivilegesBuilder {
-	rb.v.Application = application
-	return rb
-}
-
-// Privileges A list of strings, where each element is the name of an application privilege
-// or action.
-
-func (rb *ApplicationPrivilegesBuilder) Privileges(privileges ...string) *ApplicationPrivilegesBuilder {
-	rb.v.Privileges = privileges
-	return rb
-}
-
-// Resources A list resources to which the privileges are applied.
-
-func (rb *ApplicationPrivilegesBuilder) Resources(resources ...string) *ApplicationPrivilegesBuilder {
-	rb.v.Resources = resources
-	return rb
+	return r
 }

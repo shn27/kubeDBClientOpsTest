@@ -15,130 +15,224 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // IndexingStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Stats.ts#L101-L116
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Stats.ts#L143-L159
 type IndexingStats struct {
 	DeleteCurrent        int64                    `json:"delete_current"`
-	DeleteTime           *Duration                `json:"delete_time,omitempty"`
-	DeleteTimeInMillis   DurationValueUnitMillis  `json:"delete_time_in_millis"`
+	DeleteTime           Duration                 `json:"delete_time,omitempty"`
+	DeleteTimeInMillis   int64                    `json:"delete_time_in_millis"`
 	DeleteTotal          int64                    `json:"delete_total"`
 	IndexCurrent         int64                    `json:"index_current"`
 	IndexFailed          int64                    `json:"index_failed"`
-	IndexTime            *Duration                `json:"index_time,omitempty"`
-	IndexTimeInMillis    DurationValueUnitMillis  `json:"index_time_in_millis"`
+	IndexTime            Duration                 `json:"index_time,omitempty"`
+	IndexTimeInMillis    int64                    `json:"index_time_in_millis"`
 	IndexTotal           int64                    `json:"index_total"`
 	IsThrottled          bool                     `json:"is_throttled"`
 	NoopUpdateTotal      int64                    `json:"noop_update_total"`
-	ThrottleTime         *Duration                `json:"throttle_time,omitempty"`
-	ThrottleTimeInMillis DurationValueUnitMillis  `json:"throttle_time_in_millis"`
+	ThrottleTime         Duration                 `json:"throttle_time,omitempty"`
+	ThrottleTimeInMillis int64                    `json:"throttle_time_in_millis"`
 	Types                map[string]IndexingStats `json:"types,omitempty"`
+	WriteLoad            *Float64                 `json:"write_load,omitempty"`
 }
 
-// IndexingStatsBuilder holds IndexingStats struct and provides a builder API.
-type IndexingStatsBuilder struct {
-	v *IndexingStats
+func (s *IndexingStats) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "delete_current":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DeleteCurrent", err)
+				}
+				s.DeleteCurrent = value
+			case float64:
+				f := int64(v)
+				s.DeleteCurrent = f
+			}
+
+		case "delete_time":
+			if err := dec.Decode(&s.DeleteTime); err != nil {
+				return fmt.Errorf("%s | %w", "DeleteTime", err)
+			}
+
+		case "delete_time_in_millis":
+			if err := dec.Decode(&s.DeleteTimeInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "DeleteTimeInMillis", err)
+			}
+
+		case "delete_total":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DeleteTotal", err)
+				}
+				s.DeleteTotal = value
+			case float64:
+				f := int64(v)
+				s.DeleteTotal = f
+			}
+
+		case "index_current":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IndexCurrent", err)
+				}
+				s.IndexCurrent = value
+			case float64:
+				f := int64(v)
+				s.IndexCurrent = f
+			}
+
+		case "index_failed":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IndexFailed", err)
+				}
+				s.IndexFailed = value
+			case float64:
+				f := int64(v)
+				s.IndexFailed = f
+			}
+
+		case "index_time":
+			if err := dec.Decode(&s.IndexTime); err != nil {
+				return fmt.Errorf("%s | %w", "IndexTime", err)
+			}
+
+		case "index_time_in_millis":
+			if err := dec.Decode(&s.IndexTimeInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "IndexTimeInMillis", err)
+			}
+
+		case "index_total":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IndexTotal", err)
+				}
+				s.IndexTotal = value
+			case float64:
+				f := int64(v)
+				s.IndexTotal = f
+			}
+
+		case "is_throttled":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IsThrottled", err)
+				}
+				s.IsThrottled = value
+			case bool:
+				s.IsThrottled = v
+			}
+
+		case "noop_update_total":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NoopUpdateTotal", err)
+				}
+				s.NoopUpdateTotal = value
+			case float64:
+				f := int64(v)
+				s.NoopUpdateTotal = f
+			}
+
+		case "throttle_time":
+			if err := dec.Decode(&s.ThrottleTime); err != nil {
+				return fmt.Errorf("%s | %w", "ThrottleTime", err)
+			}
+
+		case "throttle_time_in_millis":
+			if err := dec.Decode(&s.ThrottleTimeInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "ThrottleTimeInMillis", err)
+			}
+
+		case "types":
+			if s.Types == nil {
+				s.Types = make(map[string]IndexingStats, 0)
+			}
+			if err := dec.Decode(&s.Types); err != nil {
+				return fmt.Errorf("%s | %w", "Types", err)
+			}
+
+		case "write_load":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "WriteLoad", err)
+				}
+				f := Float64(value)
+				s.WriteLoad = &f
+			case float64:
+				f := Float64(v)
+				s.WriteLoad = &f
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewIndexingStats provides a builder for the IndexingStats struct.
-func NewIndexingStatsBuilder() *IndexingStatsBuilder {
-	r := IndexingStatsBuilder{
-		&IndexingStats{
-			Types: make(map[string]IndexingStats, 0),
-		},
+// NewIndexingStats returns a IndexingStats.
+func NewIndexingStats() *IndexingStats {
+	r := &IndexingStats{
+		Types: make(map[string]IndexingStats, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the IndexingStats struct
-func (rb *IndexingStatsBuilder) Build() IndexingStats {
-	return *rb.v
-}
-
-func (rb *IndexingStatsBuilder) DeleteCurrent(deletecurrent int64) *IndexingStatsBuilder {
-	rb.v.DeleteCurrent = deletecurrent
-	return rb
-}
-
-func (rb *IndexingStatsBuilder) DeleteTime(deletetime *DurationBuilder) *IndexingStatsBuilder {
-	v := deletetime.Build()
-	rb.v.DeleteTime = &v
-	return rb
-}
-
-func (rb *IndexingStatsBuilder) DeleteTimeInMillis(deletetimeinmillis *DurationValueUnitMillisBuilder) *IndexingStatsBuilder {
-	v := deletetimeinmillis.Build()
-	rb.v.DeleteTimeInMillis = v
-	return rb
-}
-
-func (rb *IndexingStatsBuilder) DeleteTotal(deletetotal int64) *IndexingStatsBuilder {
-	rb.v.DeleteTotal = deletetotal
-	return rb
-}
-
-func (rb *IndexingStatsBuilder) IndexCurrent(indexcurrent int64) *IndexingStatsBuilder {
-	rb.v.IndexCurrent = indexcurrent
-	return rb
-}
-
-func (rb *IndexingStatsBuilder) IndexFailed(indexfailed int64) *IndexingStatsBuilder {
-	rb.v.IndexFailed = indexfailed
-	return rb
-}
-
-func (rb *IndexingStatsBuilder) IndexTime(indextime *DurationBuilder) *IndexingStatsBuilder {
-	v := indextime.Build()
-	rb.v.IndexTime = &v
-	return rb
-}
-
-func (rb *IndexingStatsBuilder) IndexTimeInMillis(indextimeinmillis *DurationValueUnitMillisBuilder) *IndexingStatsBuilder {
-	v := indextimeinmillis.Build()
-	rb.v.IndexTimeInMillis = v
-	return rb
-}
-
-func (rb *IndexingStatsBuilder) IndexTotal(indextotal int64) *IndexingStatsBuilder {
-	rb.v.IndexTotal = indextotal
-	return rb
-}
-
-func (rb *IndexingStatsBuilder) IsThrottled(isthrottled bool) *IndexingStatsBuilder {
-	rb.v.IsThrottled = isthrottled
-	return rb
-}
-
-func (rb *IndexingStatsBuilder) NoopUpdateTotal(noopupdatetotal int64) *IndexingStatsBuilder {
-	rb.v.NoopUpdateTotal = noopupdatetotal
-	return rb
-}
-
-func (rb *IndexingStatsBuilder) ThrottleTime(throttletime *DurationBuilder) *IndexingStatsBuilder {
-	v := throttletime.Build()
-	rb.v.ThrottleTime = &v
-	return rb
-}
-
-func (rb *IndexingStatsBuilder) ThrottleTimeInMillis(throttletimeinmillis *DurationValueUnitMillisBuilder) *IndexingStatsBuilder {
-	v := throttletimeinmillis.Build()
-	rb.v.ThrottleTimeInMillis = v
-	return rb
-}
-
-func (rb *IndexingStatsBuilder) Types(values map[string]*IndexingStatsBuilder) *IndexingStatsBuilder {
-	tmp := make(map[string]IndexingStats, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Types = tmp
-	return rb
+	return r
 }

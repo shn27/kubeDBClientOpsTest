@@ -15,19 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package ratemode
 package ratemode
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/metric.ts#L132-L135
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/metric.ts#L252-L261
 type RateMode struct {
-	name string
+	Name string
 }
 
 var (
@@ -41,7 +39,7 @@ func (r RateMode) MarshalText() (text []byte, err error) {
 }
 
 func (r *RateMode) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
 	case "sum":
 		*r = Sum
@@ -55,5 +53,5 @@ func (r *RateMode) UnmarshalText(text []byte) error {
 }
 
 func (r RateMode) String() string {
-	return r.name
+	return r.Name
 }

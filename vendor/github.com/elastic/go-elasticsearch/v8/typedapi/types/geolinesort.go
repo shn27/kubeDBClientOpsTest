@@ -15,40 +15,55 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // GeoLineSort type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/metric.ts#L89-L91
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/metric.ts#L151-L156
 type GeoLineSort struct {
-	Field Field `json:"field"`
+	// Field The name of the numeric field to use as the sort key for ordering the points.
+	Field string `json:"field"`
 }
 
-// GeoLineSortBuilder holds GeoLineSort struct and provides a builder API.
-type GeoLineSortBuilder struct {
-	v *GeoLineSort
-}
+func (s *GeoLineSort) UnmarshalJSON(data []byte) error {
 
-// NewGeoLineSort provides a builder for the GeoLineSort struct.
-func NewGeoLineSortBuilder() *GeoLineSortBuilder {
-	r := GeoLineSortBuilder{
-		&GeoLineSort{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the GeoLineSort struct
-func (rb *GeoLineSortBuilder) Build() GeoLineSort {
-	return *rb.v
-}
+// NewGeoLineSort returns a GeoLineSort.
+func NewGeoLineSort() *GeoLineSort {
+	r := &GeoLineSort{}
 
-func (rb *GeoLineSortBuilder) Field(field Field) *GeoLineSortBuilder {
-	rb.v.Field = field
-	return rb
+	return r
 }

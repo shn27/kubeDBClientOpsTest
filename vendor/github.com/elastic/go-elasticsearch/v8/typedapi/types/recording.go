@@ -15,60 +15,90 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // Recording type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/_types/Stats.ts#L88-L93
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/_types/Stats.ts#L225-L230
 type Recording struct {
-	CumulativeExecutionCount      *int64                   `json:"cumulative_execution_count,omitempty"`
-	CumulativeExecutionTime       *Duration                `json:"cumulative_execution_time,omitempty"`
-	CumulativeExecutionTimeMillis *DurationValueUnitMillis `json:"cumulative_execution_time_millis,omitempty"`
-	Name                          *string                  `json:"name,omitempty"`
+	CumulativeExecutionCount      *int64   `json:"cumulative_execution_count,omitempty"`
+	CumulativeExecutionTime       Duration `json:"cumulative_execution_time,omitempty"`
+	CumulativeExecutionTimeMillis *int64   `json:"cumulative_execution_time_millis,omitempty"`
+	Name                          *string  `json:"name,omitempty"`
 }
 
-// RecordingBuilder holds Recording struct and provides a builder API.
-type RecordingBuilder struct {
-	v *Recording
-}
+func (s *Recording) UnmarshalJSON(data []byte) error {
 
-// NewRecording provides a builder for the Recording struct.
-func NewRecordingBuilder() *RecordingBuilder {
-	r := RecordingBuilder{
-		&Recording{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "cumulative_execution_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CumulativeExecutionCount", err)
+				}
+				s.CumulativeExecutionCount = &value
+			case float64:
+				f := int64(v)
+				s.CumulativeExecutionCount = &f
+			}
+
+		case "cumulative_execution_time":
+			if err := dec.Decode(&s.CumulativeExecutionTime); err != nil {
+				return fmt.Errorf("%s | %w", "CumulativeExecutionTime", err)
+			}
+
+		case "cumulative_execution_time_millis":
+			if err := dec.Decode(&s.CumulativeExecutionTimeMillis); err != nil {
+				return fmt.Errorf("%s | %w", "CumulativeExecutionTimeMillis", err)
+			}
+
+		case "name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Name = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the Recording struct
-func (rb *RecordingBuilder) Build() Recording {
-	return *rb.v
-}
+// NewRecording returns a Recording.
+func NewRecording() *Recording {
+	r := &Recording{}
 
-func (rb *RecordingBuilder) CumulativeExecutionCount(cumulativeexecutioncount int64) *RecordingBuilder {
-	rb.v.CumulativeExecutionCount = &cumulativeexecutioncount
-	return rb
-}
-
-func (rb *RecordingBuilder) CumulativeExecutionTime(cumulativeexecutiontime *DurationBuilder) *RecordingBuilder {
-	v := cumulativeexecutiontime.Build()
-	rb.v.CumulativeExecutionTime = &v
-	return rb
-}
-
-func (rb *RecordingBuilder) CumulativeExecutionTimeMillis(cumulativeexecutiontimemillis *DurationValueUnitMillisBuilder) *RecordingBuilder {
-	v := cumulativeexecutiontimemillis.Build()
-	rb.v.CumulativeExecutionTimeMillis = &v
-	return rb
-}
-
-func (rb *RecordingBuilder) Name(name string) *RecordingBuilder {
-	rb.v.Name = &name
-	return rb
+	return r
 }

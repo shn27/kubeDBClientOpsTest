@@ -15,76 +15,113 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/cardinalityexecutionmode"
 )
 
 // CardinalityAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/metric.ts#L62-L66
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/metric.ts#L87-L99
 type CardinalityAggregation struct {
-	ExecutionHint      *cardinalityexecutionmode.CardinalityExecutionMode `json:"execution_hint,omitempty"`
-	Field              *Field                                             `json:"field,omitempty"`
-	Missing            *Missing                                           `json:"missing,omitempty"`
-	PrecisionThreshold *int                                               `json:"precision_threshold,omitempty"`
-	Rehash             *bool                                              `json:"rehash,omitempty"`
-	Script             *Script                                            `json:"script,omitempty"`
+	// ExecutionHint Mechanism by which cardinality aggregations is run.
+	ExecutionHint *cardinalityexecutionmode.CardinalityExecutionMode `json:"execution_hint,omitempty"`
+	// Field The field on which to run the aggregation.
+	Field *string `json:"field,omitempty"`
+	// Missing The value to apply to documents that do not have a value.
+	// By default, documents without a value are ignored.
+	Missing Missing `json:"missing,omitempty"`
+	// PrecisionThreshold A unique count below which counts are expected to be close to accurate.
+	// This allows to trade memory for accuracy.
+	PrecisionThreshold *int    `json:"precision_threshold,omitempty"`
+	Rehash             *bool   `json:"rehash,omitempty"`
+	Script             *Script `json:"script,omitempty"`
 }
 
-// CardinalityAggregationBuilder holds CardinalityAggregation struct and provides a builder API.
-type CardinalityAggregationBuilder struct {
-	v *CardinalityAggregation
-}
+func (s *CardinalityAggregation) UnmarshalJSON(data []byte) error {
 
-// NewCardinalityAggregation provides a builder for the CardinalityAggregation struct.
-func NewCardinalityAggregationBuilder() *CardinalityAggregationBuilder {
-	r := CardinalityAggregationBuilder{
-		&CardinalityAggregation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "execution_hint":
+			if err := dec.Decode(&s.ExecutionHint); err != nil {
+				return fmt.Errorf("%s | %w", "ExecutionHint", err)
+			}
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "missing":
+			if err := dec.Decode(&s.Missing); err != nil {
+				return fmt.Errorf("%s | %w", "Missing", err)
+			}
+
+		case "precision_threshold":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PrecisionThreshold", err)
+				}
+				s.PrecisionThreshold = &value
+			case float64:
+				f := int(v)
+				s.PrecisionThreshold = &f
+			}
+
+		case "rehash":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Rehash", err)
+				}
+				s.Rehash = &value
+			case bool:
+				s.Rehash = &v
+			}
+
+		case "script":
+			if err := dec.Decode(&s.Script); err != nil {
+				return fmt.Errorf("%s | %w", "Script", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the CardinalityAggregation struct
-func (rb *CardinalityAggregationBuilder) Build() CardinalityAggregation {
-	return *rb.v
-}
+// NewCardinalityAggregation returns a CardinalityAggregation.
+func NewCardinalityAggregation() *CardinalityAggregation {
+	r := &CardinalityAggregation{}
 
-func (rb *CardinalityAggregationBuilder) ExecutionHint(executionhint cardinalityexecutionmode.CardinalityExecutionMode) *CardinalityAggregationBuilder {
-	rb.v.ExecutionHint = &executionhint
-	return rb
-}
-
-func (rb *CardinalityAggregationBuilder) Field(field Field) *CardinalityAggregationBuilder {
-	rb.v.Field = &field
-	return rb
-}
-
-func (rb *CardinalityAggregationBuilder) Missing(missing *MissingBuilder) *CardinalityAggregationBuilder {
-	v := missing.Build()
-	rb.v.Missing = &v
-	return rb
-}
-
-func (rb *CardinalityAggregationBuilder) PrecisionThreshold(precisionthreshold int) *CardinalityAggregationBuilder {
-	rb.v.PrecisionThreshold = &precisionthreshold
-	return rb
-}
-
-func (rb *CardinalityAggregationBuilder) Rehash(rehash bool) *CardinalityAggregationBuilder {
-	rb.v.Rehash = &rehash
-	return rb
-}
-
-func (rb *CardinalityAggregationBuilder) Script(script *ScriptBuilder) *CardinalityAggregationBuilder {
-	v := script.Build()
-	rb.v.Script = &v
-	return rb
+	return r
 }

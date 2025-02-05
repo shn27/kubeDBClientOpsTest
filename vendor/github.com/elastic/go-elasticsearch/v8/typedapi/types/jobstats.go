@@ -15,104 +15,155 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/jobstate"
 )
 
 // JobStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/Job.ts#L96-L107
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/Job.ts#L284-L330
 type JobStats struct {
-	AssignmentExplanation *string               `json:"assignment_explanation,omitempty"`
-	DataCounts            DataCounts            `json:"data_counts"`
-	Deleting              *bool                 `json:"deleting,omitempty"`
-	ForecastsStats        JobForecastStatistics `json:"forecasts_stats"`
-	JobId                 string                `json:"job_id"`
-	ModelSizeStats        ModelSizeStats        `json:"model_size_stats"`
-	Node                  *DiscoveryNode        `json:"node,omitempty"`
-	OpenTime              *DateTime             `json:"open_time,omitempty"`
-	State                 jobstate.JobState     `json:"state"`
-	TimingStats           JobTimingStats        `json:"timing_stats"`
+	// AssignmentExplanation For open anomaly detection jobs only, contains messages relating to the
+	// selection of a node to run the job.
+	AssignmentExplanation *string `json:"assignment_explanation,omitempty"`
+	// DataCounts An object that describes the quantity of input to the job and any related
+	// error counts.
+	// The `data_count` values are cumulative for the lifetime of a job.
+	// If a model snapshot is reverted or old results are deleted, the job counts
+	// are not reset.
+	DataCounts DataCounts `json:"data_counts"`
+	// Deleting Indicates that the process of deleting the job is in progress but not yet
+	// completed. It is only reported when `true`.
+	Deleting *bool `json:"deleting,omitempty"`
+	// ForecastsStats An object that provides statistical information about forecasts belonging to
+	// this job.
+	// Some statistics are omitted if no forecasts have been made.
+	ForecastsStats JobForecastStatistics `json:"forecasts_stats"`
+	// JobId Identifier for the anomaly detection job.
+	JobId string `json:"job_id"`
+	// ModelSizeStats An object that provides information about the size and contents of the model.
+	ModelSizeStats ModelSizeStats `json:"model_size_stats"`
+	// Node Contains properties for the node that runs the job.
+	// This information is available only for open jobs.
+	Node *DiscoveryNodeCompact `json:"node,omitempty"`
+	// OpenTime For open jobs only, the elapsed time for which the job has been open.
+	OpenTime DateTime `json:"open_time,omitempty"`
+	// State The status of the anomaly detection job, which can be one of the following
+	// values: `closed`, `closing`, `failed`, `opened`, `opening`.
+	State jobstate.JobState `json:"state"`
+	// TimingStats An object that provides statistical information about timing aspect of this
+	// job.
+	TimingStats JobTimingStats `json:"timing_stats"`
 }
 
-// JobStatsBuilder holds JobStats struct and provides a builder API.
-type JobStatsBuilder struct {
-	v *JobStats
-}
+func (s *JobStats) UnmarshalJSON(data []byte) error {
 
-// NewJobStats provides a builder for the JobStats struct.
-func NewJobStatsBuilder() *JobStatsBuilder {
-	r := JobStatsBuilder{
-		&JobStats{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "assignment_explanation":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "AssignmentExplanation", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.AssignmentExplanation = &o
+
+		case "data_counts":
+			if err := dec.Decode(&s.DataCounts); err != nil {
+				return fmt.Errorf("%s | %w", "DataCounts", err)
+			}
+
+		case "deleting":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Deleting", err)
+				}
+				s.Deleting = &value
+			case bool:
+				s.Deleting = &v
+			}
+
+		case "forecasts_stats":
+			if err := dec.Decode(&s.ForecastsStats); err != nil {
+				return fmt.Errorf("%s | %w", "ForecastsStats", err)
+			}
+
+		case "job_id":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "JobId", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.JobId = o
+
+		case "model_size_stats":
+			if err := dec.Decode(&s.ModelSizeStats); err != nil {
+				return fmt.Errorf("%s | %w", "ModelSizeStats", err)
+			}
+
+		case "node":
+			if err := dec.Decode(&s.Node); err != nil {
+				return fmt.Errorf("%s | %w", "Node", err)
+			}
+
+		case "open_time":
+			if err := dec.Decode(&s.OpenTime); err != nil {
+				return fmt.Errorf("%s | %w", "OpenTime", err)
+			}
+
+		case "state":
+			if err := dec.Decode(&s.State); err != nil {
+				return fmt.Errorf("%s | %w", "State", err)
+			}
+
+		case "timing_stats":
+			if err := dec.Decode(&s.TimingStats); err != nil {
+				return fmt.Errorf("%s | %w", "TimingStats", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the JobStats struct
-func (rb *JobStatsBuilder) Build() JobStats {
-	return *rb.v
-}
+// NewJobStats returns a JobStats.
+func NewJobStats() *JobStats {
+	r := &JobStats{}
 
-func (rb *JobStatsBuilder) AssignmentExplanation(assignmentexplanation string) *JobStatsBuilder {
-	rb.v.AssignmentExplanation = &assignmentexplanation
-	return rb
-}
-
-func (rb *JobStatsBuilder) DataCounts(datacounts *DataCountsBuilder) *JobStatsBuilder {
-	v := datacounts.Build()
-	rb.v.DataCounts = v
-	return rb
-}
-
-func (rb *JobStatsBuilder) Deleting(deleting bool) *JobStatsBuilder {
-	rb.v.Deleting = &deleting
-	return rb
-}
-
-func (rb *JobStatsBuilder) ForecastsStats(forecastsstats *JobForecastStatisticsBuilder) *JobStatsBuilder {
-	v := forecastsstats.Build()
-	rb.v.ForecastsStats = v
-	return rb
-}
-
-func (rb *JobStatsBuilder) JobId(jobid string) *JobStatsBuilder {
-	rb.v.JobId = jobid
-	return rb
-}
-
-func (rb *JobStatsBuilder) ModelSizeStats(modelsizestats *ModelSizeStatsBuilder) *JobStatsBuilder {
-	v := modelsizestats.Build()
-	rb.v.ModelSizeStats = v
-	return rb
-}
-
-func (rb *JobStatsBuilder) Node(node *DiscoveryNodeBuilder) *JobStatsBuilder {
-	v := node.Build()
-	rb.v.Node = &v
-	return rb
-}
-
-func (rb *JobStatsBuilder) OpenTime(opentime *DateTimeBuilder) *JobStatsBuilder {
-	v := opentime.Build()
-	rb.v.OpenTime = &v
-	return rb
-}
-
-func (rb *JobStatsBuilder) State(state jobstate.JobState) *JobStatsBuilder {
-	rb.v.State = state
-	return rb
-}
-
-func (rb *JobStatsBuilder) TimingStats(timingstats *JobTimingStatsBuilder) *JobStatsBuilder {
-	v := timingstats.Build()
-	rb.v.TimingStats = v
-	return rb
+	return r
 }

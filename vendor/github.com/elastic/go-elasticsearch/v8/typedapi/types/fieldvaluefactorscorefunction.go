@@ -15,62 +15,103 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/fieldvaluefactormodifier"
 )
 
 // FieldValueFactorScoreFunction type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/compound.ts#L70-L75
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/compound.ts#L149-L168
 type FieldValueFactorScoreFunction struct {
-	Factor   *float64                                           `json:"factor,omitempty"`
-	Field    Field                                              `json:"field"`
-	Missing  *float64                                           `json:"missing,omitempty"`
+	// Factor Optional factor to multiply the field value with.
+	Factor *Float64 `json:"factor,omitempty"`
+	// Field Field to be extracted from the document.
+	Field string `json:"field"`
+	// Missing Value used if the document doesn’t have that field.
+	// The modifier and factor are still applied to it as though it were read from
+	// the document.
+	Missing *Float64 `json:"missing,omitempty"`
+	// Modifier Modifier to apply to the field value.
 	Modifier *fieldvaluefactormodifier.FieldValueFactorModifier `json:"modifier,omitempty"`
 }
 
-// FieldValueFactorScoreFunctionBuilder holds FieldValueFactorScoreFunction struct and provides a builder API.
-type FieldValueFactorScoreFunctionBuilder struct {
-	v *FieldValueFactorScoreFunction
-}
+func (s *FieldValueFactorScoreFunction) UnmarshalJSON(data []byte) error {
 
-// NewFieldValueFactorScoreFunction provides a builder for the FieldValueFactorScoreFunction struct.
-func NewFieldValueFactorScoreFunctionBuilder() *FieldValueFactorScoreFunctionBuilder {
-	r := FieldValueFactorScoreFunctionBuilder{
-		&FieldValueFactorScoreFunction{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "factor":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Factor", err)
+				}
+				f := Float64(value)
+				s.Factor = &f
+			case float64:
+				f := Float64(v)
+				s.Factor = &f
+			}
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "missing":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Missing", err)
+				}
+				f := Float64(value)
+				s.Missing = &f
+			case float64:
+				f := Float64(v)
+				s.Missing = &f
+			}
+
+		case "modifier":
+			if err := dec.Decode(&s.Modifier); err != nil {
+				return fmt.Errorf("%s | %w", "Modifier", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the FieldValueFactorScoreFunction struct
-func (rb *FieldValueFactorScoreFunctionBuilder) Build() FieldValueFactorScoreFunction {
-	return *rb.v
-}
+// NewFieldValueFactorScoreFunction returns a FieldValueFactorScoreFunction.
+func NewFieldValueFactorScoreFunction() *FieldValueFactorScoreFunction {
+	r := &FieldValueFactorScoreFunction{}
 
-func (rb *FieldValueFactorScoreFunctionBuilder) Factor(factor float64) *FieldValueFactorScoreFunctionBuilder {
-	rb.v.Factor = &factor
-	return rb
-}
-
-func (rb *FieldValueFactorScoreFunctionBuilder) Field(field Field) *FieldValueFactorScoreFunctionBuilder {
-	rb.v.Field = field
-	return rb
-}
-
-func (rb *FieldValueFactorScoreFunctionBuilder) Missing(missing float64) *FieldValueFactorScoreFunctionBuilder {
-	rb.v.Missing = &missing
-	return rb
-}
-
-func (rb *FieldValueFactorScoreFunctionBuilder) Modifier(modifier fieldvaluefactormodifier.FieldValueFactorModifier) *FieldValueFactorScoreFunctionBuilder {
-	rb.v.Modifier = &modifier
-	return rb
+	return r
 }

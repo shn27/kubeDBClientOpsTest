@@ -15,73 +15,71 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // TotalFeatureImportance type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/TrainedModel.ts#L221-L228
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/TrainedModel.ts#L277-L284
 type TotalFeatureImportance struct {
 	// Classes If the trained model is a classification model, feature importance statistics
 	// are gathered per target class value.
 	Classes []TotalFeatureImportanceClass `json:"classes"`
 	// FeatureName The feature for which this importance was calculated.
-	FeatureName Name `json:"feature_name"`
+	FeatureName string `json:"feature_name"`
 	// Importance A collection of feature importance statistics related to the training data
 	// set for this particular feature.
 	Importance []TotalFeatureImportanceStatistics `json:"importance"`
 }
 
-// TotalFeatureImportanceBuilder holds TotalFeatureImportance struct and provides a builder API.
-type TotalFeatureImportanceBuilder struct {
-	v *TotalFeatureImportance
-}
+func (s *TotalFeatureImportance) UnmarshalJSON(data []byte) error {
 
-// NewTotalFeatureImportance provides a builder for the TotalFeatureImportance struct.
-func NewTotalFeatureImportanceBuilder() *TotalFeatureImportanceBuilder {
-	r := TotalFeatureImportanceBuilder{
-		&TotalFeatureImportance{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "classes":
+			if err := dec.Decode(&s.Classes); err != nil {
+				return fmt.Errorf("%s | %w", "Classes", err)
+			}
+
+		case "feature_name":
+			if err := dec.Decode(&s.FeatureName); err != nil {
+				return fmt.Errorf("%s | %w", "FeatureName", err)
+			}
+
+		case "importance":
+			if err := dec.Decode(&s.Importance); err != nil {
+				return fmt.Errorf("%s | %w", "Importance", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TotalFeatureImportance struct
-func (rb *TotalFeatureImportanceBuilder) Build() TotalFeatureImportance {
-	return *rb.v
-}
+// NewTotalFeatureImportance returns a TotalFeatureImportance.
+func NewTotalFeatureImportance() *TotalFeatureImportance {
+	r := &TotalFeatureImportance{}
 
-// Classes If the trained model is a classification model, feature importance statistics
-// are gathered per target class value.
-
-func (rb *TotalFeatureImportanceBuilder) Classes(classes []TotalFeatureImportanceClassBuilder) *TotalFeatureImportanceBuilder {
-	tmp := make([]TotalFeatureImportanceClass, len(classes))
-	for _, value := range classes {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Classes = tmp
-	return rb
-}
-
-// FeatureName The feature for which this importance was calculated.
-
-func (rb *TotalFeatureImportanceBuilder) FeatureName(featurename Name) *TotalFeatureImportanceBuilder {
-	rb.v.FeatureName = featurename
-	return rb
-}
-
-// Importance A collection of feature importance statistics related to the training data
-// set for this particular feature.
-
-func (rb *TotalFeatureImportanceBuilder) Importance(importance []TotalFeatureImportanceStatisticsBuilder) *TotalFeatureImportanceBuilder {
-	tmp := make([]TotalFeatureImportanceStatistics, len(importance))
-	for _, value := range importance {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Importance = tmp
-	return rb
+	return r
 }

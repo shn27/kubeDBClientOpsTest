@@ -15,48 +15,118 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // GeoBoundsAggregate type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L290-L293
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L327-L333
 type GeoBoundsAggregate struct {
-	Bounds GeoBounds `json:"bounds"`
-	Meta   *Metadata `json:"meta,omitempty"`
+	Bounds GeoBounds `json:"bounds,omitempty"`
+	Meta   Metadata  `json:"meta,omitempty"`
 }
 
-// GeoBoundsAggregateBuilder holds GeoBoundsAggregate struct and provides a builder API.
-type GeoBoundsAggregateBuilder struct {
-	v *GeoBoundsAggregate
-}
+func (s *GeoBoundsAggregate) UnmarshalJSON(data []byte) error {
 
-// NewGeoBoundsAggregate provides a builder for the GeoBoundsAggregate struct.
-func NewGeoBoundsAggregateBuilder() *GeoBoundsAggregateBuilder {
-	r := GeoBoundsAggregateBuilder{
-		&GeoBoundsAggregate{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "bounds":
+			message := json.RawMessage{}
+			if err := dec.Decode(&message); err != nil {
+				return fmt.Errorf("%s | %w", "Bounds", err)
+			}
+			keyDec := json.NewDecoder(bytes.NewReader(message))
+		bounds_field:
+			for {
+				t, err := keyDec.Token()
+				if err != nil {
+					if errors.Is(err, io.EOF) {
+						break
+					}
+					return fmt.Errorf("%s | %w", "Bounds", err)
+				}
+
+				switch t {
+
+				case "bottom", "left", "right", "top":
+					o := NewCoordsGeoBounds()
+					localDec := json.NewDecoder(bytes.NewReader(message))
+					if err := localDec.Decode(&o); err != nil {
+						return fmt.Errorf("%s | %w", "Bounds", err)
+					}
+					s.Bounds = o
+					break bounds_field
+
+				case "bottom_right", "top_left":
+					o := NewTopLeftBottomRightGeoBounds()
+					localDec := json.NewDecoder(bytes.NewReader(message))
+					if err := localDec.Decode(&o); err != nil {
+						return fmt.Errorf("%s | %w", "Bounds", err)
+					}
+					s.Bounds = o
+					break bounds_field
+
+				case "bottom_left", "top_right":
+					o := NewTopRightBottomLeftGeoBounds()
+					localDec := json.NewDecoder(bytes.NewReader(message))
+					if err := localDec.Decode(&o); err != nil {
+						return fmt.Errorf("%s | %w", "Bounds", err)
+					}
+					s.Bounds = o
+					break bounds_field
+
+				case "wkt":
+					o := NewWktGeoBounds()
+					localDec := json.NewDecoder(bytes.NewReader(message))
+					if err := localDec.Decode(&o); err != nil {
+						return fmt.Errorf("%s | %w", "Bounds", err)
+					}
+					s.Bounds = o
+					break bounds_field
+
+				}
+			}
+			if s.Bounds == nil {
+				localDec := json.NewDecoder(bytes.NewReader(message))
+				if err := localDec.Decode(&s.Bounds); err != nil {
+					return fmt.Errorf("%s | %w", "Bounds", err)
+				}
+			}
+
+		case "meta":
+			if err := dec.Decode(&s.Meta); err != nil {
+				return fmt.Errorf("%s | %w", "Meta", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the GeoBoundsAggregate struct
-func (rb *GeoBoundsAggregateBuilder) Build() GeoBoundsAggregate {
-	return *rb.v
-}
+// NewGeoBoundsAggregate returns a GeoBoundsAggregate.
+func NewGeoBoundsAggregate() *GeoBoundsAggregate {
+	r := &GeoBoundsAggregate{}
 
-func (rb *GeoBoundsAggregateBuilder) Bounds(bounds *GeoBoundsBuilder) *GeoBoundsAggregateBuilder {
-	v := bounds.Build()
-	rb.v.Bounds = v
-	return rb
-}
-
-func (rb *GeoBoundsAggregateBuilder) Meta(meta *MetadataBuilder) *GeoBoundsAggregateBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
+	return r
 }

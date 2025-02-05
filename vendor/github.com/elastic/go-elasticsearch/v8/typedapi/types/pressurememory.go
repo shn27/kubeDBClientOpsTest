@@ -15,82 +15,227 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // PressureMemory type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/_types/Stats.ts#L65-L74
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/_types/Stats.ts#L144-L199
 type PressureMemory struct {
-	AllInBytes                            *int64 `json:"all_in_bytes,omitempty"`
+	// All Memory consumed by indexing requests in the coordinating, primary, or replica
+	// stage.
+	All ByteSize `json:"all,omitempty"`
+	// AllInBytes Memory consumed, in bytes, by indexing requests in the coordinating, primary,
+	// or replica stage.
+	AllInBytes *int64 `json:"all_in_bytes,omitempty"`
+	// CombinedCoordinatingAndPrimary Memory consumed by indexing requests in the coordinating or primary stage.
+	// This value is not the sum of coordinating and primary as a node can reuse the
+	// coordinating memory if the primary stage is executed locally.
+	CombinedCoordinatingAndPrimary ByteSize `json:"combined_coordinating_and_primary,omitempty"`
+	// CombinedCoordinatingAndPrimaryInBytes Memory consumed, in bytes, by indexing requests in the coordinating or
+	// primary stage.
+	// This value is not the sum of coordinating and primary as a node can reuse the
+	// coordinating memory if the primary stage is executed locally.
 	CombinedCoordinatingAndPrimaryInBytes *int64 `json:"combined_coordinating_and_primary_in_bytes,omitempty"`
-	CoordinatingInBytes                   *int64 `json:"coordinating_in_bytes,omitempty"`
-	CoordinatingRejections                *int64 `json:"coordinating_rejections,omitempty"`
-	PrimaryInBytes                        *int64 `json:"primary_in_bytes,omitempty"`
-	PrimaryRejections                     *int64 `json:"primary_rejections,omitempty"`
-	ReplicaInBytes                        *int64 `json:"replica_in_bytes,omitempty"`
-	ReplicaRejections                     *int64 `json:"replica_rejections,omitempty"`
+	// Coordinating Memory consumed by indexing requests in the coordinating stage.
+	Coordinating ByteSize `json:"coordinating,omitempty"`
+	// CoordinatingInBytes Memory consumed, in bytes, by indexing requests in the coordinating stage.
+	CoordinatingInBytes *int64 `json:"coordinating_in_bytes,omitempty"`
+	// CoordinatingRejections Number of indexing requests rejected in the coordinating stage.
+	CoordinatingRejections *int64 `json:"coordinating_rejections,omitempty"`
+	// Primary Memory consumed by indexing requests in the primary stage.
+	Primary ByteSize `json:"primary,omitempty"`
+	// PrimaryInBytes Memory consumed, in bytes, by indexing requests in the primary stage.
+	PrimaryInBytes *int64 `json:"primary_in_bytes,omitempty"`
+	// PrimaryRejections Number of indexing requests rejected in the primary stage.
+	PrimaryRejections *int64 `json:"primary_rejections,omitempty"`
+	// Replica Memory consumed by indexing requests in the replica stage.
+	Replica ByteSize `json:"replica,omitempty"`
+	// ReplicaInBytes Memory consumed, in bytes, by indexing requests in the replica stage.
+	ReplicaInBytes *int64 `json:"replica_in_bytes,omitempty"`
+	// ReplicaRejections Number of indexing requests rejected in the replica stage.
+	ReplicaRejections *int64 `json:"replica_rejections,omitempty"`
 }
 
-// PressureMemoryBuilder holds PressureMemory struct and provides a builder API.
-type PressureMemoryBuilder struct {
-	v *PressureMemory
-}
+func (s *PressureMemory) UnmarshalJSON(data []byte) error {
 
-// NewPressureMemory provides a builder for the PressureMemory struct.
-func NewPressureMemoryBuilder() *PressureMemoryBuilder {
-	r := PressureMemoryBuilder{
-		&PressureMemory{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "all":
+			if err := dec.Decode(&s.All); err != nil {
+				return fmt.Errorf("%s | %w", "All", err)
+			}
+
+		case "all_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "AllInBytes", err)
+				}
+				s.AllInBytes = &value
+			case float64:
+				f := int64(v)
+				s.AllInBytes = &f
+			}
+
+		case "combined_coordinating_and_primary":
+			if err := dec.Decode(&s.CombinedCoordinatingAndPrimary); err != nil {
+				return fmt.Errorf("%s | %w", "CombinedCoordinatingAndPrimary", err)
+			}
+
+		case "combined_coordinating_and_primary_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CombinedCoordinatingAndPrimaryInBytes", err)
+				}
+				s.CombinedCoordinatingAndPrimaryInBytes = &value
+			case float64:
+				f := int64(v)
+				s.CombinedCoordinatingAndPrimaryInBytes = &f
+			}
+
+		case "coordinating":
+			if err := dec.Decode(&s.Coordinating); err != nil {
+				return fmt.Errorf("%s | %w", "Coordinating", err)
+			}
+
+		case "coordinating_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CoordinatingInBytes", err)
+				}
+				s.CoordinatingInBytes = &value
+			case float64:
+				f := int64(v)
+				s.CoordinatingInBytes = &f
+			}
+
+		case "coordinating_rejections":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CoordinatingRejections", err)
+				}
+				s.CoordinatingRejections = &value
+			case float64:
+				f := int64(v)
+				s.CoordinatingRejections = &f
+			}
+
+		case "primary":
+			if err := dec.Decode(&s.Primary); err != nil {
+				return fmt.Errorf("%s | %w", "Primary", err)
+			}
+
+		case "primary_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PrimaryInBytes", err)
+				}
+				s.PrimaryInBytes = &value
+			case float64:
+				f := int64(v)
+				s.PrimaryInBytes = &f
+			}
+
+		case "primary_rejections":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PrimaryRejections", err)
+				}
+				s.PrimaryRejections = &value
+			case float64:
+				f := int64(v)
+				s.PrimaryRejections = &f
+			}
+
+		case "replica":
+			if err := dec.Decode(&s.Replica); err != nil {
+				return fmt.Errorf("%s | %w", "Replica", err)
+			}
+
+		case "replica_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ReplicaInBytes", err)
+				}
+				s.ReplicaInBytes = &value
+			case float64:
+				f := int64(v)
+				s.ReplicaInBytes = &f
+			}
+
+		case "replica_rejections":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ReplicaRejections", err)
+				}
+				s.ReplicaRejections = &value
+			case float64:
+				f := int64(v)
+				s.ReplicaRejections = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the PressureMemory struct
-func (rb *PressureMemoryBuilder) Build() PressureMemory {
-	return *rb.v
-}
+// NewPressureMemory returns a PressureMemory.
+func NewPressureMemory() *PressureMemory {
+	r := &PressureMemory{}
 
-func (rb *PressureMemoryBuilder) AllInBytes(allinbytes int64) *PressureMemoryBuilder {
-	rb.v.AllInBytes = &allinbytes
-	return rb
-}
-
-func (rb *PressureMemoryBuilder) CombinedCoordinatingAndPrimaryInBytes(combinedcoordinatingandprimaryinbytes int64) *PressureMemoryBuilder {
-	rb.v.CombinedCoordinatingAndPrimaryInBytes = &combinedcoordinatingandprimaryinbytes
-	return rb
-}
-
-func (rb *PressureMemoryBuilder) CoordinatingInBytes(coordinatinginbytes int64) *PressureMemoryBuilder {
-	rb.v.CoordinatingInBytes = &coordinatinginbytes
-	return rb
-}
-
-func (rb *PressureMemoryBuilder) CoordinatingRejections(coordinatingrejections int64) *PressureMemoryBuilder {
-	rb.v.CoordinatingRejections = &coordinatingrejections
-	return rb
-}
-
-func (rb *PressureMemoryBuilder) PrimaryInBytes(primaryinbytes int64) *PressureMemoryBuilder {
-	rb.v.PrimaryInBytes = &primaryinbytes
-	return rb
-}
-
-func (rb *PressureMemoryBuilder) PrimaryRejections(primaryrejections int64) *PressureMemoryBuilder {
-	rb.v.PrimaryRejections = &primaryrejections
-	return rb
-}
-
-func (rb *PressureMemoryBuilder) ReplicaInBytes(replicainbytes int64) *PressureMemoryBuilder {
-	rb.v.ReplicaInBytes = &replicainbytes
-	return rb
-}
-
-func (rb *PressureMemoryBuilder) ReplicaRejections(replicarejections int64) *PressureMemoryBuilder {
-	rb.v.ReplicaRejections = &replicarejections
-	return rb
+	return r
 }

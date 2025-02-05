@@ -15,98 +15,119 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+
+	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/clusterprivilege"
+)
+
 // Role type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/get_role/types.ts#L29-L39
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/get_role/types.ts#L32-L53
 type Role struct {
 	Applications      []ApplicationPrivileges                   `json:"applications"`
-	Cluster           []string                                  `json:"cluster"`
+	Cluster           []clusterprivilege.ClusterPrivilege       `json:"cluster"`
 	Global            map[string]map[string]map[string][]string `json:"global,omitempty"`
 	Indices           []IndicesPrivileges                       `json:"indices"`
 	Metadata          Metadata                                  `json:"metadata"`
+	RemoteCluster     []RemoteClusterPrivileges                 `json:"remote_cluster,omitempty"`
+	RemoteIndices     []RemoteIndicesPrivileges                 `json:"remote_indices,omitempty"`
 	RoleTemplates     []RoleTemplate                            `json:"role_templates,omitempty"`
 	RunAs             []string                                  `json:"run_as"`
-	TransientMetadata TransientMetadataConfig                   `json:"transient_metadata"`
+	TransientMetadata map[string]json.RawMessage                `json:"transient_metadata,omitempty"`
 }
 
-// RoleBuilder holds Role struct and provides a builder API.
-type RoleBuilder struct {
-	v *Role
+func (s *Role) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "applications":
+			if err := dec.Decode(&s.Applications); err != nil {
+				return fmt.Errorf("%s | %w", "Applications", err)
+			}
+
+		case "cluster":
+			if err := dec.Decode(&s.Cluster); err != nil {
+				return fmt.Errorf("%s | %w", "Cluster", err)
+			}
+
+		case "global":
+			if s.Global == nil {
+				s.Global = make(map[string]map[string]map[string][]string, 0)
+			}
+			if err := dec.Decode(&s.Global); err != nil {
+				return fmt.Errorf("%s | %w", "Global", err)
+			}
+
+		case "indices":
+			if err := dec.Decode(&s.Indices); err != nil {
+				return fmt.Errorf("%s | %w", "Indices", err)
+			}
+
+		case "metadata":
+			if err := dec.Decode(&s.Metadata); err != nil {
+				return fmt.Errorf("%s | %w", "Metadata", err)
+			}
+
+		case "remote_cluster":
+			if err := dec.Decode(&s.RemoteCluster); err != nil {
+				return fmt.Errorf("%s | %w", "RemoteCluster", err)
+			}
+
+		case "remote_indices":
+			if err := dec.Decode(&s.RemoteIndices); err != nil {
+				return fmt.Errorf("%s | %w", "RemoteIndices", err)
+			}
+
+		case "role_templates":
+			if err := dec.Decode(&s.RoleTemplates); err != nil {
+				return fmt.Errorf("%s | %w", "RoleTemplates", err)
+			}
+
+		case "run_as":
+			if err := dec.Decode(&s.RunAs); err != nil {
+				return fmt.Errorf("%s | %w", "RunAs", err)
+			}
+
+		case "transient_metadata":
+			if s.TransientMetadata == nil {
+				s.TransientMetadata = make(map[string]json.RawMessage, 0)
+			}
+			if err := dec.Decode(&s.TransientMetadata); err != nil {
+				return fmt.Errorf("%s | %w", "TransientMetadata", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewRole provides a builder for the Role struct.
-func NewRoleBuilder() *RoleBuilder {
-	r := RoleBuilder{
-		&Role{
-			Global: make(map[string]map[string]map[string][]string, 0),
-		},
+// NewRole returns a Role.
+func NewRole() *Role {
+	r := &Role{
+		Global:            make(map[string]map[string]map[string][]string, 0),
+		TransientMetadata: make(map[string]json.RawMessage, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the Role struct
-func (rb *RoleBuilder) Build() Role {
-	return *rb.v
-}
-
-func (rb *RoleBuilder) Applications(applications []ApplicationPrivilegesBuilder) *RoleBuilder {
-	tmp := make([]ApplicationPrivileges, len(applications))
-	for _, value := range applications {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Applications = tmp
-	return rb
-}
-
-func (rb *RoleBuilder) Cluster(cluster ...string) *RoleBuilder {
-	rb.v.Cluster = cluster
-	return rb
-}
-
-func (rb *RoleBuilder) Global(value map[string]map[string]map[string][]string) *RoleBuilder {
-	rb.v.Global = value
-	return rb
-}
-
-func (rb *RoleBuilder) Indices(indices []IndicesPrivilegesBuilder) *RoleBuilder {
-	tmp := make([]IndicesPrivileges, len(indices))
-	for _, value := range indices {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Indices = tmp
-	return rb
-}
-
-func (rb *RoleBuilder) Metadata(metadata *MetadataBuilder) *RoleBuilder {
-	v := metadata.Build()
-	rb.v.Metadata = v
-	return rb
-}
-
-func (rb *RoleBuilder) RoleTemplates(role_templates []RoleTemplateBuilder) *RoleBuilder {
-	tmp := make([]RoleTemplate, len(role_templates))
-	for _, value := range role_templates {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.RoleTemplates = tmp
-	return rb
-}
-
-func (rb *RoleBuilder) RunAs(run_as ...string) *RoleBuilder {
-	rb.v.RunAs = run_as
-	return rb
-}
-
-func (rb *RoleBuilder) TransientMetadata(transientmetadata *TransientMetadataConfigBuilder) *RoleBuilder {
-	v := transientmetadata.Build()
-	rb.v.TransientMetadata = v
-	return rb
+	return r
 }

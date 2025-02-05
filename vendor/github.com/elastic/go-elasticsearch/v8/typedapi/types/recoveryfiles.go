@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // RecoveryFiles type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/recovery/types.ts#L56-L62
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/recovery/types.ts#L56-L62
 type RecoveryFiles struct {
 	Details   []FileDetails `json:"details,omitempty"`
 	Percent   Percentage    `json:"percent"`
@@ -33,51 +40,84 @@ type RecoveryFiles struct {
 	Total     int64         `json:"total"`
 }
 
-// RecoveryFilesBuilder holds RecoveryFiles struct and provides a builder API.
-type RecoveryFilesBuilder struct {
-	v *RecoveryFiles
-}
+func (s *RecoveryFiles) UnmarshalJSON(data []byte) error {
 
-// NewRecoveryFiles provides a builder for the RecoveryFiles struct.
-func NewRecoveryFilesBuilder() *RecoveryFilesBuilder {
-	r := RecoveryFilesBuilder{
-		&RecoveryFiles{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "details":
+			if err := dec.Decode(&s.Details); err != nil {
+				return fmt.Errorf("%s | %w", "Details", err)
+			}
+
+		case "percent":
+			if err := dec.Decode(&s.Percent); err != nil {
+				return fmt.Errorf("%s | %w", "Percent", err)
+			}
+
+		case "recovered":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Recovered", err)
+				}
+				s.Recovered = value
+			case float64:
+				f := int64(v)
+				s.Recovered = f
+			}
+
+		case "reused":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Reused", err)
+				}
+				s.Reused = value
+			case float64:
+				f := int64(v)
+				s.Reused = f
+			}
+
+		case "total":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Total", err)
+				}
+				s.Total = value
+			case float64:
+				f := int64(v)
+				s.Total = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RecoveryFiles struct
-func (rb *RecoveryFilesBuilder) Build() RecoveryFiles {
-	return *rb.v
-}
+// NewRecoveryFiles returns a RecoveryFiles.
+func NewRecoveryFiles() *RecoveryFiles {
+	r := &RecoveryFiles{}
 
-func (rb *RecoveryFilesBuilder) Details(details []FileDetailsBuilder) *RecoveryFilesBuilder {
-	tmp := make([]FileDetails, len(details))
-	for _, value := range details {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Details = tmp
-	return rb
-}
-
-func (rb *RecoveryFilesBuilder) Percent(percent *PercentageBuilder) *RecoveryFilesBuilder {
-	v := percent.Build()
-	rb.v.Percent = v
-	return rb
-}
-
-func (rb *RecoveryFilesBuilder) Recovered(recovered int64) *RecoveryFilesBuilder {
-	rb.v.Recovered = recovered
-	return rb
-}
-
-func (rb *RecoveryFilesBuilder) Reused(reused int64) *RecoveryFilesBuilder {
-	rb.v.Reused = reused
-	return rb
-}
-
-func (rb *RecoveryFilesBuilder) Total(total int64) *RecoveryFilesBuilder {
-	rb.v.Total = total
-	return rb
+	return r
 }

@@ -15,58 +15,120 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // VariableWidthHistogramAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/bucket.ts#L426-L431
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/bucket.ts#L1091-L1115
 type VariableWidthHistogramAggregation struct {
-	Buckets       *int   `json:"buckets,omitempty"`
-	Field         *Field `json:"field,omitempty"`
-	InitialBuffer *int   `json:"initial_buffer,omitempty"`
-	ShardSize     *int   `json:"shard_size,omitempty"`
+	// Buckets The target number of buckets.
+	Buckets *int `json:"buckets,omitempty"`
+	// Field The name of the field.
+	Field *string `json:"field,omitempty"`
+	// InitialBuffer Specifies the number of individual documents that will be stored in memory on
+	// a shard before the initial bucketing algorithm is run.
+	// Defaults to `min(10 * shard_size, 50000)`.
+	InitialBuffer *int    `json:"initial_buffer,omitempty"`
+	Script        *Script `json:"script,omitempty"`
+	// ShardSize The number of buckets that the coordinating node will request from each
+	// shard.
+	// Defaults to `buckets * 50`.
+	ShardSize *int `json:"shard_size,omitempty"`
 }
 
-// VariableWidthHistogramAggregationBuilder holds VariableWidthHistogramAggregation struct and provides a builder API.
-type VariableWidthHistogramAggregationBuilder struct {
-	v *VariableWidthHistogramAggregation
-}
+func (s *VariableWidthHistogramAggregation) UnmarshalJSON(data []byte) error {
 
-// NewVariableWidthHistogramAggregation provides a builder for the VariableWidthHistogramAggregation struct.
-func NewVariableWidthHistogramAggregationBuilder() *VariableWidthHistogramAggregationBuilder {
-	r := VariableWidthHistogramAggregationBuilder{
-		&VariableWidthHistogramAggregation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "buckets":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Buckets", err)
+				}
+				s.Buckets = &value
+			case float64:
+				f := int(v)
+				s.Buckets = &f
+			}
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "initial_buffer":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "InitialBuffer", err)
+				}
+				s.InitialBuffer = &value
+			case float64:
+				f := int(v)
+				s.InitialBuffer = &f
+			}
+
+		case "script":
+			if err := dec.Decode(&s.Script); err != nil {
+				return fmt.Errorf("%s | %w", "Script", err)
+			}
+
+		case "shard_size":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ShardSize", err)
+				}
+				s.ShardSize = &value
+			case float64:
+				f := int(v)
+				s.ShardSize = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the VariableWidthHistogramAggregation struct
-func (rb *VariableWidthHistogramAggregationBuilder) Build() VariableWidthHistogramAggregation {
-	return *rb.v
-}
+// NewVariableWidthHistogramAggregation returns a VariableWidthHistogramAggregation.
+func NewVariableWidthHistogramAggregation() *VariableWidthHistogramAggregation {
+	r := &VariableWidthHistogramAggregation{}
 
-func (rb *VariableWidthHistogramAggregationBuilder) Buckets(buckets int) *VariableWidthHistogramAggregationBuilder {
-	rb.v.Buckets = &buckets
-	return rb
-}
-
-func (rb *VariableWidthHistogramAggregationBuilder) Field(field Field) *VariableWidthHistogramAggregationBuilder {
-	rb.v.Field = &field
-	return rb
-}
-
-func (rb *VariableWidthHistogramAggregationBuilder) InitialBuffer(initialbuffer int) *VariableWidthHistogramAggregationBuilder {
-	rb.v.InitialBuffer = &initialbuffer
-	return rb
-}
-
-func (rb *VariableWidthHistogramAggregationBuilder) ShardSize(shardsize int) *VariableWidthHistogramAggregationBuilder {
-	rb.v.ShardSize = &shardsize
-	return rb
+	return r
 }

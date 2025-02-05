@@ -15,49 +15,88 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // StemmerTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L319-L322
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L321-L325
 type StemmerTokenFilter struct {
-	Language string         `json:"language"`
-	Type     string         `json:"type,omitempty"`
-	Version  *VersionString `json:"version,omitempty"`
+	Language *string `json:"language,omitempty"`
+	Type     string  `json:"type,omitempty"`
+	Version  *string `json:"version,omitempty"`
 }
 
-// StemmerTokenFilterBuilder holds StemmerTokenFilter struct and provides a builder API.
-type StemmerTokenFilterBuilder struct {
-	v *StemmerTokenFilter
+func (s *StemmerTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "language", "name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Language", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Language = &o
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewStemmerTokenFilter provides a builder for the StemmerTokenFilter struct.
-func NewStemmerTokenFilterBuilder() *StemmerTokenFilterBuilder {
-	r := StemmerTokenFilterBuilder{
-		&StemmerTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s StemmerTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerStemmerTokenFilter StemmerTokenFilter
+	tmp := innerStemmerTokenFilter{
+		Language: s.Language,
+		Type:     s.Type,
+		Version:  s.Version,
 	}
 
-	r.v.Type = "stemmer"
+	tmp.Type = "stemmer"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the StemmerTokenFilter struct
-func (rb *StemmerTokenFilterBuilder) Build() StemmerTokenFilter {
-	return *rb.v
-}
+// NewStemmerTokenFilter returns a StemmerTokenFilter.
+func NewStemmerTokenFilter() *StemmerTokenFilter {
+	r := &StemmerTokenFilter{}
 
-func (rb *StemmerTokenFilterBuilder) Language(language string) *StemmerTokenFilterBuilder {
-	rb.v.Language = language
-	return rb
-}
-
-func (rb *StemmerTokenFilterBuilder) Version(version VersionString) *StemmerTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

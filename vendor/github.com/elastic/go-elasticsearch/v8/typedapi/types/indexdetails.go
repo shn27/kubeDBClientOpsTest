@@ -15,59 +15,104 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // IndexDetails type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/snapshot/_types/SnapshotIndexDetails.ts#L23-L28
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/snapshot/_types/SnapshotIndexDetails.ts#L23-L28
 type IndexDetails struct {
-	MaxSegmentsPerShard int64     `json:"max_segments_per_shard"`
-	ShardCount          int       `json:"shard_count"`
-	Size                *ByteSize `json:"size,omitempty"`
-	SizeInBytes         int64     `json:"size_in_bytes"`
+	MaxSegmentsPerShard int64    `json:"max_segments_per_shard"`
+	ShardCount          int      `json:"shard_count"`
+	Size                ByteSize `json:"size,omitempty"`
+	SizeInBytes         int64    `json:"size_in_bytes"`
 }
 
-// IndexDetailsBuilder holds IndexDetails struct and provides a builder API.
-type IndexDetailsBuilder struct {
-	v *IndexDetails
-}
+func (s *IndexDetails) UnmarshalJSON(data []byte) error {
 
-// NewIndexDetails provides a builder for the IndexDetails struct.
-func NewIndexDetailsBuilder() *IndexDetailsBuilder {
-	r := IndexDetailsBuilder{
-		&IndexDetails{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "max_segments_per_shard":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxSegmentsPerShard", err)
+				}
+				s.MaxSegmentsPerShard = value
+			case float64:
+				f := int64(v)
+				s.MaxSegmentsPerShard = f
+			}
+
+		case "shard_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ShardCount", err)
+				}
+				s.ShardCount = value
+			case float64:
+				f := int(v)
+				s.ShardCount = f
+			}
+
+		case "size":
+			if err := dec.Decode(&s.Size); err != nil {
+				return fmt.Errorf("%s | %w", "Size", err)
+			}
+
+		case "size_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "SizeInBytes", err)
+				}
+				s.SizeInBytes = value
+			case float64:
+				f := int64(v)
+				s.SizeInBytes = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the IndexDetails struct
-func (rb *IndexDetailsBuilder) Build() IndexDetails {
-	return *rb.v
-}
+// NewIndexDetails returns a IndexDetails.
+func NewIndexDetails() *IndexDetails {
+	r := &IndexDetails{}
 
-func (rb *IndexDetailsBuilder) MaxSegmentsPerShard(maxsegmentspershard int64) *IndexDetailsBuilder {
-	rb.v.MaxSegmentsPerShard = maxsegmentspershard
-	return rb
-}
-
-func (rb *IndexDetailsBuilder) ShardCount(shardcount int) *IndexDetailsBuilder {
-	rb.v.ShardCount = shardcount
-	return rb
-}
-
-func (rb *IndexDetailsBuilder) Size(size *ByteSizeBuilder) *IndexDetailsBuilder {
-	v := size.Build()
-	rb.v.Size = &v
-	return rb
-}
-
-func (rb *IndexDetailsBuilder) SizeInBytes(sizeinbytes int64) *IndexDetailsBuilder {
-	rb.v.SizeInBytes = sizeinbytes
-	return rb
+	return r
 }

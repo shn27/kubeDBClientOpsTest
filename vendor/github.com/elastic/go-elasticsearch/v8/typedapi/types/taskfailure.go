@@ -15,59 +15,90 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // TaskFailure type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Errors.ts#L66-L71
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Errors.ts#L68-L73
 type TaskFailure struct {
-	NodeId NodeId     `json:"node_id"`
+	NodeId string     `json:"node_id"`
 	Reason ErrorCause `json:"reason"`
 	Status string     `json:"status"`
 	TaskId int64      `json:"task_id"`
 }
 
-// TaskFailureBuilder holds TaskFailure struct and provides a builder API.
-type TaskFailureBuilder struct {
-	v *TaskFailure
-}
+func (s *TaskFailure) UnmarshalJSON(data []byte) error {
 
-// NewTaskFailure provides a builder for the TaskFailure struct.
-func NewTaskFailureBuilder() *TaskFailureBuilder {
-	r := TaskFailureBuilder{
-		&TaskFailure{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "node_id":
+			if err := dec.Decode(&s.NodeId); err != nil {
+				return fmt.Errorf("%s | %w", "NodeId", err)
+			}
+
+		case "reason":
+			if err := dec.Decode(&s.Reason); err != nil {
+				return fmt.Errorf("%s | %w", "Reason", err)
+			}
+
+		case "status":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Status", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Status = o
+
+		case "task_id":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TaskId", err)
+				}
+				s.TaskId = value
+			case float64:
+				f := int64(v)
+				s.TaskId = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TaskFailure struct
-func (rb *TaskFailureBuilder) Build() TaskFailure {
-	return *rb.v
-}
+// NewTaskFailure returns a TaskFailure.
+func NewTaskFailure() *TaskFailure {
+	r := &TaskFailure{}
 
-func (rb *TaskFailureBuilder) NodeId(nodeid NodeId) *TaskFailureBuilder {
-	rb.v.NodeId = nodeid
-	return rb
-}
-
-func (rb *TaskFailureBuilder) Reason(reason *ErrorCauseBuilder) *TaskFailureBuilder {
-	v := reason.Build()
-	rb.v.Reason = v
-	return rb
-}
-
-func (rb *TaskFailureBuilder) Status(status string) *TaskFailureBuilder {
-	rb.v.Status = status
-	return rb
-}
-
-func (rb *TaskFailureBuilder) TaskId(taskid int64) *TaskFailureBuilder {
-	rb.v.TaskId = taskid
-	return rb
+	return r
 }

@@ -15,46 +15,79 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // InferenceClassImportance type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L635-L638
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L784-L787
 type InferenceClassImportance struct {
 	ClassName  string  `json:"class_name"`
-	Importance float64 `json:"importance"`
+	Importance Float64 `json:"importance"`
 }
 
-// InferenceClassImportanceBuilder holds InferenceClassImportance struct and provides a builder API.
-type InferenceClassImportanceBuilder struct {
-	v *InferenceClassImportance
-}
+func (s *InferenceClassImportance) UnmarshalJSON(data []byte) error {
 
-// NewInferenceClassImportance provides a builder for the InferenceClassImportance struct.
-func NewInferenceClassImportanceBuilder() *InferenceClassImportanceBuilder {
-	r := InferenceClassImportanceBuilder{
-		&InferenceClassImportance{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "class_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ClassName", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ClassName = o
+
+		case "importance":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Importance", err)
+				}
+				f := Float64(value)
+				s.Importance = f
+			case float64:
+				f := Float64(v)
+				s.Importance = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the InferenceClassImportance struct
-func (rb *InferenceClassImportanceBuilder) Build() InferenceClassImportance {
-	return *rb.v
-}
+// NewInferenceClassImportance returns a InferenceClassImportance.
+func NewInferenceClassImportance() *InferenceClassImportance {
+	r := &InferenceClassImportance{}
 
-func (rb *InferenceClassImportanceBuilder) ClassName(classname string) *InferenceClassImportanceBuilder {
-	rb.v.ClassName = classname
-	return rb
-}
-
-func (rb *InferenceClassImportanceBuilder) Importance(importance float64) *InferenceClassImportanceBuilder {
-	rb.v.Importance = importance
-	return rb
+	return r
 }

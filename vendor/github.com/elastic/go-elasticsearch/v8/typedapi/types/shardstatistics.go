@@ -15,68 +15,27 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // ShardStatistics type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Stats.ts#L33-L39
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Stats.ts#L54-L66
 type ShardStatistics struct {
-	Failed     uint           `json:"failed"`
-	Failures   []ShardFailure `json:"failures,omitempty"`
-	Skipped    *uint          `json:"skipped,omitempty"`
-	Successful uint           `json:"successful"`
-	Total      uint           `json:"total"`
+	Failed   uint           `json:"failed"`
+	Failures []ShardFailure `json:"failures,omitempty"`
+	Skipped  *uint          `json:"skipped,omitempty"`
+	// Successful Indicates how many shards have successfully run the search.
+	Successful uint `json:"successful"`
+	// Total Indicates how many shards the search will run on overall.
+	Total uint `json:"total"`
 }
 
-// ShardStatisticsBuilder holds ShardStatistics struct and provides a builder API.
-type ShardStatisticsBuilder struct {
-	v *ShardStatistics
-}
+// NewShardStatistics returns a ShardStatistics.
+func NewShardStatistics() *ShardStatistics {
+	r := &ShardStatistics{}
 
-// NewShardStatistics provides a builder for the ShardStatistics struct.
-func NewShardStatisticsBuilder() *ShardStatisticsBuilder {
-	r := ShardStatisticsBuilder{
-		&ShardStatistics{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the ShardStatistics struct
-func (rb *ShardStatisticsBuilder) Build() ShardStatistics {
-	return *rb.v
-}
-
-func (rb *ShardStatisticsBuilder) Failed(failed uint) *ShardStatisticsBuilder {
-	rb.v.Failed = failed
-	return rb
-}
-
-func (rb *ShardStatisticsBuilder) Failures(failures []ShardFailureBuilder) *ShardStatisticsBuilder {
-	tmp := make([]ShardFailure, len(failures))
-	for _, value := range failures {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Failures = tmp
-	return rb
-}
-
-func (rb *ShardStatisticsBuilder) Skipped(skipped uint) *ShardStatisticsBuilder {
-	rb.v.Skipped = &skipped
-	return rb
-}
-
-func (rb *ShardStatisticsBuilder) Successful(successful uint) *ShardStatisticsBuilder {
-	rb.v.Successful = successful
-	return rb
-}
-
-func (rb *ShardStatisticsBuilder) Total(total uint) *ShardStatisticsBuilder {
-	rb.v.Total = total
-	return rb
+	return r
 }

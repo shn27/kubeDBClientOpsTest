@@ -15,52 +15,100 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // LinearInterpolationSmoothingModel type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/suggester.ts#L213-L217
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/suggester.ts#L437-L441
 type LinearInterpolationSmoothingModel struct {
-	BigramLambda  float64 `json:"bigram_lambda"`
-	TrigramLambda float64 `json:"trigram_lambda"`
-	UnigramLambda float64 `json:"unigram_lambda"`
+	BigramLambda  Float64 `json:"bigram_lambda"`
+	TrigramLambda Float64 `json:"trigram_lambda"`
+	UnigramLambda Float64 `json:"unigram_lambda"`
 }
 
-// LinearInterpolationSmoothingModelBuilder holds LinearInterpolationSmoothingModel struct and provides a builder API.
-type LinearInterpolationSmoothingModelBuilder struct {
-	v *LinearInterpolationSmoothingModel
-}
+func (s *LinearInterpolationSmoothingModel) UnmarshalJSON(data []byte) error {
 
-// NewLinearInterpolationSmoothingModel provides a builder for the LinearInterpolationSmoothingModel struct.
-func NewLinearInterpolationSmoothingModelBuilder() *LinearInterpolationSmoothingModelBuilder {
-	r := LinearInterpolationSmoothingModelBuilder{
-		&LinearInterpolationSmoothingModel{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "bigram_lambda":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "BigramLambda", err)
+				}
+				f := Float64(value)
+				s.BigramLambda = f
+			case float64:
+				f := Float64(v)
+				s.BigramLambda = f
+			}
+
+		case "trigram_lambda":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TrigramLambda", err)
+				}
+				f := Float64(value)
+				s.TrigramLambda = f
+			case float64:
+				f := Float64(v)
+				s.TrigramLambda = f
+			}
+
+		case "unigram_lambda":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "UnigramLambda", err)
+				}
+				f := Float64(value)
+				s.UnigramLambda = f
+			case float64:
+				f := Float64(v)
+				s.UnigramLambda = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the LinearInterpolationSmoothingModel struct
-func (rb *LinearInterpolationSmoothingModelBuilder) Build() LinearInterpolationSmoothingModel {
-	return *rb.v
-}
+// NewLinearInterpolationSmoothingModel returns a LinearInterpolationSmoothingModel.
+func NewLinearInterpolationSmoothingModel() *LinearInterpolationSmoothingModel {
+	r := &LinearInterpolationSmoothingModel{}
 
-func (rb *LinearInterpolationSmoothingModelBuilder) BigramLambda(bigramlambda float64) *LinearInterpolationSmoothingModelBuilder {
-	rb.v.BigramLambda = bigramlambda
-	return rb
-}
-
-func (rb *LinearInterpolationSmoothingModelBuilder) TrigramLambda(trigramlambda float64) *LinearInterpolationSmoothingModelBuilder {
-	rb.v.TrigramLambda = trigramlambda
-	return rb
-}
-
-func (rb *LinearInterpolationSmoothingModelBuilder) UnigramLambda(unigramlambda float64) *LinearInterpolationSmoothingModelBuilder {
-	rb.v.UnigramLambda = unigramlambda
-	return rb
+	return r
 }

@@ -15,50 +15,60 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // FollowIndexStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ccr/_types/FollowIndexStats.ts#L30-L33
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ccr/_types/FollowIndexStats.ts#L30-L33
 type FollowIndexStats struct {
-	Index  IndexName    `json:"index"`
-	Shards []ShardStats `json:"shards"`
+	Index  string          `json:"index"`
+	Shards []CcrShardStats `json:"shards"`
 }
 
-// FollowIndexStatsBuilder holds FollowIndexStats struct and provides a builder API.
-type FollowIndexStatsBuilder struct {
-	v *FollowIndexStats
-}
+func (s *FollowIndexStats) UnmarshalJSON(data []byte) error {
 
-// NewFollowIndexStats provides a builder for the FollowIndexStats struct.
-func NewFollowIndexStatsBuilder() *FollowIndexStatsBuilder {
-	r := FollowIndexStatsBuilder{
-		&FollowIndexStats{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "index":
+			if err := dec.Decode(&s.Index); err != nil {
+				return fmt.Errorf("%s | %w", "Index", err)
+			}
+
+		case "shards":
+			if err := dec.Decode(&s.Shards); err != nil {
+				return fmt.Errorf("%s | %w", "Shards", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the FollowIndexStats struct
-func (rb *FollowIndexStatsBuilder) Build() FollowIndexStats {
-	return *rb.v
-}
+// NewFollowIndexStats returns a FollowIndexStats.
+func NewFollowIndexStats() *FollowIndexStats {
+	r := &FollowIndexStats{}
 
-func (rb *FollowIndexStatsBuilder) Index(index IndexName) *FollowIndexStatsBuilder {
-	rb.v.Index = index
-	return rb
-}
-
-func (rb *FollowIndexStatsBuilder) Shards(shards []ShardStatsBuilder) *FollowIndexStatsBuilder {
-	tmp := make([]ShardStats, len(shards))
-	for _, value := range shards {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Shards = tmp
-	return rb
+	return r
 }

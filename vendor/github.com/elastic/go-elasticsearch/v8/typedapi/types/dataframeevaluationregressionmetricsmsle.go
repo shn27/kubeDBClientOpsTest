@@ -15,45 +15,68 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DataframeEvaluationRegressionMetricsMsle type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/DataframeEvaluation.ts#L112-L115
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/DataframeEvaluation.ts#L112-L115
 type DataframeEvaluationRegressionMetricsMsle struct {
 	// Offset Defines the transition point at which you switch from minimizing quadratic
 	// error to minimizing quadratic log error. Defaults to 1.
-	Offset *float64 `json:"offset,omitempty"`
+	Offset *Float64 `json:"offset,omitempty"`
 }
 
-// DataframeEvaluationRegressionMetricsMsleBuilder holds DataframeEvaluationRegressionMetricsMsle struct and provides a builder API.
-type DataframeEvaluationRegressionMetricsMsleBuilder struct {
-	v *DataframeEvaluationRegressionMetricsMsle
-}
+func (s *DataframeEvaluationRegressionMetricsMsle) UnmarshalJSON(data []byte) error {
 
-// NewDataframeEvaluationRegressionMetricsMsle provides a builder for the DataframeEvaluationRegressionMetricsMsle struct.
-func NewDataframeEvaluationRegressionMetricsMsleBuilder() *DataframeEvaluationRegressionMetricsMsleBuilder {
-	r := DataframeEvaluationRegressionMetricsMsleBuilder{
-		&DataframeEvaluationRegressionMetricsMsle{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "offset":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Offset", err)
+				}
+				f := Float64(value)
+				s.Offset = &f
+			case float64:
+				f := Float64(v)
+				s.Offset = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DataframeEvaluationRegressionMetricsMsle struct
-func (rb *DataframeEvaluationRegressionMetricsMsleBuilder) Build() DataframeEvaluationRegressionMetricsMsle {
-	return *rb.v
-}
+// NewDataframeEvaluationRegressionMetricsMsle returns a DataframeEvaluationRegressionMetricsMsle.
+func NewDataframeEvaluationRegressionMetricsMsle() *DataframeEvaluationRegressionMetricsMsle {
+	r := &DataframeEvaluationRegressionMetricsMsle{}
 
-// Offset Defines the transition point at which you switch from minimizing quadratic
-// error to minimizing quadratic log error. Defaults to 1.
-
-func (rb *DataframeEvaluationRegressionMetricsMsleBuilder) Offset(offset float64) *DataframeEvaluationRegressionMetricsMsleBuilder {
-	rb.v.Offset = &offset
-	return rb
+	return r
 }

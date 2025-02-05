@@ -15,70 +15,105 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // RerouteParameters type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/reroute/types.ts#L98-L105
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/reroute/types.ts#L98-L105
 type RerouteParameters struct {
-	AllowPrimary bool      `json:"allow_primary"`
-	FromNode     *NodeName `json:"from_node,omitempty"`
-	Index        IndexName `json:"index"`
-	Node         NodeName  `json:"node"`
-	Shard        int       `json:"shard"`
-	ToNode       *NodeName `json:"to_node,omitempty"`
+	AllowPrimary bool    `json:"allow_primary"`
+	FromNode     *string `json:"from_node,omitempty"`
+	Index        string  `json:"index"`
+	Node         string  `json:"node"`
+	Shard        int     `json:"shard"`
+	ToNode       *string `json:"to_node,omitempty"`
 }
 
-// RerouteParametersBuilder holds RerouteParameters struct and provides a builder API.
-type RerouteParametersBuilder struct {
-	v *RerouteParameters
-}
+func (s *RerouteParameters) UnmarshalJSON(data []byte) error {
 
-// NewRerouteParameters provides a builder for the RerouteParameters struct.
-func NewRerouteParametersBuilder() *RerouteParametersBuilder {
-	r := RerouteParametersBuilder{
-		&RerouteParameters{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "allow_primary":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "AllowPrimary", err)
+				}
+				s.AllowPrimary = value
+			case bool:
+				s.AllowPrimary = v
+			}
+
+		case "from_node":
+			if err := dec.Decode(&s.FromNode); err != nil {
+				return fmt.Errorf("%s | %w", "FromNode", err)
+			}
+
+		case "index":
+			if err := dec.Decode(&s.Index); err != nil {
+				return fmt.Errorf("%s | %w", "Index", err)
+			}
+
+		case "node":
+			if err := dec.Decode(&s.Node); err != nil {
+				return fmt.Errorf("%s | %w", "Node", err)
+			}
+
+		case "shard":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Shard", err)
+				}
+				s.Shard = value
+			case float64:
+				f := int(v)
+				s.Shard = f
+			}
+
+		case "to_node":
+			if err := dec.Decode(&s.ToNode); err != nil {
+				return fmt.Errorf("%s | %w", "ToNode", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RerouteParameters struct
-func (rb *RerouteParametersBuilder) Build() RerouteParameters {
-	return *rb.v
-}
+// NewRerouteParameters returns a RerouteParameters.
+func NewRerouteParameters() *RerouteParameters {
+	r := &RerouteParameters{}
 
-func (rb *RerouteParametersBuilder) AllowPrimary(allowprimary bool) *RerouteParametersBuilder {
-	rb.v.AllowPrimary = allowprimary
-	return rb
-}
-
-func (rb *RerouteParametersBuilder) FromNode(fromnode NodeName) *RerouteParametersBuilder {
-	rb.v.FromNode = &fromnode
-	return rb
-}
-
-func (rb *RerouteParametersBuilder) Index(index IndexName) *RerouteParametersBuilder {
-	rb.v.Index = index
-	return rb
-}
-
-func (rb *RerouteParametersBuilder) Node(node NodeName) *RerouteParametersBuilder {
-	rb.v.Node = node
-	return rb
-}
-
-func (rb *RerouteParametersBuilder) Shard(shard int) *RerouteParametersBuilder {
-	rb.v.Shard = shard
-	return rb
-}
-
-func (rb *RerouteParametersBuilder) ToNode(tonode NodeName) *RerouteParametersBuilder {
-	rb.v.ToNode = &tonode
-	return rb
+	return r
 }

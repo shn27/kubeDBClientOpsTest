@@ -15,60 +15,109 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // MultiTermsAggregate type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L448-L450
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L501-L506
 type MultiTermsAggregate struct {
 	Buckets                 BucketsMultiTermsBucket `json:"buckets"`
 	DocCountErrorUpperBound *int64                  `json:"doc_count_error_upper_bound,omitempty"`
-	Meta                    *Metadata               `json:"meta,omitempty"`
-	SumOtherDocCount        int64                   `json:"sum_other_doc_count"`
+	Meta                    Metadata                `json:"meta,omitempty"`
+	SumOtherDocCount        *int64                  `json:"sum_other_doc_count,omitempty"`
 }
 
-// MultiTermsAggregateBuilder holds MultiTermsAggregate struct and provides a builder API.
-type MultiTermsAggregateBuilder struct {
-	v *MultiTermsAggregate
-}
+func (s *MultiTermsAggregate) UnmarshalJSON(data []byte) error {
 
-// NewMultiTermsAggregate provides a builder for the MultiTermsAggregate struct.
-func NewMultiTermsAggregateBuilder() *MultiTermsAggregateBuilder {
-	r := MultiTermsAggregateBuilder{
-		&MultiTermsAggregate{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "buckets":
+
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			source := bytes.NewReader(rawMsg)
+			localDec := json.NewDecoder(source)
+			switch rawMsg[0] {
+			case '{':
+				o := make(map[string]MultiTermsBucket, 0)
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Buckets", err)
+				}
+				s.Buckets = o
+			case '[':
+				o := []MultiTermsBucket{}
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Buckets", err)
+				}
+				s.Buckets = o
+			}
+
+		case "doc_count_error_upper_bound":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DocCountErrorUpperBound", err)
+				}
+				s.DocCountErrorUpperBound = &value
+			case float64:
+				f := int64(v)
+				s.DocCountErrorUpperBound = &f
+			}
+
+		case "meta":
+			if err := dec.Decode(&s.Meta); err != nil {
+				return fmt.Errorf("%s | %w", "Meta", err)
+			}
+
+		case "sum_other_doc_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "SumOtherDocCount", err)
+				}
+				s.SumOtherDocCount = &value
+			case float64:
+				f := int64(v)
+				s.SumOtherDocCount = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the MultiTermsAggregate struct
-func (rb *MultiTermsAggregateBuilder) Build() MultiTermsAggregate {
-	return *rb.v
-}
+// NewMultiTermsAggregate returns a MultiTermsAggregate.
+func NewMultiTermsAggregate() *MultiTermsAggregate {
+	r := &MultiTermsAggregate{}
 
-func (rb *MultiTermsAggregateBuilder) Buckets(buckets *BucketsMultiTermsBucketBuilder) *MultiTermsAggregateBuilder {
-	v := buckets.Build()
-	rb.v.Buckets = v
-	return rb
-}
-
-func (rb *MultiTermsAggregateBuilder) DocCountErrorUpperBound(doccounterrorupperbound int64) *MultiTermsAggregateBuilder {
-	rb.v.DocCountErrorUpperBound = &doccounterrorupperbound
-	return rb
-}
-
-func (rb *MultiTermsAggregateBuilder) Meta(meta *MetadataBuilder) *MultiTermsAggregateBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *MultiTermsAggregateBuilder) SumOtherDocCount(sumotherdoccount int64) *MultiTermsAggregateBuilder {
-	rb.v.SumOtherDocCount = sumotherdoccount
-	return rb
+	return r
 }

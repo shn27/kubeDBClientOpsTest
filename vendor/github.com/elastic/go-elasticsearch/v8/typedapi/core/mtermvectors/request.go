@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package mtermvectors
 
@@ -31,28 +29,25 @@ import (
 
 // Request holds the request body struct for the package mtermvectors
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/mtermvectors/MultiTermVectorsRequest.ts#L31-L58
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/mtermvectors/MultiTermVectorsRequest.ts#L31-L116
 type Request struct {
-	Docs []types.Operation `json:"docs,omitempty"`
 
-	Ids []types.Id `json:"ids,omitempty"`
+	// Docs Array of existing or artificial documents.
+	Docs []types.MTermVectorsOperation `json:"docs,omitempty"`
+	// Ids Simplified syntax to specify documents by their ID if they're in the same
+	// index.
+	Ids []string `json:"ids,omitempty"`
 }
 
-// RequestBuilder is the builder API for the mtermvectors.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -61,23 +56,4 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	}
 
 	return &req, nil
-}
-
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
-
-func (rb *RequestBuilder) Docs(docs []types.OperationBuilder) *RequestBuilder {
-	tmp := make([]types.Operation, len(docs))
-	for _, value := range docs {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Docs = tmp
-	return rb
-}
-
-func (rb *RequestBuilder) Ids(ids ...types.Id) *RequestBuilder {
-	rb.v.Ids = ids
-	return rb
 }

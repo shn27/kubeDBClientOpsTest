@@ -15,12 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
-
-// Forces the execution of a stored watch.
+// This API can be used to force execution of the watch outside of its
+// triggering logic or to simulate the watch execution for debugging purposes.
+// For testing and debugging purposes, you also have fine-grained control on how
+// the watch runs. You can execute the watch without executing all of its
+// actions or alternatively by simulating them. You can also force execution by
+// ignoring the watch condition and control whether a watch record would be
+// written to the watch history after execution.
 package executewatch
 
 import (
@@ -29,12 +33,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 
 	"github.com/elastic/elastic-transport-go/v8/elastictransport"
+	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
+	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/actionexecutionmode"
 )
 
 const (
@@ -51,14 +58,19 @@ type ExecuteWatch struct {
 	values  url.Values
 	path    url.URL
 
-	buf *gobytes.Buffer
+	raw io.Reader
 
-	req *Request
-	raw json.RawMessage
+	req      *Request
+	deferred []func(request *Request) error
+	buf      *gobytes.Buffer
 
 	paramSet int
 
 	id string
+
+	spanStarted bool
+
+	instrument elastictransport.Instrumentation
 }
 
 // NewExecuteWatch type alias for index.
@@ -74,7 +86,13 @@ func NewExecuteWatchFunc(tp elastictransport.Interface) NewExecuteWatch {
 	}
 }
 
-// Forces the execution of a stored watch.
+// This API can be used to force execution of the watch outside of its
+// triggering logic or to simulate the watch execution for debugging purposes.
+// For testing and debugging purposes, you also have fine-grained control on how
+// the watch runs. You can execute the watch without executing all of its
+// actions or alternatively by simulating them. You can also force execution by
+// ignoring the watch condition and control whether a watch record would be
+// written to the watch history after execution.
 //
 // https://www.elastic.co/guide/en/elasticsearch/reference/current/watcher-api-execute-watch.html
 func New(tp elastictransport.Interface) *ExecuteWatch {
@@ -82,7 +100,16 @@ func New(tp elastictransport.Interface) *ExecuteWatch {
 		transport: tp,
 		values:    make(url.Values),
 		headers:   make(http.Header),
-		buf:       gobytes.NewBuffer(nil),
+
+		buf: gobytes.NewBuffer(nil),
+
+		req: NewRequest(),
+	}
+
+	if instrumented, ok := r.transport.(elastictransport.Instrumented); ok {
+		if instrument := instrumented.InstrumentationEnabled(); instrument != nil {
+			r.instrument = instrument
+		}
 	}
 
 	return r
@@ -90,7 +117,7 @@ func New(tp elastictransport.Interface) *ExecuteWatch {
 
 // Raw takes a json payload as input which is then passed to the http.Request
 // If specified Raw takes precedence on Request method.
-func (r *ExecuteWatch) Raw(raw json.RawMessage) *ExecuteWatch {
+func (r *ExecuteWatch) Raw(raw io.Reader) *ExecuteWatch {
 	r.raw = raw
 
 	return r
@@ -112,9 +139,17 @@ func (r *ExecuteWatch) HttpRequest(ctx context.Context) (*http.Request, error) {
 
 	var err error
 
-	if r.raw != nil {
-		r.buf.Write(r.raw)
-	} else if r.req != nil {
+	if len(r.deferred) > 0 {
+		for _, f := range r.deferred {
+			deferredErr := f(r.req)
+			if deferredErr != nil {
+				return nil, deferredErr
+			}
+		}
+	}
+
+	if r.raw == nil && r.req != nil {
+
 		data, err := json.Marshal(r.req)
 
 		if err != nil {
@@ -122,6 +157,11 @@ func (r *ExecuteWatch) HttpRequest(ctx context.Context) (*http.Request, error) {
 		}
 
 		r.buf.Write(data)
+
+	}
+
+	if r.buf.Len() > 0 {
+		r.raw = r.buf
 	}
 
 	r.path.Scheme = "http"
@@ -133,7 +173,11 @@ func (r *ExecuteWatch) HttpRequest(ctx context.Context) (*http.Request, error) {
 		path.WriteString("/")
 		path.WriteString("watch")
 		path.WriteString("/")
-		path.WriteString(url.PathEscape(r.id))
+
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordPathPart(ctx, "id", r.id)
+		}
+		path.WriteString(r.id)
 		path.WriteString("/")
 		path.WriteString("_execute")
 
@@ -157,16 +201,22 @@ func (r *ExecuteWatch) HttpRequest(ctx context.Context) (*http.Request, error) {
 	}
 
 	if ctx != nil {
-		req, err = http.NewRequestWithContext(ctx, method, r.path.String(), r.buf)
+		req, err = http.NewRequestWithContext(ctx, method, r.path.String(), r.raw)
 	} else {
-		req, err = http.NewRequest(method, r.path.String(), r.buf)
+		req, err = http.NewRequest(method, r.path.String(), r.raw)
 	}
 
-	if r.buf.Len() > 0 {
-		req.Header.Set("content-type", "application/vnd.elasticsearch+json;compatible-with=8")
+	req.Header = r.headers.Clone()
+
+	if req.Header.Get("Content-Type") == "" {
+		if r.raw != nil {
+			req.Header.Set("Content-Type", "application/vnd.elasticsearch+json;compatible-with=8")
+		}
 	}
 
-	req.Header.Set("accept", "application/vnd.elasticsearch+json;compatible-with=8")
+	if req.Header.Get("Accept") == "" {
+		req.Header.Set("Accept", "application/vnd.elasticsearch+json;compatible-with=8")
+	}
 
 	if err != nil {
 		return req, fmt.Errorf("could not build http.Request: %w", err)
@@ -175,19 +225,100 @@ func (r *ExecuteWatch) HttpRequest(ctx context.Context) (*http.Request, error) {
 	return req, nil
 }
 
-// Do runs the http.Request through the provided transport.
-func (r ExecuteWatch) Do(ctx context.Context) (*http.Response, error) {
+// Perform runs the http.Request through the provided transport and returns an http.Response.
+func (r ExecuteWatch) Perform(providedCtx context.Context) (*http.Response, error) {
+	var ctx context.Context
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		if r.spanStarted == false {
+			ctx := instrument.Start(providedCtx, "watcher.execute_watch")
+			defer instrument.Close(ctx)
+		}
+	}
+	if ctx == nil {
+		ctx = providedCtx
+	}
+
 	req, err := r.HttpRequest(ctx)
 	if err != nil {
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
 		return nil, err
 	}
 
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		instrument.BeforeRequest(req, "watcher.execute_watch")
+		if reader := instrument.RecordRequestBody(ctx, "watcher.execute_watch", r.raw); reader != nil {
+			req.Body = reader
+		}
+	}
 	res, err := r.transport.Perform(req)
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		instrument.AfterRequest(req, "elasticsearch", "watcher.execute_watch")
+	}
 	if err != nil {
-		return nil, fmt.Errorf("an error happened during the ExecuteWatch query execution: %w", err)
+		localErr := fmt.Errorf("an error happened during the ExecuteWatch query execution: %w", err)
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, localErr)
+		}
+		return nil, localErr
 	}
 
 	return res, nil
+}
+
+// Do runs the request through the transport, handle the response and returns a executewatch.Response
+func (r ExecuteWatch) Do(providedCtx context.Context) (*Response, error) {
+	var ctx context.Context
+	r.spanStarted = true
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		ctx = instrument.Start(providedCtx, "watcher.execute_watch")
+		defer instrument.Close(ctx)
+	}
+	if ctx == nil {
+		ctx = providedCtx
+	}
+
+	response := NewResponse()
+
+	res, err := r.Perform(ctx)
+	if err != nil {
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode < 299 {
+		err = json.NewDecoder(res.Body).Decode(response)
+		if err != nil {
+			if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+				instrument.RecordError(ctx, err)
+			}
+			return nil, err
+		}
+
+		return response, nil
+	}
+
+	errorResponse := types.NewElasticsearchError()
+	err = json.NewDecoder(res.Body).Decode(errorResponse)
+	if err != nil {
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
+		return nil, err
+	}
+
+	if errorResponse.Status == 0 {
+		errorResponse.Status = res.StatusCode
+	}
+
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		instrument.RecordError(ctx, errorResponse)
+	}
+	return nil, errorResponse
 }
 
 // Header set a key, value pair in the ExecuteWatch headers map.
@@ -199,17 +330,128 @@ func (r *ExecuteWatch) Header(key, value string) *ExecuteWatch {
 
 // Id Identifier for the watch.
 // API Name: id
-func (r *ExecuteWatch) Id(v string) *ExecuteWatch {
+func (r *ExecuteWatch) Id(id string) *ExecuteWatch {
 	r.paramSet |= idMask
-	r.id = v
+	r.id = id
 
 	return r
 }
 
 // Debug Defines whether the watch runs in debug mode.
 // API name: debug
-func (r *ExecuteWatch) Debug(b bool) *ExecuteWatch {
-	r.values.Set("debug", strconv.FormatBool(b))
+func (r *ExecuteWatch) Debug(debug bool) *ExecuteWatch {
+	r.values.Set("debug", strconv.FormatBool(debug))
+
+	return r
+}
+
+// ErrorTrace When set to `true` Elasticsearch will include the full stack trace of errors
+// when they occur.
+// API name: error_trace
+func (r *ExecuteWatch) ErrorTrace(errortrace bool) *ExecuteWatch {
+	r.values.Set("error_trace", strconv.FormatBool(errortrace))
+
+	return r
+}
+
+// FilterPath Comma-separated list of filters in dot notation which reduce the response
+// returned by Elasticsearch.
+// API name: filter_path
+func (r *ExecuteWatch) FilterPath(filterpaths ...string) *ExecuteWatch {
+	tmp := []string{}
+	for _, item := range filterpaths {
+		tmp = append(tmp, fmt.Sprintf("%v", item))
+	}
+	r.values.Set("filter_path", strings.Join(tmp, ","))
+
+	return r
+}
+
+// Human When set to `true` will return statistics in a format suitable for humans.
+// For example `"exists_time": "1h"` for humans and
+// `"eixsts_time_in_millis": 3600000` for computers. When disabled the human
+// readable values will be omitted. This makes sense for responses being
+// consumed
+// only by machines.
+// API name: human
+func (r *ExecuteWatch) Human(human bool) *ExecuteWatch {
+	r.values.Set("human", strconv.FormatBool(human))
+
+	return r
+}
+
+// Pretty If set to `true` the returned JSON will be "pretty-formatted". Only use
+// this option for debugging only.
+// API name: pretty
+func (r *ExecuteWatch) Pretty(pretty bool) *ExecuteWatch {
+	r.values.Set("pretty", strconv.FormatBool(pretty))
+
+	return r
+}
+
+// ActionModes Determines how to handle the watch actions as part of the watch execution.
+// API name: action_modes
+func (r *ExecuteWatch) ActionModes(actionmodes map[string]actionexecutionmode.ActionExecutionMode) *ExecuteWatch {
+
+	r.req.ActionModes = actionmodes
+
+	return r
+}
+
+// AlternativeInput When present, the watch uses this object as a payload instead of executing
+// its own input.
+// API name: alternative_input
+func (r *ExecuteWatch) AlternativeInput(alternativeinput map[string]json.RawMessage) *ExecuteWatch {
+
+	r.req.AlternativeInput = alternativeinput
+
+	return r
+}
+
+// IgnoreCondition When set to `true`, the watch execution uses the always condition. This can
+// also be specified as an HTTP parameter.
+// API name: ignore_condition
+func (r *ExecuteWatch) IgnoreCondition(ignorecondition bool) *ExecuteWatch {
+	r.req.IgnoreCondition = &ignorecondition
+
+	return r
+}
+
+// RecordExecution When set to `true`, the watch record representing the watch execution result
+// is persisted to the `.watcher-history` index for the current time. In
+// addition, the status of the watch is updated, possibly throttling subsequent
+// executions. This can also be specified as an HTTP parameter.
+// API name: record_execution
+func (r *ExecuteWatch) RecordExecution(recordexecution bool) *ExecuteWatch {
+	r.req.RecordExecution = &recordexecution
+
+	return r
+}
+
+// API name: simulated_actions
+func (r *ExecuteWatch) SimulatedActions(simulatedactions *types.SimulatedActions) *ExecuteWatch {
+
+	r.req.SimulatedActions = simulatedactions
+
+	return r
+}
+
+// TriggerData This structure is parsed as the data of the trigger event that will be used
+// during the watch execution
+// API name: trigger_data
+func (r *ExecuteWatch) TriggerData(triggerdata *types.ScheduleTriggerEvent) *ExecuteWatch {
+
+	r.req.TriggerData = triggerdata
+
+	return r
+}
+
+// Watch When present, this watch is used instead of the one specified in the request.
+// This watch is not persisted to the index and record_execution cannot be set.
+// API name: watch
+func (r *ExecuteWatch) Watch(watch *types.Watch) *ExecuteWatch {
+
+	r.req.Watch = watch
 
 	return r
 }

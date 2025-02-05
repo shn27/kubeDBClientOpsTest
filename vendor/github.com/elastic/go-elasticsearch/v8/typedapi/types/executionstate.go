@@ -15,53 +15,83 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ExecutionState type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Action.ts#L117-L121
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Action.ts#L114-L118
 type ExecutionState struct {
 	Reason     *string  `json:"reason,omitempty"`
 	Successful bool     `json:"successful"`
 	Timestamp  DateTime `json:"timestamp"`
 }
 
-// ExecutionStateBuilder holds ExecutionState struct and provides a builder API.
-type ExecutionStateBuilder struct {
-	v *ExecutionState
-}
+func (s *ExecutionState) UnmarshalJSON(data []byte) error {
 
-// NewExecutionState provides a builder for the ExecutionState struct.
-func NewExecutionStateBuilder() *ExecutionStateBuilder {
-	r := ExecutionStateBuilder{
-		&ExecutionState{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "reason":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Reason", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Reason = &o
+
+		case "successful":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Successful", err)
+				}
+				s.Successful = value
+			case bool:
+				s.Successful = v
+			}
+
+		case "timestamp":
+			if err := dec.Decode(&s.Timestamp); err != nil {
+				return fmt.Errorf("%s | %w", "Timestamp", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ExecutionState struct
-func (rb *ExecutionStateBuilder) Build() ExecutionState {
-	return *rb.v
-}
+// NewExecutionState returns a ExecutionState.
+func NewExecutionState() *ExecutionState {
+	r := &ExecutionState{}
 
-func (rb *ExecutionStateBuilder) Reason(reason string) *ExecutionStateBuilder {
-	rb.v.Reason = &reason
-	return rb
-}
-
-func (rb *ExecutionStateBuilder) Successful(successful bool) *ExecutionStateBuilder {
-	rb.v.Successful = successful
-	return rb
-}
-
-func (rb *ExecutionStateBuilder) Timestamp(timestamp *DateTimeBuilder) *ExecutionStateBuilder {
-	v := timestamp.Build()
-	rb.v.Timestamp = v
-	return rb
+	return r
 }

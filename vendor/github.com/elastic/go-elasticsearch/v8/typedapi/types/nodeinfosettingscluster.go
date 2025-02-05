@@ -15,67 +15,78 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // NodeInfoSettingsCluster type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/info/types.ts#L131-L138
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/info/types.ts#L132-L142
 type NodeInfoSettingsCluster struct {
 	DeprecationIndexing *DeprecationIndexing            `json:"deprecation_indexing,omitempty"`
 	Election            NodeInfoSettingsClusterElection `json:"election"`
-	InitialMasterNodes  *string                         `json:"initial_master_nodes,omitempty"`
-	Name                Name                            `json:"name"`
+	InitialMasterNodes  []string                        `json:"initial_master_nodes,omitempty"`
+	Name                string                          `json:"name"`
 	Routing             *IndexRouting                   `json:"routing,omitempty"`
 }
 
-// NodeInfoSettingsClusterBuilder holds NodeInfoSettingsCluster struct and provides a builder API.
-type NodeInfoSettingsClusterBuilder struct {
-	v *NodeInfoSettingsCluster
-}
+func (s *NodeInfoSettingsCluster) UnmarshalJSON(data []byte) error {
 
-// NewNodeInfoSettingsCluster provides a builder for the NodeInfoSettingsCluster struct.
-func NewNodeInfoSettingsClusterBuilder() *NodeInfoSettingsClusterBuilder {
-	r := NodeInfoSettingsClusterBuilder{
-		&NodeInfoSettingsCluster{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "deprecation_indexing":
+			if err := dec.Decode(&s.DeprecationIndexing); err != nil {
+				return fmt.Errorf("%s | %w", "DeprecationIndexing", err)
+			}
+
+		case "election":
+			if err := dec.Decode(&s.Election); err != nil {
+				return fmt.Errorf("%s | %w", "Election", err)
+			}
+
+		case "initial_master_nodes":
+			if err := dec.Decode(&s.InitialMasterNodes); err != nil {
+				return fmt.Errorf("%s | %w", "InitialMasterNodes", err)
+			}
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		case "routing":
+			if err := dec.Decode(&s.Routing); err != nil {
+				return fmt.Errorf("%s | %w", "Routing", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the NodeInfoSettingsCluster struct
-func (rb *NodeInfoSettingsClusterBuilder) Build() NodeInfoSettingsCluster {
-	return *rb.v
-}
+// NewNodeInfoSettingsCluster returns a NodeInfoSettingsCluster.
+func NewNodeInfoSettingsCluster() *NodeInfoSettingsCluster {
+	r := &NodeInfoSettingsCluster{}
 
-func (rb *NodeInfoSettingsClusterBuilder) DeprecationIndexing(deprecationindexing *DeprecationIndexingBuilder) *NodeInfoSettingsClusterBuilder {
-	v := deprecationindexing.Build()
-	rb.v.DeprecationIndexing = &v
-	return rb
-}
-
-func (rb *NodeInfoSettingsClusterBuilder) Election(election *NodeInfoSettingsClusterElectionBuilder) *NodeInfoSettingsClusterBuilder {
-	v := election.Build()
-	rb.v.Election = v
-	return rb
-}
-
-func (rb *NodeInfoSettingsClusterBuilder) InitialMasterNodes(initialmasternodes string) *NodeInfoSettingsClusterBuilder {
-	rb.v.InitialMasterNodes = &initialmasternodes
-	return rb
-}
-
-func (rb *NodeInfoSettingsClusterBuilder) Name(name Name) *NodeInfoSettingsClusterBuilder {
-	rb.v.Name = name
-	return rb
-}
-
-func (rb *NodeInfoSettingsClusterBuilder) Routing(routing *IndexRoutingBuilder) *NodeInfoSettingsClusterBuilder {
-	v := routing.Build()
-	rb.v.Routing = &v
-	return rb
+	return r
 }

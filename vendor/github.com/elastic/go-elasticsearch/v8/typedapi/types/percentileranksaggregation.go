@@ -15,86 +15,124 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // PercentileRanksAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/metric.ts#L105-L110
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/metric.ts#L180-L202
 type PercentileRanksAggregation struct {
-	Field   *Field     `json:"field,omitempty"`
-	Format  *string    `json:"format,omitempty"`
-	Hdr     *HdrMethod `json:"hdr,omitempty"`
-	Keyed   *bool      `json:"keyed,omitempty"`
-	Missing *Missing   `json:"missing,omitempty"`
-	Script  *Script    `json:"script,omitempty"`
-	Tdigest *TDigest   `json:"tdigest,omitempty"`
-	Values  []float64  `json:"values,omitempty"`
+	// Field The field on which to run the aggregation.
+	Field  *string `json:"field,omitempty"`
+	Format *string `json:"format,omitempty"`
+	// Hdr Uses the alternative High Dynamic Range Histogram algorithm to calculate
+	// percentile ranks.
+	Hdr *HdrMethod `json:"hdr,omitempty"`
+	// Keyed By default, the aggregation associates a unique string key with each bucket
+	// and returns the ranges as a hash rather than an array.
+	// Set to `false` to disable this behavior.
+	Keyed *bool `json:"keyed,omitempty"`
+	// Missing The value to apply to documents that do not have a value.
+	// By default, documents without a value are ignored.
+	Missing Missing `json:"missing,omitempty"`
+	Script  *Script `json:"script,omitempty"`
+	// Tdigest Sets parameters for the default TDigest algorithm used to calculate
+	// percentile ranks.
+	Tdigest *TDigest `json:"tdigest,omitempty"`
+	// Values An array of values for which to calculate the percentile ranks.
+	Values *[]Float64 `json:"values,omitempty"`
 }
 
-// PercentileRanksAggregationBuilder holds PercentileRanksAggregation struct and provides a builder API.
-type PercentileRanksAggregationBuilder struct {
-	v *PercentileRanksAggregation
-}
+func (s *PercentileRanksAggregation) UnmarshalJSON(data []byte) error {
 
-// NewPercentileRanksAggregation provides a builder for the PercentileRanksAggregation struct.
-func NewPercentileRanksAggregationBuilder() *PercentileRanksAggregationBuilder {
-	r := PercentileRanksAggregationBuilder{
-		&PercentileRanksAggregation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "format":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Format", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Format = &o
+
+		case "hdr":
+			if err := dec.Decode(&s.Hdr); err != nil {
+				return fmt.Errorf("%s | %w", "Hdr", err)
+			}
+
+		case "keyed":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Keyed", err)
+				}
+				s.Keyed = &value
+			case bool:
+				s.Keyed = &v
+			}
+
+		case "missing":
+			if err := dec.Decode(&s.Missing); err != nil {
+				return fmt.Errorf("%s | %w", "Missing", err)
+			}
+
+		case "script":
+			if err := dec.Decode(&s.Script); err != nil {
+				return fmt.Errorf("%s | %w", "Script", err)
+			}
+
+		case "tdigest":
+			if err := dec.Decode(&s.Tdigest); err != nil {
+				return fmt.Errorf("%s | %w", "Tdigest", err)
+			}
+
+		case "values":
+			if err := dec.Decode(&s.Values); err != nil {
+				return fmt.Errorf("%s | %w", "Values", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the PercentileRanksAggregation struct
-func (rb *PercentileRanksAggregationBuilder) Build() PercentileRanksAggregation {
-	return *rb.v
-}
+// NewPercentileRanksAggregation returns a PercentileRanksAggregation.
+func NewPercentileRanksAggregation() *PercentileRanksAggregation {
+	r := &PercentileRanksAggregation{}
 
-func (rb *PercentileRanksAggregationBuilder) Field(field Field) *PercentileRanksAggregationBuilder {
-	rb.v.Field = &field
-	return rb
-}
-
-func (rb *PercentileRanksAggregationBuilder) Format(format string) *PercentileRanksAggregationBuilder {
-	rb.v.Format = &format
-	return rb
-}
-
-func (rb *PercentileRanksAggregationBuilder) Hdr(hdr *HdrMethodBuilder) *PercentileRanksAggregationBuilder {
-	v := hdr.Build()
-	rb.v.Hdr = &v
-	return rb
-}
-
-func (rb *PercentileRanksAggregationBuilder) Keyed(keyed bool) *PercentileRanksAggregationBuilder {
-	rb.v.Keyed = &keyed
-	return rb
-}
-
-func (rb *PercentileRanksAggregationBuilder) Missing(missing *MissingBuilder) *PercentileRanksAggregationBuilder {
-	v := missing.Build()
-	rb.v.Missing = &v
-	return rb
-}
-
-func (rb *PercentileRanksAggregationBuilder) Script(script *ScriptBuilder) *PercentileRanksAggregationBuilder {
-	v := script.Build()
-	rb.v.Script = &v
-	return rb
-}
-
-func (rb *PercentileRanksAggregationBuilder) Tdigest(tdigest *TDigestBuilder) *PercentileRanksAggregationBuilder {
-	v := tdigest.Build()
-	rb.v.Tdigest = &v
-	return rb
-}
-
-func (rb *PercentileRanksAggregationBuilder) Values(values []float64) *PercentileRanksAggregationBuilder {
-	rb.v.Values = values
-	return rb
+	return r
 }

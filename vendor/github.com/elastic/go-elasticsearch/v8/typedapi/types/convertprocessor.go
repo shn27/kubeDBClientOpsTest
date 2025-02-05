@@ -15,90 +15,157 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/converttype"
 )
 
 // ConvertProcessor type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ingest/_types/Processors.ts#L146-L151
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ingest/_types/Processors.ts#L672-L692
 type ConvertProcessor struct {
-	Field         Field                   `json:"field"`
-	If            *string                 `json:"if,omitempty"`
-	IgnoreFailure *bool                   `json:"ignore_failure,omitempty"`
-	IgnoreMissing *bool                   `json:"ignore_missing,omitempty"`
-	OnFailure     []ProcessorContainer    `json:"on_failure,omitempty"`
-	Tag           *string                 `json:"tag,omitempty"`
-	TargetField   Field                   `json:"target_field"`
-	Type          converttype.ConvertType `json:"type"`
+	// Description Description of the processor.
+	// Useful for describing the purpose of the processor or its configuration.
+	Description *string `json:"description,omitempty"`
+	// Field The field whose value is to be converted.
+	Field string `json:"field"`
+	// If Conditionally execute the processor.
+	If *string `json:"if,omitempty"`
+	// IgnoreFailure Ignore failures for the processor.
+	IgnoreFailure *bool `json:"ignore_failure,omitempty"`
+	// IgnoreMissing If `true` and `field` does not exist or is `null`, the processor quietly
+	// exits without modifying the document.
+	IgnoreMissing *bool `json:"ignore_missing,omitempty"`
+	// OnFailure Handle failures for the processor.
+	OnFailure []ProcessorContainer `json:"on_failure,omitempty"`
+	// Tag Identifier for the processor.
+	// Useful for debugging and metrics.
+	Tag *string `json:"tag,omitempty"`
+	// TargetField The field to assign the converted value to.
+	// By default, the `field` is updated in-place.
+	TargetField *string `json:"target_field,omitempty"`
+	// Type The type to convert the existing value to.
+	Type converttype.ConvertType `json:"type"`
 }
 
-// ConvertProcessorBuilder holds ConvertProcessor struct and provides a builder API.
-type ConvertProcessorBuilder struct {
-	v *ConvertProcessor
-}
+func (s *ConvertProcessor) UnmarshalJSON(data []byte) error {
 
-// NewConvertProcessor provides a builder for the ConvertProcessor struct.
-func NewConvertProcessorBuilder() *ConvertProcessorBuilder {
-	r := ConvertProcessorBuilder{
-		&ConvertProcessor{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "description":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Description", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Description = &o
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "if":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "If", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.If = &o
+
+		case "ignore_failure":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IgnoreFailure", err)
+				}
+				s.IgnoreFailure = &value
+			case bool:
+				s.IgnoreFailure = &v
+			}
+
+		case "ignore_missing":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IgnoreMissing", err)
+				}
+				s.IgnoreMissing = &value
+			case bool:
+				s.IgnoreMissing = &v
+			}
+
+		case "on_failure":
+			if err := dec.Decode(&s.OnFailure); err != nil {
+				return fmt.Errorf("%s | %w", "OnFailure", err)
+			}
+
+		case "tag":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Tag", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Tag = &o
+
+		case "target_field":
+			if err := dec.Decode(&s.TargetField); err != nil {
+				return fmt.Errorf("%s | %w", "TargetField", err)
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ConvertProcessor struct
-func (rb *ConvertProcessorBuilder) Build() ConvertProcessor {
-	return *rb.v
-}
+// NewConvertProcessor returns a ConvertProcessor.
+func NewConvertProcessor() *ConvertProcessor {
+	r := &ConvertProcessor{}
 
-func (rb *ConvertProcessorBuilder) Field(field Field) *ConvertProcessorBuilder {
-	rb.v.Field = field
-	return rb
-}
-
-func (rb *ConvertProcessorBuilder) If_(if_ string) *ConvertProcessorBuilder {
-	rb.v.If = &if_
-	return rb
-}
-
-func (rb *ConvertProcessorBuilder) IgnoreFailure(ignorefailure bool) *ConvertProcessorBuilder {
-	rb.v.IgnoreFailure = &ignorefailure
-	return rb
-}
-
-func (rb *ConvertProcessorBuilder) IgnoreMissing(ignoremissing bool) *ConvertProcessorBuilder {
-	rb.v.IgnoreMissing = &ignoremissing
-	return rb
-}
-
-func (rb *ConvertProcessorBuilder) OnFailure(on_failure []ProcessorContainerBuilder) *ConvertProcessorBuilder {
-	tmp := make([]ProcessorContainer, len(on_failure))
-	for _, value := range on_failure {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.OnFailure = tmp
-	return rb
-}
-
-func (rb *ConvertProcessorBuilder) Tag(tag string) *ConvertProcessorBuilder {
-	rb.v.Tag = &tag
-	return rb
-}
-
-func (rb *ConvertProcessorBuilder) TargetField(targetfield Field) *ConvertProcessorBuilder {
-	rb.v.TargetField = targetfield
-	return rb
-}
-
-func (rb *ConvertProcessorBuilder) Type_(type_ converttype.ConvertType) *ConvertProcessorBuilder {
-	rb.v.Type = type_
-	return rb
+	return r
 }

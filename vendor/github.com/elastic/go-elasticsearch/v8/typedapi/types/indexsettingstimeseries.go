@@ -15,48 +15,60 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // IndexSettingsTimeSeries type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/IndexSettings.ts#L318-L321
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/IndexSettings.ts#L327-L330
 type IndexSettingsTimeSeries struct {
-	EndTime   *DateTime `json:"end_time,omitempty"`
-	StartTime *DateTime `json:"start_time,omitempty"`
+	EndTime   DateTime `json:"end_time,omitempty"`
+	StartTime DateTime `json:"start_time,omitempty"`
 }
 
-// IndexSettingsTimeSeriesBuilder holds IndexSettingsTimeSeries struct and provides a builder API.
-type IndexSettingsTimeSeriesBuilder struct {
-	v *IndexSettingsTimeSeries
-}
+func (s *IndexSettingsTimeSeries) UnmarshalJSON(data []byte) error {
 
-// NewIndexSettingsTimeSeries provides a builder for the IndexSettingsTimeSeries struct.
-func NewIndexSettingsTimeSeriesBuilder() *IndexSettingsTimeSeriesBuilder {
-	r := IndexSettingsTimeSeriesBuilder{
-		&IndexSettingsTimeSeries{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "end_time":
+			if err := dec.Decode(&s.EndTime); err != nil {
+				return fmt.Errorf("%s | %w", "EndTime", err)
+			}
+
+		case "start_time":
+			if err := dec.Decode(&s.StartTime); err != nil {
+				return fmt.Errorf("%s | %w", "StartTime", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the IndexSettingsTimeSeries struct
-func (rb *IndexSettingsTimeSeriesBuilder) Build() IndexSettingsTimeSeries {
-	return *rb.v
-}
+// NewIndexSettingsTimeSeries returns a IndexSettingsTimeSeries.
+func NewIndexSettingsTimeSeries() *IndexSettingsTimeSeries {
+	r := &IndexSettingsTimeSeries{}
 
-func (rb *IndexSettingsTimeSeriesBuilder) EndTime(endtime *DateTimeBuilder) *IndexSettingsTimeSeriesBuilder {
-	v := endtime.Build()
-	rb.v.EndTime = &v
-	return rb
-}
-
-func (rb *IndexSettingsTimeSeriesBuilder) StartTime(starttime *DateTimeBuilder) *IndexSettingsTimeSeriesBuilder {
-	v := starttime.Build()
-	rb.v.StartTime = &v
-	return rb
+	return r
 }

@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // PhraseSuggest type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/suggester.ts#L57-L62
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/suggester.ts#L57-L62
 type PhraseSuggest struct {
 	Length  int                   `json:"length"`
 	Offset  int                   `json:"offset"`
@@ -32,41 +39,89 @@ type PhraseSuggest struct {
 	Text    string                `json:"text"`
 }
 
-// PhraseSuggestBuilder holds PhraseSuggest struct and provides a builder API.
-type PhraseSuggestBuilder struct {
-	v *PhraseSuggest
-}
+func (s *PhraseSuggest) UnmarshalJSON(data []byte) error {
 
-// NewPhraseSuggest provides a builder for the PhraseSuggest struct.
-func NewPhraseSuggestBuilder() *PhraseSuggestBuilder {
-	r := PhraseSuggestBuilder{
-		&PhraseSuggest{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "length":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Length", err)
+				}
+				s.Length = value
+			case float64:
+				f := int(v)
+				s.Length = f
+			}
+
+		case "offset":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Offset", err)
+				}
+				s.Offset = value
+			case float64:
+				f := int(v)
+				s.Offset = f
+			}
+
+		case "options":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := NewPhraseSuggestOption()
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Options", err)
+				}
+
+				s.Options = append(s.Options, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Options); err != nil {
+					return fmt.Errorf("%s | %w", "Options", err)
+				}
+			}
+
+		case "text":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Text", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Text = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the PhraseSuggest struct
-func (rb *PhraseSuggestBuilder) Build() PhraseSuggest {
-	return *rb.v
-}
+// NewPhraseSuggest returns a PhraseSuggest.
+func NewPhraseSuggest() *PhraseSuggest {
+	r := &PhraseSuggest{}
 
-func (rb *PhraseSuggestBuilder) Length(length int) *PhraseSuggestBuilder {
-	rb.v.Length = length
-	return rb
-}
-
-func (rb *PhraseSuggestBuilder) Offset(offset int) *PhraseSuggestBuilder {
-	rb.v.Offset = offset
-	return rb
-}
-
-func (rb *PhraseSuggestBuilder) Options(arg []PhraseSuggestOption) *PhraseSuggestBuilder {
-	rb.v.Options = arg
-	return rb
-}
-
-func (rb *PhraseSuggestBuilder) Text(text string) *PhraseSuggestBuilder {
-	rb.v.Text = text
-	return rb
+	return r
 }

@@ -15,40 +15,62 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // NodeInfoIngestDownloader type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/info/types.ts#L127-L129
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/info/types.ts#L128-L130
 type NodeInfoIngestDownloader struct {
 	Enabled string `json:"enabled"`
 }
 
-// NodeInfoIngestDownloaderBuilder holds NodeInfoIngestDownloader struct and provides a builder API.
-type NodeInfoIngestDownloaderBuilder struct {
-	v *NodeInfoIngestDownloader
-}
+func (s *NodeInfoIngestDownloader) UnmarshalJSON(data []byte) error {
 
-// NewNodeInfoIngestDownloader provides a builder for the NodeInfoIngestDownloader struct.
-func NewNodeInfoIngestDownloaderBuilder() *NodeInfoIngestDownloaderBuilder {
-	r := NodeInfoIngestDownloaderBuilder{
-		&NodeInfoIngestDownloader{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "enabled":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Enabled", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Enabled = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the NodeInfoIngestDownloader struct
-func (rb *NodeInfoIngestDownloaderBuilder) Build() NodeInfoIngestDownloader {
-	return *rb.v
-}
+// NewNodeInfoIngestDownloader returns a NodeInfoIngestDownloader.
+func NewNodeInfoIngestDownloader() *NodeInfoIngestDownloader {
+	r := &NodeInfoIngestDownloader{}
 
-func (rb *NodeInfoIngestDownloaderBuilder) Enabled(enabled string) *NodeInfoIngestDownloaderBuilder {
-	rb.v.Enabled = enabled
-	return rb
+	return r
 }

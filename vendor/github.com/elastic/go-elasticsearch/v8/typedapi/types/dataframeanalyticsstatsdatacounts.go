@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DataframeAnalyticsStatsDataCounts type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/DataframeAnalytics.ts#L361-L368
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/DataframeAnalytics.ts#L365-L372
 type DataframeAnalyticsStatsDataCounts struct {
 	// SkippedDocsCount The number of documents that are skipped during the analysis because they
 	// contained values that are not supported by the analysis. For example, outlier
@@ -39,47 +46,77 @@ type DataframeAnalyticsStatsDataCounts struct {
 	TrainingDocsCount int `json:"training_docs_count"`
 }
 
-// DataframeAnalyticsStatsDataCountsBuilder holds DataframeAnalyticsStatsDataCounts struct and provides a builder API.
-type DataframeAnalyticsStatsDataCountsBuilder struct {
-	v *DataframeAnalyticsStatsDataCounts
-}
+func (s *DataframeAnalyticsStatsDataCounts) UnmarshalJSON(data []byte) error {
 
-// NewDataframeAnalyticsStatsDataCounts provides a builder for the DataframeAnalyticsStatsDataCounts struct.
-func NewDataframeAnalyticsStatsDataCountsBuilder() *DataframeAnalyticsStatsDataCountsBuilder {
-	r := DataframeAnalyticsStatsDataCountsBuilder{
-		&DataframeAnalyticsStatsDataCounts{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "skipped_docs_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "SkippedDocsCount", err)
+				}
+				s.SkippedDocsCount = value
+			case float64:
+				f := int(v)
+				s.SkippedDocsCount = f
+			}
+
+		case "test_docs_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TestDocsCount", err)
+				}
+				s.TestDocsCount = value
+			case float64:
+				f := int(v)
+				s.TestDocsCount = f
+			}
+
+		case "training_docs_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TrainingDocsCount", err)
+				}
+				s.TrainingDocsCount = value
+			case float64:
+				f := int(v)
+				s.TrainingDocsCount = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DataframeAnalyticsStatsDataCounts struct
-func (rb *DataframeAnalyticsStatsDataCountsBuilder) Build() DataframeAnalyticsStatsDataCounts {
-	return *rb.v
-}
+// NewDataframeAnalyticsStatsDataCounts returns a DataframeAnalyticsStatsDataCounts.
+func NewDataframeAnalyticsStatsDataCounts() *DataframeAnalyticsStatsDataCounts {
+	r := &DataframeAnalyticsStatsDataCounts{}
 
-// SkippedDocsCount The number of documents that are skipped during the analysis because they
-// contained values that are not supported by the analysis. For example, outlier
-// detection does not support missing fields so it skips documents with missing
-// fields. Likewise, all types of analysis skip documents that contain arrays
-// with more than one element.
-
-func (rb *DataframeAnalyticsStatsDataCountsBuilder) SkippedDocsCount(skippeddocscount int) *DataframeAnalyticsStatsDataCountsBuilder {
-	rb.v.SkippedDocsCount = skippeddocscount
-	return rb
-}
-
-// TestDocsCount The number of documents that are not used for training the model and can be
-// used for testing.
-
-func (rb *DataframeAnalyticsStatsDataCountsBuilder) TestDocsCount(testdocscount int) *DataframeAnalyticsStatsDataCountsBuilder {
-	rb.v.TestDocsCount = testdocscount
-	return rb
-}
-
-// TrainingDocsCount The number of documents that are used for training the model.
-
-func (rb *DataframeAnalyticsStatsDataCountsBuilder) TrainingDocsCount(trainingdocscount int) *DataframeAnalyticsStatsDataCountsBuilder {
-	rb.v.TrainingDocsCount = trainingdocscount
-	return rb
+	return r
 }

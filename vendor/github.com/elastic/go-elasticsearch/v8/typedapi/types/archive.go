@@ -15,52 +15,95 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // Archive type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/usage/types.ts#L43-L45
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/xpack/usage/types.ts#L46-L48
 type Archive struct {
 	Available    bool  `json:"available"`
 	Enabled      bool  `json:"enabled"`
 	IndicesCount int64 `json:"indices_count"`
 }
 
-// ArchiveBuilder holds Archive struct and provides a builder API.
-type ArchiveBuilder struct {
-	v *Archive
-}
+func (s *Archive) UnmarshalJSON(data []byte) error {
 
-// NewArchive provides a builder for the Archive struct.
-func NewArchiveBuilder() *ArchiveBuilder {
-	r := ArchiveBuilder{
-		&Archive{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "available":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Available", err)
+				}
+				s.Available = value
+			case bool:
+				s.Available = v
+			}
+
+		case "enabled":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Enabled", err)
+				}
+				s.Enabled = value
+			case bool:
+				s.Enabled = v
+			}
+
+		case "indices_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IndicesCount", err)
+				}
+				s.IndicesCount = value
+			case float64:
+				f := int64(v)
+				s.IndicesCount = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the Archive struct
-func (rb *ArchiveBuilder) Build() Archive {
-	return *rb.v
-}
+// NewArchive returns a Archive.
+func NewArchive() *Archive {
+	r := &Archive{}
 
-func (rb *ArchiveBuilder) Available(available bool) *ArchiveBuilder {
-	rb.v.Available = available
-	return rb
-}
-
-func (rb *ArchiveBuilder) Enabled(enabled bool) *ArchiveBuilder {
-	rb.v.Enabled = enabled
-	return rb
-}
-
-func (rb *ArchiveBuilder) IndicesCount(indicescount int64) *ArchiveBuilder {
-	rb.v.IndicesCount = indicescount
-	return rb
+	return r
 }

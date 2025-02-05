@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package rendersearchtemplate
 
@@ -29,32 +27,31 @@ import (
 
 // Request holds the request body struct for the package rendersearchtemplate
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/render_search_template/RenderSearchTemplateRequest.ts#L25-L39
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/render_search_template/RenderSearchTemplateRequest.ts#L25-L58
 type Request struct {
 	File *string `json:"file,omitempty"`
-
-	Params map[string]interface{} `json:"params,omitempty"`
-
+	// Params Key-value pairs used to replace Mustache variables in the template.
+	// The key is the variable name.
+	// The value is the variable value.
+	Params map[string]json.RawMessage `json:"params,omitempty"`
+	// Source An inline search template.
+	// Supports the same parameters as the search API's request body.
+	// These parameters also support Mustache variables.
+	// If no `id` or `<templated-id>` is specified, this parameter is required.
 	Source *string `json:"source,omitempty"`
 }
 
-// RequestBuilder is the builder API for the rendersearchtemplate.Request
-type RequestBuilder struct {
-	v *Request
-}
-
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{
-			Params: make(map[string]interface{}, 0),
-		},
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{
+		Params: make(map[string]json.RawMessage, 0),
 	}
-	return &r
+
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -63,24 +60,4 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	}
 
 	return &req, nil
-}
-
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
-
-func (rb *RequestBuilder) File(file string) *RequestBuilder {
-	rb.v.File = &file
-	return rb
-}
-
-func (rb *RequestBuilder) Params(value map[string]interface{}) *RequestBuilder {
-	rb.v.Params = value
-	return rb
-}
-
-func (rb *RequestBuilder) Source(source string) *RequestBuilder {
-	rb.v.Source = &source
-	return rb
 }

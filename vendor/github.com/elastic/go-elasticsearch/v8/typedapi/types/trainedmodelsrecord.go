@@ -15,197 +15,274 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // TrainedModelsRecord type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cat/ml_trained_models/types.ts#L23-L111
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cat/ml_trained_models/types.ts#L23-L115
 type TrainedModelsRecord struct {
-	// CreateTime The time the model was created
-	CreateTime *DateTime `json:"create_time,omitempty"`
-	// CreatedBy who created the model
+	// CreateTime The time the model was created.
+	CreateTime DateTime `json:"create_time,omitempty"`
+	// CreatedBy Information about the creator of the model.
 	CreatedBy *string `json:"created_by,omitempty"`
-	// DataFrameAnalysis The analysis used by the data frame to build the model
+	// DataFrameAnalysis The analysis used by the data frame to build the model.
 	DataFrameAnalysis *string `json:"data_frame.analysis,omitempty"`
-	// DataFrameCreateTime The time the data frame analytics config was created
+	// DataFrameCreateTime The time the data frame analytics job was created.
 	DataFrameCreateTime *string `json:"data_frame.create_time,omitempty"`
-	// DataFrameId The data frame analytics config id that created the model (if still
-	// available)
+	// DataFrameId The identifier for the data frame analytics job that created the model.
+	// Only displayed if the job is still available.
 	DataFrameId *string `json:"data_frame.id,omitempty"`
-	// DataFrameSourceIndex The source index used to train in the data frame analysis
+	// DataFrameSourceIndex The source index used to train in the data frame analysis.
 	DataFrameSourceIndex *string `json:"data_frame.source_index,omitempty"`
-	// Description The model description
+	// Description A description of the model.
 	Description *string `json:"description,omitempty"`
-	// HeapSize the estimated heap size to keep the model in memory
-	HeapSize *ByteSize `json:"heap_size,omitempty"`
-	// Id the trained model id
-	Id *Id `json:"id,omitempty"`
-	// IngestCount The total number of docs processed by the model
+	// HeapSize The estimated heap size to keep the model in memory.
+	HeapSize ByteSize `json:"heap_size,omitempty"`
+	// Id The model identifier.
+	Id *string `json:"id,omitempty"`
+	// IngestCount The total number of documents that are processed by the model.
 	IngestCount *string `json:"ingest.count,omitempty"`
-	// IngestCurrent The total documents currently being handled by the model
+	// IngestCurrent The total number of documents that are currently being handled by the model.
 	IngestCurrent *string `json:"ingest.current,omitempty"`
-	// IngestFailed The total count of failed ingest attempts with this model
+	// IngestFailed The total number of failed ingest attempts with the model.
 	IngestFailed *string `json:"ingest.failed,omitempty"`
-	// IngestPipelines The number of pipelines referencing the model
+	// IngestPipelines The number of pipelines that are referencing the model.
 	IngestPipelines *string `json:"ingest.pipelines,omitempty"`
-	// IngestTime The total time spent processing docs with this model
+	// IngestTime The total time spent processing documents with thie model.
 	IngestTime *string `json:"ingest.time,omitempty"`
-	// License The license level of the model
+	// License The license level of the model.
 	License *string `json:"license,omitempty"`
-	// Operations the estimated number of operations to use the model
+	// Operations The estimated number of operations to use the model.
+	// This number helps to measure the computational complexity of the model.
 	Operations *string `json:"operations,omitempty"`
 	Type       *string `json:"type,omitempty"`
-	// Version The version of Elasticsearch when the model was created
-	Version *VersionString `json:"version,omitempty"`
+	// Version The version of Elasticsearch when the model was created.
+	Version *string `json:"version,omitempty"`
 }
 
-// TrainedModelsRecordBuilder holds TrainedModelsRecord struct and provides a builder API.
-type TrainedModelsRecordBuilder struct {
-	v *TrainedModelsRecord
-}
+func (s *TrainedModelsRecord) UnmarshalJSON(data []byte) error {
 
-// NewTrainedModelsRecord provides a builder for the TrainedModelsRecord struct.
-func NewTrainedModelsRecordBuilder() *TrainedModelsRecordBuilder {
-	r := TrainedModelsRecordBuilder{
-		&TrainedModelsRecord{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "create_time", "ct":
+			if err := dec.Decode(&s.CreateTime); err != nil {
+				return fmt.Errorf("%s | %w", "CreateTime", err)
+			}
+
+		case "created_by", "c", "createdBy":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "CreatedBy", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.CreatedBy = &o
+
+		case "data_frame.analysis", "dfa", "dataFrameAnalyticsAnalysis":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "DataFrameAnalysis", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.DataFrameAnalysis = &o
+
+		case "data_frame.create_time", "dft", "dataFrameAnalyticsTime":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "DataFrameCreateTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.DataFrameCreateTime = &o
+
+		case "data_frame.id", "dfid", "dataFrameAnalytics":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "DataFrameId", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.DataFrameId = &o
+
+		case "data_frame.source_index", "dfsi", "dataFrameAnalyticsSrcIndex":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "DataFrameSourceIndex", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.DataFrameSourceIndex = &o
+
+		case "description", "d":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Description", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Description = &o
+
+		case "heap_size", "hs", "modelHeapSize":
+			if err := dec.Decode(&s.HeapSize); err != nil {
+				return fmt.Errorf("%s | %w", "HeapSize", err)
+			}
+
+		case "id":
+			if err := dec.Decode(&s.Id); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
+
+		case "ingest.count", "ic", "ingestCount":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "IngestCount", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.IngestCount = &o
+
+		case "ingest.current", "icurr", "ingestCurrent":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "IngestCurrent", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.IngestCurrent = &o
+
+		case "ingest.failed", "if", "ingestFailed":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "IngestFailed", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.IngestFailed = &o
+
+		case "ingest.pipelines", "ip", "ingestPipelines":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "IngestPipelines", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.IngestPipelines = &o
+
+		case "ingest.time", "it", "ingestTime":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "IngestTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.IngestTime = &o
+
+		case "license", "l":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "License", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.License = &o
+
+		case "operations", "o", "modelOperations":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Operations", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Operations = &o
+
+		case "type":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Type = &o
+
+		case "version", "v":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TrainedModelsRecord struct
-func (rb *TrainedModelsRecordBuilder) Build() TrainedModelsRecord {
-	return *rb.v
-}
+// NewTrainedModelsRecord returns a TrainedModelsRecord.
+func NewTrainedModelsRecord() *TrainedModelsRecord {
+	r := &TrainedModelsRecord{}
 
-// CreateTime The time the model was created
-
-func (rb *TrainedModelsRecordBuilder) CreateTime(createtime *DateTimeBuilder) *TrainedModelsRecordBuilder {
-	v := createtime.Build()
-	rb.v.CreateTime = &v
-	return rb
-}
-
-// CreatedBy who created the model
-
-func (rb *TrainedModelsRecordBuilder) CreatedBy(createdby string) *TrainedModelsRecordBuilder {
-	rb.v.CreatedBy = &createdby
-	return rb
-}
-
-// DataFrameAnalysis The analysis used by the data frame to build the model
-
-func (rb *TrainedModelsRecordBuilder) DataFrameAnalysis(dataframeanalysis string) *TrainedModelsRecordBuilder {
-	rb.v.DataFrameAnalysis = &dataframeanalysis
-	return rb
-}
-
-// DataFrameCreateTime The time the data frame analytics config was created
-
-func (rb *TrainedModelsRecordBuilder) DataFrameCreateTime(dataframecreatetime string) *TrainedModelsRecordBuilder {
-	rb.v.DataFrameCreateTime = &dataframecreatetime
-	return rb
-}
-
-// DataFrameId The data frame analytics config id that created the model (if still
-// available)
-
-func (rb *TrainedModelsRecordBuilder) DataFrameId(dataframeid string) *TrainedModelsRecordBuilder {
-	rb.v.DataFrameId = &dataframeid
-	return rb
-}
-
-// DataFrameSourceIndex The source index used to train in the data frame analysis
-
-func (rb *TrainedModelsRecordBuilder) DataFrameSourceIndex(dataframesourceindex string) *TrainedModelsRecordBuilder {
-	rb.v.DataFrameSourceIndex = &dataframesourceindex
-	return rb
-}
-
-// Description The model description
-
-func (rb *TrainedModelsRecordBuilder) Description(description string) *TrainedModelsRecordBuilder {
-	rb.v.Description = &description
-	return rb
-}
-
-// HeapSize the estimated heap size to keep the model in memory
-
-func (rb *TrainedModelsRecordBuilder) HeapSize(heapsize *ByteSizeBuilder) *TrainedModelsRecordBuilder {
-	v := heapsize.Build()
-	rb.v.HeapSize = &v
-	return rb
-}
-
-// Id the trained model id
-
-func (rb *TrainedModelsRecordBuilder) Id(id Id) *TrainedModelsRecordBuilder {
-	rb.v.Id = &id
-	return rb
-}
-
-// IngestCount The total number of docs processed by the model
-
-func (rb *TrainedModelsRecordBuilder) IngestCount(ingestcount string) *TrainedModelsRecordBuilder {
-	rb.v.IngestCount = &ingestcount
-	return rb
-}
-
-// IngestCurrent The total documents currently being handled by the model
-
-func (rb *TrainedModelsRecordBuilder) IngestCurrent(ingestcurrent string) *TrainedModelsRecordBuilder {
-	rb.v.IngestCurrent = &ingestcurrent
-	return rb
-}
-
-// IngestFailed The total count of failed ingest attempts with this model
-
-func (rb *TrainedModelsRecordBuilder) IngestFailed(ingestfailed string) *TrainedModelsRecordBuilder {
-	rb.v.IngestFailed = &ingestfailed
-	return rb
-}
-
-// IngestPipelines The number of pipelines referencing the model
-
-func (rb *TrainedModelsRecordBuilder) IngestPipelines(ingestpipelines string) *TrainedModelsRecordBuilder {
-	rb.v.IngestPipelines = &ingestpipelines
-	return rb
-}
-
-// IngestTime The total time spent processing docs with this model
-
-func (rb *TrainedModelsRecordBuilder) IngestTime(ingesttime string) *TrainedModelsRecordBuilder {
-	rb.v.IngestTime = &ingesttime
-	return rb
-}
-
-// License The license level of the model
-
-func (rb *TrainedModelsRecordBuilder) License(license string) *TrainedModelsRecordBuilder {
-	rb.v.License = &license
-	return rb
-}
-
-// Operations the estimated number of operations to use the model
-
-func (rb *TrainedModelsRecordBuilder) Operations(operations string) *TrainedModelsRecordBuilder {
-	rb.v.Operations = &operations
-	return rb
-}
-
-func (rb *TrainedModelsRecordBuilder) Type_(type_ string) *TrainedModelsRecordBuilder {
-	rb.v.Type = &type_
-	return rb
-}
-
-// Version The version of Elasticsearch when the model was created
-
-func (rb *TrainedModelsRecordBuilder) Version(version VersionString) *TrainedModelsRecordBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

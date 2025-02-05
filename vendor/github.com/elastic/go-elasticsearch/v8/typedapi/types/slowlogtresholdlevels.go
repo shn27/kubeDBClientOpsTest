@@ -15,62 +15,72 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // SlowlogTresholdLevels type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/IndexSettings.ts#L489-L494
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/IndexSettings.ts#L502-L507
 type SlowlogTresholdLevels struct {
-	Debug *Duration `json:"debug,omitempty"`
-	Info  *Duration `json:"info,omitempty"`
-	Trace *Duration `json:"trace,omitempty"`
-	Warn  *Duration `json:"warn,omitempty"`
+	Debug Duration `json:"debug,omitempty"`
+	Info  Duration `json:"info,omitempty"`
+	Trace Duration `json:"trace,omitempty"`
+	Warn  Duration `json:"warn,omitempty"`
 }
 
-// SlowlogTresholdLevelsBuilder holds SlowlogTresholdLevels struct and provides a builder API.
-type SlowlogTresholdLevelsBuilder struct {
-	v *SlowlogTresholdLevels
-}
+func (s *SlowlogTresholdLevels) UnmarshalJSON(data []byte) error {
 
-// NewSlowlogTresholdLevels provides a builder for the SlowlogTresholdLevels struct.
-func NewSlowlogTresholdLevelsBuilder() *SlowlogTresholdLevelsBuilder {
-	r := SlowlogTresholdLevelsBuilder{
-		&SlowlogTresholdLevels{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "debug":
+			if err := dec.Decode(&s.Debug); err != nil {
+				return fmt.Errorf("%s | %w", "Debug", err)
+			}
+
+		case "info":
+			if err := dec.Decode(&s.Info); err != nil {
+				return fmt.Errorf("%s | %w", "Info", err)
+			}
+
+		case "trace":
+			if err := dec.Decode(&s.Trace); err != nil {
+				return fmt.Errorf("%s | %w", "Trace", err)
+			}
+
+		case "warn":
+			if err := dec.Decode(&s.Warn); err != nil {
+				return fmt.Errorf("%s | %w", "Warn", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SlowlogTresholdLevels struct
-func (rb *SlowlogTresholdLevelsBuilder) Build() SlowlogTresholdLevels {
-	return *rb.v
-}
+// NewSlowlogTresholdLevels returns a SlowlogTresholdLevels.
+func NewSlowlogTresholdLevels() *SlowlogTresholdLevels {
+	r := &SlowlogTresholdLevels{}
 
-func (rb *SlowlogTresholdLevelsBuilder) Debug(debug *DurationBuilder) *SlowlogTresholdLevelsBuilder {
-	v := debug.Build()
-	rb.v.Debug = &v
-	return rb
-}
-
-func (rb *SlowlogTresholdLevelsBuilder) Info(info *DurationBuilder) *SlowlogTresholdLevelsBuilder {
-	v := info.Build()
-	rb.v.Info = &v
-	return rb
-}
-
-func (rb *SlowlogTresholdLevelsBuilder) Trace(trace *DurationBuilder) *SlowlogTresholdLevelsBuilder {
-	v := trace.Build()
-	rb.v.Trace = &v
-	return rb
-}
-
-func (rb *SlowlogTresholdLevelsBuilder) Warn(warn *DurationBuilder) *SlowlogTresholdLevelsBuilder {
-	v := warn.Build()
-	rb.v.Warn = &v
-	return rb
+	return r
 }

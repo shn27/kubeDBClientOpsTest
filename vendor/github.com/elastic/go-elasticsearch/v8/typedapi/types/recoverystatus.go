@@ -15,44 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // RecoveryStatus type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/recovery/types.ts#L98-L100
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/recovery/types.ts#L98-L100
 type RecoveryStatus struct {
 	Shards []ShardRecovery `json:"shards"`
 }
 
-// RecoveryStatusBuilder holds RecoveryStatus struct and provides a builder API.
-type RecoveryStatusBuilder struct {
-	v *RecoveryStatus
-}
+// NewRecoveryStatus returns a RecoveryStatus.
+func NewRecoveryStatus() *RecoveryStatus {
+	r := &RecoveryStatus{}
 
-// NewRecoveryStatus provides a builder for the RecoveryStatus struct.
-func NewRecoveryStatusBuilder() *RecoveryStatusBuilder {
-	r := RecoveryStatusBuilder{
-		&RecoveryStatus{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the RecoveryStatus struct
-func (rb *RecoveryStatusBuilder) Build() RecoveryStatus {
-	return *rb.v
-}
-
-func (rb *RecoveryStatusBuilder) Shards(shards []ShardRecoveryBuilder) *RecoveryStatusBuilder {
-	tmp := make([]ShardRecovery, len(shards))
-	for _, value := range shards {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Shards = tmp
-	return rb
+	return r
 }

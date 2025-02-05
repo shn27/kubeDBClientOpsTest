@@ -15,77 +15,85 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/valuetype"
 )
 
 // WeightedAverageAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/metric.ts#L211-L216
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/metric.ts#L449-L463
 type WeightedAverageAggregation struct {
-	Format    *string               `json:"format,omitempty"`
-	Meta      *Metadata             `json:"meta,omitempty"`
-	Name      *string               `json:"name,omitempty"`
+	// Format A numeric response formatter.
+	Format *string `json:"format,omitempty"`
+	// Value Configuration for the field that provides the values.
 	Value     *WeightedAverageValue `json:"value,omitempty"`
 	ValueType *valuetype.ValueType  `json:"value_type,omitempty"`
-	Weight    *WeightedAverageValue `json:"weight,omitempty"`
+	// Weight Configuration for the field or script that provides the weights.
+	Weight *WeightedAverageValue `json:"weight,omitempty"`
 }
 
-// WeightedAverageAggregationBuilder holds WeightedAverageAggregation struct and provides a builder API.
-type WeightedAverageAggregationBuilder struct {
-	v *WeightedAverageAggregation
-}
+func (s *WeightedAverageAggregation) UnmarshalJSON(data []byte) error {
 
-// NewWeightedAverageAggregation provides a builder for the WeightedAverageAggregation struct.
-func NewWeightedAverageAggregationBuilder() *WeightedAverageAggregationBuilder {
-	r := WeightedAverageAggregationBuilder{
-		&WeightedAverageAggregation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "format":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Format", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Format = &o
+
+		case "value":
+			if err := dec.Decode(&s.Value); err != nil {
+				return fmt.Errorf("%s | %w", "Value", err)
+			}
+
+		case "value_type":
+			if err := dec.Decode(&s.ValueType); err != nil {
+				return fmt.Errorf("%s | %w", "ValueType", err)
+			}
+
+		case "weight":
+			if err := dec.Decode(&s.Weight); err != nil {
+				return fmt.Errorf("%s | %w", "Weight", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the WeightedAverageAggregation struct
-func (rb *WeightedAverageAggregationBuilder) Build() WeightedAverageAggregation {
-	return *rb.v
-}
+// NewWeightedAverageAggregation returns a WeightedAverageAggregation.
+func NewWeightedAverageAggregation() *WeightedAverageAggregation {
+	r := &WeightedAverageAggregation{}
 
-func (rb *WeightedAverageAggregationBuilder) Format(format string) *WeightedAverageAggregationBuilder {
-	rb.v.Format = &format
-	return rb
-}
-
-func (rb *WeightedAverageAggregationBuilder) Meta(meta *MetadataBuilder) *WeightedAverageAggregationBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *WeightedAverageAggregationBuilder) Name(name string) *WeightedAverageAggregationBuilder {
-	rb.v.Name = &name
-	return rb
-}
-
-func (rb *WeightedAverageAggregationBuilder) Value(value *WeightedAverageValueBuilder) *WeightedAverageAggregationBuilder {
-	v := value.Build()
-	rb.v.Value = &v
-	return rb
-}
-
-func (rb *WeightedAverageAggregationBuilder) ValueType(valuetype valuetype.ValueType) *WeightedAverageAggregationBuilder {
-	rb.v.ValueType = &valuetype
-	return rb
-}
-
-func (rb *WeightedAverageAggregationBuilder) Weight(weight *WeightedAverageValueBuilder) *WeightedAverageAggregationBuilder {
-	v := weight.Build()
-	rb.v.Weight = &v
-	return rb
+	return r
 }

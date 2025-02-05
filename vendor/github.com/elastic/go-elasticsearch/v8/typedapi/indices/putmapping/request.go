@@ -15,16 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package putmapping
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"strconv"
 
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/dynamicmapping"
@@ -32,68 +34,52 @@ import (
 
 // Request holds the request body struct for the package putmapping
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/put_mapping/IndicesPutMappingRequest.ts#L42-L116
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/put_mapping/IndicesPutMappingRequest.ts#L41-L149
 type Request struct {
 
 	// DateDetection Controls whether dynamic date detection is enabled.
 	DateDetection *bool `json:"date_detection,omitempty"`
-
 	// Dynamic Controls whether new fields are added dynamically.
 	Dynamic *dynamicmapping.DynamicMapping `json:"dynamic,omitempty"`
-
 	// DynamicDateFormats If date detection is enabled then new string fields are checked
 	// against 'dynamic_date_formats' and if the value matches then
 	// a new date field is added instead of string.
 	DynamicDateFormats []string `json:"dynamic_date_formats,omitempty"`
-
 	// DynamicTemplates Specify dynamic templates for the mapping.
 	DynamicTemplates []map[string]types.DynamicTemplate `json:"dynamic_templates,omitempty"`
-
 	// FieldNames_ Control whether field names are enabled for the index.
 	FieldNames_ *types.FieldNamesField `json:"_field_names,omitempty"`
-
 	// Meta_ A mapping type can have custom meta data associated with it. These are
 	// not used at all by Elasticsearch, but can be used to store
 	// application-specific metadata.
-	Meta_ *types.Metadata `json:"_meta,omitempty"`
-
+	Meta_ types.Metadata `json:"_meta,omitempty"`
 	// NumericDetection Automatically map strings into numeric data types for all fields.
 	NumericDetection *bool `json:"numeric_detection,omitempty"`
-
 	// Properties Mapping for a field. For new fields, this mapping can include:
 	//
 	// - Field name
 	// - Field data type
 	// - Mapping parameters
-	Properties map[types.PropertyName]types.Property `json:"properties,omitempty"`
-
+	Properties map[string]types.Property `json:"properties,omitempty"`
 	// Routing_ Enable making a routing value required on indexed documents.
 	Routing_ *types.RoutingField `json:"_routing,omitempty"`
-
 	// Runtime Mapping of runtime fields for the index.
-	Runtime *types.RuntimeFields `json:"runtime,omitempty"`
-
+	Runtime types.RuntimeFields `json:"runtime,omitempty"`
 	// Source_ Control whether the _source field is enabled on the index.
 	Source_ *types.SourceField `json:"_source,omitempty"`
 }
 
-// RequestBuilder is the builder API for the putmapping.Request
-type RequestBuilder struct {
-	v *Request
-}
-
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{
-			Properties: make(map[types.PropertyName]types.Property, 0),
-		},
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{
+		Properties: make(map[string]types.Property, 0),
 	}
-	return &r
+
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -104,71 +90,424 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) DateDetection(datedetection bool) *RequestBuilder {
-	rb.v.DateDetection = &datedetection
-	return rb
-}
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
 
-func (rb *RequestBuilder) Dynamic(dynamic dynamicmapping.DynamicMapping) *RequestBuilder {
-	rb.v.Dynamic = &dynamic
-	return rb
-}
+		switch t {
 
-func (rb *RequestBuilder) DynamicDateFormats(dynamic_date_formats ...string) *RequestBuilder {
-	rb.v.DynamicDateFormats = dynamic_date_formats
-	return rb
-}
+		case "date_detection":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DateDetection", err)
+				}
+				s.DateDetection = &value
+			case bool:
+				s.DateDetection = &v
+			}
 
-func (rb *RequestBuilder) DynamicTemplates(arg []map[string]types.DynamicTemplate) *RequestBuilder {
-	rb.v.DynamicTemplates = arg
-	return rb
-}
+		case "dynamic":
+			if err := dec.Decode(&s.Dynamic); err != nil {
+				return fmt.Errorf("%s | %w", "Dynamic", err)
+			}
 
-func (rb *RequestBuilder) FieldNames_(fieldnames_ *types.FieldNamesFieldBuilder) *RequestBuilder {
-	v := fieldnames_.Build()
-	rb.v.FieldNames_ = &v
-	return rb
-}
+		case "dynamic_date_formats":
+			if err := dec.Decode(&s.DynamicDateFormats); err != nil {
+				return fmt.Errorf("%s | %w", "DynamicDateFormats", err)
+			}
 
-func (rb *RequestBuilder) Meta_(meta_ *types.MetadataBuilder) *RequestBuilder {
-	v := meta_.Build()
-	rb.v.Meta_ = &v
-	return rb
-}
+		case "dynamic_templates":
 
-func (rb *RequestBuilder) NumericDetection(numericdetection bool) *RequestBuilder {
-	rb.v.NumericDetection = &numericdetection
-	return rb
-}
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			source := bytes.NewReader(rawMsg)
+			localDec := json.NewDecoder(source)
+			switch rawMsg[0] {
+			case '{':
+				o := make(map[string]types.DynamicTemplate, 0)
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "DynamicTemplates", err)
+				}
+				s.DynamicTemplates = append(s.DynamicTemplates, o)
+			case '[':
+				o := make([]map[string]types.DynamicTemplate, 0)
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "DynamicTemplates", err)
+				}
+				s.DynamicTemplates = o
+			}
 
-func (rb *RequestBuilder) Properties(values map[types.PropertyName]*types.PropertyBuilder) *RequestBuilder {
-	tmp := make(map[types.PropertyName]types.Property, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
+		case "_field_names":
+			if err := dec.Decode(&s.FieldNames_); err != nil {
+				return fmt.Errorf("%s | %w", "FieldNames_", err)
+			}
+
+		case "_meta":
+			if err := dec.Decode(&s.Meta_); err != nil {
+				return fmt.Errorf("%s | %w", "Meta_", err)
+			}
+
+		case "numeric_detection":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NumericDetection", err)
+				}
+				s.NumericDetection = &value
+			case bool:
+				s.NumericDetection = &v
+			}
+
+		case "properties":
+			if s.Properties == nil {
+				s.Properties = make(map[string]types.Property, 0)
+			}
+			refs := make(map[string]json.RawMessage, 0)
+			dec.Decode(&refs)
+			for key, message := range refs {
+				kind := make(map[string]any)
+				buf := bytes.NewReader(message)
+				localDec := json.NewDecoder(buf)
+				localDec.Decode(&kind)
+				buf.Seek(0, io.SeekStart)
+				if _, ok := kind["type"]; !ok {
+					kind["type"] = "object"
+				}
+				switch kind["type"] {
+				case "binary":
+					oo := types.NewBinaryProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "boolean":
+					oo := types.NewBooleanProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "{dynamic_type}":
+					oo := types.NewDynamicProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "join":
+					oo := types.NewJoinProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "keyword":
+					oo := types.NewKeywordProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "match_only_text":
+					oo := types.NewMatchOnlyTextProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "percolator":
+					oo := types.NewPercolatorProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "rank_feature":
+					oo := types.NewRankFeatureProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "rank_features":
+					oo := types.NewRankFeaturesProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "search_as_you_type":
+					oo := types.NewSearchAsYouTypeProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "text":
+					oo := types.NewTextProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "version":
+					oo := types.NewVersionProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "wildcard":
+					oo := types.NewWildcardProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "date_nanos":
+					oo := types.NewDateNanosProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "date":
+					oo := types.NewDateProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "aggregate_metric_double":
+					oo := types.NewAggregateMetricDoubleProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "dense_vector":
+					oo := types.NewDenseVectorProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "flattened":
+					oo := types.NewFlattenedProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "nested":
+					oo := types.NewNestedProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "object":
+					oo := types.NewObjectProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "semantic_text":
+					oo := types.NewSemanticTextProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "sparse_vector":
+					oo := types.NewSparseVectorProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "completion":
+					oo := types.NewCompletionProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "constant_keyword":
+					oo := types.NewConstantKeywordProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "alias":
+					oo := types.NewFieldAliasProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "histogram":
+					oo := types.NewHistogramProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "ip":
+					oo := types.NewIpProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "murmur3":
+					oo := types.NewMurmur3HashProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "token_count":
+					oo := types.NewTokenCountProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "geo_point":
+					oo := types.NewGeoPointProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "geo_shape":
+					oo := types.NewGeoShapeProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "point":
+					oo := types.NewPointProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "shape":
+					oo := types.NewShapeProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "byte":
+					oo := types.NewByteNumberProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "double":
+					oo := types.NewDoubleNumberProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "float":
+					oo := types.NewFloatNumberProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "half_float":
+					oo := types.NewHalfFloatNumberProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "integer":
+					oo := types.NewIntegerNumberProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "long":
+					oo := types.NewLongNumberProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "scaled_float":
+					oo := types.NewScaledFloatNumberProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "short":
+					oo := types.NewShortNumberProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "unsigned_long":
+					oo := types.NewUnsignedLongNumberProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "date_range":
+					oo := types.NewDateRangeProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "double_range":
+					oo := types.NewDoubleRangeProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "float_range":
+					oo := types.NewFloatRangeProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "integer_range":
+					oo := types.NewIntegerRangeProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "ip_range":
+					oo := types.NewIpRangeProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "long_range":
+					oo := types.NewLongRangeProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "icu_collation_keyword":
+					oo := types.NewIcuCollationProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				default:
+					oo := new(types.Property)
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				}
+			}
+
+		case "_routing":
+			if err := dec.Decode(&s.Routing_); err != nil {
+				return fmt.Errorf("%s | %w", "Routing_", err)
+			}
+
+		case "runtime":
+			if err := dec.Decode(&s.Runtime); err != nil {
+				return fmt.Errorf("%s | %w", "Runtime", err)
+			}
+
+		case "_source":
+			if err := dec.Decode(&s.Source_); err != nil {
+				return fmt.Errorf("%s | %w", "Source_", err)
+			}
+
+		}
 	}
-	rb.v.Properties = tmp
-	return rb
-}
-
-func (rb *RequestBuilder) Routing_(routing_ *types.RoutingFieldBuilder) *RequestBuilder {
-	v := routing_.Build()
-	rb.v.Routing_ = &v
-	return rb
-}
-
-func (rb *RequestBuilder) Runtime(runtime *types.RuntimeFieldsBuilder) *RequestBuilder {
-	v := runtime.Build()
-	rb.v.Runtime = &v
-	return rb
-}
-
-func (rb *RequestBuilder) Source_(source_ *types.SourceFieldBuilder) *RequestBuilder {
-	v := source_.Build()
-	rb.v.Source_ = &v
-	return rb
+	return nil
 }

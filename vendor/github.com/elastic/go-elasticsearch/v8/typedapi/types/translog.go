@@ -15,20 +15,24 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/translogdurability"
 )
 
 // Translog type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/IndexSettings.ts#L332-L354
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/IndexSettings.ts#L341-L363
 type Translog struct {
 	// Durability Whether or not to `fsync` and commit the translog after every index, delete,
 	// update, or bulk request.
@@ -43,70 +47,57 @@ type Translog struct {
 	// long. Once the
 	// maximum size has been reached a flush will happen, generating a new Lucene
 	// commit point.
-	FlushThresholdSize *ByteSize          `json:"flush_threshold_size,omitempty"`
+	FlushThresholdSize ByteSize           `json:"flush_threshold_size,omitempty"`
 	Retention          *TranslogRetention `json:"retention,omitempty"`
 	// SyncInterval How often the translog is fsynced to disk and committed, regardless of write
 	// operations.
 	// Values less than 100ms are not allowed.
-	SyncInterval *Duration `json:"sync_interval,omitempty"`
+	SyncInterval Duration `json:"sync_interval,omitempty"`
 }
 
-// TranslogBuilder holds Translog struct and provides a builder API.
-type TranslogBuilder struct {
-	v *Translog
-}
+func (s *Translog) UnmarshalJSON(data []byte) error {
 
-// NewTranslog provides a builder for the Translog struct.
-func NewTranslogBuilder() *TranslogBuilder {
-	r := TranslogBuilder{
-		&Translog{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "durability":
+			if err := dec.Decode(&s.Durability); err != nil {
+				return fmt.Errorf("%s | %w", "Durability", err)
+			}
+
+		case "flush_threshold_size":
+			if err := dec.Decode(&s.FlushThresholdSize); err != nil {
+				return fmt.Errorf("%s | %w", "FlushThresholdSize", err)
+			}
+
+		case "retention":
+			if err := dec.Decode(&s.Retention); err != nil {
+				return fmt.Errorf("%s | %w", "Retention", err)
+			}
+
+		case "sync_interval":
+			if err := dec.Decode(&s.SyncInterval); err != nil {
+				return fmt.Errorf("%s | %w", "SyncInterval", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the Translog struct
-func (rb *TranslogBuilder) Build() Translog {
-	return *rb.v
-}
+// NewTranslog returns a Translog.
+func NewTranslog() *Translog {
+	r := &Translog{}
 
-// Durability Whether or not to `fsync` and commit the translog after every index, delete,
-// update, or bulk request.
-
-func (rb *TranslogBuilder) Durability(durability translogdurability.TranslogDurability) *TranslogBuilder {
-	rb.v.Durability = &durability
-	return rb
-}
-
-// FlushThresholdSize The translog stores all operations that are not yet safely persisted in
-// Lucene (i.e., are not
-// part of a Lucene commit point). Although these operations are available for
-// reads, they will need
-// to be replayed if the shard was stopped and had to be recovered. This setting
-// controls the
-// maximum total size of these operations, to prevent recoveries from taking too
-// long. Once the
-// maximum size has been reached a flush will happen, generating a new Lucene
-// commit point.
-
-func (rb *TranslogBuilder) FlushThresholdSize(flushthresholdsize *ByteSizeBuilder) *TranslogBuilder {
-	v := flushthresholdsize.Build()
-	rb.v.FlushThresholdSize = &v
-	return rb
-}
-
-func (rb *TranslogBuilder) Retention(retention *TranslogRetentionBuilder) *TranslogBuilder {
-	v := retention.Build()
-	rb.v.Retention = &v
-	return rb
-}
-
-// SyncInterval How often the translog is fsynced to disk and committed, regardless of write
-// operations.
-// Values less than 100ms are not allowed.
-
-func (rb *TranslogBuilder) SyncInterval(syncinterval *DurationBuilder) *TranslogBuilder {
-	v := syncinterval.Build()
-	rb.v.SyncInterval = &v
-	return rb
+	return r
 }

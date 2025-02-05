@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
@@ -27,38 +25,5 @@ package types
 //	map[string]VariableWidthHistogramBucket
 //	[]VariableWidthHistogramBucket
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L303-L312
-type BucketsVariableWidthHistogramBucket interface{}
-
-// BucketsVariableWidthHistogramBucketBuilder holds BucketsVariableWidthHistogramBucket struct and provides a builder API.
-type BucketsVariableWidthHistogramBucketBuilder struct {
-	v BucketsVariableWidthHistogramBucket
-}
-
-// NewBucketsVariableWidthHistogramBucket provides a builder for the BucketsVariableWidthHistogramBucket struct.
-func NewBucketsVariableWidthHistogramBucketBuilder() *BucketsVariableWidthHistogramBucketBuilder {
-	return &BucketsVariableWidthHistogramBucketBuilder{}
-}
-
-// Build finalize the chain and returns the BucketsVariableWidthHistogramBucket struct
-func (u *BucketsVariableWidthHistogramBucketBuilder) Build() BucketsVariableWidthHistogramBucket {
-	return u.v
-}
-
-func (u *BucketsVariableWidthHistogramBucketBuilder) Map(values map[string]*VariableWidthHistogramBucketBuilder) *BucketsVariableWidthHistogramBucketBuilder {
-	tmp := make(map[string]VariableWidthHistogramBucket, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	u.v = tmp
-	return u
-}
-
-func (u *BucketsVariableWidthHistogramBucketBuilder) VariableWidthHistogramBuckets(variablewidthhistogrambuckets []VariableWidthHistogramBucketBuilder) *BucketsVariableWidthHistogramBucketBuilder {
-	tmp := make([]VariableWidthHistogramBucket, len(variablewidthhistogrambuckets))
-	for _, value := range variablewidthhistogrambuckets {
-		tmp = append(tmp, value.Build())
-	}
-	u.v = tmp
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L346-L355
+type BucketsVariableWidthHistogramBucket any

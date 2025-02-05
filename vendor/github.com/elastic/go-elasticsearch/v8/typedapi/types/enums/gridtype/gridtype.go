@@ -15,19 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package gridtype
 package gridtype
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search_mvt/_types/GridType.ts#L20-L25
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search_mvt/_types/GridType.ts#L20-L28
 type GridType struct {
-	name string
+	Name string
 }
 
 var (
@@ -43,7 +41,7 @@ func (g GridType) MarshalText() (text []byte, err error) {
 }
 
 func (g *GridType) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
 	case "grid":
 		*g = Grid
@@ -59,5 +57,5 @@ func (g *GridType) UnmarshalText(text []byte) error {
 }
 
 func (g GridType) String() string {
-	return g.name
+	return g.Name
 }

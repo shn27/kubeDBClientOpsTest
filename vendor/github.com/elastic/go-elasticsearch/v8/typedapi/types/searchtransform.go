@@ -15,48 +15,60 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // SearchTransform type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Transform.ts#L46-L49
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Transform.ts#L46-L49
 type SearchTransform struct {
 	Request SearchInputRequestDefinition `json:"request"`
 	Timeout Duration                     `json:"timeout"`
 }
 
-// SearchTransformBuilder holds SearchTransform struct and provides a builder API.
-type SearchTransformBuilder struct {
-	v *SearchTransform
-}
+func (s *SearchTransform) UnmarshalJSON(data []byte) error {
 
-// NewSearchTransform provides a builder for the SearchTransform struct.
-func NewSearchTransformBuilder() *SearchTransformBuilder {
-	r := SearchTransformBuilder{
-		&SearchTransform{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "request":
+			if err := dec.Decode(&s.Request); err != nil {
+				return fmt.Errorf("%s | %w", "Request", err)
+			}
+
+		case "timeout":
+			if err := dec.Decode(&s.Timeout); err != nil {
+				return fmt.Errorf("%s | %w", "Timeout", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SearchTransform struct
-func (rb *SearchTransformBuilder) Build() SearchTransform {
-	return *rb.v
-}
+// NewSearchTransform returns a SearchTransform.
+func NewSearchTransform() *SearchTransform {
+	r := &SearchTransform{}
 
-func (rb *SearchTransformBuilder) Request(request *SearchInputRequestDefinitionBuilder) *SearchTransformBuilder {
-	v := request.Build()
-	rb.v.Request = v
-	return rb
-}
-
-func (rb *SearchTransformBuilder) Timeout(timeout *DurationBuilder) *SearchTransformBuilder {
-	v := timeout.Build()
-	rb.v.Timeout = v
-	return rb
+	return r
 }

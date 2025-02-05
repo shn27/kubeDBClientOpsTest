@@ -15,19 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package statslevel
 package statslevel
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/searchable_snapshots/_types/stats.ts#L20-L24
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/searchable_snapshots/_types/stats.ts#L20-L24
 type StatsLevel struct {
-	name string
+	Name string
 }
 
 var (
@@ -43,7 +41,7 @@ func (s StatsLevel) MarshalText() (text []byte, err error) {
 }
 
 func (s *StatsLevel) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
 	case "cluster":
 		*s = Cluster
@@ -59,5 +57,5 @@ func (s *StatsLevel) UnmarshalText(text []byte) error {
 }
 
 func (s StatsLevel) String() string {
-	return s.name
+	return s.Name
 }

@@ -15,88 +15,107 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // JobTimingStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/Job.ts#L109-L118
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/Job.ts#L332-L341
 type JobTimingStats struct {
-	AverageBucketProcessingTimeMs                   *DurationValueUnitFloatMillis `json:"average_bucket_processing_time_ms,omitempty"`
-	BucketCount                                     int64                         `json:"bucket_count"`
-	ExponentialAverageBucketProcessingTimeMs        *DurationValueUnitFloatMillis `json:"exponential_average_bucket_processing_time_ms,omitempty"`
-	ExponentialAverageBucketProcessingTimePerHourMs DurationValueUnitFloatMillis  `json:"exponential_average_bucket_processing_time_per_hour_ms"`
-	JobId                                           Id                            `json:"job_id"`
-	MaximumBucketProcessingTimeMs                   *DurationValueUnitFloatMillis `json:"maximum_bucket_processing_time_ms,omitempty"`
-	MinimumBucketProcessingTimeMs                   *DurationValueUnitFloatMillis `json:"minimum_bucket_processing_time_ms,omitempty"`
-	TotalBucketProcessingTimeMs                     DurationValueUnitFloatMillis  `json:"total_bucket_processing_time_ms"`
+	AverageBucketProcessingTimeMs                   Float64 `json:"average_bucket_processing_time_ms,omitempty"`
+	BucketCount                                     int64   `json:"bucket_count"`
+	ExponentialAverageBucketProcessingTimeMs        Float64 `json:"exponential_average_bucket_processing_time_ms,omitempty"`
+	ExponentialAverageBucketProcessingTimePerHourMs Float64 `json:"exponential_average_bucket_processing_time_per_hour_ms"`
+	JobId                                           string  `json:"job_id"`
+	MaximumBucketProcessingTimeMs                   Float64 `json:"maximum_bucket_processing_time_ms,omitempty"`
+	MinimumBucketProcessingTimeMs                   Float64 `json:"minimum_bucket_processing_time_ms,omitempty"`
+	TotalBucketProcessingTimeMs                     Float64 `json:"total_bucket_processing_time_ms"`
 }
 
-// JobTimingStatsBuilder holds JobTimingStats struct and provides a builder API.
-type JobTimingStatsBuilder struct {
-	v *JobTimingStats
-}
+func (s *JobTimingStats) UnmarshalJSON(data []byte) error {
 
-// NewJobTimingStats provides a builder for the JobTimingStats struct.
-func NewJobTimingStatsBuilder() *JobTimingStatsBuilder {
-	r := JobTimingStatsBuilder{
-		&JobTimingStats{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "average_bucket_processing_time_ms":
+			if err := dec.Decode(&s.AverageBucketProcessingTimeMs); err != nil {
+				return fmt.Errorf("%s | %w", "AverageBucketProcessingTimeMs", err)
+			}
+
+		case "bucket_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "BucketCount", err)
+				}
+				s.BucketCount = value
+			case float64:
+				f := int64(v)
+				s.BucketCount = f
+			}
+
+		case "exponential_average_bucket_processing_time_ms":
+			if err := dec.Decode(&s.ExponentialAverageBucketProcessingTimeMs); err != nil {
+				return fmt.Errorf("%s | %w", "ExponentialAverageBucketProcessingTimeMs", err)
+			}
+
+		case "exponential_average_bucket_processing_time_per_hour_ms":
+			if err := dec.Decode(&s.ExponentialAverageBucketProcessingTimePerHourMs); err != nil {
+				return fmt.Errorf("%s | %w", "ExponentialAverageBucketProcessingTimePerHourMs", err)
+			}
+
+		case "job_id":
+			if err := dec.Decode(&s.JobId); err != nil {
+				return fmt.Errorf("%s | %w", "JobId", err)
+			}
+
+		case "maximum_bucket_processing_time_ms":
+			if err := dec.Decode(&s.MaximumBucketProcessingTimeMs); err != nil {
+				return fmt.Errorf("%s | %w", "MaximumBucketProcessingTimeMs", err)
+			}
+
+		case "minimum_bucket_processing_time_ms":
+			if err := dec.Decode(&s.MinimumBucketProcessingTimeMs); err != nil {
+				return fmt.Errorf("%s | %w", "MinimumBucketProcessingTimeMs", err)
+			}
+
+		case "total_bucket_processing_time_ms":
+			if err := dec.Decode(&s.TotalBucketProcessingTimeMs); err != nil {
+				return fmt.Errorf("%s | %w", "TotalBucketProcessingTimeMs", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the JobTimingStats struct
-func (rb *JobTimingStatsBuilder) Build() JobTimingStats {
-	return *rb.v
-}
+// NewJobTimingStats returns a JobTimingStats.
+func NewJobTimingStats() *JobTimingStats {
+	r := &JobTimingStats{}
 
-func (rb *JobTimingStatsBuilder) AverageBucketProcessingTimeMs(averagebucketprocessingtimems *DurationValueUnitFloatMillisBuilder) *JobTimingStatsBuilder {
-	v := averagebucketprocessingtimems.Build()
-	rb.v.AverageBucketProcessingTimeMs = &v
-	return rb
-}
-
-func (rb *JobTimingStatsBuilder) BucketCount(bucketcount int64) *JobTimingStatsBuilder {
-	rb.v.BucketCount = bucketcount
-	return rb
-}
-
-func (rb *JobTimingStatsBuilder) ExponentialAverageBucketProcessingTimeMs(exponentialaveragebucketprocessingtimems *DurationValueUnitFloatMillisBuilder) *JobTimingStatsBuilder {
-	v := exponentialaveragebucketprocessingtimems.Build()
-	rb.v.ExponentialAverageBucketProcessingTimeMs = &v
-	return rb
-}
-
-func (rb *JobTimingStatsBuilder) ExponentialAverageBucketProcessingTimePerHourMs(exponentialaveragebucketprocessingtimeperhourms *DurationValueUnitFloatMillisBuilder) *JobTimingStatsBuilder {
-	v := exponentialaveragebucketprocessingtimeperhourms.Build()
-	rb.v.ExponentialAverageBucketProcessingTimePerHourMs = v
-	return rb
-}
-
-func (rb *JobTimingStatsBuilder) JobId(jobid Id) *JobTimingStatsBuilder {
-	rb.v.JobId = jobid
-	return rb
-}
-
-func (rb *JobTimingStatsBuilder) MaximumBucketProcessingTimeMs(maximumbucketprocessingtimems *DurationValueUnitFloatMillisBuilder) *JobTimingStatsBuilder {
-	v := maximumbucketprocessingtimems.Build()
-	rb.v.MaximumBucketProcessingTimeMs = &v
-	return rb
-}
-
-func (rb *JobTimingStatsBuilder) MinimumBucketProcessingTimeMs(minimumbucketprocessingtimems *DurationValueUnitFloatMillisBuilder) *JobTimingStatsBuilder {
-	v := minimumbucketprocessingtimems.Build()
-	rb.v.MinimumBucketProcessingTimeMs = &v
-	return rb
-}
-
-func (rb *JobTimingStatsBuilder) TotalBucketProcessingTimeMs(totalbucketprocessingtimems *DurationValueUnitFloatMillisBuilder) *JobTimingStatsBuilder {
-	v := totalbucketprocessingtimems.Build()
-	rb.v.TotalBucketProcessingTimeMs = v
-	return rb
+	return r
 }

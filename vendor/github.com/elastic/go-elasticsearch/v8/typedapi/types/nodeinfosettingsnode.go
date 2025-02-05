@@ -15,54 +15,79 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // NodeInfoSettingsNode type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/info/types.ts#L148-L152
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/info/types.ts#L152-L156
 type NodeInfoSettingsNode struct {
-	Attr                 map[string]interface{} `json:"attr"`
-	MaxLocalStorageNodes *string                `json:"max_local_storage_nodes,omitempty"`
-	Name                 Name                   `json:"name"`
+	Attr                 map[string]json.RawMessage `json:"attr"`
+	MaxLocalStorageNodes *string                    `json:"max_local_storage_nodes,omitempty"`
+	Name                 string                     `json:"name"`
 }
 
-// NodeInfoSettingsNodeBuilder holds NodeInfoSettingsNode struct and provides a builder API.
-type NodeInfoSettingsNodeBuilder struct {
-	v *NodeInfoSettingsNode
+func (s *NodeInfoSettingsNode) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "attr":
+			if s.Attr == nil {
+				s.Attr = make(map[string]json.RawMessage, 0)
+			}
+			if err := dec.Decode(&s.Attr); err != nil {
+				return fmt.Errorf("%s | %w", "Attr", err)
+			}
+
+		case "max_local_storage_nodes":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "MaxLocalStorageNodes", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.MaxLocalStorageNodes = &o
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewNodeInfoSettingsNode provides a builder for the NodeInfoSettingsNode struct.
-func NewNodeInfoSettingsNodeBuilder() *NodeInfoSettingsNodeBuilder {
-	r := NodeInfoSettingsNodeBuilder{
-		&NodeInfoSettingsNode{
-			Attr: make(map[string]interface{}, 0),
-		},
+// NewNodeInfoSettingsNode returns a NodeInfoSettingsNode.
+func NewNodeInfoSettingsNode() *NodeInfoSettingsNode {
+	r := &NodeInfoSettingsNode{
+		Attr: make(map[string]json.RawMessage, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the NodeInfoSettingsNode struct
-func (rb *NodeInfoSettingsNodeBuilder) Build() NodeInfoSettingsNode {
-	return *rb.v
-}
-
-func (rb *NodeInfoSettingsNodeBuilder) Attr(value map[string]interface{}) *NodeInfoSettingsNodeBuilder {
-	rb.v.Attr = value
-	return rb
-}
-
-func (rb *NodeInfoSettingsNodeBuilder) MaxLocalStorageNodes(maxlocalstoragenodes string) *NodeInfoSettingsNodeBuilder {
-	rb.v.MaxLocalStorageNodes = &maxlocalstoragenodes
-	return rb
-}
-
-func (rb *NodeInfoSettingsNodeBuilder) Name(name Name) *NodeInfoSettingsNodeBuilder {
-	rb.v.Name = name
-	return rb
+	return r
 }

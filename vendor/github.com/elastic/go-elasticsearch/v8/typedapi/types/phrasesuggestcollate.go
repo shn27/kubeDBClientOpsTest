@@ -15,55 +15,85 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // PhraseSuggestCollate type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/suggester.ts#L177-L181
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/suggester.ts#L333-L346
 type PhraseSuggestCollate struct {
-	Params map[string]interface{}    `json:"params,omitempty"`
-	Prune  *bool                     `json:"prune,omitempty"`
-	Query  PhraseSuggestCollateQuery `json:"query"`
+	// Params Parameters to use if the query is templated.
+	Params map[string]json.RawMessage `json:"params,omitempty"`
+	// Prune Returns all suggestions with an extra `collate_match` option indicating
+	// whether the generated phrase matched any document.
+	Prune *bool `json:"prune,omitempty"`
+	// Query A collate query that is run once for every suggestion.
+	Query PhraseSuggestCollateQuery `json:"query"`
 }
 
-// PhraseSuggestCollateBuilder holds PhraseSuggestCollate struct and provides a builder API.
-type PhraseSuggestCollateBuilder struct {
-	v *PhraseSuggestCollate
+func (s *PhraseSuggestCollate) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "params":
+			if s.Params == nil {
+				s.Params = make(map[string]json.RawMessage, 0)
+			}
+			if err := dec.Decode(&s.Params); err != nil {
+				return fmt.Errorf("%s | %w", "Params", err)
+			}
+
+		case "prune":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Prune", err)
+				}
+				s.Prune = &value
+			case bool:
+				s.Prune = &v
+			}
+
+		case "query":
+			if err := dec.Decode(&s.Query); err != nil {
+				return fmt.Errorf("%s | %w", "Query", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewPhraseSuggestCollate provides a builder for the PhraseSuggestCollate struct.
-func NewPhraseSuggestCollateBuilder() *PhraseSuggestCollateBuilder {
-	r := PhraseSuggestCollateBuilder{
-		&PhraseSuggestCollate{
-			Params: make(map[string]interface{}, 0),
-		},
+// NewPhraseSuggestCollate returns a PhraseSuggestCollate.
+func NewPhraseSuggestCollate() *PhraseSuggestCollate {
+	r := &PhraseSuggestCollate{
+		Params: make(map[string]json.RawMessage, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the PhraseSuggestCollate struct
-func (rb *PhraseSuggestCollateBuilder) Build() PhraseSuggestCollate {
-	return *rb.v
-}
-
-func (rb *PhraseSuggestCollateBuilder) Params(value map[string]interface{}) *PhraseSuggestCollateBuilder {
-	rb.v.Params = value
-	return rb
-}
-
-func (rb *PhraseSuggestCollateBuilder) Prune(prune bool) *PhraseSuggestCollateBuilder {
-	rb.v.Prune = &prune
-	return rb
-}
-
-func (rb *PhraseSuggestCollateBuilder) Query(query *PhraseSuggestCollateQueryBuilder) *PhraseSuggestCollateBuilder {
-	v := query.Build()
-	rb.v.Query = v
-	return rb
+	return r
 }

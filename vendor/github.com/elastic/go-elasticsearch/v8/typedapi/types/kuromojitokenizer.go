@@ -15,20 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/kuromojitokenizationmode"
 )
 
 // KuromojiTokenizer type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/kuromoji-plugin.ts#L58-L67
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/kuromoji-plugin.ts#L58-L67
 type KuromojiTokenizer struct {
 	DiscardCompoundToken *bool                                             `json:"discard_compound_token,omitempty"`
 	DiscardPunctuation   *bool                                             `json:"discard_punctuation,omitempty"`
@@ -38,66 +43,140 @@ type KuromojiTokenizer struct {
 	Type                 string                                            `json:"type,omitempty"`
 	UserDictionary       *string                                           `json:"user_dictionary,omitempty"`
 	UserDictionaryRules  []string                                          `json:"user_dictionary_rules,omitempty"`
-	Version              *VersionString                                    `json:"version,omitempty"`
+	Version              *string                                           `json:"version,omitempty"`
 }
 
-// KuromojiTokenizerBuilder holds KuromojiTokenizer struct and provides a builder API.
-type KuromojiTokenizerBuilder struct {
-	v *KuromojiTokenizer
+func (s *KuromojiTokenizer) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "discard_compound_token":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DiscardCompoundToken", err)
+				}
+				s.DiscardCompoundToken = &value
+			case bool:
+				s.DiscardCompoundToken = &v
+			}
+
+		case "discard_punctuation":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DiscardPunctuation", err)
+				}
+				s.DiscardPunctuation = &value
+			case bool:
+				s.DiscardPunctuation = &v
+			}
+
+		case "mode":
+			if err := dec.Decode(&s.Mode); err != nil {
+				return fmt.Errorf("%s | %w", "Mode", err)
+			}
+
+		case "nbest_cost":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NbestCost", err)
+				}
+				s.NbestCost = &value
+			case float64:
+				f := int(v)
+				s.NbestCost = &f
+			}
+
+		case "nbest_examples":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "NbestExamples", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.NbestExamples = &o
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "user_dictionary":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "UserDictionary", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.UserDictionary = &o
+
+		case "user_dictionary_rules":
+			if err := dec.Decode(&s.UserDictionaryRules); err != nil {
+				return fmt.Errorf("%s | %w", "UserDictionaryRules", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewKuromojiTokenizer provides a builder for the KuromojiTokenizer struct.
-func NewKuromojiTokenizerBuilder() *KuromojiTokenizerBuilder {
-	r := KuromojiTokenizerBuilder{
-		&KuromojiTokenizer{},
+// MarshalJSON override marshalling to include literal value
+func (s KuromojiTokenizer) MarshalJSON() ([]byte, error) {
+	type innerKuromojiTokenizer KuromojiTokenizer
+	tmp := innerKuromojiTokenizer{
+		DiscardCompoundToken: s.DiscardCompoundToken,
+		DiscardPunctuation:   s.DiscardPunctuation,
+		Mode:                 s.Mode,
+		NbestCost:            s.NbestCost,
+		NbestExamples:        s.NbestExamples,
+		Type:                 s.Type,
+		UserDictionary:       s.UserDictionary,
+		UserDictionaryRules:  s.UserDictionaryRules,
+		Version:              s.Version,
 	}
 
-	r.v.Type = "kuromoji_tokenizer"
+	tmp.Type = "kuromoji_tokenizer"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the KuromojiTokenizer struct
-func (rb *KuromojiTokenizerBuilder) Build() KuromojiTokenizer {
-	return *rb.v
-}
+// NewKuromojiTokenizer returns a KuromojiTokenizer.
+func NewKuromojiTokenizer() *KuromojiTokenizer {
+	r := &KuromojiTokenizer{}
 
-func (rb *KuromojiTokenizerBuilder) DiscardCompoundToken(discardcompoundtoken bool) *KuromojiTokenizerBuilder {
-	rb.v.DiscardCompoundToken = &discardcompoundtoken
-	return rb
-}
-
-func (rb *KuromojiTokenizerBuilder) DiscardPunctuation(discardpunctuation bool) *KuromojiTokenizerBuilder {
-	rb.v.DiscardPunctuation = &discardpunctuation
-	return rb
-}
-
-func (rb *KuromojiTokenizerBuilder) Mode(mode kuromojitokenizationmode.KuromojiTokenizationMode) *KuromojiTokenizerBuilder {
-	rb.v.Mode = mode
-	return rb
-}
-
-func (rb *KuromojiTokenizerBuilder) NbestCost(nbestcost int) *KuromojiTokenizerBuilder {
-	rb.v.NbestCost = &nbestcost
-	return rb
-}
-
-func (rb *KuromojiTokenizerBuilder) NbestExamples(nbestexamples string) *KuromojiTokenizerBuilder {
-	rb.v.NbestExamples = &nbestexamples
-	return rb
-}
-
-func (rb *KuromojiTokenizerBuilder) UserDictionary(userdictionary string) *KuromojiTokenizerBuilder {
-	rb.v.UserDictionary = &userdictionary
-	return rb
-}
-
-func (rb *KuromojiTokenizerBuilder) UserDictionaryRules(user_dictionary_rules ...string) *KuromojiTokenizerBuilder {
-	rb.v.UserDictionaryRules = user_dictionary_rules
-	return rb
-}
-
-func (rb *KuromojiTokenizerBuilder) Version(version VersionString) *KuromojiTokenizerBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

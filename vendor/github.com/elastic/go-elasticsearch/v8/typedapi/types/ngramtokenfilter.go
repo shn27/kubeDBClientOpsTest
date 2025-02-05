@@ -15,61 +15,117 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // NGramTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L265-L270
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L267-L272
 type NGramTokenFilter struct {
-	MaxGram          *int           `json:"max_gram,omitempty"`
-	MinGram          *int           `json:"min_gram,omitempty"`
-	PreserveOriginal *bool          `json:"preserve_original,omitempty"`
-	Type             string         `json:"type,omitempty"`
-	Version          *VersionString `json:"version,omitempty"`
+	MaxGram          *int               `json:"max_gram,omitempty"`
+	MinGram          *int               `json:"min_gram,omitempty"`
+	PreserveOriginal Stringifiedboolean `json:"preserve_original,omitempty"`
+	Type             string             `json:"type,omitempty"`
+	Version          *string            `json:"version,omitempty"`
 }
 
-// NGramTokenFilterBuilder holds NGramTokenFilter struct and provides a builder API.
-type NGramTokenFilterBuilder struct {
-	v *NGramTokenFilter
+func (s *NGramTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "max_gram":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxGram", err)
+				}
+				s.MaxGram = &value
+			case float64:
+				f := int(v)
+				s.MaxGram = &f
+			}
+
+		case "min_gram":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MinGram", err)
+				}
+				s.MinGram = &value
+			case float64:
+				f := int(v)
+				s.MinGram = &f
+			}
+
+		case "preserve_original":
+			if err := dec.Decode(&s.PreserveOriginal); err != nil {
+				return fmt.Errorf("%s | %w", "PreserveOriginal", err)
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewNGramTokenFilter provides a builder for the NGramTokenFilter struct.
-func NewNGramTokenFilterBuilder() *NGramTokenFilterBuilder {
-	r := NGramTokenFilterBuilder{
-		&NGramTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s NGramTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerNGramTokenFilter NGramTokenFilter
+	tmp := innerNGramTokenFilter{
+		MaxGram:          s.MaxGram,
+		MinGram:          s.MinGram,
+		PreserveOriginal: s.PreserveOriginal,
+		Type:             s.Type,
+		Version:          s.Version,
 	}
 
-	r.v.Type = "ngram"
+	tmp.Type = "ngram"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the NGramTokenFilter struct
-func (rb *NGramTokenFilterBuilder) Build() NGramTokenFilter {
-	return *rb.v
-}
+// NewNGramTokenFilter returns a NGramTokenFilter.
+func NewNGramTokenFilter() *NGramTokenFilter {
+	r := &NGramTokenFilter{}
 
-func (rb *NGramTokenFilterBuilder) MaxGram(maxgram int) *NGramTokenFilterBuilder {
-	rb.v.MaxGram = &maxgram
-	return rb
-}
-
-func (rb *NGramTokenFilterBuilder) MinGram(mingram int) *NGramTokenFilterBuilder {
-	rb.v.MinGram = &mingram
-	return rb
-}
-
-func (rb *NGramTokenFilterBuilder) PreserveOriginal(preserveoriginal bool) *NGramTokenFilterBuilder {
-	rb.v.PreserveOriginal = &preserveoriginal
-	return rb
-}
-
-func (rb *NGramTokenFilterBuilder) Version(version VersionString) *NGramTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

@@ -15,34 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // RuntimeFields type alias.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/mapping/RuntimeFields.ts#L24-L24
-type RuntimeFields map[Field][]RuntimeField
-
-// RuntimeFieldsBuilder holds RuntimeFields struct and provides a builder API.
-type RuntimeFieldsBuilder struct {
-	v RuntimeFields
-}
-
-// NewRuntimeFields provides a builder for the RuntimeFields struct.
-func NewRuntimeFieldsBuilder() *RuntimeFieldsBuilder {
-	return &RuntimeFieldsBuilder{}
-}
-
-// Build finalize the chain and returns the RuntimeFields struct
-func (b *RuntimeFieldsBuilder) Build() RuntimeFields {
-	return b.v
-}
-
-func (b *RuntimeFieldsBuilder) RuntimeFields(value RuntimeFields) *RuntimeFieldsBuilder {
-	b.v = value
-	return b
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/mapping/RuntimeFields.ts#L24-L24
+type RuntimeFields map[string]RuntimeField

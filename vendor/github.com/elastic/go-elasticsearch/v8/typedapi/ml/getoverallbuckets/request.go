@@ -15,62 +15,52 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package getoverallbuckets
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"strconv"
 
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 )
 
 // Request holds the request body struct for the package getoverallbuckets
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/get_overall_buckets/MlGetOverallBucketsRequest.ts#L25-L143
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/get_overall_buckets/MlGetOverallBucketsRequest.ts#L25-L146
 type Request struct {
 
 	// AllowNoMatch Refer to the description for the `allow_no_match` query parameter.
 	AllowNoMatch *bool `json:"allow_no_match,omitempty"`
-
 	// BucketSpan Refer to the description for the `bucket_span` query parameter.
-	BucketSpan *types.Duration `json:"bucket_span,omitempty"`
-
+	BucketSpan types.Duration `json:"bucket_span,omitempty"`
 	// End Refer to the description for the `end` query parameter.
-	End *types.DateTime `json:"end,omitempty"`
-
+	End types.DateTime `json:"end,omitempty"`
 	// ExcludeInterim Refer to the description for the `exclude_interim` query parameter.
 	ExcludeInterim *bool `json:"exclude_interim,omitempty"`
-
 	// OverallScore Refer to the description for the `overall_score` query parameter.
 	OverallScore string `json:"overall_score,omitempty"`
-
 	// Start Refer to the description for the `start` query parameter.
-	Start *types.DateTime `json:"start,omitempty"`
-
+	Start types.DateTime `json:"start,omitempty"`
 	// TopN Refer to the description for the `top_n` query parameter.
 	TopN *int `json:"top_n,omitempty"`
 }
 
-// RequestBuilder is the builder API for the getoverallbuckets.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -81,45 +71,92 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) AllowNoMatch(allownomatch bool) *RequestBuilder {
-	rb.v.AllowNoMatch = &allownomatch
-	return rb
-}
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
 
-func (rb *RequestBuilder) BucketSpan(bucketspan *types.DurationBuilder) *RequestBuilder {
-	v := bucketspan.Build()
-	rb.v.BucketSpan = &v
-	return rb
-}
+		switch t {
 
-func (rb *RequestBuilder) End(end *types.DateTimeBuilder) *RequestBuilder {
-	v := end.Build()
-	rb.v.End = &v
-	return rb
-}
+		case "allow_no_match":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "AllowNoMatch", err)
+				}
+				s.AllowNoMatch = &value
+			case bool:
+				s.AllowNoMatch = &v
+			}
 
-func (rb *RequestBuilder) ExcludeInterim(excludeinterim bool) *RequestBuilder {
-	rb.v.ExcludeInterim = &excludeinterim
-	return rb
-}
+		case "bucket_span":
+			if err := dec.Decode(&s.BucketSpan); err != nil {
+				return fmt.Errorf("%s | %w", "BucketSpan", err)
+			}
 
-func (rb *RequestBuilder) OverallScore(arg string) *RequestBuilder {
-	rb.v.OverallScore = arg
-	return rb
-}
+		case "end":
+			if err := dec.Decode(&s.End); err != nil {
+				return fmt.Errorf("%s | %w", "End", err)
+			}
 
-func (rb *RequestBuilder) Start(start *types.DateTimeBuilder) *RequestBuilder {
-	v := start.Build()
-	rb.v.Start = &v
-	return rb
-}
+		case "exclude_interim":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ExcludeInterim", err)
+				}
+				s.ExcludeInterim = &value
+			case bool:
+				s.ExcludeInterim = &v
+			}
 
-func (rb *RequestBuilder) TopN(topn int) *RequestBuilder {
-	rb.v.TopN = &topn
-	return rb
+		case "overall_score":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "OverallScore", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.OverallScore = o
+
+		case "start":
+			if err := dec.Decode(&s.Start); err != nil {
+				return fmt.Errorf("%s | %w", "Start", err)
+			}
+
+		case "top_n":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TopN", err)
+				}
+				s.TopN = &value
+			case float64:
+				f := int(v)
+				s.TopN = &f
+			}
+
+		}
+	}
+	return nil
 }

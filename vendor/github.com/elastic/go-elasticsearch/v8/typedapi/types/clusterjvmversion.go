@@ -15,76 +15,144 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ClusterJvmVersion type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/stats/types.ts#L161-L169
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/stats/types.ts#L305-L335
 type ClusterJvmVersion struct {
-	BundledJdk      bool          `json:"bundled_jdk"`
-	Count           int           `json:"count"`
-	UsingBundledJdk bool          `json:"using_bundled_jdk"`
-	Version         VersionString `json:"version"`
-	VmName          string        `json:"vm_name"`
-	VmVendor        string        `json:"vm_vendor"`
-	VmVersion       VersionString `json:"vm_version"`
+	// BundledJdk Always `true`. All distributions come with a bundled Java Development Kit
+	// (JDK).
+	BundledJdk bool `json:"bundled_jdk"`
+	// Count Total number of selected nodes using JVM.
+	Count int `json:"count"`
+	// UsingBundledJdk If `true`, a bundled JDK is in use by JVM.
+	UsingBundledJdk bool `json:"using_bundled_jdk"`
+	// Version Version of JVM used by one or more selected nodes.
+	Version string `json:"version"`
+	// VmName Name of the JVM.
+	VmName string `json:"vm_name"`
+	// VmVendor Vendor of the JVM.
+	VmVendor string `json:"vm_vendor"`
+	// VmVersion Full version number of JVM.
+	// The full version number includes a plus sign (+) followed by the build
+	// number.
+	VmVersion string `json:"vm_version"`
 }
 
-// ClusterJvmVersionBuilder holds ClusterJvmVersion struct and provides a builder API.
-type ClusterJvmVersionBuilder struct {
-	v *ClusterJvmVersion
-}
+func (s *ClusterJvmVersion) UnmarshalJSON(data []byte) error {
 
-// NewClusterJvmVersion provides a builder for the ClusterJvmVersion struct.
-func NewClusterJvmVersionBuilder() *ClusterJvmVersionBuilder {
-	r := ClusterJvmVersionBuilder{
-		&ClusterJvmVersion{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "bundled_jdk":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "BundledJdk", err)
+				}
+				s.BundledJdk = value
+			case bool:
+				s.BundledJdk = v
+			}
+
+		case "count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Count", err)
+				}
+				s.Count = value
+			case float64:
+				f := int(v)
+				s.Count = f
+			}
+
+		case "using_bundled_jdk":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "UsingBundledJdk", err)
+				}
+				s.UsingBundledJdk = value
+			case bool:
+				s.UsingBundledJdk = v
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		case "vm_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "VmName", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.VmName = o
+
+		case "vm_vendor":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "VmVendor", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.VmVendor = o
+
+		case "vm_version":
+			if err := dec.Decode(&s.VmVersion); err != nil {
+				return fmt.Errorf("%s | %w", "VmVersion", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ClusterJvmVersion struct
-func (rb *ClusterJvmVersionBuilder) Build() ClusterJvmVersion {
-	return *rb.v
-}
+// NewClusterJvmVersion returns a ClusterJvmVersion.
+func NewClusterJvmVersion() *ClusterJvmVersion {
+	r := &ClusterJvmVersion{}
 
-func (rb *ClusterJvmVersionBuilder) BundledJdk(bundledjdk bool) *ClusterJvmVersionBuilder {
-	rb.v.BundledJdk = bundledjdk
-	return rb
-}
-
-func (rb *ClusterJvmVersionBuilder) Count(count int) *ClusterJvmVersionBuilder {
-	rb.v.Count = count
-	return rb
-}
-
-func (rb *ClusterJvmVersionBuilder) UsingBundledJdk(usingbundledjdk bool) *ClusterJvmVersionBuilder {
-	rb.v.UsingBundledJdk = usingbundledjdk
-	return rb
-}
-
-func (rb *ClusterJvmVersionBuilder) Version(version VersionString) *ClusterJvmVersionBuilder {
-	rb.v.Version = version
-	return rb
-}
-
-func (rb *ClusterJvmVersionBuilder) VmName(vmname string) *ClusterJvmVersionBuilder {
-	rb.v.VmName = vmname
-	return rb
-}
-
-func (rb *ClusterJvmVersionBuilder) VmVendor(vmvendor string) *ClusterJvmVersionBuilder {
-	rb.v.VmVendor = vmvendor
-	return rb
-}
-
-func (rb *ClusterJvmVersionBuilder) VmVersion(vmversion VersionString) *ClusterJvmVersionBuilder {
-	rb.v.VmVersion = vmversion
-	return rb
+	return r
 }

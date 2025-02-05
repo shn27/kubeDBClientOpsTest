@@ -15,49 +15,92 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // WhitespaceTokenizer type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/tokenizers.ts#L114-L117
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/tokenizers.ts#L135-L138
 type WhitespaceTokenizer struct {
-	MaxTokenLength *int           `json:"max_token_length,omitempty"`
-	Type           string         `json:"type,omitempty"`
-	Version        *VersionString `json:"version,omitempty"`
+	MaxTokenLength *int    `json:"max_token_length,omitempty"`
+	Type           string  `json:"type,omitempty"`
+	Version        *string `json:"version,omitempty"`
 }
 
-// WhitespaceTokenizerBuilder holds WhitespaceTokenizer struct and provides a builder API.
-type WhitespaceTokenizerBuilder struct {
-	v *WhitespaceTokenizer
+func (s *WhitespaceTokenizer) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "max_token_length":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxTokenLength", err)
+				}
+				s.MaxTokenLength = &value
+			case float64:
+				f := int(v)
+				s.MaxTokenLength = &f
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewWhitespaceTokenizer provides a builder for the WhitespaceTokenizer struct.
-func NewWhitespaceTokenizerBuilder() *WhitespaceTokenizerBuilder {
-	r := WhitespaceTokenizerBuilder{
-		&WhitespaceTokenizer{},
+// MarshalJSON override marshalling to include literal value
+func (s WhitespaceTokenizer) MarshalJSON() ([]byte, error) {
+	type innerWhitespaceTokenizer WhitespaceTokenizer
+	tmp := innerWhitespaceTokenizer{
+		MaxTokenLength: s.MaxTokenLength,
+		Type:           s.Type,
+		Version:        s.Version,
 	}
 
-	r.v.Type = "whitespace"
+	tmp.Type = "whitespace"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the WhitespaceTokenizer struct
-func (rb *WhitespaceTokenizerBuilder) Build() WhitespaceTokenizer {
-	return *rb.v
-}
+// NewWhitespaceTokenizer returns a WhitespaceTokenizer.
+func NewWhitespaceTokenizer() *WhitespaceTokenizer {
+	r := &WhitespaceTokenizer{}
 
-func (rb *WhitespaceTokenizerBuilder) MaxTokenLength(maxtokenlength int) *WhitespaceTokenizerBuilder {
-	rb.v.MaxTokenLength = &maxtokenlength
-	return rb
-}
-
-func (rb *WhitespaceTokenizerBuilder) Version(version VersionString) *WhitespaceTokenizerBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

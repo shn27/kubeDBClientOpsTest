@@ -15,53 +15,62 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // TrainedModelSizeStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/TrainedModel.ts#L120-L125
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/TrainedModel.ts#L137-L142
 type TrainedModelSizeStats struct {
 	// ModelSizeBytes The size of the model in bytes.
 	ModelSizeBytes ByteSize `json:"model_size_bytes"`
 	// RequiredNativeMemoryBytes The amount of memory required to load the model in bytes.
-	RequiredNativeMemoryBytes int `json:"required_native_memory_bytes"`
+	RequiredNativeMemoryBytes ByteSize `json:"required_native_memory_bytes"`
 }
 
-// TrainedModelSizeStatsBuilder holds TrainedModelSizeStats struct and provides a builder API.
-type TrainedModelSizeStatsBuilder struct {
-	v *TrainedModelSizeStats
-}
+func (s *TrainedModelSizeStats) UnmarshalJSON(data []byte) error {
 
-// NewTrainedModelSizeStats provides a builder for the TrainedModelSizeStats struct.
-func NewTrainedModelSizeStatsBuilder() *TrainedModelSizeStatsBuilder {
-	r := TrainedModelSizeStatsBuilder{
-		&TrainedModelSizeStats{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "model_size_bytes":
+			if err := dec.Decode(&s.ModelSizeBytes); err != nil {
+				return fmt.Errorf("%s | %w", "ModelSizeBytes", err)
+			}
+
+		case "required_native_memory_bytes":
+			if err := dec.Decode(&s.RequiredNativeMemoryBytes); err != nil {
+				return fmt.Errorf("%s | %w", "RequiredNativeMemoryBytes", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TrainedModelSizeStats struct
-func (rb *TrainedModelSizeStatsBuilder) Build() TrainedModelSizeStats {
-	return *rb.v
-}
+// NewTrainedModelSizeStats returns a TrainedModelSizeStats.
+func NewTrainedModelSizeStats() *TrainedModelSizeStats {
+	r := &TrainedModelSizeStats{}
 
-// ModelSizeBytes The size of the model in bytes.
-
-func (rb *TrainedModelSizeStatsBuilder) ModelSizeBytes(modelsizebytes *ByteSizeBuilder) *TrainedModelSizeStatsBuilder {
-	v := modelsizebytes.Build()
-	rb.v.ModelSizeBytes = v
-	return rb
-}
-
-// RequiredNativeMemoryBytes The amount of memory required to load the model in bytes.
-
-func (rb *TrainedModelSizeStatsBuilder) RequiredNativeMemoryBytes(requirednativememorybytes int) *TrainedModelSizeStatsBuilder {
-	rb.v.RequiredNativeMemoryBytes = requirednativememorybytes
-	return rb
+	return r
 }

@@ -15,25 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package highlightertype
 package highlightertype
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/highlighting.ts#L79-L85
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/highlighting.ts#L175-L190
 type HighlighterType struct {
-	name string
+	Name string
 }
 
 var (
 	Plain = HighlighterType{"plain"}
 
-	Fvh = HighlighterType{"fvh"}
+	Fastvector = HighlighterType{"fvh"}
 
 	Unified = HighlighterType{"unified"}
 )
@@ -43,12 +41,12 @@ func (h HighlighterType) MarshalText() (text []byte, err error) {
 }
 
 func (h *HighlighterType) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
 	case "plain":
 		*h = Plain
 	case "fvh":
-		*h = Fvh
+		*h = Fastvector
 	case "unified":
 		*h = Unified
 	default:
@@ -59,5 +57,5 @@ func (h *HighlighterType) UnmarshalText(text []byte) error {
 }
 
 func (h HighlighterType) String() string {
-	return h.name
+	return h.Name
 }

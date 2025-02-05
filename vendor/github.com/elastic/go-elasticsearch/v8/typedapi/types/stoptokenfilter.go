@@ -15,68 +15,138 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // StopTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L96-L102
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L96-L102
 type StopTokenFilter struct {
-	IgnoreCase     *bool          `json:"ignore_case,omitempty"`
-	RemoveTrailing *bool          `json:"remove_trailing,omitempty"`
-	Stopwords      *StopWords     `json:"stopwords,omitempty"`
-	StopwordsPath  *string        `json:"stopwords_path,omitempty"`
-	Type           string         `json:"type,omitempty"`
-	Version        *VersionString `json:"version,omitempty"`
+	IgnoreCase     *bool    `json:"ignore_case,omitempty"`
+	RemoveTrailing *bool    `json:"remove_trailing,omitempty"`
+	Stopwords      []string `json:"stopwords,omitempty"`
+	StopwordsPath  *string  `json:"stopwords_path,omitempty"`
+	Type           string   `json:"type,omitempty"`
+	Version        *string  `json:"version,omitempty"`
 }
 
-// StopTokenFilterBuilder holds StopTokenFilter struct and provides a builder API.
-type StopTokenFilterBuilder struct {
-	v *StopTokenFilter
+func (s *StopTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "ignore_case":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IgnoreCase", err)
+				}
+				s.IgnoreCase = &value
+			case bool:
+				s.IgnoreCase = &v
+			}
+
+		case "remove_trailing":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "RemoveTrailing", err)
+				}
+				s.RemoveTrailing = &value
+			case bool:
+				s.RemoveTrailing = &v
+			}
+
+		case "stopwords":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Stopwords", err)
+				}
+
+				s.Stopwords = append(s.Stopwords, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Stopwords); err != nil {
+					return fmt.Errorf("%s | %w", "Stopwords", err)
+				}
+			}
+
+		case "stopwords_path":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "StopwordsPath", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.StopwordsPath = &o
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewStopTokenFilter provides a builder for the StopTokenFilter struct.
-func NewStopTokenFilterBuilder() *StopTokenFilterBuilder {
-	r := StopTokenFilterBuilder{
-		&StopTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s StopTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerStopTokenFilter StopTokenFilter
+	tmp := innerStopTokenFilter{
+		IgnoreCase:     s.IgnoreCase,
+		RemoveTrailing: s.RemoveTrailing,
+		Stopwords:      s.Stopwords,
+		StopwordsPath:  s.StopwordsPath,
+		Type:           s.Type,
+		Version:        s.Version,
 	}
 
-	r.v.Type = "stop"
+	tmp.Type = "stop"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the StopTokenFilter struct
-func (rb *StopTokenFilterBuilder) Build() StopTokenFilter {
-	return *rb.v
-}
+// NewStopTokenFilter returns a StopTokenFilter.
+func NewStopTokenFilter() *StopTokenFilter {
+	r := &StopTokenFilter{}
 
-func (rb *StopTokenFilterBuilder) IgnoreCase(ignorecase bool) *StopTokenFilterBuilder {
-	rb.v.IgnoreCase = &ignorecase
-	return rb
-}
-
-func (rb *StopTokenFilterBuilder) RemoveTrailing(removetrailing bool) *StopTokenFilterBuilder {
-	rb.v.RemoveTrailing = &removetrailing
-	return rb
-}
-
-func (rb *StopTokenFilterBuilder) Stopwords(stopwords *StopWordsBuilder) *StopTokenFilterBuilder {
-	v := stopwords.Build()
-	rb.v.Stopwords = &v
-	return rb
-}
-
-func (rb *StopTokenFilterBuilder) StopwordsPath(stopwordspath string) *StopTokenFilterBuilder {
-	rb.v.StopwordsPath = &stopwordspath
-	return rb
-}
-
-func (rb *StopTokenFilterBuilder) Version(version VersionString) *StopTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

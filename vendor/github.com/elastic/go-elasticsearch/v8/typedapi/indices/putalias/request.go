@@ -15,50 +15,59 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package putalias
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"strconv"
 
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 )
 
 // Request holds the request body struct for the package putalias
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/put_alias/IndicesPutAliasRequest.ts#L25-L46
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/put_alias/IndicesPutAliasRequest.ts#L25-L92
 type Request struct {
-	Filter *types.QueryContainer `json:"filter,omitempty"`
 
-	IndexRouting *types.Routing `json:"index_routing,omitempty"`
-
+	// Filter Query used to limit documents the alias can access.
+	Filter *types.Query `json:"filter,omitempty"`
+	// IndexRouting Value used to route indexing operations to a specific shard.
+	// If specified, this overwrites the `routing` value for indexing operations.
+	// Data stream aliases don’t support this parameter.
+	IndexRouting *string `json:"index_routing,omitempty"`
+	// IsWriteIndex If `true`, sets the write index or data stream for the alias.
+	// If an alias points to multiple indices or data streams and `is_write_index`
+	// isn’t set, the alias rejects write requests.
+	// If an index alias points to one index and `is_write_index` isn’t set, the
+	// index automatically acts as the write index.
+	// Data stream aliases don’t automatically set a write data stream, even if the
+	// alias points to one data stream.
 	IsWriteIndex *bool `json:"is_write_index,omitempty"`
-
-	Routing *types.Routing `json:"routing,omitempty"`
-
-	SearchRouting *types.Routing `json:"search_routing,omitempty"`
+	// Routing Value used to route indexing and search operations to a specific shard.
+	// Data stream aliases don’t support this parameter.
+	Routing *string `json:"routing,omitempty"`
+	// SearchRouting Value used to route search operations to a specific shard.
+	// If specified, this overwrites the `routing` value for search operations.
+	// Data stream aliases don’t support this parameter.
+	SearchRouting *string `json:"search_routing,omitempty"`
 }
 
-// RequestBuilder is the builder API for the putalias.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -69,33 +78,55 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) Filter(filter *types.QueryContainerBuilder) *RequestBuilder {
-	v := filter.Build()
-	rb.v.Filter = &v
-	return rb
-}
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
 
-func (rb *RequestBuilder) IndexRouting(indexrouting types.Routing) *RequestBuilder {
-	rb.v.IndexRouting = &indexrouting
-	return rb
-}
+		switch t {
 
-func (rb *RequestBuilder) IsWriteIndex(iswriteindex bool) *RequestBuilder {
-	rb.v.IsWriteIndex = &iswriteindex
-	return rb
-}
+		case "filter":
+			if err := dec.Decode(&s.Filter); err != nil {
+				return fmt.Errorf("%s | %w", "Filter", err)
+			}
 
-func (rb *RequestBuilder) Routing(routing types.Routing) *RequestBuilder {
-	rb.v.Routing = &routing
-	return rb
-}
+		case "index_routing":
+			if err := dec.Decode(&s.IndexRouting); err != nil {
+				return fmt.Errorf("%s | %w", "IndexRouting", err)
+			}
 
-func (rb *RequestBuilder) SearchRouting(searchrouting types.Routing) *RequestBuilder {
-	rb.v.SearchRouting = &searchrouting
-	return rb
+		case "is_write_index":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IsWriteIndex", err)
+				}
+				s.IsWriteIndex = &value
+			case bool:
+				s.IsWriteIndex = &v
+			}
+
+		case "routing":
+			if err := dec.Decode(&s.Routing); err != nil {
+				return fmt.Errorf("%s | %w", "Routing", err)
+			}
+
+		case "search_routing":
+			if err := dec.Decode(&s.SearchRouting); err != nil {
+				return fmt.Errorf("%s | %w", "SearchRouting", err)
+			}
+
+		}
+	}
+	return nil
 }

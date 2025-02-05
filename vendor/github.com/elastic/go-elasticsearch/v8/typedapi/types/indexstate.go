@@ -15,76 +15,91 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // IndexState type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/IndexState.ts#L26-L33
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/IndexState.ts#L27-L40
 type IndexState struct {
-	Aliases    map[IndexName]Alias `json:"aliases,omitempty"`
-	DataStream *DataStreamName     `json:"data_stream,omitempty"`
+	Aliases    map[string]Alias `json:"aliases,omitempty"`
+	DataStream *string          `json:"data_stream,omitempty"`
 	// Defaults Default settings, included when the request's `include_default` is `true`.
 	Defaults *IndexSettings `json:"defaults,omitempty"`
-	Mappings *TypeMapping   `json:"mappings,omitempty"`
-	Settings *IndexSettings `json:"settings,omitempty"`
+	// Lifecycle Data stream lifecycle applicable if this is a data stream.
+	Lifecycle *DataStreamLifecycle `json:"lifecycle,omitempty"`
+	Mappings  *TypeMapping         `json:"mappings,omitempty"`
+	Settings  *IndexSettings       `json:"settings,omitempty"`
 }
 
-// IndexStateBuilder holds IndexState struct and provides a builder API.
-type IndexStateBuilder struct {
-	v *IndexState
+func (s *IndexState) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "aliases":
+			if s.Aliases == nil {
+				s.Aliases = make(map[string]Alias, 0)
+			}
+			if err := dec.Decode(&s.Aliases); err != nil {
+				return fmt.Errorf("%s | %w", "Aliases", err)
+			}
+
+		case "data_stream":
+			if err := dec.Decode(&s.DataStream); err != nil {
+				return fmt.Errorf("%s | %w", "DataStream", err)
+			}
+
+		case "defaults":
+			if err := dec.Decode(&s.Defaults); err != nil {
+				return fmt.Errorf("%s | %w", "Defaults", err)
+			}
+
+		case "lifecycle":
+			if err := dec.Decode(&s.Lifecycle); err != nil {
+				return fmt.Errorf("%s | %w", "Lifecycle", err)
+			}
+
+		case "mappings":
+			if err := dec.Decode(&s.Mappings); err != nil {
+				return fmt.Errorf("%s | %w", "Mappings", err)
+			}
+
+		case "settings":
+			if err := dec.Decode(&s.Settings); err != nil {
+				return fmt.Errorf("%s | %w", "Settings", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewIndexState provides a builder for the IndexState struct.
-func NewIndexStateBuilder() *IndexStateBuilder {
-	r := IndexStateBuilder{
-		&IndexState{
-			Aliases: make(map[IndexName]Alias, 0),
-		},
+// NewIndexState returns a IndexState.
+func NewIndexState() *IndexState {
+	r := &IndexState{
+		Aliases: make(map[string]Alias, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the IndexState struct
-func (rb *IndexStateBuilder) Build() IndexState {
-	return *rb.v
-}
-
-func (rb *IndexStateBuilder) Aliases(values map[IndexName]*AliasBuilder) *IndexStateBuilder {
-	tmp := make(map[IndexName]Alias, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Aliases = tmp
-	return rb
-}
-
-func (rb *IndexStateBuilder) DataStream(datastream DataStreamName) *IndexStateBuilder {
-	rb.v.DataStream = &datastream
-	return rb
-}
-
-// Defaults Default settings, included when the request's `include_default` is `true`.
-
-func (rb *IndexStateBuilder) Defaults(defaults *IndexSettingsBuilder) *IndexStateBuilder {
-	v := defaults.Build()
-	rb.v.Defaults = &v
-	return rb
-}
-
-func (rb *IndexStateBuilder) Mappings(mappings *TypeMappingBuilder) *IndexStateBuilder {
-	v := mappings.Build()
-	rb.v.Mappings = &v
-	return rb
-}
-
-func (rb *IndexStateBuilder) Settings(settings *IndexSettingsBuilder) *IndexStateBuilder {
-	v := settings.Build()
-	rb.v.Settings = &v
-	return rb
+	return r
 }

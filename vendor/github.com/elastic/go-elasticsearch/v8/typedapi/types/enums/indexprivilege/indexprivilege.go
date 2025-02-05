@@ -15,24 +15,20 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package indexprivilege
 package indexprivilege
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/_types/Privileges.ts#L138-L158
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/_types/Privileges.ts#L362-L404
 type IndexPrivilege struct {
-	name string
+	Name string
 }
 
 var (
-	None = IndexPrivilege{"none"}
-
 	All = IndexPrivilege{"all"}
 
 	Autoconfigure = IndexPrivilege{"auto_configure"}
@@ -42,6 +38,10 @@ var (
 	Createdoc = IndexPrivilege{"create_doc"}
 
 	Createindex = IndexPrivilege{"create_index"}
+
+	Crossclusterreplication = IndexPrivilege{"cross_cluster_replication"}
+
+	Crossclusterreplicationinternal = IndexPrivilege{"cross_cluster_replication_internal"}
 
 	Delete = IndexPrivilege{"delete"}
 
@@ -53,6 +53,8 @@ var (
 
 	Manage = IndexPrivilege{"manage"}
 
+	Managedatastreamlifecycle = IndexPrivilege{"manage_data_stream_lifecycle"}
+
 	Managefollowindex = IndexPrivilege{"manage_follow_index"}
 
 	Manageilm = IndexPrivilege{"manage_ilm"}
@@ -60,6 +62,8 @@ var (
 	Manageleaderindex = IndexPrivilege{"manage_leader_index"}
 
 	Monitor = IndexPrivilege{"monitor"}
+
+	None = IndexPrivilege{"none"}
 
 	Read = IndexPrivilege{"read"}
 
@@ -75,10 +79,8 @@ func (i IndexPrivilege) MarshalText() (text []byte, err error) {
 }
 
 func (i *IndexPrivilege) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
-	case "none":
-		*i = None
 	case "all":
 		*i = All
 	case "auto_configure":
@@ -89,6 +91,10 @@ func (i *IndexPrivilege) UnmarshalText(text []byte) error {
 		*i = Createdoc
 	case "create_index":
 		*i = Createindex
+	case "cross_cluster_replication":
+		*i = Crossclusterreplication
+	case "cross_cluster_replication_internal":
+		*i = Crossclusterreplicationinternal
 	case "delete":
 		*i = Delete
 	case "delete_index":
@@ -99,6 +105,8 @@ func (i *IndexPrivilege) UnmarshalText(text []byte) error {
 		*i = Maintenance
 	case "manage":
 		*i = Manage
+	case "manage_data_stream_lifecycle":
+		*i = Managedatastreamlifecycle
 	case "manage_follow_index":
 		*i = Managefollowindex
 	case "manage_ilm":
@@ -107,6 +115,8 @@ func (i *IndexPrivilege) UnmarshalText(text []byte) error {
 		*i = Manageleaderindex
 	case "monitor":
 		*i = Monitor
+	case "none":
+		*i = None
 	case "read":
 		*i = Read
 	case "read_cross_cluster":
@@ -123,5 +133,5 @@ func (i *IndexPrivilege) UnmarshalText(text []byte) error {
 }
 
 func (i IndexPrivilege) String() string {
-	return i.name
+	return i.Name
 }

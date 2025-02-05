@@ -15,47 +15,68 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // KeyedProcessor type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/_types/Stats.ts#L151-L154
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/_types/Stats.ts#L415-L418
 type KeyedProcessor struct {
 	Stats *Processor `json:"stats,omitempty"`
 	Type  *string    `json:"type,omitempty"`
 }
 
-// KeyedProcessorBuilder holds KeyedProcessor struct and provides a builder API.
-type KeyedProcessorBuilder struct {
-	v *KeyedProcessor
-}
+func (s *KeyedProcessor) UnmarshalJSON(data []byte) error {
 
-// NewKeyedProcessor provides a builder for the KeyedProcessor struct.
-func NewKeyedProcessorBuilder() *KeyedProcessorBuilder {
-	r := KeyedProcessorBuilder{
-		&KeyedProcessor{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "stats":
+			if err := dec.Decode(&s.Stats); err != nil {
+				return fmt.Errorf("%s | %w", "Stats", err)
+			}
+
+		case "type":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Type = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the KeyedProcessor struct
-func (rb *KeyedProcessorBuilder) Build() KeyedProcessor {
-	return *rb.v
-}
+// NewKeyedProcessor returns a KeyedProcessor.
+func NewKeyedProcessor() *KeyedProcessor {
+	r := &KeyedProcessor{}
 
-func (rb *KeyedProcessorBuilder) Stats(stats *ProcessorBuilder) *KeyedProcessorBuilder {
-	v := stats.Build()
-	rb.v.Stats = &v
-	return rb
-}
-
-func (rb *KeyedProcessorBuilder) Type_(type_ string) *KeyedProcessorBuilder {
-	rb.v.Type = &type_
-	return rb
+	return r
 }

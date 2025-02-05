@@ -15,46 +15,22 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // TimeOfMonth type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Schedule.ts#L115-L118
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Schedule.ts#L110-L113
 type TimeOfMonth struct {
 	At []string `json:"at"`
 	On []int    `json:"on"`
 }
 
-// TimeOfMonthBuilder holds TimeOfMonth struct and provides a builder API.
-type TimeOfMonthBuilder struct {
-	v *TimeOfMonth
-}
+// NewTimeOfMonth returns a TimeOfMonth.
+func NewTimeOfMonth() *TimeOfMonth {
+	r := &TimeOfMonth{}
 
-// NewTimeOfMonth provides a builder for the TimeOfMonth struct.
-func NewTimeOfMonthBuilder() *TimeOfMonthBuilder {
-	r := TimeOfMonthBuilder{
-		&TimeOfMonth{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the TimeOfMonth struct
-func (rb *TimeOfMonthBuilder) Build() TimeOfMonth {
-	return *rb.v
-}
-
-func (rb *TimeOfMonthBuilder) At(at ...string) *TimeOfMonthBuilder {
-	rb.v.At = at
-	return rb
-}
-
-func (rb *TimeOfMonthBuilder) On(on ...int) *TimeOfMonthBuilder {
-	rb.v.On = on
-	return rb
+	return r
 }

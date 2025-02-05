@@ -15,40 +15,62 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // NodeInfoBootstrap type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/info/types.ts#L193-L195
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/info/types.ts#L204-L206
 type NodeInfoBootstrap struct {
 	MemoryLock string `json:"memory_lock"`
 }
 
-// NodeInfoBootstrapBuilder holds NodeInfoBootstrap struct and provides a builder API.
-type NodeInfoBootstrapBuilder struct {
-	v *NodeInfoBootstrap
-}
+func (s *NodeInfoBootstrap) UnmarshalJSON(data []byte) error {
 
-// NewNodeInfoBootstrap provides a builder for the NodeInfoBootstrap struct.
-func NewNodeInfoBootstrapBuilder() *NodeInfoBootstrapBuilder {
-	r := NodeInfoBootstrapBuilder{
-		&NodeInfoBootstrap{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "memory_lock":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "MemoryLock", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.MemoryLock = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the NodeInfoBootstrap struct
-func (rb *NodeInfoBootstrapBuilder) Build() NodeInfoBootstrap {
-	return *rb.v
-}
+// NewNodeInfoBootstrap returns a NodeInfoBootstrap.
+func NewNodeInfoBootstrap() *NodeInfoBootstrap {
+	r := &NodeInfoBootstrap{}
 
-func (rb *NodeInfoBootstrapBuilder) MemoryLock(memorylock string) *NodeInfoBootstrapBuilder {
-	rb.v.MemoryLock = memorylock
-	return rb
+	return r
 }

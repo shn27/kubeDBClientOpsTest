@@ -15,47 +15,72 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ErrorResponseBase type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Base.ts#L66-L75
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Base.ts#L76-L85
 type ErrorResponseBase struct {
 	Error  ErrorCause `json:"error"`
 	Status int        `json:"status"`
 }
 
-// ErrorResponseBaseBuilder holds ErrorResponseBase struct and provides a builder API.
-type ErrorResponseBaseBuilder struct {
-	v *ErrorResponseBase
-}
+func (s *ErrorResponseBase) UnmarshalJSON(data []byte) error {
 
-// NewErrorResponseBase provides a builder for the ErrorResponseBase struct.
-func NewErrorResponseBaseBuilder() *ErrorResponseBaseBuilder {
-	r := ErrorResponseBaseBuilder{
-		&ErrorResponseBase{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "error":
+			if err := dec.Decode(&s.Error); err != nil {
+				return fmt.Errorf("%s | %w", "Error", err)
+			}
+
+		case "status":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Status", err)
+				}
+				s.Status = value
+			case float64:
+				f := int(v)
+				s.Status = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ErrorResponseBase struct
-func (rb *ErrorResponseBaseBuilder) Build() ErrorResponseBase {
-	return *rb.v
-}
+// NewErrorResponseBase returns a ErrorResponseBase.
+func NewErrorResponseBase() *ErrorResponseBase {
+	r := &ErrorResponseBase{}
 
-func (rb *ErrorResponseBaseBuilder) Error(error *ErrorCauseBuilder) *ErrorResponseBaseBuilder {
-	v := error.Build()
-	rb.v.Error = v
-	return rb
-}
-
-func (rb *ErrorResponseBaseBuilder) Status(status int) *ErrorResponseBaseBuilder {
-	rb.v.Status = status
-	return rb
+	return r
 }

@@ -15,43 +15,73 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // SimpleAnalyzer type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/analyzers.ts#L83-L86
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/analyzers.ts#L329-L332
 type SimpleAnalyzer struct {
-	Type    string         `json:"type,omitempty"`
-	Version *VersionString `json:"version,omitempty"`
+	Type    string  `json:"type,omitempty"`
+	Version *string `json:"version,omitempty"`
 }
 
-// SimpleAnalyzerBuilder holds SimpleAnalyzer struct and provides a builder API.
-type SimpleAnalyzerBuilder struct {
-	v *SimpleAnalyzer
+func (s *SimpleAnalyzer) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewSimpleAnalyzer provides a builder for the SimpleAnalyzer struct.
-func NewSimpleAnalyzerBuilder() *SimpleAnalyzerBuilder {
-	r := SimpleAnalyzerBuilder{
-		&SimpleAnalyzer{},
+// MarshalJSON override marshalling to include literal value
+func (s SimpleAnalyzer) MarshalJSON() ([]byte, error) {
+	type innerSimpleAnalyzer SimpleAnalyzer
+	tmp := innerSimpleAnalyzer{
+		Type:    s.Type,
+		Version: s.Version,
 	}
 
-	r.v.Type = "simple"
+	tmp.Type = "simple"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the SimpleAnalyzer struct
-func (rb *SimpleAnalyzerBuilder) Build() SimpleAnalyzer {
-	return *rb.v
-}
+// NewSimpleAnalyzer returns a SimpleAnalyzer.
+func NewSimpleAnalyzer() *SimpleAnalyzer {
+	r := &SimpleAnalyzer{}
 
-func (rb *SimpleAnalyzerBuilder) Version(version VersionString) *SimpleAnalyzerBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

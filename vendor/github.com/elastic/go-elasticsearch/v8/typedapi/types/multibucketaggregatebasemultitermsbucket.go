@@ -15,48 +15,76 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // MultiBucketAggregateBaseMultiTermsBucket type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L314-L316
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L357-L359
 type MultiBucketAggregateBaseMultiTermsBucket struct {
 	Buckets BucketsMultiTermsBucket `json:"buckets"`
-	Meta    *Metadata               `json:"meta,omitempty"`
+	Meta    Metadata                `json:"meta,omitempty"`
 }
 
-// MultiBucketAggregateBaseMultiTermsBucketBuilder holds MultiBucketAggregateBaseMultiTermsBucket struct and provides a builder API.
-type MultiBucketAggregateBaseMultiTermsBucketBuilder struct {
-	v *MultiBucketAggregateBaseMultiTermsBucket
-}
+func (s *MultiBucketAggregateBaseMultiTermsBucket) UnmarshalJSON(data []byte) error {
 
-// NewMultiBucketAggregateBaseMultiTermsBucket provides a builder for the MultiBucketAggregateBaseMultiTermsBucket struct.
-func NewMultiBucketAggregateBaseMultiTermsBucketBuilder() *MultiBucketAggregateBaseMultiTermsBucketBuilder {
-	r := MultiBucketAggregateBaseMultiTermsBucketBuilder{
-		&MultiBucketAggregateBaseMultiTermsBucket{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "buckets":
+
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			source := bytes.NewReader(rawMsg)
+			localDec := json.NewDecoder(source)
+			switch rawMsg[0] {
+			case '{':
+				o := make(map[string]MultiTermsBucket, 0)
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Buckets", err)
+				}
+				s.Buckets = o
+			case '[':
+				o := []MultiTermsBucket{}
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Buckets", err)
+				}
+				s.Buckets = o
+			}
+
+		case "meta":
+			if err := dec.Decode(&s.Meta); err != nil {
+				return fmt.Errorf("%s | %w", "Meta", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the MultiBucketAggregateBaseMultiTermsBucket struct
-func (rb *MultiBucketAggregateBaseMultiTermsBucketBuilder) Build() MultiBucketAggregateBaseMultiTermsBucket {
-	return *rb.v
-}
+// NewMultiBucketAggregateBaseMultiTermsBucket returns a MultiBucketAggregateBaseMultiTermsBucket.
+func NewMultiBucketAggregateBaseMultiTermsBucket() *MultiBucketAggregateBaseMultiTermsBucket {
+	r := &MultiBucketAggregateBaseMultiTermsBucket{}
 
-func (rb *MultiBucketAggregateBaseMultiTermsBucketBuilder) Buckets(buckets *BucketsMultiTermsBucketBuilder) *MultiBucketAggregateBaseMultiTermsBucketBuilder {
-	v := buckets.Build()
-	rb.v.Buckets = v
-	return rb
-}
-
-func (rb *MultiBucketAggregateBaseMultiTermsBucketBuilder) Meta(meta *MetadataBuilder) *MultiBucketAggregateBaseMultiTermsBucketBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
+	return r
 }

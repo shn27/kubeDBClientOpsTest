@@ -15,77 +15,96 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/searchtype"
 )
 
 // SearchInputRequestDefinition type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Input.ts#L120-L127
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Input.ts#L118-L125
 type SearchInputRequestDefinition struct {
 	Body               *SearchInputRequestBody    `json:"body,omitempty"`
-	Indices            []IndexName                `json:"indices,omitempty"`
+	Indices            []string                   `json:"indices,omitempty"`
 	IndicesOptions     *IndicesOptions            `json:"indices_options,omitempty"`
 	RestTotalHitsAsInt *bool                      `json:"rest_total_hits_as_int,omitempty"`
 	SearchType         *searchtype.SearchType     `json:"search_type,omitempty"`
 	Template           *SearchTemplateRequestBody `json:"template,omitempty"`
 }
 
-// SearchInputRequestDefinitionBuilder holds SearchInputRequestDefinition struct and provides a builder API.
-type SearchInputRequestDefinitionBuilder struct {
-	v *SearchInputRequestDefinition
-}
+func (s *SearchInputRequestDefinition) UnmarshalJSON(data []byte) error {
 
-// NewSearchInputRequestDefinition provides a builder for the SearchInputRequestDefinition struct.
-func NewSearchInputRequestDefinitionBuilder() *SearchInputRequestDefinitionBuilder {
-	r := SearchInputRequestDefinitionBuilder{
-		&SearchInputRequestDefinition{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "body":
+			if err := dec.Decode(&s.Body); err != nil {
+				return fmt.Errorf("%s | %w", "Body", err)
+			}
+
+		case "indices":
+			if err := dec.Decode(&s.Indices); err != nil {
+				return fmt.Errorf("%s | %w", "Indices", err)
+			}
+
+		case "indices_options":
+			if err := dec.Decode(&s.IndicesOptions); err != nil {
+				return fmt.Errorf("%s | %w", "IndicesOptions", err)
+			}
+
+		case "rest_total_hits_as_int":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "RestTotalHitsAsInt", err)
+				}
+				s.RestTotalHitsAsInt = &value
+			case bool:
+				s.RestTotalHitsAsInt = &v
+			}
+
+		case "search_type":
+			if err := dec.Decode(&s.SearchType); err != nil {
+				return fmt.Errorf("%s | %w", "SearchType", err)
+			}
+
+		case "template":
+			if err := dec.Decode(&s.Template); err != nil {
+				return fmt.Errorf("%s | %w", "Template", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SearchInputRequestDefinition struct
-func (rb *SearchInputRequestDefinitionBuilder) Build() SearchInputRequestDefinition {
-	return *rb.v
-}
+// NewSearchInputRequestDefinition returns a SearchInputRequestDefinition.
+func NewSearchInputRequestDefinition() *SearchInputRequestDefinition {
+	r := &SearchInputRequestDefinition{}
 
-func (rb *SearchInputRequestDefinitionBuilder) Body(body *SearchInputRequestBodyBuilder) *SearchInputRequestDefinitionBuilder {
-	v := body.Build()
-	rb.v.Body = &v
-	return rb
-}
-
-func (rb *SearchInputRequestDefinitionBuilder) Indices(indices ...IndexName) *SearchInputRequestDefinitionBuilder {
-	rb.v.Indices = indices
-	return rb
-}
-
-func (rb *SearchInputRequestDefinitionBuilder) IndicesOptions(indicesoptions *IndicesOptionsBuilder) *SearchInputRequestDefinitionBuilder {
-	v := indicesoptions.Build()
-	rb.v.IndicesOptions = &v
-	return rb
-}
-
-func (rb *SearchInputRequestDefinitionBuilder) RestTotalHitsAsInt(resttotalhitsasint bool) *SearchInputRequestDefinitionBuilder {
-	rb.v.RestTotalHitsAsInt = &resttotalhitsasint
-	return rb
-}
-
-func (rb *SearchInputRequestDefinitionBuilder) SearchType(searchtype searchtype.SearchType) *SearchInputRequestDefinitionBuilder {
-	rb.v.SearchType = &searchtype
-	return rb
-}
-
-func (rb *SearchInputRequestDefinitionBuilder) Template(template *SearchTemplateRequestBodyBuilder) *SearchInputRequestDefinitionBuilder {
-	v := template.Build()
-	rb.v.Template = &v
-	return rb
+	return r
 }

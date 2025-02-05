@@ -15,25 +15,30 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/actionstatusoptions"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/actiontype"
 )
 
 // ExecutionResultAction type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Execution.ts#L74-L86
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Execution.ts#L74-L86
 type ExecutionResultAction struct {
 	Email     *EmailResult                            `json:"email,omitempty"`
 	Error     *ErrorCause                             `json:"error,omitempty"`
-	Id        Id                                      `json:"id"`
+	Id        string                                  `json:"id"`
 	Index     *IndexResult                            `json:"index,omitempty"`
 	Logging   *LoggingResult                          `json:"logging,omitempty"`
 	Pagerduty *PagerDutyResult                        `json:"pagerduty,omitempty"`
@@ -44,83 +49,91 @@ type ExecutionResultAction struct {
 	Webhook   *WebhookResult                          `json:"webhook,omitempty"`
 }
 
-// ExecutionResultActionBuilder holds ExecutionResultAction struct and provides a builder API.
-type ExecutionResultActionBuilder struct {
-	v *ExecutionResultAction
-}
+func (s *ExecutionResultAction) UnmarshalJSON(data []byte) error {
 
-// NewExecutionResultAction provides a builder for the ExecutionResultAction struct.
-func NewExecutionResultActionBuilder() *ExecutionResultActionBuilder {
-	r := ExecutionResultActionBuilder{
-		&ExecutionResultAction{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "email":
+			if err := dec.Decode(&s.Email); err != nil {
+				return fmt.Errorf("%s | %w", "Email", err)
+			}
+
+		case "error":
+			if err := dec.Decode(&s.Error); err != nil {
+				return fmt.Errorf("%s | %w", "Error", err)
+			}
+
+		case "id":
+			if err := dec.Decode(&s.Id); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
+
+		case "index":
+			if err := dec.Decode(&s.Index); err != nil {
+				return fmt.Errorf("%s | %w", "Index", err)
+			}
+
+		case "logging":
+			if err := dec.Decode(&s.Logging); err != nil {
+				return fmt.Errorf("%s | %w", "Logging", err)
+			}
+
+		case "pagerduty":
+			if err := dec.Decode(&s.Pagerduty); err != nil {
+				return fmt.Errorf("%s | %w", "Pagerduty", err)
+			}
+
+		case "reason":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Reason", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Reason = &o
+
+		case "slack":
+			if err := dec.Decode(&s.Slack); err != nil {
+				return fmt.Errorf("%s | %w", "Slack", err)
+			}
+
+		case "status":
+			if err := dec.Decode(&s.Status); err != nil {
+				return fmt.Errorf("%s | %w", "Status", err)
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "webhook":
+			if err := dec.Decode(&s.Webhook); err != nil {
+				return fmt.Errorf("%s | %w", "Webhook", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ExecutionResultAction struct
-func (rb *ExecutionResultActionBuilder) Build() ExecutionResultAction {
-	return *rb.v
-}
+// NewExecutionResultAction returns a ExecutionResultAction.
+func NewExecutionResultAction() *ExecutionResultAction {
+	r := &ExecutionResultAction{}
 
-func (rb *ExecutionResultActionBuilder) Email(email *EmailResultBuilder) *ExecutionResultActionBuilder {
-	v := email.Build()
-	rb.v.Email = &v
-	return rb
-}
-
-func (rb *ExecutionResultActionBuilder) Error(error *ErrorCauseBuilder) *ExecutionResultActionBuilder {
-	v := error.Build()
-	rb.v.Error = &v
-	return rb
-}
-
-func (rb *ExecutionResultActionBuilder) Id(id Id) *ExecutionResultActionBuilder {
-	rb.v.Id = id
-	return rb
-}
-
-func (rb *ExecutionResultActionBuilder) Index(index *IndexResultBuilder) *ExecutionResultActionBuilder {
-	v := index.Build()
-	rb.v.Index = &v
-	return rb
-}
-
-func (rb *ExecutionResultActionBuilder) Logging(logging *LoggingResultBuilder) *ExecutionResultActionBuilder {
-	v := logging.Build()
-	rb.v.Logging = &v
-	return rb
-}
-
-func (rb *ExecutionResultActionBuilder) Pagerduty(pagerduty *PagerDutyResultBuilder) *ExecutionResultActionBuilder {
-	v := pagerduty.Build()
-	rb.v.Pagerduty = &v
-	return rb
-}
-
-func (rb *ExecutionResultActionBuilder) Reason(reason string) *ExecutionResultActionBuilder {
-	rb.v.Reason = &reason
-	return rb
-}
-
-func (rb *ExecutionResultActionBuilder) Slack(slack *SlackResultBuilder) *ExecutionResultActionBuilder {
-	v := slack.Build()
-	rb.v.Slack = &v
-	return rb
-}
-
-func (rb *ExecutionResultActionBuilder) Status(status actionstatusoptions.ActionStatusOptions) *ExecutionResultActionBuilder {
-	rb.v.Status = status
-	return rb
-}
-
-func (rb *ExecutionResultActionBuilder) Type_(type_ actiontype.ActionType) *ExecutionResultActionBuilder {
-	rb.v.Type = type_
-	return rb
-}
-
-func (rb *ExecutionResultActionBuilder) Webhook(webhook *WebhookResultBuilder) *ExecutionResultActionBuilder {
-	v := webhook.Build()
-	rb.v.Webhook = &v
-	return rb
+	return r
 }

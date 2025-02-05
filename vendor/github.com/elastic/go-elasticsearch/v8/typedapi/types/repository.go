@@ -15,53 +15,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
-// Repository type.
+// Repository holds the union for the following types:
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/snapshot/_types/SnapshotRepository.ts#L23-L27
-type Repository struct {
-	Settings RepositorySettings `json:"settings"`
-	Type     string             `json:"type"`
-	Uuid     *Uuid              `json:"uuid,omitempty"`
-}
-
-// RepositoryBuilder holds Repository struct and provides a builder API.
-type RepositoryBuilder struct {
-	v *Repository
-}
-
-// NewRepository provides a builder for the Repository struct.
-func NewRepositoryBuilder() *RepositoryBuilder {
-	r := RepositoryBuilder{
-		&Repository{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the Repository struct
-func (rb *RepositoryBuilder) Build() Repository {
-	return *rb.v
-}
-
-func (rb *RepositoryBuilder) Settings(settings *RepositorySettingsBuilder) *RepositoryBuilder {
-	v := settings.Build()
-	rb.v.Settings = v
-	return rb
-}
-
-func (rb *RepositoryBuilder) Type_(type_ string) *RepositoryBuilder {
-	rb.v.Type = type_
-	return rb
-}
-
-func (rb *RepositoryBuilder) Uuid(uuid Uuid) *RepositoryBuilder {
-	rb.v.Uuid = &uuid
-	return rb
-}
+//	AzureRepository
+//	GcsRepository
+//	S3Repository
+//	SharedFileSystemRepository
+//	ReadOnlyUrlRepository
+//	SourceOnlyRepository
+//
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/snapshot/_types/SnapshotRepository.ts#L24-L34
+type Repository any

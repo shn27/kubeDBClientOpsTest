@@ -15,60 +15,77 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // AvgAggregate type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L198-L199
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L218-L222
 type AvgAggregate struct {
-	Meta *Metadata `json:"meta,omitempty"`
+	Meta Metadata `json:"meta,omitempty"`
 	// Value The metric value. A missing value generally means that there was no data to
 	// aggregate,
 	// unless specified otherwise.
-	Value         float64 `json:"value,omitempty"`
-	ValueAsString *string `json:"value_as_string,omitempty"`
+	Value         *Float64 `json:"value,omitempty"`
+	ValueAsString *string  `json:"value_as_string,omitempty"`
 }
 
-// AvgAggregateBuilder holds AvgAggregate struct and provides a builder API.
-type AvgAggregateBuilder struct {
-	v *AvgAggregate
-}
+func (s *AvgAggregate) UnmarshalJSON(data []byte) error {
 
-// NewAvgAggregate provides a builder for the AvgAggregate struct.
-func NewAvgAggregateBuilder() *AvgAggregateBuilder {
-	r := AvgAggregateBuilder{
-		&AvgAggregate{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "meta":
+			if err := dec.Decode(&s.Meta); err != nil {
+				return fmt.Errorf("%s | %w", "Meta", err)
+			}
+
+		case "value":
+			if err := dec.Decode(&s.Value); err != nil {
+				return fmt.Errorf("%s | %w", "Value", err)
+			}
+
+		case "value_as_string":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ValueAsString", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ValueAsString = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the AvgAggregate struct
-func (rb *AvgAggregateBuilder) Build() AvgAggregate {
-	return *rb.v
-}
+// NewAvgAggregate returns a AvgAggregate.
+func NewAvgAggregate() *AvgAggregate {
+	r := &AvgAggregate{}
 
-func (rb *AvgAggregateBuilder) Meta(meta *MetadataBuilder) *AvgAggregateBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-// Value The metric value. A missing value generally means that there was no data to
-// aggregate,
-// unless specified otherwise.
-
-func (rb *AvgAggregateBuilder) Value(value float64) *AvgAggregateBuilder {
-	rb.v.Value = value
-	return rb
-}
-
-func (rb *AvgAggregateBuilder) ValueAsString(valueasstring string) *AvgAggregateBuilder {
-	rb.v.ValueAsString = &valueasstring
-	return rb
+	return r
 }

@@ -15,52 +15,56 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package invalidateapikey
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
-
-	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
+	"io"
+	"strconv"
 )
 
 // Request holds the request body struct for the package invalidateapikey
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/invalidate_api_key/SecurityInvalidateApiKeyRequest.ts#L23-L37
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/invalidate_api_key/SecurityInvalidateApiKeyRequest.ts#L23-L69
 type Request struct {
-	Id *types.Id `json:"id,omitempty"`
-
-	Ids []types.Id `json:"ids,omitempty"`
-
-	Name *types.Name `json:"name,omitempty"`
-
+	Id *string `json:"id,omitempty"`
+	// Ids A list of API key ids.
+	// This parameter cannot be used with any of `name`, `realm_name`, or
+	// `username`.
+	Ids []string `json:"ids,omitempty"`
+	// Name An API key name.
+	// This parameter cannot be used with any of `ids`, `realm_name` or `username`.
+	Name *string `json:"name,omitempty"`
+	// Owner Can be used to query API keys owned by the currently authenticated user.
+	// The `realm_name` or `username` parameters cannot be specified when this
+	// parameter is set to `true` as they are assumed to be the currently
+	// authenticated ones.
 	Owner *bool `json:"owner,omitempty"`
-
+	// RealmName The name of an authentication realm.
+	// This parameter cannot be used with either `ids` or `name`, or when `owner`
+	// flag is set to `true`.
 	RealmName *string `json:"realm_name,omitempty"`
-
-	Username *types.Username `json:"username,omitempty"`
+	// Username The username of a user.
+	// This parameter cannot be used with either `ids` or `name`, or when `owner`
+	// flag is set to `true`.
+	Username *string `json:"username,omitempty"`
 }
 
-// RequestBuilder is the builder API for the invalidateapikey.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -71,37 +75,67 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) Id(id types.Id) *RequestBuilder {
-	rb.v.Id = &id
-	return rb
-}
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
 
-func (rb *RequestBuilder) Ids(ids ...types.Id) *RequestBuilder {
-	rb.v.Ids = ids
-	return rb
-}
+		switch t {
 
-func (rb *RequestBuilder) Name(name types.Name) *RequestBuilder {
-	rb.v.Name = &name
-	return rb
-}
+		case "id":
+			if err := dec.Decode(&s.Id); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
 
-func (rb *RequestBuilder) Owner(owner bool) *RequestBuilder {
-	rb.v.Owner = &owner
-	return rb
-}
+		case "ids":
+			if err := dec.Decode(&s.Ids); err != nil {
+				return fmt.Errorf("%s | %w", "Ids", err)
+			}
 
-func (rb *RequestBuilder) RealmName(realmname string) *RequestBuilder {
-	rb.v.RealmName = &realmname
-	return rb
-}
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
 
-func (rb *RequestBuilder) Username(username types.Username) *RequestBuilder {
-	rb.v.Username = &username
-	return rb
+		case "owner":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Owner", err)
+				}
+				s.Owner = &value
+			case bool:
+				s.Owner = &v
+			}
+
+		case "realm_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "RealmName", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.RealmName = &o
+
+		case "username":
+			if err := dec.Decode(&s.Username); err != nil {
+				return fmt.Errorf("%s | %w", "Username", err)
+			}
+
+		}
+	}
+	return nil
 }

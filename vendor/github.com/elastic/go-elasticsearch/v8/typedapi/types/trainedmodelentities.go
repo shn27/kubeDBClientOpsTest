@@ -15,64 +15,126 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // TrainedModelEntities type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/inference.ts#L386-L392
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/inference.ts#L421-L427
 type TrainedModelEntities struct {
 	ClassName        string  `json:"class_name"`
-	ClassProbability float64 `json:"class_probability"`
+	ClassProbability Float64 `json:"class_probability"`
 	EndPos           int     `json:"end_pos"`
 	Entity           string  `json:"entity"`
 	StartPos         int     `json:"start_pos"`
 }
 
-// TrainedModelEntitiesBuilder holds TrainedModelEntities struct and provides a builder API.
-type TrainedModelEntitiesBuilder struct {
-	v *TrainedModelEntities
-}
+func (s *TrainedModelEntities) UnmarshalJSON(data []byte) error {
 
-// NewTrainedModelEntities provides a builder for the TrainedModelEntities struct.
-func NewTrainedModelEntitiesBuilder() *TrainedModelEntitiesBuilder {
-	r := TrainedModelEntitiesBuilder{
-		&TrainedModelEntities{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "class_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ClassName", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ClassName = o
+
+		case "class_probability":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ClassProbability", err)
+				}
+				f := Float64(value)
+				s.ClassProbability = f
+			case float64:
+				f := Float64(v)
+				s.ClassProbability = f
+			}
+
+		case "end_pos":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "EndPos", err)
+				}
+				s.EndPos = value
+			case float64:
+				f := int(v)
+				s.EndPos = f
+			}
+
+		case "entity":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Entity", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Entity = o
+
+		case "start_pos":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "StartPos", err)
+				}
+				s.StartPos = value
+			case float64:
+				f := int(v)
+				s.StartPos = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TrainedModelEntities struct
-func (rb *TrainedModelEntitiesBuilder) Build() TrainedModelEntities {
-	return *rb.v
-}
+// NewTrainedModelEntities returns a TrainedModelEntities.
+func NewTrainedModelEntities() *TrainedModelEntities {
+	r := &TrainedModelEntities{}
 
-func (rb *TrainedModelEntitiesBuilder) ClassName(classname string) *TrainedModelEntitiesBuilder {
-	rb.v.ClassName = classname
-	return rb
-}
-
-func (rb *TrainedModelEntitiesBuilder) ClassProbability(classprobability float64) *TrainedModelEntitiesBuilder {
-	rb.v.ClassProbability = classprobability
-	return rb
-}
-
-func (rb *TrainedModelEntitiesBuilder) EndPos(endpos int) *TrainedModelEntitiesBuilder {
-	rb.v.EndPos = endpos
-	return rb
-}
-
-func (rb *TrainedModelEntitiesBuilder) Entity(entity string) *TrainedModelEntitiesBuilder {
-	rb.v.Entity = entity
-	return rb
-}
-
-func (rb *TrainedModelEntitiesBuilder) StartPos(startpos int) *TrainedModelEntitiesBuilder {
-	rb.v.StartPos = startpos
-	return rb
+	return r
 }

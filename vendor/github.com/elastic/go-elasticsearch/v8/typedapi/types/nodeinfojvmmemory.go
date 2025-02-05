@@ -15,99 +15,159 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // NodeInfoJvmMemory type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/info/types.ts#L302-L313
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/info/types.ts#L318-L329
 type NodeInfoJvmMemory struct {
-	DirectMax          *ByteSize `json:"direct_max,omitempty"`
-	DirectMaxInBytes   int64     `json:"direct_max_in_bytes"`
-	HeapInit           *ByteSize `json:"heap_init,omitempty"`
-	HeapInitInBytes    int64     `json:"heap_init_in_bytes"`
-	HeapMax            *ByteSize `json:"heap_max,omitempty"`
-	HeapMaxInBytes     int64     `json:"heap_max_in_bytes"`
-	NonHeapInit        *ByteSize `json:"non_heap_init,omitempty"`
-	NonHeapInitInBytes int64     `json:"non_heap_init_in_bytes"`
-	NonHeapMax         *ByteSize `json:"non_heap_max,omitempty"`
-	NonHeapMaxInBytes  int64     `json:"non_heap_max_in_bytes"`
+	DirectMax          ByteSize `json:"direct_max,omitempty"`
+	DirectMaxInBytes   int64    `json:"direct_max_in_bytes"`
+	HeapInit           ByteSize `json:"heap_init,omitempty"`
+	HeapInitInBytes    int64    `json:"heap_init_in_bytes"`
+	HeapMax            ByteSize `json:"heap_max,omitempty"`
+	HeapMaxInBytes     int64    `json:"heap_max_in_bytes"`
+	NonHeapInit        ByteSize `json:"non_heap_init,omitempty"`
+	NonHeapInitInBytes int64    `json:"non_heap_init_in_bytes"`
+	NonHeapMax         ByteSize `json:"non_heap_max,omitempty"`
+	NonHeapMaxInBytes  int64    `json:"non_heap_max_in_bytes"`
 }
 
-// NodeInfoJvmMemoryBuilder holds NodeInfoJvmMemory struct and provides a builder API.
-type NodeInfoJvmMemoryBuilder struct {
-	v *NodeInfoJvmMemory
-}
+func (s *NodeInfoJvmMemory) UnmarshalJSON(data []byte) error {
 
-// NewNodeInfoJvmMemory provides a builder for the NodeInfoJvmMemory struct.
-func NewNodeInfoJvmMemoryBuilder() *NodeInfoJvmMemoryBuilder {
-	r := NodeInfoJvmMemoryBuilder{
-		&NodeInfoJvmMemory{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "direct_max":
+			if err := dec.Decode(&s.DirectMax); err != nil {
+				return fmt.Errorf("%s | %w", "DirectMax", err)
+			}
+
+		case "direct_max_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DirectMaxInBytes", err)
+				}
+				s.DirectMaxInBytes = value
+			case float64:
+				f := int64(v)
+				s.DirectMaxInBytes = f
+			}
+
+		case "heap_init":
+			if err := dec.Decode(&s.HeapInit); err != nil {
+				return fmt.Errorf("%s | %w", "HeapInit", err)
+			}
+
+		case "heap_init_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "HeapInitInBytes", err)
+				}
+				s.HeapInitInBytes = value
+			case float64:
+				f := int64(v)
+				s.HeapInitInBytes = f
+			}
+
+		case "heap_max":
+			if err := dec.Decode(&s.HeapMax); err != nil {
+				return fmt.Errorf("%s | %w", "HeapMax", err)
+			}
+
+		case "heap_max_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "HeapMaxInBytes", err)
+				}
+				s.HeapMaxInBytes = value
+			case float64:
+				f := int64(v)
+				s.HeapMaxInBytes = f
+			}
+
+		case "non_heap_init":
+			if err := dec.Decode(&s.NonHeapInit); err != nil {
+				return fmt.Errorf("%s | %w", "NonHeapInit", err)
+			}
+
+		case "non_heap_init_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NonHeapInitInBytes", err)
+				}
+				s.NonHeapInitInBytes = value
+			case float64:
+				f := int64(v)
+				s.NonHeapInitInBytes = f
+			}
+
+		case "non_heap_max":
+			if err := dec.Decode(&s.NonHeapMax); err != nil {
+				return fmt.Errorf("%s | %w", "NonHeapMax", err)
+			}
+
+		case "non_heap_max_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NonHeapMaxInBytes", err)
+				}
+				s.NonHeapMaxInBytes = value
+			case float64:
+				f := int64(v)
+				s.NonHeapMaxInBytes = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the NodeInfoJvmMemory struct
-func (rb *NodeInfoJvmMemoryBuilder) Build() NodeInfoJvmMemory {
-	return *rb.v
-}
+// NewNodeInfoJvmMemory returns a NodeInfoJvmMemory.
+func NewNodeInfoJvmMemory() *NodeInfoJvmMemory {
+	r := &NodeInfoJvmMemory{}
 
-func (rb *NodeInfoJvmMemoryBuilder) DirectMax(directmax *ByteSizeBuilder) *NodeInfoJvmMemoryBuilder {
-	v := directmax.Build()
-	rb.v.DirectMax = &v
-	return rb
-}
-
-func (rb *NodeInfoJvmMemoryBuilder) DirectMaxInBytes(directmaxinbytes int64) *NodeInfoJvmMemoryBuilder {
-	rb.v.DirectMaxInBytes = directmaxinbytes
-	return rb
-}
-
-func (rb *NodeInfoJvmMemoryBuilder) HeapInit(heapinit *ByteSizeBuilder) *NodeInfoJvmMemoryBuilder {
-	v := heapinit.Build()
-	rb.v.HeapInit = &v
-	return rb
-}
-
-func (rb *NodeInfoJvmMemoryBuilder) HeapInitInBytes(heapinitinbytes int64) *NodeInfoJvmMemoryBuilder {
-	rb.v.HeapInitInBytes = heapinitinbytes
-	return rb
-}
-
-func (rb *NodeInfoJvmMemoryBuilder) HeapMax(heapmax *ByteSizeBuilder) *NodeInfoJvmMemoryBuilder {
-	v := heapmax.Build()
-	rb.v.HeapMax = &v
-	return rb
-}
-
-func (rb *NodeInfoJvmMemoryBuilder) HeapMaxInBytes(heapmaxinbytes int64) *NodeInfoJvmMemoryBuilder {
-	rb.v.HeapMaxInBytes = heapmaxinbytes
-	return rb
-}
-
-func (rb *NodeInfoJvmMemoryBuilder) NonHeapInit(nonheapinit *ByteSizeBuilder) *NodeInfoJvmMemoryBuilder {
-	v := nonheapinit.Build()
-	rb.v.NonHeapInit = &v
-	return rb
-}
-
-func (rb *NodeInfoJvmMemoryBuilder) NonHeapInitInBytes(nonheapinitinbytes int64) *NodeInfoJvmMemoryBuilder {
-	rb.v.NonHeapInitInBytes = nonheapinitinbytes
-	return rb
-}
-
-func (rb *NodeInfoJvmMemoryBuilder) NonHeapMax(nonheapmax *ByteSizeBuilder) *NodeInfoJvmMemoryBuilder {
-	v := nonheapmax.Build()
-	rb.v.NonHeapMax = &v
-	return rb
-}
-
-func (rb *NodeInfoJvmMemoryBuilder) NonHeapMaxInBytes(nonheapmaxinbytes int64) *NodeInfoJvmMemoryBuilder {
-	rb.v.NonHeapMaxInBytes = nonheapmaxinbytes
-	return rb
+	return r
 }

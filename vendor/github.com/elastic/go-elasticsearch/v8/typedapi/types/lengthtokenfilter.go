@@ -15,55 +15,110 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // LengthTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L242-L246
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L244-L248
 type LengthTokenFilter struct {
-	Max     *int           `json:"max,omitempty"`
-	Min     *int           `json:"min,omitempty"`
-	Type    string         `json:"type,omitempty"`
-	Version *VersionString `json:"version,omitempty"`
+	Max     *int    `json:"max,omitempty"`
+	Min     *int    `json:"min,omitempty"`
+	Type    string  `json:"type,omitempty"`
+	Version *string `json:"version,omitempty"`
 }
 
-// LengthTokenFilterBuilder holds LengthTokenFilter struct and provides a builder API.
-type LengthTokenFilterBuilder struct {
-	v *LengthTokenFilter
+func (s *LengthTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "max":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Max", err)
+				}
+				s.Max = &value
+			case float64:
+				f := int(v)
+				s.Max = &f
+			}
+
+		case "min":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Min", err)
+				}
+				s.Min = &value
+			case float64:
+				f := int(v)
+				s.Min = &f
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewLengthTokenFilter provides a builder for the LengthTokenFilter struct.
-func NewLengthTokenFilterBuilder() *LengthTokenFilterBuilder {
-	r := LengthTokenFilterBuilder{
-		&LengthTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s LengthTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerLengthTokenFilter LengthTokenFilter
+	tmp := innerLengthTokenFilter{
+		Max:     s.Max,
+		Min:     s.Min,
+		Type:    s.Type,
+		Version: s.Version,
 	}
 
-	r.v.Type = "length"
+	tmp.Type = "length"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the LengthTokenFilter struct
-func (rb *LengthTokenFilterBuilder) Build() LengthTokenFilter {
-	return *rb.v
-}
+// NewLengthTokenFilter returns a LengthTokenFilter.
+func NewLengthTokenFilter() *LengthTokenFilter {
+	r := &LengthTokenFilter{}
 
-func (rb *LengthTokenFilterBuilder) Max(max int) *LengthTokenFilterBuilder {
-	rb.v.Max = &max
-	return rb
-}
-
-func (rb *LengthTokenFilterBuilder) Min(min int) *LengthTokenFilterBuilder {
-	rb.v.Min = &min
-	return rb
-}
-
-func (rb *LengthTokenFilterBuilder) Version(version VersionString) *LengthTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

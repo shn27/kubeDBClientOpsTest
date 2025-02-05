@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 //
-// Code generated from specification version 8.4.0: DO NOT EDIT
+// Code generated from specification version 8.17.0: DO NOT EDIT
 
 package esapi
 
@@ -33,6 +33,11 @@ func newSecurityUpdateUserProfileDataFunc(t Transport) SecurityUpdateUserProfile
 		for _, f := range o {
 			f(&r)
 		}
+
+		if transport, ok := t.(Instrumented); ok {
+			r.instrument = transport.InstrumentationEnabled()
+		}
+
 		return r.Do(r.ctx, t)
 	}
 }
@@ -40,8 +45,6 @@ func newSecurityUpdateUserProfileDataFunc(t Transport) SecurityUpdateUserProfile
 // ----- API Definition -------------------------------------------------------
 
 // SecurityUpdateUserProfileData - Update application specific data for the user profile of the given unique ID.
-//
-// This API is experimental.
 //
 // See full documentation at https://www.elastic.co/guide/en/elasticsearch/reference/current/security-api-update-user-profile-data.html.
 type SecurityUpdateUserProfileData func(body io.Reader, uid string, o ...func(*SecurityUpdateUserProfileDataRequest)) (*Response, error)
@@ -64,15 +67,26 @@ type SecurityUpdateUserProfileDataRequest struct {
 	Header http.Header
 
 	ctx context.Context
+
+	instrument Instrumentation
 }
 
 // Do executes the request and returns response or error.
-func (r SecurityUpdateUserProfileDataRequest) Do(ctx context.Context, transport Transport) (*Response, error) {
+func (r SecurityUpdateUserProfileDataRequest) Do(providedCtx context.Context, transport Transport) (*Response, error) {
 	var (
 		method string
 		path   strings.Builder
 		params map[string]string
+		ctx    context.Context
 	)
+
+	if instrument, ok := r.instrument.(Instrumentation); ok {
+		ctx = instrument.Start(providedCtx, "security.update_user_profile_data")
+		defer instrument.Close(ctx)
+	}
+	if ctx == nil {
+		ctx = providedCtx
+	}
 
 	method = "PUT"
 
@@ -84,6 +98,9 @@ func (r SecurityUpdateUserProfileDataRequest) Do(ctx context.Context, transport 
 	path.WriteString("profile")
 	path.WriteString("/")
 	path.WriteString(r.UID)
+	if instrument, ok := r.instrument.(Instrumentation); ok {
+		instrument.RecordPathPart(ctx, "uid", r.UID)
+	}
 	path.WriteString("/")
 	path.WriteString("_data")
 
@@ -119,6 +136,9 @@ func (r SecurityUpdateUserProfileDataRequest) Do(ctx context.Context, transport 
 
 	req, err := newRequest(method, path.String(), r.Body)
 	if err != nil {
+		if instrument, ok := r.instrument.(Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
 		return nil, err
 	}
 
@@ -128,10 +148,6 @@ func (r SecurityUpdateUserProfileDataRequest) Do(ctx context.Context, transport 
 			q.Set(k, v)
 		}
 		req.URL.RawQuery = q.Encode()
-	}
-
-	if r.Body != nil {
-		req.Header[headerContentType] = headerContentTypeJSON
 	}
 
 	if len(r.Header) > 0 {
@@ -146,12 +162,28 @@ func (r SecurityUpdateUserProfileDataRequest) Do(ctx context.Context, transport 
 		}
 	}
 
+	if r.Body != nil && req.Header.Get(headerContentType) == "" {
+		req.Header[headerContentType] = headerContentTypeJSON
+	}
+
 	if ctx != nil {
 		req = req.WithContext(ctx)
 	}
 
+	if instrument, ok := r.instrument.(Instrumentation); ok {
+		instrument.BeforeRequest(req, "security.update_user_profile_data")
+		if reader := instrument.RecordRequestBody(ctx, "security.update_user_profile_data", r.Body); reader != nil {
+			req.Body = reader
+		}
+	}
 	res, err := transport.Perform(req)
+	if instrument, ok := r.instrument.(Instrumentation); ok {
+		instrument.AfterRequest(req, "elasticsearch", "security.update_user_profile_data")
+	}
 	if err != nil {
+		if instrument, ok := r.instrument.(Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
 		return nil, err
 	}
 

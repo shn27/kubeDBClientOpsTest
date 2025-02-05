@@ -15,71 +15,110 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ClusterIndicesShards type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/stats/types.ts#L49-L61
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/stats/types.ts#L60-L72
 type ClusterIndicesShards struct {
 	// Index Contains statistics about shards assigned to selected nodes.
 	Index *ClusterIndicesShardsIndex `json:"index,omitempty"`
 	// Primaries Number of primary shards assigned to selected nodes.
-	Primaries *float64 `json:"primaries,omitempty"`
+	Primaries *Float64 `json:"primaries,omitempty"`
 	// Replication Ratio of replica shards to primary shards across all selected nodes.
-	Replication *float64 `json:"replication,omitempty"`
+	Replication *Float64 `json:"replication,omitempty"`
 	// Total Total number of shards assigned to selected nodes.
-	Total *float64 `json:"total,omitempty"`
+	Total *Float64 `json:"total,omitempty"`
 }
 
-// ClusterIndicesShardsBuilder holds ClusterIndicesShards struct and provides a builder API.
-type ClusterIndicesShardsBuilder struct {
-	v *ClusterIndicesShards
-}
+func (s *ClusterIndicesShards) UnmarshalJSON(data []byte) error {
 
-// NewClusterIndicesShards provides a builder for the ClusterIndicesShards struct.
-func NewClusterIndicesShardsBuilder() *ClusterIndicesShardsBuilder {
-	r := ClusterIndicesShardsBuilder{
-		&ClusterIndicesShards{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "index":
+			if err := dec.Decode(&s.Index); err != nil {
+				return fmt.Errorf("%s | %w", "Index", err)
+			}
+
+		case "primaries":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Primaries", err)
+				}
+				f := Float64(value)
+				s.Primaries = &f
+			case float64:
+				f := Float64(v)
+				s.Primaries = &f
+			}
+
+		case "replication":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Replication", err)
+				}
+				f := Float64(value)
+				s.Replication = &f
+			case float64:
+				f := Float64(v)
+				s.Replication = &f
+			}
+
+		case "total":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Total", err)
+				}
+				f := Float64(value)
+				s.Total = &f
+			case float64:
+				f := Float64(v)
+				s.Total = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ClusterIndicesShards struct
-func (rb *ClusterIndicesShardsBuilder) Build() ClusterIndicesShards {
-	return *rb.v
-}
+// NewClusterIndicesShards returns a ClusterIndicesShards.
+func NewClusterIndicesShards() *ClusterIndicesShards {
+	r := &ClusterIndicesShards{}
 
-// Index Contains statistics about shards assigned to selected nodes.
-
-func (rb *ClusterIndicesShardsBuilder) Index(index *ClusterIndicesShardsIndexBuilder) *ClusterIndicesShardsBuilder {
-	v := index.Build()
-	rb.v.Index = &v
-	return rb
-}
-
-// Primaries Number of primary shards assigned to selected nodes.
-
-func (rb *ClusterIndicesShardsBuilder) Primaries(primaries float64) *ClusterIndicesShardsBuilder {
-	rb.v.Primaries = &primaries
-	return rb
-}
-
-// Replication Ratio of replica shards to primary shards across all selected nodes.
-
-func (rb *ClusterIndicesShardsBuilder) Replication(replication float64) *ClusterIndicesShardsBuilder {
-	rb.v.Replication = &replication
-	return rb
-}
-
-// Total Total number of shards assigned to selected nodes.
-
-func (rb *ClusterIndicesShardsBuilder) Total(total float64) *ClusterIndicesShardsBuilder {
-	rb.v.Total = &total
-	return rb
+	return r
 }

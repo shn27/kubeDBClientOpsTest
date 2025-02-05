@@ -15,59 +15,110 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // CgroupCpu type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/_types/Stats.ts#L193-L198
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/_types/Stats.ts#L523-L540
 type CgroupCpu struct {
-	CfsPeriodMicros *int           `json:"cfs_period_micros,omitempty"`
-	CfsQuotaMicros  *int           `json:"cfs_quota_micros,omitempty"`
-	ControlGroup    *string        `json:"control_group,omitempty"`
-	Stat            *CgroupCpuStat `json:"stat,omitempty"`
+	// CfsPeriodMicros The period of time, in microseconds, for how regularly all tasks in the same
+	// cgroup as the Elasticsearch process should have their access to CPU resources
+	// reallocated.
+	CfsPeriodMicros *int `json:"cfs_period_micros,omitempty"`
+	// CfsQuotaMicros The total amount of time, in microseconds, for which all tasks in the same
+	// cgroup as the Elasticsearch process can run during one period
+	// `cfs_period_micros`.
+	CfsQuotaMicros *int `json:"cfs_quota_micros,omitempty"`
+	// ControlGroup The `cpu` control group to which the Elasticsearch process belongs.
+	ControlGroup *string `json:"control_group,omitempty"`
+	// Stat Contains CPU statistics for the node.
+	Stat *CgroupCpuStat `json:"stat,omitempty"`
 }
 
-// CgroupCpuBuilder holds CgroupCpu struct and provides a builder API.
-type CgroupCpuBuilder struct {
-	v *CgroupCpu
-}
+func (s *CgroupCpu) UnmarshalJSON(data []byte) error {
 
-// NewCgroupCpu provides a builder for the CgroupCpu struct.
-func NewCgroupCpuBuilder() *CgroupCpuBuilder {
-	r := CgroupCpuBuilder{
-		&CgroupCpu{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "cfs_period_micros":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CfsPeriodMicros", err)
+				}
+				s.CfsPeriodMicros = &value
+			case float64:
+				f := int(v)
+				s.CfsPeriodMicros = &f
+			}
+
+		case "cfs_quota_micros":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CfsQuotaMicros", err)
+				}
+				s.CfsQuotaMicros = &value
+			case float64:
+				f := int(v)
+				s.CfsQuotaMicros = &f
+			}
+
+		case "control_group":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ControlGroup", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ControlGroup = &o
+
+		case "stat":
+			if err := dec.Decode(&s.Stat); err != nil {
+				return fmt.Errorf("%s | %w", "Stat", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the CgroupCpu struct
-func (rb *CgroupCpuBuilder) Build() CgroupCpu {
-	return *rb.v
-}
+// NewCgroupCpu returns a CgroupCpu.
+func NewCgroupCpu() *CgroupCpu {
+	r := &CgroupCpu{}
 
-func (rb *CgroupCpuBuilder) CfsPeriodMicros(cfsperiodmicros int) *CgroupCpuBuilder {
-	rb.v.CfsPeriodMicros = &cfsperiodmicros
-	return rb
-}
-
-func (rb *CgroupCpuBuilder) CfsQuotaMicros(cfsquotamicros int) *CgroupCpuBuilder {
-	rb.v.CfsQuotaMicros = &cfsquotamicros
-	return rb
-}
-
-func (rb *CgroupCpuBuilder) ControlGroup(controlgroup string) *CgroupCpuBuilder {
-	rb.v.ControlGroup = &controlgroup
-	return rb
-}
-
-func (rb *CgroupCpuBuilder) Stat(stat *CgroupCpuStatBuilder) *CgroupCpuBuilder {
-	v := stat.Build()
-	rb.v.Stat = &v
-	return rb
+	return r
 }

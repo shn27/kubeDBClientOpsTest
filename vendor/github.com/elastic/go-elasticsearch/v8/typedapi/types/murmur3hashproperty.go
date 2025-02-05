@@ -15,115 +15,801 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/dynamicmapping"
 )
 
 // Murmur3HashProperty type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/mapping/specialized.ts#L66-L68
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/mapping/specialized.ts#L81-L83
 type Murmur3HashProperty struct {
-	CopyTo        *Fields                        `json:"copy_to,omitempty"`
-	DocValues     *bool                          `json:"doc_values,omitempty"`
-	Dynamic       *dynamicmapping.DynamicMapping `json:"dynamic,omitempty"`
-	Fields        map[PropertyName]Property      `json:"fields,omitempty"`
-	IgnoreAbove   *int                           `json:"ignore_above,omitempty"`
-	LocalMetadata *Metadata                      `json:"local_metadata,omitempty"`
-	Meta          map[string]string              `json:"meta,omitempty"`
-	Properties    map[PropertyName]Property      `json:"properties,omitempty"`
-	Similarity    *string                        `json:"similarity,omitempty"`
-	Store         *bool                          `json:"store,omitempty"`
-	Type          string                         `json:"type,omitempty"`
+	CopyTo      []string                       `json:"copy_to,omitempty"`
+	DocValues   *bool                          `json:"doc_values,omitempty"`
+	Dynamic     *dynamicmapping.DynamicMapping `json:"dynamic,omitempty"`
+	Fields      map[string]Property            `json:"fields,omitempty"`
+	IgnoreAbove *int                           `json:"ignore_above,omitempty"`
+	// Meta Metadata about the field.
+	Meta       map[string]string   `json:"meta,omitempty"`
+	Properties map[string]Property `json:"properties,omitempty"`
+	Store      *bool               `json:"store,omitempty"`
+	Type       string              `json:"type,omitempty"`
 }
 
-// Murmur3HashPropertyBuilder holds Murmur3HashProperty struct and provides a builder API.
-type Murmur3HashPropertyBuilder struct {
-	v *Murmur3HashProperty
+func (s *Murmur3HashProperty) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "copy_to":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "CopyTo", err)
+				}
+
+				s.CopyTo = append(s.CopyTo, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.CopyTo); err != nil {
+					return fmt.Errorf("%s | %w", "CopyTo", err)
+				}
+			}
+
+		case "doc_values":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DocValues", err)
+				}
+				s.DocValues = &value
+			case bool:
+				s.DocValues = &v
+			}
+
+		case "dynamic":
+			if err := dec.Decode(&s.Dynamic); err != nil {
+				return fmt.Errorf("%s | %w", "Dynamic", err)
+			}
+
+		case "fields":
+			if s.Fields == nil {
+				s.Fields = make(map[string]Property, 0)
+			}
+			refs := make(map[string]json.RawMessage, 0)
+			dec.Decode(&refs)
+			for key, message := range refs {
+				kind := make(map[string]any)
+				buf := bytes.NewReader(message)
+				localDec := json.NewDecoder(buf)
+				localDec.Decode(&kind)
+				buf.Seek(0, io.SeekStart)
+				if _, ok := kind["type"]; !ok {
+					kind["type"] = "object"
+				}
+				switch kind["type"] {
+				case "binary":
+					oo := NewBinaryProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "boolean":
+					oo := NewBooleanProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "{dynamic_type}":
+					oo := NewDynamicProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "join":
+					oo := NewJoinProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "keyword":
+					oo := NewKeywordProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "match_only_text":
+					oo := NewMatchOnlyTextProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "percolator":
+					oo := NewPercolatorProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "rank_feature":
+					oo := NewRankFeatureProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "rank_features":
+					oo := NewRankFeaturesProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "search_as_you_type":
+					oo := NewSearchAsYouTypeProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "text":
+					oo := NewTextProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "version":
+					oo := NewVersionProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "wildcard":
+					oo := NewWildcardProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "date_nanos":
+					oo := NewDateNanosProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "date":
+					oo := NewDateProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "aggregate_metric_double":
+					oo := NewAggregateMetricDoubleProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "dense_vector":
+					oo := NewDenseVectorProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "flattened":
+					oo := NewFlattenedProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "nested":
+					oo := NewNestedProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "object":
+					oo := NewObjectProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "semantic_text":
+					oo := NewSemanticTextProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "sparse_vector":
+					oo := NewSparseVectorProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "completion":
+					oo := NewCompletionProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "constant_keyword":
+					oo := NewConstantKeywordProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "alias":
+					oo := NewFieldAliasProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "histogram":
+					oo := NewHistogramProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "ip":
+					oo := NewIpProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "murmur3":
+					oo := NewMurmur3HashProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "token_count":
+					oo := NewTokenCountProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "geo_point":
+					oo := NewGeoPointProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "geo_shape":
+					oo := NewGeoShapeProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "point":
+					oo := NewPointProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "shape":
+					oo := NewShapeProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "byte":
+					oo := NewByteNumberProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "double":
+					oo := NewDoubleNumberProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "float":
+					oo := NewFloatNumberProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "half_float":
+					oo := NewHalfFloatNumberProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "integer":
+					oo := NewIntegerNumberProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "long":
+					oo := NewLongNumberProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "scaled_float":
+					oo := NewScaledFloatNumberProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "short":
+					oo := NewShortNumberProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "unsigned_long":
+					oo := NewUnsignedLongNumberProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "date_range":
+					oo := NewDateRangeProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "double_range":
+					oo := NewDoubleRangeProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "float_range":
+					oo := NewFloatRangeProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "integer_range":
+					oo := NewIntegerRangeProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "ip_range":
+					oo := NewIpRangeProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "long_range":
+					oo := NewLongRangeProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				case "icu_collation_keyword":
+					oo := NewIcuCollationProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				default:
+					oo := new(Property)
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Fields[key] = oo
+				}
+			}
+
+		case "ignore_above":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IgnoreAbove", err)
+				}
+				s.IgnoreAbove = &value
+			case float64:
+				f := int(v)
+				s.IgnoreAbove = &f
+			}
+
+		case "meta":
+			if s.Meta == nil {
+				s.Meta = make(map[string]string, 0)
+			}
+			if err := dec.Decode(&s.Meta); err != nil {
+				return fmt.Errorf("%s | %w", "Meta", err)
+			}
+
+		case "properties":
+			if s.Properties == nil {
+				s.Properties = make(map[string]Property, 0)
+			}
+			refs := make(map[string]json.RawMessage, 0)
+			dec.Decode(&refs)
+			for key, message := range refs {
+				kind := make(map[string]any)
+				buf := bytes.NewReader(message)
+				localDec := json.NewDecoder(buf)
+				localDec.Decode(&kind)
+				buf.Seek(0, io.SeekStart)
+				if _, ok := kind["type"]; !ok {
+					kind["type"] = "object"
+				}
+				switch kind["type"] {
+				case "binary":
+					oo := NewBinaryProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "boolean":
+					oo := NewBooleanProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "{dynamic_type}":
+					oo := NewDynamicProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "join":
+					oo := NewJoinProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "keyword":
+					oo := NewKeywordProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "match_only_text":
+					oo := NewMatchOnlyTextProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "percolator":
+					oo := NewPercolatorProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "rank_feature":
+					oo := NewRankFeatureProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "rank_features":
+					oo := NewRankFeaturesProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "search_as_you_type":
+					oo := NewSearchAsYouTypeProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "text":
+					oo := NewTextProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "version":
+					oo := NewVersionProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "wildcard":
+					oo := NewWildcardProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "date_nanos":
+					oo := NewDateNanosProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "date":
+					oo := NewDateProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "aggregate_metric_double":
+					oo := NewAggregateMetricDoubleProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "dense_vector":
+					oo := NewDenseVectorProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "flattened":
+					oo := NewFlattenedProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "nested":
+					oo := NewNestedProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "object":
+					oo := NewObjectProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "semantic_text":
+					oo := NewSemanticTextProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "sparse_vector":
+					oo := NewSparseVectorProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "completion":
+					oo := NewCompletionProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "constant_keyword":
+					oo := NewConstantKeywordProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "alias":
+					oo := NewFieldAliasProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "histogram":
+					oo := NewHistogramProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "ip":
+					oo := NewIpProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "murmur3":
+					oo := NewMurmur3HashProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "token_count":
+					oo := NewTokenCountProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "geo_point":
+					oo := NewGeoPointProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "geo_shape":
+					oo := NewGeoShapeProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "point":
+					oo := NewPointProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "shape":
+					oo := NewShapeProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "byte":
+					oo := NewByteNumberProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "double":
+					oo := NewDoubleNumberProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "float":
+					oo := NewFloatNumberProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "half_float":
+					oo := NewHalfFloatNumberProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "integer":
+					oo := NewIntegerNumberProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "long":
+					oo := NewLongNumberProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "scaled_float":
+					oo := NewScaledFloatNumberProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "short":
+					oo := NewShortNumberProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "unsigned_long":
+					oo := NewUnsignedLongNumberProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "date_range":
+					oo := NewDateRangeProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "double_range":
+					oo := NewDoubleRangeProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "float_range":
+					oo := NewFloatRangeProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "integer_range":
+					oo := NewIntegerRangeProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "ip_range":
+					oo := NewIpRangeProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "long_range":
+					oo := NewLongRangeProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				case "icu_collation_keyword":
+					oo := NewIcuCollationProperty()
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				default:
+					oo := new(Property)
+					if err := localDec.Decode(&oo); err != nil {
+						return err
+					}
+					s.Properties[key] = oo
+				}
+			}
+
+		case "store":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Store", err)
+				}
+				s.Store = &value
+			case bool:
+				s.Store = &v
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewMurmur3HashProperty provides a builder for the Murmur3HashProperty struct.
-func NewMurmur3HashPropertyBuilder() *Murmur3HashPropertyBuilder {
-	r := Murmur3HashPropertyBuilder{
-		&Murmur3HashProperty{
-			Fields:     make(map[PropertyName]Property, 0),
-			Meta:       make(map[string]string, 0),
-			Properties: make(map[PropertyName]Property, 0),
-		},
+// MarshalJSON override marshalling to include literal value
+func (s Murmur3HashProperty) MarshalJSON() ([]byte, error) {
+	type innerMurmur3HashProperty Murmur3HashProperty
+	tmp := innerMurmur3HashProperty{
+		CopyTo:      s.CopyTo,
+		DocValues:   s.DocValues,
+		Dynamic:     s.Dynamic,
+		Fields:      s.Fields,
+		IgnoreAbove: s.IgnoreAbove,
+		Meta:        s.Meta,
+		Properties:  s.Properties,
+		Store:       s.Store,
+		Type:        s.Type,
 	}
 
-	r.v.Type = "murmur3"
+	tmp.Type = "murmur3"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the Murmur3HashProperty struct
-func (rb *Murmur3HashPropertyBuilder) Build() Murmur3HashProperty {
-	return *rb.v
-}
-
-func (rb *Murmur3HashPropertyBuilder) CopyTo(copyto *FieldsBuilder) *Murmur3HashPropertyBuilder {
-	v := copyto.Build()
-	rb.v.CopyTo = &v
-	return rb
-}
-
-func (rb *Murmur3HashPropertyBuilder) DocValues(docvalues bool) *Murmur3HashPropertyBuilder {
-	rb.v.DocValues = &docvalues
-	return rb
-}
-
-func (rb *Murmur3HashPropertyBuilder) Dynamic(dynamic dynamicmapping.DynamicMapping) *Murmur3HashPropertyBuilder {
-	rb.v.Dynamic = &dynamic
-	return rb
-}
-
-func (rb *Murmur3HashPropertyBuilder) Fields(values map[PropertyName]*PropertyBuilder) *Murmur3HashPropertyBuilder {
-	tmp := make(map[PropertyName]Property, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
+// NewMurmur3HashProperty returns a Murmur3HashProperty.
+func NewMurmur3HashProperty() *Murmur3HashProperty {
+	r := &Murmur3HashProperty{
+		Fields:     make(map[string]Property, 0),
+		Meta:       make(map[string]string, 0),
+		Properties: make(map[string]Property, 0),
 	}
-	rb.v.Fields = tmp
-	return rb
-}
 
-func (rb *Murmur3HashPropertyBuilder) IgnoreAbove(ignoreabove int) *Murmur3HashPropertyBuilder {
-	rb.v.IgnoreAbove = &ignoreabove
-	return rb
-}
-
-func (rb *Murmur3HashPropertyBuilder) LocalMetadata(localmetadata *MetadataBuilder) *Murmur3HashPropertyBuilder {
-	v := localmetadata.Build()
-	rb.v.LocalMetadata = &v
-	return rb
-}
-
-func (rb *Murmur3HashPropertyBuilder) Meta(value map[string]string) *Murmur3HashPropertyBuilder {
-	rb.v.Meta = value
-	return rb
-}
-
-func (rb *Murmur3HashPropertyBuilder) Properties(values map[PropertyName]*PropertyBuilder) *Murmur3HashPropertyBuilder {
-	tmp := make(map[PropertyName]Property, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Properties = tmp
-	return rb
-}
-
-func (rb *Murmur3HashPropertyBuilder) Similarity(similarity string) *Murmur3HashPropertyBuilder {
-	rb.v.Similarity = &similarity
-	return rb
-}
-
-func (rb *Murmur3HashPropertyBuilder) Store(store bool) *Murmur3HashPropertyBuilder {
-	rb.v.Store = &store
-	return rb
+	return r
 }

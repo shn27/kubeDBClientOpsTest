@@ -15,72 +15,122 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/language"
 )
 
 // LanguageAnalyzer type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/analyzers.ts#L52-L59
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/analyzers.ts#L52-L59
 type LanguageAnalyzer struct {
 	Language      language.Language `json:"language"`
 	StemExclusion []string          `json:"stem_exclusion"`
-	Stopwords     *StopWords        `json:"stopwords,omitempty"`
+	Stopwords     []string          `json:"stopwords,omitempty"`
 	StopwordsPath *string           `json:"stopwords_path,omitempty"`
 	Type          string            `json:"type,omitempty"`
-	Version       *VersionString    `json:"version,omitempty"`
+	Version       *string           `json:"version,omitempty"`
 }
 
-// LanguageAnalyzerBuilder holds LanguageAnalyzer struct and provides a builder API.
-type LanguageAnalyzerBuilder struct {
-	v *LanguageAnalyzer
+func (s *LanguageAnalyzer) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "language":
+			if err := dec.Decode(&s.Language); err != nil {
+				return fmt.Errorf("%s | %w", "Language", err)
+			}
+
+		case "stem_exclusion":
+			if err := dec.Decode(&s.StemExclusion); err != nil {
+				return fmt.Errorf("%s | %w", "StemExclusion", err)
+			}
+
+		case "stopwords":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Stopwords", err)
+				}
+
+				s.Stopwords = append(s.Stopwords, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Stopwords); err != nil {
+					return fmt.Errorf("%s | %w", "Stopwords", err)
+				}
+			}
+
+		case "stopwords_path":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "StopwordsPath", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.StopwordsPath = &o
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewLanguageAnalyzer provides a builder for the LanguageAnalyzer struct.
-func NewLanguageAnalyzerBuilder() *LanguageAnalyzerBuilder {
-	r := LanguageAnalyzerBuilder{
-		&LanguageAnalyzer{},
+// MarshalJSON override marshalling to include literal value
+func (s LanguageAnalyzer) MarshalJSON() ([]byte, error) {
+	type innerLanguageAnalyzer LanguageAnalyzer
+	tmp := innerLanguageAnalyzer{
+		Language:      s.Language,
+		StemExclusion: s.StemExclusion,
+		Stopwords:     s.Stopwords,
+		StopwordsPath: s.StopwordsPath,
+		Type:          s.Type,
+		Version:       s.Version,
 	}
 
-	r.v.Type = "language"
+	tmp.Type = "language"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the LanguageAnalyzer struct
-func (rb *LanguageAnalyzerBuilder) Build() LanguageAnalyzer {
-	return *rb.v
-}
+// NewLanguageAnalyzer returns a LanguageAnalyzer.
+func NewLanguageAnalyzer() *LanguageAnalyzer {
+	r := &LanguageAnalyzer{}
 
-func (rb *LanguageAnalyzerBuilder) Language(language language.Language) *LanguageAnalyzerBuilder {
-	rb.v.Language = language
-	return rb
-}
-
-func (rb *LanguageAnalyzerBuilder) StemExclusion(stem_exclusion ...string) *LanguageAnalyzerBuilder {
-	rb.v.StemExclusion = stem_exclusion
-	return rb
-}
-
-func (rb *LanguageAnalyzerBuilder) Stopwords(stopwords *StopWordsBuilder) *LanguageAnalyzerBuilder {
-	v := stopwords.Build()
-	rb.v.Stopwords = &v
-	return rb
-}
-
-func (rb *LanguageAnalyzerBuilder) StopwordsPath(stopwordspath string) *LanguageAnalyzerBuilder {
-	rb.v.StopwordsPath = &stopwordspath
-	return rb
-}
-
-func (rb *LanguageAnalyzerBuilder) Version(version VersionString) *LanguageAnalyzerBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
@@ -28,31 +26,14 @@ import (
 
 // ScoreSort type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/sort.ts#L54-L56
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/sort.ts#L54-L56
 type ScoreSort struct {
 	Order *sortorder.SortOrder `json:"order,omitempty"`
 }
 
-// ScoreSortBuilder holds ScoreSort struct and provides a builder API.
-type ScoreSortBuilder struct {
-	v *ScoreSort
-}
+// NewScoreSort returns a ScoreSort.
+func NewScoreSort() *ScoreSort {
+	r := &ScoreSort{}
 
-// NewScoreSort provides a builder for the ScoreSort struct.
-func NewScoreSortBuilder() *ScoreSortBuilder {
-	r := ScoreSortBuilder{
-		&ScoreSort{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the ScoreSort struct
-func (rb *ScoreSortBuilder) Build() ScoreSort {
-	return *rb.v
-}
-
-func (rb *ScoreSortBuilder) Order(order sortorder.SortOrder) *ScoreSortBuilder {
-	rb.v.Order = &order
-	return rb
+	return r
 }

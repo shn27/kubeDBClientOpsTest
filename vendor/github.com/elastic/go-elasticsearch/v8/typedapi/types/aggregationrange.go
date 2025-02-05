@@ -15,52 +15,77 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // AggregationRange type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/bucket.ts#L294-L298
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/bucket.ts#L691-L704
 type AggregationRange struct {
-	From string  `json:"from,omitempty"`
-	Key  *string `json:"key,omitempty"`
-	To   string  `json:"to,omitempty"`
+	// From Start of the range (inclusive).
+	From *Float64 `json:"from,omitempty"`
+	// Key Custom key to return the range with.
+	Key *string `json:"key,omitempty"`
+	// To End of the range (exclusive).
+	To *Float64 `json:"to,omitempty"`
 }
 
-// AggregationRangeBuilder holds AggregationRange struct and provides a builder API.
-type AggregationRangeBuilder struct {
-	v *AggregationRange
-}
+func (s *AggregationRange) UnmarshalJSON(data []byte) error {
 
-// NewAggregationRange provides a builder for the AggregationRange struct.
-func NewAggregationRangeBuilder() *AggregationRangeBuilder {
-	r := AggregationRangeBuilder{
-		&AggregationRange{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "from":
+			if err := dec.Decode(&s.From); err != nil {
+				return fmt.Errorf("%s | %w", "From", err)
+			}
+
+		case "key":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Key", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Key = &o
+
+		case "to":
+			if err := dec.Decode(&s.To); err != nil {
+				return fmt.Errorf("%s | %w", "To", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the AggregationRange struct
-func (rb *AggregationRangeBuilder) Build() AggregationRange {
-	return *rb.v
-}
+// NewAggregationRange returns a AggregationRange.
+func NewAggregationRange() *AggregationRange {
+	r := &AggregationRange{}
 
-func (rb *AggregationRangeBuilder) From(arg string) *AggregationRangeBuilder {
-	rb.v.From = arg
-	return rb
-}
-
-func (rb *AggregationRangeBuilder) Key(key string) *AggregationRangeBuilder {
-	rb.v.Key = &key
-	return rb
-}
-
-func (rb *AggregationRangeBuilder) To(arg string) *AggregationRangeBuilder {
-	rb.v.To = arg
-	return rb
+	return r
 }

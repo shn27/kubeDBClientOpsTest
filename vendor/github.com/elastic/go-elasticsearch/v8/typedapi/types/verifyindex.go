@@ -15,62 +15,72 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // VerifyIndex type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/recovery/types.ts#L111-L116
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/recovery/types.ts#L111-L116
 type VerifyIndex struct {
-	CheckIndexTime         *Duration               `json:"check_index_time,omitempty"`
-	CheckIndexTimeInMillis DurationValueUnitMillis `json:"check_index_time_in_millis"`
-	TotalTime              *Duration               `json:"total_time,omitempty"`
-	TotalTimeInMillis      DurationValueUnitMillis `json:"total_time_in_millis"`
+	CheckIndexTime         Duration `json:"check_index_time,omitempty"`
+	CheckIndexTimeInMillis int64    `json:"check_index_time_in_millis"`
+	TotalTime              Duration `json:"total_time,omitempty"`
+	TotalTimeInMillis      int64    `json:"total_time_in_millis"`
 }
 
-// VerifyIndexBuilder holds VerifyIndex struct and provides a builder API.
-type VerifyIndexBuilder struct {
-	v *VerifyIndex
-}
+func (s *VerifyIndex) UnmarshalJSON(data []byte) error {
 
-// NewVerifyIndex provides a builder for the VerifyIndex struct.
-func NewVerifyIndexBuilder() *VerifyIndexBuilder {
-	r := VerifyIndexBuilder{
-		&VerifyIndex{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "check_index_time":
+			if err := dec.Decode(&s.CheckIndexTime); err != nil {
+				return fmt.Errorf("%s | %w", "CheckIndexTime", err)
+			}
+
+		case "check_index_time_in_millis":
+			if err := dec.Decode(&s.CheckIndexTimeInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "CheckIndexTimeInMillis", err)
+			}
+
+		case "total_time":
+			if err := dec.Decode(&s.TotalTime); err != nil {
+				return fmt.Errorf("%s | %w", "TotalTime", err)
+			}
+
+		case "total_time_in_millis":
+			if err := dec.Decode(&s.TotalTimeInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "TotalTimeInMillis", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the VerifyIndex struct
-func (rb *VerifyIndexBuilder) Build() VerifyIndex {
-	return *rb.v
-}
+// NewVerifyIndex returns a VerifyIndex.
+func NewVerifyIndex() *VerifyIndex {
+	r := &VerifyIndex{}
 
-func (rb *VerifyIndexBuilder) CheckIndexTime(checkindextime *DurationBuilder) *VerifyIndexBuilder {
-	v := checkindextime.Build()
-	rb.v.CheckIndexTime = &v
-	return rb
-}
-
-func (rb *VerifyIndexBuilder) CheckIndexTimeInMillis(checkindextimeinmillis *DurationValueUnitMillisBuilder) *VerifyIndexBuilder {
-	v := checkindextimeinmillis.Build()
-	rb.v.CheckIndexTimeInMillis = v
-	return rb
-}
-
-func (rb *VerifyIndexBuilder) TotalTime(totaltime *DurationBuilder) *VerifyIndexBuilder {
-	v := totaltime.Build()
-	rb.v.TotalTime = &v
-	return rb
-}
-
-func (rb *VerifyIndexBuilder) TotalTimeInMillis(totaltimeinmillis *DurationValueUnitMillisBuilder) *VerifyIndexBuilder {
-	v := totaltimeinmillis.Build()
-	rb.v.TotalTimeInMillis = v
-	return rb
+	return r
 }

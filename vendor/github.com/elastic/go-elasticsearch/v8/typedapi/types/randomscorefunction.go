@@ -15,46 +15,68 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // RandomScoreFunction type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/compound.ts#L65-L68
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/compound.ts#L144-L147
 type RandomScoreFunction struct {
-	Field *Field `json:"field,omitempty"`
-	Seed  string `json:"seed,omitempty"`
+	Field *string `json:"field,omitempty"`
+	Seed  string  `json:"seed,omitempty"`
 }
 
-// RandomScoreFunctionBuilder holds RandomScoreFunction struct and provides a builder API.
-type RandomScoreFunctionBuilder struct {
-	v *RandomScoreFunction
-}
+func (s *RandomScoreFunction) UnmarshalJSON(data []byte) error {
 
-// NewRandomScoreFunction provides a builder for the RandomScoreFunction struct.
-func NewRandomScoreFunctionBuilder() *RandomScoreFunctionBuilder {
-	r := RandomScoreFunctionBuilder{
-		&RandomScoreFunction{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "seed":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Seed", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Seed = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RandomScoreFunction struct
-func (rb *RandomScoreFunctionBuilder) Build() RandomScoreFunction {
-	return *rb.v
-}
+// NewRandomScoreFunction returns a RandomScoreFunction.
+func NewRandomScoreFunction() *RandomScoreFunction {
+	r := &RandomScoreFunction{}
 
-func (rb *RandomScoreFunctionBuilder) Field(field Field) *RandomScoreFunctionBuilder {
-	rb.v.Field = &field
-	return rb
-}
-
-func (rb *RandomScoreFunctionBuilder) Seed(arg string) *RandomScoreFunctionBuilder {
-	rb.v.Seed = arg
-	return rb
+	return r
 }

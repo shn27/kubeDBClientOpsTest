@@ -15,43 +15,85 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // SettingsSimilarityLmd type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/IndexSettings.ts#L206-L209
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/IndexSettings.ts#L214-L217
 type SettingsSimilarityLmd struct {
-	Mu   int    `json:"mu"`
-	Type string `json:"type,omitempty"`
+	Mu   *Float64 `json:"mu,omitempty"`
+	Type string   `json:"type,omitempty"`
 }
 
-// SettingsSimilarityLmdBuilder holds SettingsSimilarityLmd struct and provides a builder API.
-type SettingsSimilarityLmdBuilder struct {
-	v *SettingsSimilarityLmd
+func (s *SettingsSimilarityLmd) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "mu":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Mu", err)
+				}
+				f := Float64(value)
+				s.Mu = &f
+			case float64:
+				f := Float64(v)
+				s.Mu = &f
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewSettingsSimilarityLmd provides a builder for the SettingsSimilarityLmd struct.
-func NewSettingsSimilarityLmdBuilder() *SettingsSimilarityLmdBuilder {
-	r := SettingsSimilarityLmdBuilder{
-		&SettingsSimilarityLmd{},
+// MarshalJSON override marshalling to include literal value
+func (s SettingsSimilarityLmd) MarshalJSON() ([]byte, error) {
+	type innerSettingsSimilarityLmd SettingsSimilarityLmd
+	tmp := innerSettingsSimilarityLmd{
+		Mu:   s.Mu,
+		Type: s.Type,
 	}
 
-	r.v.Type = "LMDirichlet"
+	tmp.Type = "LMDirichlet"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the SettingsSimilarityLmd struct
-func (rb *SettingsSimilarityLmdBuilder) Build() SettingsSimilarityLmd {
-	return *rb.v
-}
+// NewSettingsSimilarityLmd returns a SettingsSimilarityLmd.
+func NewSettingsSimilarityLmd() *SettingsSimilarityLmd {
+	r := &SettingsSimilarityLmd{}
 
-func (rb *SettingsSimilarityLmdBuilder) Mu(mu int) *SettingsSimilarityLmdBuilder {
-	rb.v.Mu = mu
-	return rb
+	return r
 }

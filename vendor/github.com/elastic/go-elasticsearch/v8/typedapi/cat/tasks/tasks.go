@@ -15,28 +15,28 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
-
-// Returns information about the tasks currently executing on one or more nodes
-// in the cluster.
+// Returns information about tasks currently executing in the cluster.
+// IMPORTANT: cat APIs are only intended for human consumption using the command
+// line or Kibana console. They are not intended for use by applications. For
+// application consumption, use the task management API.
 package tasks
 
 import (
-	gobytes "bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 
 	"github.com/elastic/elastic-transport-go/v8/elastictransport"
+	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 )
 
 // ErrBuildPath is returned in case of missing parameters within the build of the request.
@@ -49,9 +49,13 @@ type Tasks struct {
 	values  url.Values
 	path    url.URL
 
-	buf *gobytes.Buffer
+	raw io.Reader
 
 	paramSet int
+
+	spanStarted bool
+
+	instrument elastictransport.Instrumentation
 }
 
 // NewTasks type alias for index.
@@ -67,16 +71,23 @@ func NewTasksFunc(tp elastictransport.Interface) NewTasks {
 	}
 }
 
-// Returns information about the tasks currently executing on one or more nodes
-// in the cluster.
+// Returns information about tasks currently executing in the cluster.
+// IMPORTANT: cat APIs are only intended for human consumption using the command
+// line or Kibana console. They are not intended for use by applications. For
+// application consumption, use the task management API.
 //
-// https://www.elastic.co/guide/en/elasticsearch/reference/{branch}/tasks.html
+// https://www.elastic.co/guide/en/elasticsearch/reference/current/tasks.html
 func New(tp elastictransport.Interface) *Tasks {
 	r := &Tasks{
 		transport: tp,
 		values:    make(url.Values),
 		headers:   make(http.Header),
-		buf:       gobytes.NewBuffer(nil),
+	}
+
+	if instrumented, ok := r.transport.(elastictransport.Instrumented); ok {
+		if instrument := instrumented.InstrumentationEnabled(); instrument != nil {
+			r.instrument = instrument
+		}
 	}
 
 	return r
@@ -111,12 +122,16 @@ func (r *Tasks) HttpRequest(ctx context.Context) (*http.Request, error) {
 	}
 
 	if ctx != nil {
-		req, err = http.NewRequestWithContext(ctx, method, r.path.String(), r.buf)
+		req, err = http.NewRequestWithContext(ctx, method, r.path.String(), r.raw)
 	} else {
-		req, err = http.NewRequest(method, r.path.String(), r.buf)
+		req, err = http.NewRequest(method, r.path.String(), r.raw)
 	}
 
-	req.Header.Set("accept", "application/vnd.elasticsearch+json;compatible-with=8")
+	req.Header = r.headers.Clone()
+
+	if req.Header.Get("Accept") == "" {
+		req.Header.Set("Accept", "application/vnd.elasticsearch+json;compatible-with=8")
+	}
 
 	if err != nil {
 		return req, fmt.Errorf("could not build http.Request: %w", err)
@@ -125,30 +140,121 @@ func (r *Tasks) HttpRequest(ctx context.Context) (*http.Request, error) {
 	return req, nil
 }
 
-// Do runs the http.Request through the provided transport.
-func (r Tasks) Do(ctx context.Context) (*http.Response, error) {
+// Perform runs the http.Request through the provided transport and returns an http.Response.
+func (r Tasks) Perform(providedCtx context.Context) (*http.Response, error) {
+	var ctx context.Context
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		if r.spanStarted == false {
+			ctx := instrument.Start(providedCtx, "cat.tasks")
+			defer instrument.Close(ctx)
+		}
+	}
+	if ctx == nil {
+		ctx = providedCtx
+	}
+
 	req, err := r.HttpRequest(ctx)
 	if err != nil {
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
 		return nil, err
 	}
 
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		instrument.BeforeRequest(req, "cat.tasks")
+		if reader := instrument.RecordRequestBody(ctx, "cat.tasks", r.raw); reader != nil {
+			req.Body = reader
+		}
+	}
 	res, err := r.transport.Perform(req)
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		instrument.AfterRequest(req, "elasticsearch", "cat.tasks")
+	}
 	if err != nil {
-		return nil, fmt.Errorf("an error happened during the Tasks query execution: %w", err)
+		localErr := fmt.Errorf("an error happened during the Tasks query execution: %w", err)
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, localErr)
+		}
+		return nil, localErr
 	}
 
 	return res, nil
 }
 
+// Do runs the request through the transport, handle the response and returns a tasks.Response
+func (r Tasks) Do(providedCtx context.Context) (Response, error) {
+	var ctx context.Context
+	r.spanStarted = true
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		ctx = instrument.Start(providedCtx, "cat.tasks")
+		defer instrument.Close(ctx)
+	}
+	if ctx == nil {
+		ctx = providedCtx
+	}
+
+	response := NewResponse()
+
+	res, err := r.Perform(ctx)
+	if err != nil {
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode < 299 {
+		err = json.NewDecoder(res.Body).Decode(&response)
+		if err != nil {
+			if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+				instrument.RecordError(ctx, err)
+			}
+			return nil, err
+		}
+
+		return response, nil
+	}
+
+	errorResponse := types.NewElasticsearchError()
+	err = json.NewDecoder(res.Body).Decode(errorResponse)
+	if err != nil {
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
+		return nil, err
+	}
+
+	if errorResponse.Status == 0 {
+		errorResponse.Status = res.StatusCode
+	}
+
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		instrument.RecordError(ctx, errorResponse)
+	}
+	return nil, errorResponse
+}
+
 // IsSuccess allows to run a query with a context and retrieve the result as a boolean.
 // This only exists for endpoints without a request payload and allows for quick control flow.
-func (r Tasks) IsSuccess(ctx context.Context) (bool, error) {
-	res, err := r.Do(ctx)
+func (r Tasks) IsSuccess(providedCtx context.Context) (bool, error) {
+	var ctx context.Context
+	r.spanStarted = true
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		ctx = instrument.Start(providedCtx, "cat.tasks")
+		defer instrument.Close(ctx)
+	}
+	if ctx == nil {
+		ctx = providedCtx
+	}
+
+	res, err := r.Perform(ctx)
 
 	if err != nil {
 		return false, err
 	}
-	io.Copy(ioutil.Discard, res.Body)
+	io.Copy(io.Discard, res.Body)
 	err = res.Body.Close()
 	if err != nil {
 		return false, err
@@ -156,6 +262,14 @@ func (r Tasks) IsSuccess(ctx context.Context) (bool, error) {
 
 	if res.StatusCode >= 200 && res.StatusCode < 300 {
 		return true, nil
+	}
+
+	if res.StatusCode != 404 {
+		err := fmt.Errorf("an error happened during the Tasks query execution, status code: %d", res.StatusCode)
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
+		return false, err
 	}
 
 	return false, nil
@@ -168,33 +282,149 @@ func (r *Tasks) Header(key, value string) *Tasks {
 	return r
 }
 
-// Actions A comma-separated list of actions that should be returned. Leave empty to
-// return all.
+// Actions The task action names, which are used to limit the response.
 // API name: actions
-func (r *Tasks) Actions(value string) *Tasks {
-	r.values.Set("actions", value)
+func (r *Tasks) Actions(actions ...string) *Tasks {
+	tmp := []string{}
+	for _, item := range actions {
+		tmp = append(tmp, fmt.Sprintf("%v", item))
+	}
+	r.values.Set("actions", strings.Join(tmp, ","))
 
 	return r
 }
 
-// Detailed Return detailed task information (default: false)
+// Detailed If `true`, the response includes detailed information about shard recoveries.
 // API name: detailed
-func (r *Tasks) Detailed(b bool) *Tasks {
-	r.values.Set("detailed", strconv.FormatBool(b))
+func (r *Tasks) Detailed(detailed bool) *Tasks {
+	r.values.Set("detailed", strconv.FormatBool(detailed))
 
 	return r
 }
 
+// NodeId Unique node identifiers, which are used to limit the response.
 // API name: node_id
-func (r *Tasks) NodeId(value string) *Tasks {
-	r.values.Set("node_id", value)
+func (r *Tasks) NodeId(nodeids ...string) *Tasks {
+	tmp := []string{}
+	for _, item := range nodeids {
+		tmp = append(tmp, fmt.Sprintf("%v", item))
+	}
+	r.values.Set("node_id", strings.Join(tmp, ","))
 
 	return r
 }
 
-// API name: parent_task
-func (r *Tasks) ParentTask(value string) *Tasks {
-	r.values.Set("parent_task", value)
+// ParentTaskId The parent task identifier, which is used to limit the response.
+// API name: parent_task_id
+func (r *Tasks) ParentTaskId(parenttaskid string) *Tasks {
+	r.values.Set("parent_task_id", parenttaskid)
+
+	return r
+}
+
+// Format Specifies the format to return the columnar data in, can be set to
+// `text`, `json`, `cbor`, `yaml`, or `smile`.
+// API name: format
+func (r *Tasks) Format(format string) *Tasks {
+	r.values.Set("format", format)
+
+	return r
+}
+
+// H List of columns to appear in the response. Supports simple wildcards.
+// API name: h
+func (r *Tasks) H(names ...string) *Tasks {
+	r.values.Set("h", strings.Join(names, ","))
+
+	return r
+}
+
+// Help When set to `true` will output available columns. This option
+// can't be combined with any other query string option.
+// API name: help
+func (r *Tasks) Help(help bool) *Tasks {
+	r.values.Set("help", strconv.FormatBool(help))
+
+	return r
+}
+
+// Local If `true`, the request computes the list of selected nodes from the
+// local cluster state. If `false` the list of selected nodes are computed
+// from the cluster state of the master node. In both cases the coordinating
+// node will send requests for further information to each selected node.
+// API name: local
+func (r *Tasks) Local(local bool) *Tasks {
+	r.values.Set("local", strconv.FormatBool(local))
+
+	return r
+}
+
+// MasterTimeout Period to wait for a connection to the master node.
+// API name: master_timeout
+func (r *Tasks) MasterTimeout(duration string) *Tasks {
+	r.values.Set("master_timeout", duration)
+
+	return r
+}
+
+// S List of columns that determine how the table should be sorted.
+// Sorting defaults to ascending and can be changed by setting `:asc`
+// or `:desc` as a suffix to the column name.
+// API name: s
+func (r *Tasks) S(names ...string) *Tasks {
+	r.values.Set("s", strings.Join(names, ","))
+
+	return r
+}
+
+// V When set to `true` will enable verbose output.
+// API name: v
+func (r *Tasks) V(v bool) *Tasks {
+	r.values.Set("v", strconv.FormatBool(v))
+
+	return r
+}
+
+// ErrorTrace When set to `true` Elasticsearch will include the full stack trace of errors
+// when they occur.
+// API name: error_trace
+func (r *Tasks) ErrorTrace(errortrace bool) *Tasks {
+	r.values.Set("error_trace", strconv.FormatBool(errortrace))
+
+	return r
+}
+
+// FilterPath Comma-separated list of filters in dot notation which reduce the response
+// returned by Elasticsearch.
+// API name: filter_path
+func (r *Tasks) FilterPath(filterpaths ...string) *Tasks {
+	tmp := []string{}
+	for _, item := range filterpaths {
+		tmp = append(tmp, fmt.Sprintf("%v", item))
+	}
+	r.values.Set("filter_path", strings.Join(tmp, ","))
+
+	return r
+}
+
+// Human When set to `true` will return statistics in a format suitable for humans.
+// For example `"exists_time": "1h"` for humans and
+// `"eixsts_time_in_millis": 3600000` for computers. When disabled the human
+// readable values will be omitted. This makes sense for responses being
+// consumed
+// only by machines.
+// API name: human
+func (r *Tasks) Human(human bool) *Tasks {
+	r.values.Set("human", strconv.FormatBool(human))
+
+	return r
+}
+
+// Pretty If set to `true` the returned JSON will be "pretty-formatted". Only use
+// this option for debugging only.
+// API name: pretty
+func (r *Tasks) Pretty(pretty bool) *Tasks {
+	r.values.Set("pretty", strconv.FormatBool(pretty))
 
 	return r
 }

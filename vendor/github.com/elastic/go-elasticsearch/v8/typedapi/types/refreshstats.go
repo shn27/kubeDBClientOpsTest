@@ -15,73 +15,115 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // RefreshStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Stats.ts#L168-L175
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Stats.ts#L235-L242
 type RefreshStats struct {
-	ExternalTotal             int64                   `json:"external_total"`
-	ExternalTotalTimeInMillis DurationValueUnitMillis `json:"external_total_time_in_millis"`
-	Listeners                 int64                   `json:"listeners"`
-	Total                     int64                   `json:"total"`
-	TotalTime                 *Duration               `json:"total_time,omitempty"`
-	TotalTimeInMillis         DurationValueUnitMillis `json:"total_time_in_millis"`
+	ExternalTotal             int64    `json:"external_total"`
+	ExternalTotalTimeInMillis int64    `json:"external_total_time_in_millis"`
+	Listeners                 int64    `json:"listeners"`
+	Total                     int64    `json:"total"`
+	TotalTime                 Duration `json:"total_time,omitempty"`
+	TotalTimeInMillis         int64    `json:"total_time_in_millis"`
 }
 
-// RefreshStatsBuilder holds RefreshStats struct and provides a builder API.
-type RefreshStatsBuilder struct {
-	v *RefreshStats
-}
+func (s *RefreshStats) UnmarshalJSON(data []byte) error {
 
-// NewRefreshStats provides a builder for the RefreshStats struct.
-func NewRefreshStatsBuilder() *RefreshStatsBuilder {
-	r := RefreshStatsBuilder{
-		&RefreshStats{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "external_total":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ExternalTotal", err)
+				}
+				s.ExternalTotal = value
+			case float64:
+				f := int64(v)
+				s.ExternalTotal = f
+			}
+
+		case "external_total_time_in_millis":
+			if err := dec.Decode(&s.ExternalTotalTimeInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "ExternalTotalTimeInMillis", err)
+			}
+
+		case "listeners":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Listeners", err)
+				}
+				s.Listeners = value
+			case float64:
+				f := int64(v)
+				s.Listeners = f
+			}
+
+		case "total":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Total", err)
+				}
+				s.Total = value
+			case float64:
+				f := int64(v)
+				s.Total = f
+			}
+
+		case "total_time":
+			if err := dec.Decode(&s.TotalTime); err != nil {
+				return fmt.Errorf("%s | %w", "TotalTime", err)
+			}
+
+		case "total_time_in_millis":
+			if err := dec.Decode(&s.TotalTimeInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "TotalTimeInMillis", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RefreshStats struct
-func (rb *RefreshStatsBuilder) Build() RefreshStats {
-	return *rb.v
-}
+// NewRefreshStats returns a RefreshStats.
+func NewRefreshStats() *RefreshStats {
+	r := &RefreshStats{}
 
-func (rb *RefreshStatsBuilder) ExternalTotal(externaltotal int64) *RefreshStatsBuilder {
-	rb.v.ExternalTotal = externaltotal
-	return rb
-}
-
-func (rb *RefreshStatsBuilder) ExternalTotalTimeInMillis(externaltotaltimeinmillis *DurationValueUnitMillisBuilder) *RefreshStatsBuilder {
-	v := externaltotaltimeinmillis.Build()
-	rb.v.ExternalTotalTimeInMillis = v
-	return rb
-}
-
-func (rb *RefreshStatsBuilder) Listeners(listeners int64) *RefreshStatsBuilder {
-	rb.v.Listeners = listeners
-	return rb
-}
-
-func (rb *RefreshStatsBuilder) Total(total int64) *RefreshStatsBuilder {
-	rb.v.Total = total
-	return rb
-}
-
-func (rb *RefreshStatsBuilder) TotalTime(totaltime *DurationBuilder) *RefreshStatsBuilder {
-	v := totaltime.Build()
-	rb.v.TotalTime = &v
-	return rb
-}
-
-func (rb *RefreshStatsBuilder) TotalTimeInMillis(totaltimeinmillis *DurationValueUnitMillisBuilder) *RefreshStatsBuilder {
-	v := totaltimeinmillis.Build()
-	rb.v.TotalTimeInMillis = v
-	return rb
+	return r
 }

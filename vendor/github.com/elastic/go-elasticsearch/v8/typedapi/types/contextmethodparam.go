@@ -15,46 +15,68 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ContextMethodParam type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/get_script_context/types.ts#L33-L36
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/get_script_context/types.ts#L33-L36
 type ContextMethodParam struct {
-	Name Name   `json:"name"`
+	Name string `json:"name"`
 	Type string `json:"type"`
 }
 
-// ContextMethodParamBuilder holds ContextMethodParam struct and provides a builder API.
-type ContextMethodParamBuilder struct {
-	v *ContextMethodParam
-}
+func (s *ContextMethodParam) UnmarshalJSON(data []byte) error {
 
-// NewContextMethodParam provides a builder for the ContextMethodParam struct.
-func NewContextMethodParamBuilder() *ContextMethodParamBuilder {
-	r := ContextMethodParamBuilder{
-		&ContextMethodParam{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		case "type":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Type = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ContextMethodParam struct
-func (rb *ContextMethodParamBuilder) Build() ContextMethodParam {
-	return *rb.v
-}
+// NewContextMethodParam returns a ContextMethodParam.
+func NewContextMethodParam() *ContextMethodParam {
+	r := &ContextMethodParam{}
 
-func (rb *ContextMethodParamBuilder) Name(name Name) *ContextMethodParamBuilder {
-	rb.v.Name = name
-	return rb
-}
-
-func (rb *ContextMethodParamBuilder) Type_(type_ string) *ContextMethodParamBuilder {
-	rb.v.Type = type_
-	return rb
+	return r
 }

@@ -15,74 +15,92 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // WatchStatus type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Watch.ts#L49-L56
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Watch.ts#L49-L56
 type WatchStatus struct {
-	Actions          Actions         `json:"actions"`
-	ExecutionState   *string         `json:"execution_state,omitempty"`
-	LastChecked      *DateTime       `json:"last_checked,omitempty"`
-	LastMetCondition *DateTime       `json:"last_met_condition,omitempty"`
-	State            ActivationState `json:"state"`
-	Version          VersionNumber   `json:"version"`
+	Actions          WatcherStatusActions `json:"actions"`
+	ExecutionState   *string              `json:"execution_state,omitempty"`
+	LastChecked      DateTime             `json:"last_checked,omitempty"`
+	LastMetCondition DateTime             `json:"last_met_condition,omitempty"`
+	State            ActivationState      `json:"state"`
+	Version          int64                `json:"version"`
 }
 
-// WatchStatusBuilder holds WatchStatus struct and provides a builder API.
-type WatchStatusBuilder struct {
-	v *WatchStatus
-}
+func (s *WatchStatus) UnmarshalJSON(data []byte) error {
 
-// NewWatchStatus provides a builder for the WatchStatus struct.
-func NewWatchStatusBuilder() *WatchStatusBuilder {
-	r := WatchStatusBuilder{
-		&WatchStatus{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "actions":
+			if err := dec.Decode(&s.Actions); err != nil {
+				return fmt.Errorf("%s | %w", "Actions", err)
+			}
+
+		case "execution_state":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ExecutionState", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ExecutionState = &o
+
+		case "last_checked":
+			if err := dec.Decode(&s.LastChecked); err != nil {
+				return fmt.Errorf("%s | %w", "LastChecked", err)
+			}
+
+		case "last_met_condition":
+			if err := dec.Decode(&s.LastMetCondition); err != nil {
+				return fmt.Errorf("%s | %w", "LastMetCondition", err)
+			}
+
+		case "state":
+			if err := dec.Decode(&s.State); err != nil {
+				return fmt.Errorf("%s | %w", "State", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the WatchStatus struct
-func (rb *WatchStatusBuilder) Build() WatchStatus {
-	return *rb.v
-}
+// NewWatchStatus returns a WatchStatus.
+func NewWatchStatus() *WatchStatus {
+	r := &WatchStatus{}
 
-func (rb *WatchStatusBuilder) Actions(actions *ActionsBuilder) *WatchStatusBuilder {
-	v := actions.Build()
-	rb.v.Actions = v
-	return rb
-}
-
-func (rb *WatchStatusBuilder) ExecutionState(executionstate string) *WatchStatusBuilder {
-	rb.v.ExecutionState = &executionstate
-	return rb
-}
-
-func (rb *WatchStatusBuilder) LastChecked(lastchecked *DateTimeBuilder) *WatchStatusBuilder {
-	v := lastchecked.Build()
-	rb.v.LastChecked = &v
-	return rb
-}
-
-func (rb *WatchStatusBuilder) LastMetCondition(lastmetcondition *DateTimeBuilder) *WatchStatusBuilder {
-	v := lastmetcondition.Build()
-	rb.v.LastMetCondition = &v
-	return rb
-}
-
-func (rb *WatchStatusBuilder) State(state *ActivationStateBuilder) *WatchStatusBuilder {
-	v := state.Build()
-	rb.v.State = v
-	return rb
-}
-
-func (rb *WatchStatusBuilder) Version(version VersionNumber) *WatchStatusBuilder {
-	rb.v.Version = version
-	return rb
+	return r
 }

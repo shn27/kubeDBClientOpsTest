@@ -15,65 +15,119 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // RemoveAction type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/update_aliases/types.ts#L46-L53
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/update_aliases/types.ts#L97-L122
 type RemoveAction struct {
-	Alias     *IndexAlias  `json:"alias,omitempty"`
-	Aliases   []IndexAlias `json:"aliases,omitempty"`
-	Index     *IndexName   `json:"index,omitempty"`
-	Indices   *Indices     `json:"indices,omitempty"`
-	MustExist *bool        `json:"must_exist,omitempty"`
+	// Alias Alias for the action.
+	// Index alias names support date math.
+	Alias *string `json:"alias,omitempty"`
+	// Aliases Aliases for the action.
+	// Index alias names support date math.
+	Aliases []string `json:"aliases,omitempty"`
+	// Index Data stream or index for the action.
+	// Supports wildcards (`*`).
+	Index *string `json:"index,omitempty"`
+	// Indices Data streams or indices for the action.
+	// Supports wildcards (`*`).
+	Indices []string `json:"indices,omitempty"`
+	// MustExist If `true`, the alias must exist to perform the action.
+	MustExist *bool `json:"must_exist,omitempty"`
 }
 
-// RemoveActionBuilder holds RemoveAction struct and provides a builder API.
-type RemoveActionBuilder struct {
-	v *RemoveAction
-}
+func (s *RemoveAction) UnmarshalJSON(data []byte) error {
 
-// NewRemoveAction provides a builder for the RemoveAction struct.
-func NewRemoveActionBuilder() *RemoveActionBuilder {
-	r := RemoveActionBuilder{
-		&RemoveAction{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "alias":
+			if err := dec.Decode(&s.Alias); err != nil {
+				return fmt.Errorf("%s | %w", "Alias", err)
+			}
+
+		case "aliases":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Aliases", err)
+				}
+
+				s.Aliases = append(s.Aliases, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Aliases); err != nil {
+					return fmt.Errorf("%s | %w", "Aliases", err)
+				}
+			}
+
+		case "index":
+			if err := dec.Decode(&s.Index); err != nil {
+				return fmt.Errorf("%s | %w", "Index", err)
+			}
+
+		case "indices":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Indices", err)
+				}
+
+				s.Indices = append(s.Indices, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Indices); err != nil {
+					return fmt.Errorf("%s | %w", "Indices", err)
+				}
+			}
+
+		case "must_exist":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MustExist", err)
+				}
+				s.MustExist = &value
+			case bool:
+				s.MustExist = &v
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RemoveAction struct
-func (rb *RemoveActionBuilder) Build() RemoveAction {
-	return *rb.v
-}
+// NewRemoveAction returns a RemoveAction.
+func NewRemoveAction() *RemoveAction {
+	r := &RemoveAction{}
 
-func (rb *RemoveActionBuilder) Alias(alias IndexAlias) *RemoveActionBuilder {
-	rb.v.Alias = &alias
-	return rb
-}
-
-func (rb *RemoveActionBuilder) Aliases(arg []IndexAlias) *RemoveActionBuilder {
-	rb.v.Aliases = arg
-	return rb
-}
-
-func (rb *RemoveActionBuilder) Index(index IndexName) *RemoveActionBuilder {
-	rb.v.Index = &index
-	return rb
-}
-
-func (rb *RemoveActionBuilder) Indices(indices *IndicesBuilder) *RemoveActionBuilder {
-	v := indices.Build()
-	rb.v.Indices = &v
-	return rb
-}
-
-func (rb *RemoveActionBuilder) MustExist(mustexist bool) *RemoveActionBuilder {
-	rb.v.MustExist = &mustexist
-	return rb
+	return r
 }

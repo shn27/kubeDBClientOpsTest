@@ -15,40 +15,57 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // DataStreamTimestampField type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/DataStream.ts#L48-L50
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/DataStream.ts#L129-L134
 type DataStreamTimestampField struct {
-	Name Field `json:"name"`
+	// Name Name of the timestamp field for the data stream, which must be `@timestamp`.
+	// The `@timestamp` field must be included in every document indexed to the data
+	// stream.
+	Name string `json:"name"`
 }
 
-// DataStreamTimestampFieldBuilder holds DataStreamTimestampField struct and provides a builder API.
-type DataStreamTimestampFieldBuilder struct {
-	v *DataStreamTimestampField
-}
+func (s *DataStreamTimestampField) UnmarshalJSON(data []byte) error {
 
-// NewDataStreamTimestampField provides a builder for the DataStreamTimestampField struct.
-func NewDataStreamTimestampFieldBuilder() *DataStreamTimestampFieldBuilder {
-	r := DataStreamTimestampFieldBuilder{
-		&DataStreamTimestampField{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DataStreamTimestampField struct
-func (rb *DataStreamTimestampFieldBuilder) Build() DataStreamTimestampField {
-	return *rb.v
-}
+// NewDataStreamTimestampField returns a DataStreamTimestampField.
+func NewDataStreamTimestampField() *DataStreamTimestampField {
+	r := &DataStreamTimestampField{}
 
-func (rb *DataStreamTimestampFieldBuilder) Name(name Field) *DataStreamTimestampFieldBuilder {
-	rb.v.Name = name
-	return rb
+	return r
 }

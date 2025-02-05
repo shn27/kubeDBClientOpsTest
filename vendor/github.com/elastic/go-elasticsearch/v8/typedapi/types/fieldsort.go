@@ -15,14 +15,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/fieldsortnumerictype"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/fieldtype"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/sortmode"
@@ -31,10 +36,10 @@ import (
 
 // FieldSort type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/sort.ts#L43-L52
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/sort.ts#L43-L52
 type FieldSort struct {
 	Format       *string                                    `json:"format,omitempty"`
-	Missing      *Missing                                   `json:"missing,omitempty"`
+	Missing      Missing                                    `json:"missing,omitempty"`
 	Mode         *sortmode.SortMode                         `json:"mode,omitempty"`
 	Nested       *NestedSortValue                           `json:"nested,omitempty"`
 	NumericType  *fieldsortnumerictype.FieldSortNumericType `json:"numeric_type,omitempty"`
@@ -42,58 +47,76 @@ type FieldSort struct {
 	UnmappedType *fieldtype.FieldType                       `json:"unmapped_type,omitempty"`
 }
 
-// FieldSortBuilder holds FieldSort struct and provides a builder API.
-type FieldSortBuilder struct {
-	v *FieldSort
-}
+func (s *FieldSort) UnmarshalJSON(data []byte) error {
 
-// NewFieldSort provides a builder for the FieldSort struct.
-func NewFieldSortBuilder() *FieldSortBuilder {
-	r := FieldSortBuilder{
-		&FieldSort{},
+	if !bytes.HasPrefix(data, []byte(`{`)) {
+		err := json.NewDecoder(bytes.NewReader(data)).Decode(&s.Order)
+		return err
 	}
 
-	return &r
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "format":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Format", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Format = &o
+
+		case "missing":
+			if err := dec.Decode(&s.Missing); err != nil {
+				return fmt.Errorf("%s | %w", "Missing", err)
+			}
+
+		case "mode":
+			if err := dec.Decode(&s.Mode); err != nil {
+				return fmt.Errorf("%s | %w", "Mode", err)
+			}
+
+		case "nested":
+			if err := dec.Decode(&s.Nested); err != nil {
+				return fmt.Errorf("%s | %w", "Nested", err)
+			}
+
+		case "numeric_type":
+			if err := dec.Decode(&s.NumericType); err != nil {
+				return fmt.Errorf("%s | %w", "NumericType", err)
+			}
+
+		case "order":
+			if err := dec.Decode(&s.Order); err != nil {
+				return fmt.Errorf("%s | %w", "Order", err)
+			}
+
+		case "unmapped_type":
+			if err := dec.Decode(&s.UnmappedType); err != nil {
+				return fmt.Errorf("%s | %w", "UnmappedType", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// Build finalize the chain and returns the FieldSort struct
-func (rb *FieldSortBuilder) Build() FieldSort {
-	return *rb.v
-}
+// NewFieldSort returns a FieldSort.
+func NewFieldSort() *FieldSort {
+	r := &FieldSort{}
 
-func (rb *FieldSortBuilder) Format(format string) *FieldSortBuilder {
-	rb.v.Format = &format
-	return rb
-}
-
-func (rb *FieldSortBuilder) Missing(missing *MissingBuilder) *FieldSortBuilder {
-	v := missing.Build()
-	rb.v.Missing = &v
-	return rb
-}
-
-func (rb *FieldSortBuilder) Mode(mode sortmode.SortMode) *FieldSortBuilder {
-	rb.v.Mode = &mode
-	return rb
-}
-
-func (rb *FieldSortBuilder) Nested(nested *NestedSortValueBuilder) *FieldSortBuilder {
-	v := nested.Build()
-	rb.v.Nested = &v
-	return rb
-}
-
-func (rb *FieldSortBuilder) NumericType(numerictype fieldsortnumerictype.FieldSortNumericType) *FieldSortBuilder {
-	rb.v.NumericType = &numerictype
-	return rb
-}
-
-func (rb *FieldSortBuilder) Order(order sortorder.SortOrder) *FieldSortBuilder {
-	rb.v.Order = &order
-	return rb
-}
-
-func (rb *FieldSortBuilder) UnmappedType(unmappedtype fieldtype.FieldType) *FieldSortBuilder {
-	rb.v.UnmappedType = &unmappedtype
-	return rb
+	return r
 }

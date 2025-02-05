@@ -15,47 +15,71 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // CpuAcct type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/_types/Stats.ts#L188-L191
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/_types/Stats.ts#L512-L521
 type CpuAcct struct {
-	ControlGroup *string                 `json:"control_group,omitempty"`
-	UsageNanos   *DurationValueUnitNanos `json:"usage_nanos,omitempty"`
+	// ControlGroup The `cpuacct` control group to which the Elasticsearch process belongs.
+	ControlGroup *string `json:"control_group,omitempty"`
+	// UsageNanos The total CPU time, in nanoseconds, consumed by all tasks in the same cgroup
+	// as the Elasticsearch process.
+	UsageNanos *int64 `json:"usage_nanos,omitempty"`
 }
 
-// CpuAcctBuilder holds CpuAcct struct and provides a builder API.
-type CpuAcctBuilder struct {
-	v *CpuAcct
-}
+func (s *CpuAcct) UnmarshalJSON(data []byte) error {
 
-// NewCpuAcct provides a builder for the CpuAcct struct.
-func NewCpuAcctBuilder() *CpuAcctBuilder {
-	r := CpuAcctBuilder{
-		&CpuAcct{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "control_group":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ControlGroup", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ControlGroup = &o
+
+		case "usage_nanos":
+			if err := dec.Decode(&s.UsageNanos); err != nil {
+				return fmt.Errorf("%s | %w", "UsageNanos", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the CpuAcct struct
-func (rb *CpuAcctBuilder) Build() CpuAcct {
-	return *rb.v
-}
+// NewCpuAcct returns a CpuAcct.
+func NewCpuAcct() *CpuAcct {
+	r := &CpuAcct{}
 
-func (rb *CpuAcctBuilder) ControlGroup(controlgroup string) *CpuAcctBuilder {
-	rb.v.ControlGroup = &controlgroup
-	return rb
-}
-
-func (rb *CpuAcctBuilder) UsageNanos(usagenanos *DurationValueUnitNanosBuilder) *CpuAcctBuilder {
-	v := usagenanos.Build()
-	rb.v.UsageNanos = &v
-	return rb
+	return r
 }

@@ -15,49 +15,69 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // MappingLimitSettingsNestedObjects type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/IndexSettings.ts#L445-L452
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/IndexSettings.ts#L464-L471
 type MappingLimitSettingsNestedObjects struct {
 	// Limit The maximum number of nested JSON objects that a single document can contain
 	// across all nested types. This limit helps
 	// to prevent out of memory errors when a document contains too many nested
 	// objects.
-	Limit *int `json:"limit,omitempty"`
+	Limit *int64 `json:"limit,omitempty"`
 }
 
-// MappingLimitSettingsNestedObjectsBuilder holds MappingLimitSettingsNestedObjects struct and provides a builder API.
-type MappingLimitSettingsNestedObjectsBuilder struct {
-	v *MappingLimitSettingsNestedObjects
-}
+func (s *MappingLimitSettingsNestedObjects) UnmarshalJSON(data []byte) error {
 
-// NewMappingLimitSettingsNestedObjects provides a builder for the MappingLimitSettingsNestedObjects struct.
-func NewMappingLimitSettingsNestedObjectsBuilder() *MappingLimitSettingsNestedObjectsBuilder {
-	r := MappingLimitSettingsNestedObjectsBuilder{
-		&MappingLimitSettingsNestedObjects{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "limit":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Limit", err)
+				}
+				s.Limit = &value
+			case float64:
+				f := int64(v)
+				s.Limit = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the MappingLimitSettingsNestedObjects struct
-func (rb *MappingLimitSettingsNestedObjectsBuilder) Build() MappingLimitSettingsNestedObjects {
-	return *rb.v
-}
+// NewMappingLimitSettingsNestedObjects returns a MappingLimitSettingsNestedObjects.
+func NewMappingLimitSettingsNestedObjects() *MappingLimitSettingsNestedObjects {
+	r := &MappingLimitSettingsNestedObjects{}
 
-// Limit The maximum number of nested JSON objects that a single document can contain
-// across all nested types. This limit helps
-// to prevent out of memory errors when a document contains too many nested
-// objects.
-
-func (rb *MappingLimitSettingsNestedObjectsBuilder) Limit(limit int) *MappingLimitSettingsNestedObjectsBuilder {
-	rb.v.Limit = &limit
-	return rb
+	return r
 }

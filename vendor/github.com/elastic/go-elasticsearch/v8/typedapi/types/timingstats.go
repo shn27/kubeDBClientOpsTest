@@ -15,54 +15,62 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // TimingStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/DataframeAnalytics.ts#L421-L426
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/DataframeAnalytics.ts#L564-L569
 type TimingStats struct {
 	// ElapsedTime Runtime of the analysis in milliseconds.
-	ElapsedTime DurationValueUnitMillis `json:"elapsed_time"`
+	ElapsedTime int64 `json:"elapsed_time"`
 	// IterationTime Runtime of the latest iteration of the analysis in milliseconds.
-	IterationTime *DurationValueUnitMillis `json:"iteration_time,omitempty"`
+	IterationTime *int64 `json:"iteration_time,omitempty"`
 }
 
-// TimingStatsBuilder holds TimingStats struct and provides a builder API.
-type TimingStatsBuilder struct {
-	v *TimingStats
-}
+func (s *TimingStats) UnmarshalJSON(data []byte) error {
 
-// NewTimingStats provides a builder for the TimingStats struct.
-func NewTimingStatsBuilder() *TimingStatsBuilder {
-	r := TimingStatsBuilder{
-		&TimingStats{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "elapsed_time":
+			if err := dec.Decode(&s.ElapsedTime); err != nil {
+				return fmt.Errorf("%s | %w", "ElapsedTime", err)
+			}
+
+		case "iteration_time":
+			if err := dec.Decode(&s.IterationTime); err != nil {
+				return fmt.Errorf("%s | %w", "IterationTime", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TimingStats struct
-func (rb *TimingStatsBuilder) Build() TimingStats {
-	return *rb.v
-}
+// NewTimingStats returns a TimingStats.
+func NewTimingStats() *TimingStats {
+	r := &TimingStats{}
 
-// ElapsedTime Runtime of the analysis in milliseconds.
-
-func (rb *TimingStatsBuilder) ElapsedTime(elapsedtime *DurationValueUnitMillisBuilder) *TimingStatsBuilder {
-	v := elapsedtime.Build()
-	rb.v.ElapsedTime = v
-	return rb
-}
-
-// IterationTime Runtime of the latest iteration of the analysis in milliseconds.
-
-func (rb *TimingStatsBuilder) IterationTime(iterationtime *DurationValueUnitMillisBuilder) *TimingStatsBuilder {
-	v := iterationtime.Build()
-	rb.v.IterationTime = &v
-	return rb
+	return r
 }

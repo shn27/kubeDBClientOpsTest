@@ -15,19 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package optype
 package optype
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/common.ts#L228-L231
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/common.ts#L256-L265
 type OpType struct {
-	name string
+	Name string
 }
 
 var (
@@ -41,7 +39,7 @@ func (o OpType) MarshalText() (text []byte, err error) {
 }
 
 func (o *OpType) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
 	case "index":
 		*o = Index
@@ -55,5 +53,5 @@ func (o *OpType) UnmarshalText(text []byte) error {
 }
 
 func (o OpType) String() string {
-	return o.name
+	return o.Name
 }

@@ -15,60 +15,100 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/snowballlanguage"
 )
 
 // SnowballAnalyzer type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/analyzers.ts#L88-L93
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/analyzers.ts#L334-L339
 type SnowballAnalyzer struct {
 	Language  snowballlanguage.SnowballLanguage `json:"language"`
-	Stopwords *StopWords                        `json:"stopwords,omitempty"`
+	Stopwords []string                          `json:"stopwords,omitempty"`
 	Type      string                            `json:"type,omitempty"`
-	Version   *VersionString                    `json:"version,omitempty"`
+	Version   *string                           `json:"version,omitempty"`
 }
 
-// SnowballAnalyzerBuilder holds SnowballAnalyzer struct and provides a builder API.
-type SnowballAnalyzerBuilder struct {
-	v *SnowballAnalyzer
+func (s *SnowballAnalyzer) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "language":
+			if err := dec.Decode(&s.Language); err != nil {
+				return fmt.Errorf("%s | %w", "Language", err)
+			}
+
+		case "stopwords":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Stopwords", err)
+				}
+
+				s.Stopwords = append(s.Stopwords, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Stopwords); err != nil {
+					return fmt.Errorf("%s | %w", "Stopwords", err)
+				}
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewSnowballAnalyzer provides a builder for the SnowballAnalyzer struct.
-func NewSnowballAnalyzerBuilder() *SnowballAnalyzerBuilder {
-	r := SnowballAnalyzerBuilder{
-		&SnowballAnalyzer{},
+// MarshalJSON override marshalling to include literal value
+func (s SnowballAnalyzer) MarshalJSON() ([]byte, error) {
+	type innerSnowballAnalyzer SnowballAnalyzer
+	tmp := innerSnowballAnalyzer{
+		Language:  s.Language,
+		Stopwords: s.Stopwords,
+		Type:      s.Type,
+		Version:   s.Version,
 	}
 
-	r.v.Type = "snowball"
+	tmp.Type = "snowball"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the SnowballAnalyzer struct
-func (rb *SnowballAnalyzerBuilder) Build() SnowballAnalyzer {
-	return *rb.v
-}
+// NewSnowballAnalyzer returns a SnowballAnalyzer.
+func NewSnowballAnalyzer() *SnowballAnalyzer {
+	r := &SnowballAnalyzer{}
 
-func (rb *SnowballAnalyzerBuilder) Language(language snowballlanguage.SnowballLanguage) *SnowballAnalyzerBuilder {
-	rb.v.Language = language
-	return rb
-}
-
-func (rb *SnowballAnalyzerBuilder) Stopwords(stopwords *StopWordsBuilder) *SnowballAnalyzerBuilder {
-	v := stopwords.Build()
-	rb.v.Stopwords = &v
-	return rb
-}
-
-func (rb *SnowballAnalyzerBuilder) Version(version VersionString) *SnowballAnalyzerBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

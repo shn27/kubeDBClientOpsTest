@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // TextClassificationInferenceOptions type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/inference.ts#L174-L184
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/inference.ts#L173-L183
 type TextClassificationInferenceOptions struct {
 	// ClassificationLabels Classification labels to apply other than the stored labels. Must have the
 	// same deminsions as the default configured labels
@@ -38,52 +45,67 @@ type TextClassificationInferenceOptions struct {
 	Tokenization *TokenizationConfigContainer `json:"tokenization,omitempty"`
 }
 
-// TextClassificationInferenceOptionsBuilder holds TextClassificationInferenceOptions struct and provides a builder API.
-type TextClassificationInferenceOptionsBuilder struct {
-	v *TextClassificationInferenceOptions
-}
+func (s *TextClassificationInferenceOptions) UnmarshalJSON(data []byte) error {
 
-// NewTextClassificationInferenceOptions provides a builder for the TextClassificationInferenceOptions struct.
-func NewTextClassificationInferenceOptionsBuilder() *TextClassificationInferenceOptionsBuilder {
-	r := TextClassificationInferenceOptionsBuilder{
-		&TextClassificationInferenceOptions{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "classification_labels":
+			if err := dec.Decode(&s.ClassificationLabels); err != nil {
+				return fmt.Errorf("%s | %w", "ClassificationLabels", err)
+			}
+
+		case "num_top_classes":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NumTopClasses", err)
+				}
+				s.NumTopClasses = &value
+			case float64:
+				f := int(v)
+				s.NumTopClasses = &f
+			}
+
+		case "results_field":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ResultsField", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ResultsField = &o
+
+		case "tokenization":
+			if err := dec.Decode(&s.Tokenization); err != nil {
+				return fmt.Errorf("%s | %w", "Tokenization", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TextClassificationInferenceOptions struct
-func (rb *TextClassificationInferenceOptionsBuilder) Build() TextClassificationInferenceOptions {
-	return *rb.v
-}
+// NewTextClassificationInferenceOptions returns a TextClassificationInferenceOptions.
+func NewTextClassificationInferenceOptions() *TextClassificationInferenceOptions {
+	r := &TextClassificationInferenceOptions{}
 
-// ClassificationLabels Classification labels to apply other than the stored labels. Must have the
-// same deminsions as the default configured labels
-
-func (rb *TextClassificationInferenceOptionsBuilder) ClassificationLabels(classification_labels ...string) *TextClassificationInferenceOptionsBuilder {
-	rb.v.ClassificationLabels = classification_labels
-	return rb
-}
-
-// NumTopClasses Specifies the number of top class predictions to return. Defaults to 0.
-
-func (rb *TextClassificationInferenceOptionsBuilder) NumTopClasses(numtopclasses int) *TextClassificationInferenceOptionsBuilder {
-	rb.v.NumTopClasses = &numtopclasses
-	return rb
-}
-
-// ResultsField The field that is added to incoming documents to contain the inference
-// prediction. Defaults to predicted_value.
-
-func (rb *TextClassificationInferenceOptionsBuilder) ResultsField(resultsfield string) *TextClassificationInferenceOptionsBuilder {
-	rb.v.ResultsField = &resultsfield
-	return rb
-}
-
-// Tokenization The tokenization options
-
-func (rb *TextClassificationInferenceOptionsBuilder) Tokenization(tokenization *TokenizationConfigContainerBuilder) *TextClassificationInferenceOptionsBuilder {
-	v := tokenization.Build()
-	rb.v.Tokenization = &v
-	return rb
+	return r
 }

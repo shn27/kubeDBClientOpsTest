@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // Configuration type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/slm/_types/SnapshotLifecycle.ts#L99-L129
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/slm/_types/SnapshotLifecycle.ts#L99-L129
 type Configuration struct {
 	// FeatureStates A list of feature states to be included in this snapshot. A list of features
 	// available for inclusion in the snapshot and their descriptions be can be
@@ -47,92 +54,107 @@ type Configuration struct {
 	// By default, a snapshot includes all data streams and indices in the cluster.
 	// If this argument is provided, the snapshot only includes the specified data
 	// streams and clusters.
-	Indices Indices `json:"indices"`
+	Indices []string `json:"indices,omitempty"`
 	// Metadata Attaches arbitrary metadata to the snapshot, such as a record of who took the
 	// snapshot, why it was taken, or any other useful data. Metadata must be less
 	// than 1024 bytes.
-	Metadata *Metadata `json:"metadata,omitempty"`
+	Metadata Metadata `json:"metadata,omitempty"`
 	// Partial If false, the entire snapshot will fail if one or more indices included in
 	// the snapshot do not have all primary shards available.
 	Partial *bool `json:"partial,omitempty"`
 }
 
-// ConfigurationBuilder holds Configuration struct and provides a builder API.
-type ConfigurationBuilder struct {
-	v *Configuration
-}
+func (s *Configuration) UnmarshalJSON(data []byte) error {
 
-// NewConfiguration provides a builder for the Configuration struct.
-func NewConfigurationBuilder() *ConfigurationBuilder {
-	r := ConfigurationBuilder{
-		&Configuration{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "feature_states":
+			if err := dec.Decode(&s.FeatureStates); err != nil {
+				return fmt.Errorf("%s | %w", "FeatureStates", err)
+			}
+
+		case "ignore_unavailable":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IgnoreUnavailable", err)
+				}
+				s.IgnoreUnavailable = &value
+			case bool:
+				s.IgnoreUnavailable = &v
+			}
+
+		case "include_global_state":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IncludeGlobalState", err)
+				}
+				s.IncludeGlobalState = &value
+			case bool:
+				s.IncludeGlobalState = &v
+			}
+
+		case "indices":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Indices", err)
+				}
+
+				s.Indices = append(s.Indices, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Indices); err != nil {
+					return fmt.Errorf("%s | %w", "Indices", err)
+				}
+			}
+
+		case "metadata":
+			if err := dec.Decode(&s.Metadata); err != nil {
+				return fmt.Errorf("%s | %w", "Metadata", err)
+			}
+
+		case "partial":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Partial", err)
+				}
+				s.Partial = &value
+			case bool:
+				s.Partial = &v
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the Configuration struct
-func (rb *ConfigurationBuilder) Build() Configuration {
-	return *rb.v
-}
+// NewConfiguration returns a Configuration.
+func NewConfiguration() *Configuration {
+	r := &Configuration{}
 
-// FeatureStates A list of feature states to be included in this snapshot. A list of features
-// available for inclusion in the snapshot and their descriptions be can be
-// retrieved using the get features API.
-// Each feature state includes one or more system indices containing data
-// necessary for the function of that feature. Providing an empty array will
-// include no feature states in the snapshot, regardless of the value of
-// include_global_state. By default, all available feature states will be
-// included in the snapshot if include_global_state is true, or no feature
-// states if include_global_state is false.
-
-func (rb *ConfigurationBuilder) FeatureStates(feature_states ...string) *ConfigurationBuilder {
-	rb.v.FeatureStates = feature_states
-	return rb
-}
-
-// IgnoreUnavailable If false, the snapshot fails if any data stream or index in indices is
-// missing or closed. If true, the snapshot ignores missing or closed data
-// streams and indices.
-
-func (rb *ConfigurationBuilder) IgnoreUnavailable(ignoreunavailable bool) *ConfigurationBuilder {
-	rb.v.IgnoreUnavailable = &ignoreunavailable
-	return rb
-}
-
-// IncludeGlobalState If true, the current global state is included in the snapshot.
-
-func (rb *ConfigurationBuilder) IncludeGlobalState(includeglobalstate bool) *ConfigurationBuilder {
-	rb.v.IncludeGlobalState = &includeglobalstate
-	return rb
-}
-
-// Indices A comma-separated list of data streams and indices to include in the
-// snapshot. Multi-index syntax is supported.
-// By default, a snapshot includes all data streams and indices in the cluster.
-// If this argument is provided, the snapshot only includes the specified data
-// streams and clusters.
-
-func (rb *ConfigurationBuilder) Indices(indices *IndicesBuilder) *ConfigurationBuilder {
-	v := indices.Build()
-	rb.v.Indices = v
-	return rb
-}
-
-// Metadata Attaches arbitrary metadata to the snapshot, such as a record of who took the
-// snapshot, why it was taken, or any other useful data. Metadata must be less
-// than 1024 bytes.
-
-func (rb *ConfigurationBuilder) Metadata(metadata *MetadataBuilder) *ConfigurationBuilder {
-	v := metadata.Build()
-	rb.v.Metadata = &v
-	return rb
-}
-
-// Partial If false, the entire snapshot will fail if one or more indices included in
-// the snapshot do not have all primary shards available.
-
-func (rb *ConfigurationBuilder) Partial(partial bool) *ConfigurationBuilder {
-	rb.v.Partial = &partial
-	return rb
+	return r
 }

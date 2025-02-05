@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 //
-// Code generated from specification version 8.4.0: DO NOT EDIT
+// Code generated from specification version 8.17.0: DO NOT EDIT
 
 package esapi
 
@@ -34,6 +34,11 @@ func newIndexFunc(t Transport) Index {
 		for _, f := range o {
 			f(&r)
 		}
+
+		if transport, ok := t.(Instrumented); ok {
+			r.instrument = transport.InstrumentationEnabled()
+		}
+
 		return r.Do(r.ctx, t)
 	}
 }
@@ -58,6 +63,7 @@ type IndexRequest struct {
 	Pipeline            string
 	Refresh             string
 	RequireAlias        *bool
+	RequireDataStream   *bool
 	Routing             string
 	Timeout             time.Duration
 	Version             *int
@@ -72,15 +78,26 @@ type IndexRequest struct {
 	Header http.Header
 
 	ctx context.Context
+
+	instrument Instrumentation
 }
 
 // Do executes the request and returns response or error.
-func (r IndexRequest) Do(ctx context.Context, transport Transport) (*Response, error) {
+func (r IndexRequest) Do(providedCtx context.Context, transport Transport) (*Response, error) {
 	var (
 		method string
 		path   strings.Builder
 		params map[string]string
+		ctx    context.Context
 	)
+
+	if instrument, ok := r.instrument.(Instrumentation); ok {
+		ctx = instrument.Start(providedCtx, "index")
+		defer instrument.Close(ctx)
+	}
+	if ctx == nil {
+		ctx = providedCtx
+	}
 
 	if r.DocumentID != "" {
 		method = "PUT"
@@ -92,11 +109,17 @@ func (r IndexRequest) Do(ctx context.Context, transport Transport) (*Response, e
 	path.WriteString("http://")
 	path.WriteString("/")
 	path.WriteString(r.Index)
+	if instrument, ok := r.instrument.(Instrumentation); ok {
+		instrument.RecordPathPart(ctx, "index", r.Index)
+	}
 	path.WriteString("/")
 	path.WriteString("_doc")
 	if r.DocumentID != "" {
 		path.WriteString("/")
 		path.WriteString(r.DocumentID)
+		if instrument, ok := r.instrument.(Instrumentation); ok {
+			instrument.RecordPathPart(ctx, "id", r.DocumentID)
+		}
 	}
 
 	params = make(map[string]string)
@@ -123,6 +146,10 @@ func (r IndexRequest) Do(ctx context.Context, transport Transport) (*Response, e
 
 	if r.RequireAlias != nil {
 		params["require_alias"] = strconv.FormatBool(*r.RequireAlias)
+	}
+
+	if r.RequireDataStream != nil {
+		params["require_data_stream"] = strconv.FormatBool(*r.RequireDataStream)
 	}
 
 	if r.Routing != "" {
@@ -163,6 +190,9 @@ func (r IndexRequest) Do(ctx context.Context, transport Transport) (*Response, e
 
 	req, err := newRequest(method, path.String(), r.Body)
 	if err != nil {
+		if instrument, ok := r.instrument.(Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
 		return nil, err
 	}
 
@@ -172,10 +202,6 @@ func (r IndexRequest) Do(ctx context.Context, transport Transport) (*Response, e
 			q.Set(k, v)
 		}
 		req.URL.RawQuery = q.Encode()
-	}
-
-	if r.Body != nil {
-		req.Header[headerContentType] = headerContentTypeJSON
 	}
 
 	if len(r.Header) > 0 {
@@ -190,12 +216,28 @@ func (r IndexRequest) Do(ctx context.Context, transport Transport) (*Response, e
 		}
 	}
 
+	if r.Body != nil && req.Header.Get(headerContentType) == "" {
+		req.Header[headerContentType] = headerContentTypeJSON
+	}
+
 	if ctx != nil {
 		req = req.WithContext(ctx)
 	}
 
+	if instrument, ok := r.instrument.(Instrumentation); ok {
+		instrument.BeforeRequest(req, "index")
+		if reader := instrument.RecordRequestBody(ctx, "index", r.Body); reader != nil {
+			req.Body = reader
+		}
+	}
 	res, err := transport.Perform(req)
+	if instrument, ok := r.instrument.(Instrumentation); ok {
+		instrument.AfterRequest(req, "elasticsearch", "index")
+	}
 	if err != nil {
+		if instrument, ok := r.instrument.(Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
 		return nil, err
 	}
 
@@ -261,6 +303,13 @@ func (f Index) WithRefresh(v string) func(*IndexRequest) {
 func (f Index) WithRequireAlias(v bool) func(*IndexRequest) {
 	return func(r *IndexRequest) {
 		r.RequireAlias = &v
+	}
+}
+
+// WithRequireDataStream - when true, requires the destination to be a data stream (existing or to-be-created). default is false.
+func (f Index) WithRequireDataStream(v bool) func(*IndexRequest) {
+	return func(r *IndexRequest) {
+		r.RequireDataStream = &v
 	}
 }
 

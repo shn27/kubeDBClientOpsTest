@@ -15,80 +15,112 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DateHistogramGrouping type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/rollup/_types/Groupings.ts#L30-L38
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/rollup/_types/Groupings.ts#L42-L73
 type DateHistogramGrouping struct {
-	CalendarInterval *Duration `json:"calendar_interval,omitempty"`
-	Delay            *Duration `json:"delay,omitempty"`
-	Field            Field     `json:"field"`
-	FixedInterval    *Duration `json:"fixed_interval,omitempty"`
-	Format           *string   `json:"format,omitempty"`
-	Interval         *Duration `json:"interval,omitempty"`
-	TimeZone         *TimeZone `json:"time_zone,omitempty"`
+	// CalendarInterval The interval of time buckets to be generated when rolling up.
+	CalendarInterval Duration `json:"calendar_interval,omitempty"`
+	// Delay How long to wait before rolling up new documents.
+	// By default, the indexer attempts to roll up all data that is available.
+	// However, it is not uncommon for data to arrive out of order.
+	// The indexer is unable to deal with data that arrives after a time-span has
+	// been rolled up.
+	// You need to specify a delay that matches the longest period of time you
+	// expect out-of-order data to arrive.
+	Delay Duration `json:"delay,omitempty"`
+	// Field The date field that is to be rolled up.
+	Field string `json:"field"`
+	// FixedInterval The interval of time buckets to be generated when rolling up.
+	FixedInterval Duration `json:"fixed_interval,omitempty"`
+	Format        *string  `json:"format,omitempty"`
+	Interval      Duration `json:"interval,omitempty"`
+	// TimeZone Defines what `time_zone` the rollup documents are stored as.
+	// Unlike raw data, which can shift timezones on the fly, rolled documents have
+	// to be stored with a specific timezone.
+	// By default, rollup documents are stored in `UTC`.
+	TimeZone *string `json:"time_zone,omitempty"`
 }
 
-// DateHistogramGroupingBuilder holds DateHistogramGrouping struct and provides a builder API.
-type DateHistogramGroupingBuilder struct {
-	v *DateHistogramGrouping
-}
+func (s *DateHistogramGrouping) UnmarshalJSON(data []byte) error {
 
-// NewDateHistogramGrouping provides a builder for the DateHistogramGrouping struct.
-func NewDateHistogramGroupingBuilder() *DateHistogramGroupingBuilder {
-	r := DateHistogramGroupingBuilder{
-		&DateHistogramGrouping{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "calendar_interval":
+			if err := dec.Decode(&s.CalendarInterval); err != nil {
+				return fmt.Errorf("%s | %w", "CalendarInterval", err)
+			}
+
+		case "delay":
+			if err := dec.Decode(&s.Delay); err != nil {
+				return fmt.Errorf("%s | %w", "Delay", err)
+			}
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "fixed_interval":
+			if err := dec.Decode(&s.FixedInterval); err != nil {
+				return fmt.Errorf("%s | %w", "FixedInterval", err)
+			}
+
+		case "format":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Format", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Format = &o
+
+		case "interval":
+			if err := dec.Decode(&s.Interval); err != nil {
+				return fmt.Errorf("%s | %w", "Interval", err)
+			}
+
+		case "time_zone":
+			if err := dec.Decode(&s.TimeZone); err != nil {
+				return fmt.Errorf("%s | %w", "TimeZone", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DateHistogramGrouping struct
-func (rb *DateHistogramGroupingBuilder) Build() DateHistogramGrouping {
-	return *rb.v
-}
+// NewDateHistogramGrouping returns a DateHistogramGrouping.
+func NewDateHistogramGrouping() *DateHistogramGrouping {
+	r := &DateHistogramGrouping{}
 
-func (rb *DateHistogramGroupingBuilder) CalendarInterval(calendarinterval *DurationBuilder) *DateHistogramGroupingBuilder {
-	v := calendarinterval.Build()
-	rb.v.CalendarInterval = &v
-	return rb
-}
-
-func (rb *DateHistogramGroupingBuilder) Delay(delay *DurationBuilder) *DateHistogramGroupingBuilder {
-	v := delay.Build()
-	rb.v.Delay = &v
-	return rb
-}
-
-func (rb *DateHistogramGroupingBuilder) Field(field Field) *DateHistogramGroupingBuilder {
-	rb.v.Field = field
-	return rb
-}
-
-func (rb *DateHistogramGroupingBuilder) FixedInterval(fixedinterval *DurationBuilder) *DateHistogramGroupingBuilder {
-	v := fixedinterval.Build()
-	rb.v.FixedInterval = &v
-	return rb
-}
-
-func (rb *DateHistogramGroupingBuilder) Format(format string) *DateHistogramGroupingBuilder {
-	rb.v.Format = &format
-	return rb
-}
-
-func (rb *DateHistogramGroupingBuilder) Interval(interval *DurationBuilder) *DateHistogramGroupingBuilder {
-	v := interval.Build()
-	rb.v.Interval = &v
-	return rb
-}
-
-func (rb *DateHistogramGroupingBuilder) TimeZone(timezone TimeZone) *DateHistogramGroupingBuilder {
-	rb.v.TimeZone = &timezone
-	return rb
+	return r
 }

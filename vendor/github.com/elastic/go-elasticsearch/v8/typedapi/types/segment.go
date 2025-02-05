@@ -15,96 +15,177 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // Segment type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/segments/types.ts#L28-L39
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/segments/types.ts#L28-L38
 type Segment struct {
-	Attributes    map[string]string `json:"attributes"`
-	Committed     bool              `json:"committed"`
-	Compound      bool              `json:"compound"`
-	DeletedDocs   int64             `json:"deleted_docs"`
-	Generation    int               `json:"generation"`
-	MemoryInBytes float64           `json:"memory_in_bytes"`
-	NumDocs       int64             `json:"num_docs"`
-	Search        bool              `json:"search"`
-	SizeInBytes   float64           `json:"size_in_bytes"`
-	Version       VersionString     `json:"version"`
+	Attributes  map[string]string `json:"attributes"`
+	Committed   bool              `json:"committed"`
+	Compound    bool              `json:"compound"`
+	DeletedDocs int64             `json:"deleted_docs"`
+	Generation  int               `json:"generation"`
+	NumDocs     int64             `json:"num_docs"`
+	Search      bool              `json:"search"`
+	SizeInBytes Float64           `json:"size_in_bytes"`
+	Version     string            `json:"version"`
 }
 
-// SegmentBuilder holds Segment struct and provides a builder API.
-type SegmentBuilder struct {
-	v *Segment
+func (s *Segment) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "attributes":
+			if s.Attributes == nil {
+				s.Attributes = make(map[string]string, 0)
+			}
+			if err := dec.Decode(&s.Attributes); err != nil {
+				return fmt.Errorf("%s | %w", "Attributes", err)
+			}
+
+		case "committed":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Committed", err)
+				}
+				s.Committed = value
+			case bool:
+				s.Committed = v
+			}
+
+		case "compound":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Compound", err)
+				}
+				s.Compound = value
+			case bool:
+				s.Compound = v
+			}
+
+		case "deleted_docs":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DeletedDocs", err)
+				}
+				s.DeletedDocs = value
+			case float64:
+				f := int64(v)
+				s.DeletedDocs = f
+			}
+
+		case "generation":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Generation", err)
+				}
+				s.Generation = value
+			case float64:
+				f := int(v)
+				s.Generation = f
+			}
+
+		case "num_docs":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NumDocs", err)
+				}
+				s.NumDocs = value
+			case float64:
+				f := int64(v)
+				s.NumDocs = f
+			}
+
+		case "search":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Search", err)
+				}
+				s.Search = value
+			case bool:
+				s.Search = v
+			}
+
+		case "size_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "SizeInBytes", err)
+				}
+				f := Float64(value)
+				s.SizeInBytes = f
+			case float64:
+				f := Float64(v)
+				s.SizeInBytes = f
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewSegment provides a builder for the Segment struct.
-func NewSegmentBuilder() *SegmentBuilder {
-	r := SegmentBuilder{
-		&Segment{
-			Attributes: make(map[string]string, 0),
-		},
+// NewSegment returns a Segment.
+func NewSegment() *Segment {
+	r := &Segment{
+		Attributes: make(map[string]string, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the Segment struct
-func (rb *SegmentBuilder) Build() Segment {
-	return *rb.v
-}
-
-func (rb *SegmentBuilder) Attributes(value map[string]string) *SegmentBuilder {
-	rb.v.Attributes = value
-	return rb
-}
-
-func (rb *SegmentBuilder) Committed(committed bool) *SegmentBuilder {
-	rb.v.Committed = committed
-	return rb
-}
-
-func (rb *SegmentBuilder) Compound(compound bool) *SegmentBuilder {
-	rb.v.Compound = compound
-	return rb
-}
-
-func (rb *SegmentBuilder) DeletedDocs(deleteddocs int64) *SegmentBuilder {
-	rb.v.DeletedDocs = deleteddocs
-	return rb
-}
-
-func (rb *SegmentBuilder) Generation(generation int) *SegmentBuilder {
-	rb.v.Generation = generation
-	return rb
-}
-
-func (rb *SegmentBuilder) MemoryInBytes(memoryinbytes float64) *SegmentBuilder {
-	rb.v.MemoryInBytes = memoryinbytes
-	return rb
-}
-
-func (rb *SegmentBuilder) NumDocs(numdocs int64) *SegmentBuilder {
-	rb.v.NumDocs = numdocs
-	return rb
-}
-
-func (rb *SegmentBuilder) Search(search bool) *SegmentBuilder {
-	rb.v.Search = search
-	return rb
-}
-
-func (rb *SegmentBuilder) SizeInBytes(sizeinbytes float64) *SegmentBuilder {
-	rb.v.SizeInBytes = sizeinbytes
-	return rb
-}
-
-func (rb *SegmentBuilder) Version(version VersionString) *SegmentBuilder {
-	rb.v.Version = version
-	return rb
+	return r
 }

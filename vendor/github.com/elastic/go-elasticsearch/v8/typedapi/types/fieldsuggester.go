@@ -15,73 +15,114 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // FieldSuggester type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/suggester.ts#L103-L117
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/suggester.ts#L109-L142
 type FieldSuggester struct {
+	// Completion Provides auto-complete/search-as-you-type functionality.
 	Completion *CompletionSuggester `json:"completion,omitempty"`
-	Phrase     *PhraseSuggester     `json:"phrase,omitempty"`
-	Prefix     *string              `json:"prefix,omitempty"`
-	Regex      *string              `json:"regex,omitempty"`
-	Term       *TermSuggester       `json:"term,omitempty"`
-	Text       *string              `json:"text,omitempty"`
+	// Phrase Provides access to word alternatives on a per token basis within a certain
+	// string distance.
+	Phrase *PhraseSuggester `json:"phrase,omitempty"`
+	// Prefix Prefix used to search for suggestions.
+	Prefix *string `json:"prefix,omitempty"`
+	// Regex A prefix expressed as a regular expression.
+	Regex *string `json:"regex,omitempty"`
+	// Term Suggests terms based on edit distance.
+	Term *TermSuggester `json:"term,omitempty"`
+	// Text The text to use as input for the suggester.
+	// Needs to be set globally or per suggestion.
+	Text *string `json:"text,omitempty"`
 }
 
-// FieldSuggesterBuilder holds FieldSuggester struct and provides a builder API.
-type FieldSuggesterBuilder struct {
-	v *FieldSuggester
-}
+func (s *FieldSuggester) UnmarshalJSON(data []byte) error {
 
-// NewFieldSuggester provides a builder for the FieldSuggester struct.
-func NewFieldSuggesterBuilder() *FieldSuggesterBuilder {
-	r := FieldSuggesterBuilder{
-		&FieldSuggester{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "completion":
+			if err := dec.Decode(&s.Completion); err != nil {
+				return fmt.Errorf("%s | %w", "Completion", err)
+			}
+
+		case "phrase":
+			if err := dec.Decode(&s.Phrase); err != nil {
+				return fmt.Errorf("%s | %w", "Phrase", err)
+			}
+
+		case "prefix":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Prefix", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Prefix = &o
+
+		case "regex":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Regex", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Regex = &o
+
+		case "term":
+			if err := dec.Decode(&s.Term); err != nil {
+				return fmt.Errorf("%s | %w", "Term", err)
+			}
+
+		case "text":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Text", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Text = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the FieldSuggester struct
-func (rb *FieldSuggesterBuilder) Build() FieldSuggester {
-	return *rb.v
-}
+// NewFieldSuggester returns a FieldSuggester.
+func NewFieldSuggester() *FieldSuggester {
+	r := &FieldSuggester{}
 
-func (rb *FieldSuggesterBuilder) Completion(completion *CompletionSuggesterBuilder) *FieldSuggesterBuilder {
-	v := completion.Build()
-	rb.v.Completion = &v
-	return rb
-}
-
-func (rb *FieldSuggesterBuilder) Phrase(phrase *PhraseSuggesterBuilder) *FieldSuggesterBuilder {
-	v := phrase.Build()
-	rb.v.Phrase = &v
-	return rb
-}
-
-func (rb *FieldSuggesterBuilder) Prefix(prefix string) *FieldSuggesterBuilder {
-	rb.v.Prefix = &prefix
-	return rb
-}
-
-func (rb *FieldSuggesterBuilder) Regex(regex string) *FieldSuggesterBuilder {
-	rb.v.Regex = &regex
-	return rb
-}
-
-func (rb *FieldSuggesterBuilder) Term(term *TermSuggesterBuilder) *FieldSuggesterBuilder {
-	v := term.Build()
-	rb.v.Term = &v
-	return rb
-}
-
-func (rb *FieldSuggesterBuilder) Text(text string) *FieldSuggesterBuilder {
-	rb.v.Text = &text
-	return rb
+	return r
 }

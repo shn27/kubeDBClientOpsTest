@@ -15,46 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
-
-import (
-	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/slicescalculation"
-)
 
 // Slices holds the union for the following types:
 //
 //	int
 //	slicescalculation.SlicesCalculation
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/common.ts#L319-L324
-type Slices interface{}
-
-// SlicesBuilder holds Slices struct and provides a builder API.
-type SlicesBuilder struct {
-	v Slices
-}
-
-// NewSlices provides a builder for the Slices struct.
-func NewSlicesBuilder() *SlicesBuilder {
-	return &SlicesBuilder{}
-}
-
-// Build finalize the chain and returns the Slices struct
-func (u *SlicesBuilder) Build() Slices {
-	return u.v
-}
-
-func (u *SlicesBuilder) Int(int int) *SlicesBuilder {
-	u.v = &int
-	return u
-}
-
-func (u *SlicesBuilder) SlicesCalculation(slicescalculation slicescalculation.SlicesCalculation) *SlicesBuilder {
-	u.v = &slicescalculation
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/common.ts#L365-L370
+type Slices any

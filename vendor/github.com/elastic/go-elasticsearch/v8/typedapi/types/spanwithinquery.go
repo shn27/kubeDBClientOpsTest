@@ -15,60 +15,100 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // SpanWithinQuery type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/span.ts#L74-L77
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/span.ts#L142-L156
 type SpanWithinQuery struct {
-	Big        *SpanQuery `json:"big,omitempty"`
-	Boost      *float32   `json:"boost,omitempty"`
+	// Big Can be any span query.
+	// Matching spans from `little` that are enclosed within `big` are returned.
+	Big *SpanQuery `json:"big,omitempty"`
+	// Boost Floating point number used to decrease or increase the relevance scores of
+	// the query.
+	// Boost values are relative to the default value of 1.0.
+	// A boost value between 0 and 1.0 decreases the relevance score.
+	// A value greater than 1.0 increases the relevance score.
+	Boost *float32 `json:"boost,omitempty"`
+	// Little Can be any span query.
+	// Matching spans from `little` that are enclosed within `big` are returned.
 	Little     *SpanQuery `json:"little,omitempty"`
 	QueryName_ *string    `json:"_name,omitempty"`
 }
 
-// SpanWithinQueryBuilder holds SpanWithinQuery struct and provides a builder API.
-type SpanWithinQueryBuilder struct {
-	v *SpanWithinQuery
-}
+func (s *SpanWithinQuery) UnmarshalJSON(data []byte) error {
 
-// NewSpanWithinQuery provides a builder for the SpanWithinQuery struct.
-func NewSpanWithinQueryBuilder() *SpanWithinQueryBuilder {
-	r := SpanWithinQueryBuilder{
-		&SpanWithinQuery{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "big":
+			if err := dec.Decode(&s.Big); err != nil {
+				return fmt.Errorf("%s | %w", "Big", err)
+			}
+
+		case "boost":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Boost", err)
+				}
+				f := float32(value)
+				s.Boost = &f
+			case float64:
+				f := float32(v)
+				s.Boost = &f
+			}
+
+		case "little":
+			if err := dec.Decode(&s.Little); err != nil {
+				return fmt.Errorf("%s | %w", "Little", err)
+			}
+
+		case "_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "QueryName_", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.QueryName_ = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SpanWithinQuery struct
-func (rb *SpanWithinQueryBuilder) Build() SpanWithinQuery {
-	return *rb.v
-}
+// NewSpanWithinQuery returns a SpanWithinQuery.
+func NewSpanWithinQuery() *SpanWithinQuery {
+	r := &SpanWithinQuery{}
 
-func (rb *SpanWithinQueryBuilder) Big(big *SpanQueryBuilder) *SpanWithinQueryBuilder {
-	v := big.Build()
-	rb.v.Big = &v
-	return rb
-}
-
-func (rb *SpanWithinQueryBuilder) Boost(boost float32) *SpanWithinQueryBuilder {
-	rb.v.Boost = &boost
-	return rb
-}
-
-func (rb *SpanWithinQueryBuilder) Little(little *SpanQueryBuilder) *SpanWithinQueryBuilder {
-	v := little.Build()
-	rb.v.Little = &v
-	return rb
-}
-
-func (rb *SpanWithinQueryBuilder) QueryName_(queryname_ string) *SpanWithinQueryBuilder {
-	rb.v.QueryName_ = &queryname_
-	return rb
+	return r
 }

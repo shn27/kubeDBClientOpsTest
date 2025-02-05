@@ -15,47 +15,90 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // HistogramGrouping type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/rollup/_types/Groupings.ts#L44-L47
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/rollup/_types/Groupings.ts#L84-L97
 type HistogramGrouping struct {
-	Fields   Fields `json:"fields"`
-	Interval int64  `json:"interval"`
+	// Fields The set of fields that you wish to build histograms for.
+	// All fields specified must be some kind of numeric.
+	// Order does not matter.
+	Fields []string `json:"fields"`
+	// Interval The interval of histogram buckets to be generated when rolling up.
+	// For example, a value of `5` creates buckets that are five units wide (`0-5`,
+	// `5-10`, etc).
+	// Note that only one interval can be specified in the histogram group, meaning
+	// that all fields being grouped via the histogram must share the same interval.
+	Interval int64 `json:"interval"`
 }
 
-// HistogramGroupingBuilder holds HistogramGrouping struct and provides a builder API.
-type HistogramGroupingBuilder struct {
-	v *HistogramGrouping
-}
+func (s *HistogramGrouping) UnmarshalJSON(data []byte) error {
 
-// NewHistogramGrouping provides a builder for the HistogramGrouping struct.
-func NewHistogramGroupingBuilder() *HistogramGroupingBuilder {
-	r := HistogramGroupingBuilder{
-		&HistogramGrouping{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "fields":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Fields", err)
+				}
+
+				s.Fields = append(s.Fields, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Fields); err != nil {
+					return fmt.Errorf("%s | %w", "Fields", err)
+				}
+			}
+
+		case "interval":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Interval", err)
+				}
+				s.Interval = value
+			case float64:
+				f := int64(v)
+				s.Interval = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the HistogramGrouping struct
-func (rb *HistogramGroupingBuilder) Build() HistogramGrouping {
-	return *rb.v
-}
+// NewHistogramGrouping returns a HistogramGrouping.
+func NewHistogramGrouping() *HistogramGrouping {
+	r := &HistogramGrouping{}
 
-func (rb *HistogramGroupingBuilder) Fields(fields *FieldsBuilder) *HistogramGroupingBuilder {
-	v := fields.Build()
-	rb.v.Fields = v
-	return rb
-}
-
-func (rb *HistogramGroupingBuilder) Interval(interval int64) *HistogramGroupingBuilder {
-	rb.v.Interval = interval
-	return rb
+	return r
 }

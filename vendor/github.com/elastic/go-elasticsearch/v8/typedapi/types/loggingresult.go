@@ -15,40 +15,62 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // LoggingResult type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Actions.ts#L287-L289
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Actions.ts#L287-L289
 type LoggingResult struct {
 	LoggedText string `json:"logged_text"`
 }
 
-// LoggingResultBuilder holds LoggingResult struct and provides a builder API.
-type LoggingResultBuilder struct {
-	v *LoggingResult
-}
+func (s *LoggingResult) UnmarshalJSON(data []byte) error {
 
-// NewLoggingResult provides a builder for the LoggingResult struct.
-func NewLoggingResultBuilder() *LoggingResultBuilder {
-	r := LoggingResultBuilder{
-		&LoggingResult{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "logged_text":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "LoggedText", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.LoggedText = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the LoggingResult struct
-func (rb *LoggingResultBuilder) Build() LoggingResult {
-	return *rb.v
-}
+// NewLoggingResult returns a LoggingResult.
+func NewLoggingResult() *LoggingResult {
+	r := &LoggingResult{}
 
-func (rb *LoggingResultBuilder) LoggedText(loggedtext string) *LoggingResultBuilder {
-	rb.v.LoggedText = loggedtext
-	return rb
+	return r
 }

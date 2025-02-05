@@ -15,83 +15,99 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // NodeTasks type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/tasks/_types/TaskListResponseBase.ts#L49-L57
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/tasks/_types/TaskListResponseBase.ts#L49-L57
 type NodeTasks struct {
 	Attributes       map[string]string   `json:"attributes,omitempty"`
-	Host             *Host               `json:"host,omitempty"`
-	Ip               *Ip                 `json:"ip,omitempty"`
-	Name             *NodeId             `json:"name,omitempty"`
+	Host             *string             `json:"host,omitempty"`
+	Ip               *string             `json:"ip,omitempty"`
+	Name             *string             `json:"name,omitempty"`
 	Roles            []string            `json:"roles,omitempty"`
-	Tasks            map[TaskId]TaskInfo `json:"tasks"`
-	TransportAddress *TransportAddress   `json:"transport_address,omitempty"`
+	Tasks            map[string]TaskInfo `json:"tasks"`
+	TransportAddress *string             `json:"transport_address,omitempty"`
 }
 
-// NodeTasksBuilder holds NodeTasks struct and provides a builder API.
-type NodeTasksBuilder struct {
-	v *NodeTasks
+func (s *NodeTasks) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "attributes":
+			if s.Attributes == nil {
+				s.Attributes = make(map[string]string, 0)
+			}
+			if err := dec.Decode(&s.Attributes); err != nil {
+				return fmt.Errorf("%s | %w", "Attributes", err)
+			}
+
+		case "host":
+			if err := dec.Decode(&s.Host); err != nil {
+				return fmt.Errorf("%s | %w", "Host", err)
+			}
+
+		case "ip":
+			if err := dec.Decode(&s.Ip); err != nil {
+				return fmt.Errorf("%s | %w", "Ip", err)
+			}
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		case "roles":
+			if err := dec.Decode(&s.Roles); err != nil {
+				return fmt.Errorf("%s | %w", "Roles", err)
+			}
+
+		case "tasks":
+			if s.Tasks == nil {
+				s.Tasks = make(map[string]TaskInfo, 0)
+			}
+			if err := dec.Decode(&s.Tasks); err != nil {
+				return fmt.Errorf("%s | %w", "Tasks", err)
+			}
+
+		case "transport_address":
+			if err := dec.Decode(&s.TransportAddress); err != nil {
+				return fmt.Errorf("%s | %w", "TransportAddress", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewNodeTasks provides a builder for the NodeTasks struct.
-func NewNodeTasksBuilder() *NodeTasksBuilder {
-	r := NodeTasksBuilder{
-		&NodeTasks{
-			Attributes: make(map[string]string, 0),
-			Tasks:      make(map[TaskId]TaskInfo, 0),
-		},
+// NewNodeTasks returns a NodeTasks.
+func NewNodeTasks() *NodeTasks {
+	r := &NodeTasks{
+		Attributes: make(map[string]string, 0),
+		Tasks:      make(map[string]TaskInfo, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the NodeTasks struct
-func (rb *NodeTasksBuilder) Build() NodeTasks {
-	return *rb.v
-}
-
-func (rb *NodeTasksBuilder) Attributes(value map[string]string) *NodeTasksBuilder {
-	rb.v.Attributes = value
-	return rb
-}
-
-func (rb *NodeTasksBuilder) Host(host Host) *NodeTasksBuilder {
-	rb.v.Host = &host
-	return rb
-}
-
-func (rb *NodeTasksBuilder) Ip(ip Ip) *NodeTasksBuilder {
-	rb.v.Ip = &ip
-	return rb
-}
-
-func (rb *NodeTasksBuilder) Name(name NodeId) *NodeTasksBuilder {
-	rb.v.Name = &name
-	return rb
-}
-
-func (rb *NodeTasksBuilder) Roles(roles ...string) *NodeTasksBuilder {
-	rb.v.Roles = roles
-	return rb
-}
-
-func (rb *NodeTasksBuilder) Tasks(values map[TaskId]*TaskInfoBuilder) *NodeTasksBuilder {
-	tmp := make(map[TaskId]TaskInfo, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Tasks = tmp
-	return rb
-}
-
-func (rb *NodeTasksBuilder) TransportAddress(transportaddress TransportAddress) *NodeTasksBuilder {
-	rb.v.TransportAddress = &transportaddress
-	return rb
+	return r
 }

@@ -15,34 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // Indices type alias.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/common.ts#L54-L54
-type Indices []IndexName
-
-// IndicesBuilder holds Indices struct and provides a builder API.
-type IndicesBuilder struct {
-	v Indices
-}
-
-// NewIndices provides a builder for the Indices struct.
-func NewIndicesBuilder() *IndicesBuilder {
-	return &IndicesBuilder{}
-}
-
-// Build finalize the chain and returns the Indices struct
-func (b *IndicesBuilder) Build() Indices {
-	return b.v
-}
-
-func (b *IndicesBuilder) Indices(value Indices) *IndicesBuilder {
-	b.v = value
-	return b
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/common.ts#L67-L67
+type Indices []string

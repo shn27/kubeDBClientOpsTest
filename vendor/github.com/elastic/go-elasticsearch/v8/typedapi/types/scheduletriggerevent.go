@@ -15,48 +15,60 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // ScheduleTriggerEvent type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Schedule.ts#L98-L101
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Schedule.ts#L93-L96
 type ScheduleTriggerEvent struct {
-	ScheduledTime DateTime  `json:"scheduled_time"`
-	TriggeredTime *DateTime `json:"triggered_time,omitempty"`
+	ScheduledTime DateTime `json:"scheduled_time"`
+	TriggeredTime DateTime `json:"triggered_time,omitempty"`
 }
 
-// ScheduleTriggerEventBuilder holds ScheduleTriggerEvent struct and provides a builder API.
-type ScheduleTriggerEventBuilder struct {
-	v *ScheduleTriggerEvent
-}
+func (s *ScheduleTriggerEvent) UnmarshalJSON(data []byte) error {
 
-// NewScheduleTriggerEvent provides a builder for the ScheduleTriggerEvent struct.
-func NewScheduleTriggerEventBuilder() *ScheduleTriggerEventBuilder {
-	r := ScheduleTriggerEventBuilder{
-		&ScheduleTriggerEvent{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "scheduled_time":
+			if err := dec.Decode(&s.ScheduledTime); err != nil {
+				return fmt.Errorf("%s | %w", "ScheduledTime", err)
+			}
+
+		case "triggered_time":
+			if err := dec.Decode(&s.TriggeredTime); err != nil {
+				return fmt.Errorf("%s | %w", "TriggeredTime", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ScheduleTriggerEvent struct
-func (rb *ScheduleTriggerEventBuilder) Build() ScheduleTriggerEvent {
-	return *rb.v
-}
+// NewScheduleTriggerEvent returns a ScheduleTriggerEvent.
+func NewScheduleTriggerEvent() *ScheduleTriggerEvent {
+	r := &ScheduleTriggerEvent{}
 
-func (rb *ScheduleTriggerEventBuilder) ScheduledTime(scheduledtime *DateTimeBuilder) *ScheduleTriggerEventBuilder {
-	v := scheduledtime.Build()
-	rb.v.ScheduledTime = v
-	return rb
-}
-
-func (rb *ScheduleTriggerEventBuilder) TriggeredTime(triggeredtime *DateTimeBuilder) *ScheduleTriggerEventBuilder {
-	v := triggeredtime.Build()
-	rb.v.TriggeredTime = &v
-	return rb
+	return r
 }

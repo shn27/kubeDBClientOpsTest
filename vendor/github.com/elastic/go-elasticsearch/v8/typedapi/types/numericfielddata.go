@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
@@ -28,31 +26,14 @@ import (
 
 // NumericFielddata type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/NumericFielddata.ts#L22-L24
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/NumericFielddata.ts#L22-L24
 type NumericFielddata struct {
 	Format numericfielddataformat.NumericFielddataFormat `json:"format"`
 }
 
-// NumericFielddataBuilder holds NumericFielddata struct and provides a builder API.
-type NumericFielddataBuilder struct {
-	v *NumericFielddata
-}
+// NewNumericFielddata returns a NumericFielddata.
+func NewNumericFielddata() *NumericFielddata {
+	r := &NumericFielddata{}
 
-// NewNumericFielddata provides a builder for the NumericFielddata struct.
-func NewNumericFielddataBuilder() *NumericFielddataBuilder {
-	r := NumericFielddataBuilder{
-		&NumericFielddata{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the NumericFielddata struct
-func (rb *NumericFielddataBuilder) Build() NumericFielddata {
-	return *rb.v
-}
-
-func (rb *NumericFielddataBuilder) Format(format numericfielddataformat.NumericFielddataFormat) *NumericFielddataBuilder {
-	rb.v.Format = format
-	return rb
+	return r
 }

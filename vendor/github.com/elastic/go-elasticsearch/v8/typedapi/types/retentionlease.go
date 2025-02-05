@@ -15,41 +15,54 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // RetentionLease type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/IndexSettings.ts#L65-L67
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/IndexSettings.ts#L65-L67
 type RetentionLease struct {
 	Period Duration `json:"period"`
 }
 
-// RetentionLeaseBuilder holds RetentionLease struct and provides a builder API.
-type RetentionLeaseBuilder struct {
-	v *RetentionLease
-}
+func (s *RetentionLease) UnmarshalJSON(data []byte) error {
 
-// NewRetentionLease provides a builder for the RetentionLease struct.
-func NewRetentionLeaseBuilder() *RetentionLeaseBuilder {
-	r := RetentionLeaseBuilder{
-		&RetentionLease{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "period":
+			if err := dec.Decode(&s.Period); err != nil {
+				return fmt.Errorf("%s | %w", "Period", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RetentionLease struct
-func (rb *RetentionLeaseBuilder) Build() RetentionLease {
-	return *rb.v
-}
+// NewRetentionLease returns a RetentionLease.
+func NewRetentionLease() *RetentionLease {
+	r := &RetentionLease{}
 
-func (rb *RetentionLeaseBuilder) Period(period *DurationBuilder) *RetentionLeaseBuilder {
-	v := period.Build()
-	rb.v.Period = v
-	return rb
+	return r
 }

@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // FollowerIndexParameters type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ccr/follow_info/types.ts#L38-L49
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ccr/follow_info/types.ts#L37-L48
 type FollowerIndexParameters struct {
 	MaxOutstandingReadRequests    int      `json:"max_outstanding_read_requests"`
 	MaxOutstandingWriteRequests   int      `json:"max_outstanding_write_requests"`
@@ -38,73 +45,155 @@ type FollowerIndexParameters struct {
 	ReadPollTimeout               Duration `json:"read_poll_timeout"`
 }
 
-// FollowerIndexParametersBuilder holds FollowerIndexParameters struct and provides a builder API.
-type FollowerIndexParametersBuilder struct {
-	v *FollowerIndexParameters
-}
+func (s *FollowerIndexParameters) UnmarshalJSON(data []byte) error {
 
-// NewFollowerIndexParameters provides a builder for the FollowerIndexParameters struct.
-func NewFollowerIndexParametersBuilder() *FollowerIndexParametersBuilder {
-	r := FollowerIndexParametersBuilder{
-		&FollowerIndexParameters{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "max_outstanding_read_requests":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxOutstandingReadRequests", err)
+				}
+				s.MaxOutstandingReadRequests = value
+			case float64:
+				f := int(v)
+				s.MaxOutstandingReadRequests = f
+			}
+
+		case "max_outstanding_write_requests":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxOutstandingWriteRequests", err)
+				}
+				s.MaxOutstandingWriteRequests = value
+			case float64:
+				f := int(v)
+				s.MaxOutstandingWriteRequests = f
+			}
+
+		case "max_read_request_operation_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxReadRequestOperationCount", err)
+				}
+				s.MaxReadRequestOperationCount = value
+			case float64:
+				f := int(v)
+				s.MaxReadRequestOperationCount = f
+			}
+
+		case "max_read_request_size":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "MaxReadRequestSize", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.MaxReadRequestSize = o
+
+		case "max_retry_delay":
+			if err := dec.Decode(&s.MaxRetryDelay); err != nil {
+				return fmt.Errorf("%s | %w", "MaxRetryDelay", err)
+			}
+
+		case "max_write_buffer_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxWriteBufferCount", err)
+				}
+				s.MaxWriteBufferCount = value
+			case float64:
+				f := int(v)
+				s.MaxWriteBufferCount = f
+			}
+
+		case "max_write_buffer_size":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "MaxWriteBufferSize", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.MaxWriteBufferSize = o
+
+		case "max_write_request_operation_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxWriteRequestOperationCount", err)
+				}
+				s.MaxWriteRequestOperationCount = value
+			case float64:
+				f := int(v)
+				s.MaxWriteRequestOperationCount = f
+			}
+
+		case "max_write_request_size":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "MaxWriteRequestSize", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.MaxWriteRequestSize = o
+
+		case "read_poll_timeout":
+			if err := dec.Decode(&s.ReadPollTimeout); err != nil {
+				return fmt.Errorf("%s | %w", "ReadPollTimeout", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the FollowerIndexParameters struct
-func (rb *FollowerIndexParametersBuilder) Build() FollowerIndexParameters {
-	return *rb.v
-}
+// NewFollowerIndexParameters returns a FollowerIndexParameters.
+func NewFollowerIndexParameters() *FollowerIndexParameters {
+	r := &FollowerIndexParameters{}
 
-func (rb *FollowerIndexParametersBuilder) MaxOutstandingReadRequests(maxoutstandingreadrequests int) *FollowerIndexParametersBuilder {
-	rb.v.MaxOutstandingReadRequests = maxoutstandingreadrequests
-	return rb
-}
-
-func (rb *FollowerIndexParametersBuilder) MaxOutstandingWriteRequests(maxoutstandingwriterequests int) *FollowerIndexParametersBuilder {
-	rb.v.MaxOutstandingWriteRequests = maxoutstandingwriterequests
-	return rb
-}
-
-func (rb *FollowerIndexParametersBuilder) MaxReadRequestOperationCount(maxreadrequestoperationcount int) *FollowerIndexParametersBuilder {
-	rb.v.MaxReadRequestOperationCount = maxreadrequestoperationcount
-	return rb
-}
-
-func (rb *FollowerIndexParametersBuilder) MaxReadRequestSize(maxreadrequestsize string) *FollowerIndexParametersBuilder {
-	rb.v.MaxReadRequestSize = maxreadrequestsize
-	return rb
-}
-
-func (rb *FollowerIndexParametersBuilder) MaxRetryDelay(maxretrydelay *DurationBuilder) *FollowerIndexParametersBuilder {
-	v := maxretrydelay.Build()
-	rb.v.MaxRetryDelay = v
-	return rb
-}
-
-func (rb *FollowerIndexParametersBuilder) MaxWriteBufferCount(maxwritebuffercount int) *FollowerIndexParametersBuilder {
-	rb.v.MaxWriteBufferCount = maxwritebuffercount
-	return rb
-}
-
-func (rb *FollowerIndexParametersBuilder) MaxWriteBufferSize(maxwritebuffersize string) *FollowerIndexParametersBuilder {
-	rb.v.MaxWriteBufferSize = maxwritebuffersize
-	return rb
-}
-
-func (rb *FollowerIndexParametersBuilder) MaxWriteRequestOperationCount(maxwriterequestoperationcount int) *FollowerIndexParametersBuilder {
-	rb.v.MaxWriteRequestOperationCount = maxwriterequestoperationcount
-	return rb
-}
-
-func (rb *FollowerIndexParametersBuilder) MaxWriteRequestSize(maxwriterequestsize string) *FollowerIndexParametersBuilder {
-	rb.v.MaxWriteRequestSize = maxwriterequestsize
-	return rb
-}
-
-func (rb *FollowerIndexParametersBuilder) ReadPollTimeout(readpolltimeout *DurationBuilder) *FollowerIndexParametersBuilder {
-	v := readpolltimeout.Build()
-	rb.v.ReadPollTimeout = v
-	return rb
+	return r
 }

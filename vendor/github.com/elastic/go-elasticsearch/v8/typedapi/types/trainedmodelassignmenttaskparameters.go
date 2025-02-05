@@ -15,89 +15,151 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
+	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/trainingpriority"
+)
+
 // TrainedModelAssignmentTaskParameters type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/TrainedModel.ts#L299-L325
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/TrainedModel.ts#L357-L393
 type TrainedModelAssignmentTaskParameters struct {
 	// CacheSize The size of the trained model cache.
-	CacheSize ByteSize `json:"cache_size"`
+	CacheSize ByteSize `json:"cache_size,omitempty"`
+	// DeploymentId The unique identifier for the trained model deployment.
+	DeploymentId string `json:"deployment_id"`
 	// ModelBytes The size of the trained model in bytes.
-	ModelBytes int `json:"model_bytes"`
+	ModelBytes ByteSize `json:"model_bytes"`
 	// ModelId The unique identifier for the trained model.
-	ModelId Id `json:"model_id"`
+	ModelId string `json:"model_id"`
 	// NumberOfAllocations The total number of allocations this model is assigned across ML nodes.
-	NumberOfAllocations int `json:"number_of_allocations"`
+	NumberOfAllocations      int                               `json:"number_of_allocations"`
+	PerAllocationMemoryBytes ByteSize                          `json:"per_allocation_memory_bytes"`
+	PerDeploymentMemoryBytes ByteSize                          `json:"per_deployment_memory_bytes"`
+	Priority                 trainingpriority.TrainingPriority `json:"priority"`
 	// QueueCapacity Number of inference requests are allowed in the queue at a time.
 	QueueCapacity int `json:"queue_capacity"`
 	// ThreadsPerAllocation Number of threads per allocation.
 	ThreadsPerAllocation int `json:"threads_per_allocation"`
 }
 
-// TrainedModelAssignmentTaskParametersBuilder holds TrainedModelAssignmentTaskParameters struct and provides a builder API.
-type TrainedModelAssignmentTaskParametersBuilder struct {
-	v *TrainedModelAssignmentTaskParameters
-}
+func (s *TrainedModelAssignmentTaskParameters) UnmarshalJSON(data []byte) error {
 
-// NewTrainedModelAssignmentTaskParameters provides a builder for the TrainedModelAssignmentTaskParameters struct.
-func NewTrainedModelAssignmentTaskParametersBuilder() *TrainedModelAssignmentTaskParametersBuilder {
-	r := TrainedModelAssignmentTaskParametersBuilder{
-		&TrainedModelAssignmentTaskParameters{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "cache_size":
+			if err := dec.Decode(&s.CacheSize); err != nil {
+				return fmt.Errorf("%s | %w", "CacheSize", err)
+			}
+
+		case "deployment_id":
+			if err := dec.Decode(&s.DeploymentId); err != nil {
+				return fmt.Errorf("%s | %w", "DeploymentId", err)
+			}
+
+		case "model_bytes":
+			if err := dec.Decode(&s.ModelBytes); err != nil {
+				return fmt.Errorf("%s | %w", "ModelBytes", err)
+			}
+
+		case "model_id":
+			if err := dec.Decode(&s.ModelId); err != nil {
+				return fmt.Errorf("%s | %w", "ModelId", err)
+			}
+
+		case "number_of_allocations":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NumberOfAllocations", err)
+				}
+				s.NumberOfAllocations = value
+			case float64:
+				f := int(v)
+				s.NumberOfAllocations = f
+			}
+
+		case "per_allocation_memory_bytes":
+			if err := dec.Decode(&s.PerAllocationMemoryBytes); err != nil {
+				return fmt.Errorf("%s | %w", "PerAllocationMemoryBytes", err)
+			}
+
+		case "per_deployment_memory_bytes":
+			if err := dec.Decode(&s.PerDeploymentMemoryBytes); err != nil {
+				return fmt.Errorf("%s | %w", "PerDeploymentMemoryBytes", err)
+			}
+
+		case "priority":
+			if err := dec.Decode(&s.Priority); err != nil {
+				return fmt.Errorf("%s | %w", "Priority", err)
+			}
+
+		case "queue_capacity":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "QueueCapacity", err)
+				}
+				s.QueueCapacity = value
+			case float64:
+				f := int(v)
+				s.QueueCapacity = f
+			}
+
+		case "threads_per_allocation":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ThreadsPerAllocation", err)
+				}
+				s.ThreadsPerAllocation = value
+			case float64:
+				f := int(v)
+				s.ThreadsPerAllocation = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TrainedModelAssignmentTaskParameters struct
-func (rb *TrainedModelAssignmentTaskParametersBuilder) Build() TrainedModelAssignmentTaskParameters {
-	return *rb.v
-}
+// NewTrainedModelAssignmentTaskParameters returns a TrainedModelAssignmentTaskParameters.
+func NewTrainedModelAssignmentTaskParameters() *TrainedModelAssignmentTaskParameters {
+	r := &TrainedModelAssignmentTaskParameters{}
 
-// CacheSize The size of the trained model cache.
-
-func (rb *TrainedModelAssignmentTaskParametersBuilder) CacheSize(cachesize *ByteSizeBuilder) *TrainedModelAssignmentTaskParametersBuilder {
-	v := cachesize.Build()
-	rb.v.CacheSize = v
-	return rb
-}
-
-// ModelBytes The size of the trained model in bytes.
-
-func (rb *TrainedModelAssignmentTaskParametersBuilder) ModelBytes(modelbytes int) *TrainedModelAssignmentTaskParametersBuilder {
-	rb.v.ModelBytes = modelbytes
-	return rb
-}
-
-// ModelId The unique identifier for the trained model.
-
-func (rb *TrainedModelAssignmentTaskParametersBuilder) ModelId(modelid Id) *TrainedModelAssignmentTaskParametersBuilder {
-	rb.v.ModelId = modelid
-	return rb
-}
-
-// NumberOfAllocations The total number of allocations this model is assigned across ML nodes.
-
-func (rb *TrainedModelAssignmentTaskParametersBuilder) NumberOfAllocations(numberofallocations int) *TrainedModelAssignmentTaskParametersBuilder {
-	rb.v.NumberOfAllocations = numberofallocations
-	return rb
-}
-
-// QueueCapacity Number of inference requests are allowed in the queue at a time.
-
-func (rb *TrainedModelAssignmentTaskParametersBuilder) QueueCapacity(queuecapacity int) *TrainedModelAssignmentTaskParametersBuilder {
-	rb.v.QueueCapacity = queuecapacity
-	return rb
-}
-
-// ThreadsPerAllocation Number of threads per allocation.
-
-func (rb *TrainedModelAssignmentTaskParametersBuilder) ThreadsPerAllocation(threadsperallocation int) *TrainedModelAssignmentTaskParametersBuilder {
-	rb.v.ThreadsPerAllocation = threadsperallocation
-	return rb
+	return r
 }

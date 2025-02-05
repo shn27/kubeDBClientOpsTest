@@ -15,54 +15,66 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // ActivationStatus type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Activation.ts#L29-L33
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Activation.ts#L29-L33
 type ActivationStatus struct {
-	Actions Actions         `json:"actions"`
-	State   ActivationState `json:"state"`
-	Version VersionNumber   `json:"version"`
+	Actions WatcherStatusActions `json:"actions"`
+	State   ActivationState      `json:"state"`
+	Version int64                `json:"version"`
 }
 
-// ActivationStatusBuilder holds ActivationStatus struct and provides a builder API.
-type ActivationStatusBuilder struct {
-	v *ActivationStatus
-}
+func (s *ActivationStatus) UnmarshalJSON(data []byte) error {
 
-// NewActivationStatus provides a builder for the ActivationStatus struct.
-func NewActivationStatusBuilder() *ActivationStatusBuilder {
-	r := ActivationStatusBuilder{
-		&ActivationStatus{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "actions":
+			if err := dec.Decode(&s.Actions); err != nil {
+				return fmt.Errorf("%s | %w", "Actions", err)
+			}
+
+		case "state":
+			if err := dec.Decode(&s.State); err != nil {
+				return fmt.Errorf("%s | %w", "State", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ActivationStatus struct
-func (rb *ActivationStatusBuilder) Build() ActivationStatus {
-	return *rb.v
-}
+// NewActivationStatus returns a ActivationStatus.
+func NewActivationStatus() *ActivationStatus {
+	r := &ActivationStatus{}
 
-func (rb *ActivationStatusBuilder) Actions(actions *ActionsBuilder) *ActivationStatusBuilder {
-	v := actions.Build()
-	rb.v.Actions = v
-	return rb
-}
-
-func (rb *ActivationStatusBuilder) State(state *ActivationStateBuilder) *ActivationStatusBuilder {
-	v := state.Build()
-	rb.v.State = v
-	return rb
-}
-
-func (rb *ActivationStatusBuilder) Version(version VersionNumber) *ActivationStatusBuilder {
-	rb.v.Version = version
-	return rb
+	return r
 }

@@ -15,66 +15,117 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // BoostingQuery type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/compound.ts#L36-L40
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/compound.ts#L58-L74
 type BoostingQuery struct {
-	Boost         *float32        `json:"boost,omitempty"`
-	Negative      *QueryContainer `json:"negative,omitempty"`
-	NegativeBoost float64         `json:"negative_boost"`
-	Positive      *QueryContainer `json:"positive,omitempty"`
-	QueryName_    *string         `json:"_name,omitempty"`
+	// Boost Floating point number used to decrease or increase the relevance scores of
+	// the query.
+	// Boost values are relative to the default value of 1.0.
+	// A boost value between 0 and 1.0 decreases the relevance score.
+	// A value greater than 1.0 increases the relevance score.
+	Boost *float32 `json:"boost,omitempty"`
+	// Negative Query used to decrease the relevance score of matching documents.
+	Negative *Query `json:"negative,omitempty"`
+	// NegativeBoost Floating point number between 0 and 1.0 used to decrease the relevance scores
+	// of documents matching the `negative` query.
+	NegativeBoost Float64 `json:"negative_boost"`
+	// Positive Any returned documents must match this query.
+	Positive   *Query  `json:"positive,omitempty"`
+	QueryName_ *string `json:"_name,omitempty"`
 }
 
-// BoostingQueryBuilder holds BoostingQuery struct and provides a builder API.
-type BoostingQueryBuilder struct {
-	v *BoostingQuery
-}
+func (s *BoostingQuery) UnmarshalJSON(data []byte) error {
 
-// NewBoostingQuery provides a builder for the BoostingQuery struct.
-func NewBoostingQueryBuilder() *BoostingQueryBuilder {
-	r := BoostingQueryBuilder{
-		&BoostingQuery{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "boost":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Boost", err)
+				}
+				f := float32(value)
+				s.Boost = &f
+			case float64:
+				f := float32(v)
+				s.Boost = &f
+			}
+
+		case "negative":
+			if err := dec.Decode(&s.Negative); err != nil {
+				return fmt.Errorf("%s | %w", "Negative", err)
+			}
+
+		case "negative_boost":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NegativeBoost", err)
+				}
+				f := Float64(value)
+				s.NegativeBoost = f
+			case float64:
+				f := Float64(v)
+				s.NegativeBoost = f
+			}
+
+		case "positive":
+			if err := dec.Decode(&s.Positive); err != nil {
+				return fmt.Errorf("%s | %w", "Positive", err)
+			}
+
+		case "_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "QueryName_", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.QueryName_ = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the BoostingQuery struct
-func (rb *BoostingQueryBuilder) Build() BoostingQuery {
-	return *rb.v
-}
+// NewBoostingQuery returns a BoostingQuery.
+func NewBoostingQuery() *BoostingQuery {
+	r := &BoostingQuery{}
 
-func (rb *BoostingQueryBuilder) Boost(boost float32) *BoostingQueryBuilder {
-	rb.v.Boost = &boost
-	return rb
-}
-
-func (rb *BoostingQueryBuilder) Negative(negative *QueryContainerBuilder) *BoostingQueryBuilder {
-	v := negative.Build()
-	rb.v.Negative = &v
-	return rb
-}
-
-func (rb *BoostingQueryBuilder) NegativeBoost(negativeboost float64) *BoostingQueryBuilder {
-	rb.v.NegativeBoost = negativeboost
-	return rb
-}
-
-func (rb *BoostingQueryBuilder) Positive(positive *QueryContainerBuilder) *BoostingQueryBuilder {
-	v := positive.Build()
-	rb.v.Positive = &v
-	return rb
-}
-
-func (rb *BoostingQueryBuilder) QueryName_(queryname_ string) *BoostingQueryBuilder {
-	rb.v.QueryName_ = &queryname_
-	return rb
+	return r
 }

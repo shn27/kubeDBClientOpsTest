@@ -15,47 +15,72 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // NodeInfoNetwork type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/info/types.ts#L320-L323
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/info/types.ts#L336-L339
 type NodeInfoNetwork struct {
 	PrimaryInterface NodeInfoNetworkInterface `json:"primary_interface"`
 	RefreshInterval  int                      `json:"refresh_interval"`
 }
 
-// NodeInfoNetworkBuilder holds NodeInfoNetwork struct and provides a builder API.
-type NodeInfoNetworkBuilder struct {
-	v *NodeInfoNetwork
-}
+func (s *NodeInfoNetwork) UnmarshalJSON(data []byte) error {
 
-// NewNodeInfoNetwork provides a builder for the NodeInfoNetwork struct.
-func NewNodeInfoNetworkBuilder() *NodeInfoNetworkBuilder {
-	r := NodeInfoNetworkBuilder{
-		&NodeInfoNetwork{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "primary_interface":
+			if err := dec.Decode(&s.PrimaryInterface); err != nil {
+				return fmt.Errorf("%s | %w", "PrimaryInterface", err)
+			}
+
+		case "refresh_interval":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "RefreshInterval", err)
+				}
+				s.RefreshInterval = value
+			case float64:
+				f := int(v)
+				s.RefreshInterval = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the NodeInfoNetwork struct
-func (rb *NodeInfoNetworkBuilder) Build() NodeInfoNetwork {
-	return *rb.v
-}
+// NewNodeInfoNetwork returns a NodeInfoNetwork.
+func NewNodeInfoNetwork() *NodeInfoNetwork {
+	r := &NodeInfoNetwork{}
 
-func (rb *NodeInfoNetworkBuilder) PrimaryInterface(primaryinterface *NodeInfoNetworkInterfaceBuilder) *NodeInfoNetworkBuilder {
-	v := primaryinterface.Build()
-	rb.v.PrimaryInterface = v
-	return rb
-}
-
-func (rb *NodeInfoNetworkBuilder) RefreshInterval(refreshinterval int) *NodeInfoNetworkBuilder {
-	rb.v.RefreshInterval = refreshinterval
-	return rb
+	return r
 }

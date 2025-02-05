@@ -15,43 +15,73 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // KStemTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L238-L240
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L240-L242
 type KStemTokenFilter struct {
-	Type    string         `json:"type,omitempty"`
-	Version *VersionString `json:"version,omitempty"`
+	Type    string  `json:"type,omitempty"`
+	Version *string `json:"version,omitempty"`
 }
 
-// KStemTokenFilterBuilder holds KStemTokenFilter struct and provides a builder API.
-type KStemTokenFilterBuilder struct {
-	v *KStemTokenFilter
+func (s *KStemTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewKStemTokenFilter provides a builder for the KStemTokenFilter struct.
-func NewKStemTokenFilterBuilder() *KStemTokenFilterBuilder {
-	r := KStemTokenFilterBuilder{
-		&KStemTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s KStemTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerKStemTokenFilter KStemTokenFilter
+	tmp := innerKStemTokenFilter{
+		Type:    s.Type,
+		Version: s.Version,
 	}
 
-	r.v.Type = "kstem"
+	tmp.Type = "kstem"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the KStemTokenFilter struct
-func (rb *KStemTokenFilterBuilder) Build() KStemTokenFilter {
-	return *rb.v
-}
+// NewKStemTokenFilter returns a KStemTokenFilter.
+func NewKStemTokenFilter() *KStemTokenFilter {
+	r := &KStemTokenFilter{}
 
-func (rb *KStemTokenFilterBuilder) Version(version VersionString) *KStemTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

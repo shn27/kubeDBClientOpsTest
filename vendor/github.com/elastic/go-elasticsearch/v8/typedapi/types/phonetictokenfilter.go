@@ -15,14 +15,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/phoneticencoder"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/phoneticlanguage"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/phoneticnametype"
@@ -31,70 +36,131 @@ import (
 
 // PhoneticTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/phonetic-plugin.ts#L64-L72
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/phonetic-plugin.ts#L64-L72
 type PhoneticTokenFilter struct {
 	Encoder     phoneticencoder.PhoneticEncoder     `json:"encoder"`
-	Languageset []phoneticlanguage.PhoneticLanguage `json:"languageset"`
+	Languageset []phoneticlanguage.PhoneticLanguage `json:"languageset,omitempty"`
 	MaxCodeLen  *int                                `json:"max_code_len,omitempty"`
-	NameType    phoneticnametype.PhoneticNameType   `json:"name_type"`
+	NameType    *phoneticnametype.PhoneticNameType  `json:"name_type,omitempty"`
 	Replace     *bool                               `json:"replace,omitempty"`
-	RuleType    phoneticruletype.PhoneticRuleType   `json:"rule_type"`
+	RuleType    *phoneticruletype.PhoneticRuleType  `json:"rule_type,omitempty"`
 	Type        string                              `json:"type,omitempty"`
-	Version     *VersionString                      `json:"version,omitempty"`
+	Version     *string                             `json:"version,omitempty"`
 }
 
-// PhoneticTokenFilterBuilder holds PhoneticTokenFilter struct and provides a builder API.
-type PhoneticTokenFilterBuilder struct {
-	v *PhoneticTokenFilter
+func (s *PhoneticTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "encoder":
+			if err := dec.Decode(&s.Encoder); err != nil {
+				return fmt.Errorf("%s | %w", "Encoder", err)
+			}
+
+		case "languageset":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := &phoneticlanguage.PhoneticLanguage{}
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Languageset", err)
+				}
+
+				s.Languageset = append(s.Languageset, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Languageset); err != nil {
+					return fmt.Errorf("%s | %w", "Languageset", err)
+				}
+			}
+
+		case "max_code_len":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxCodeLen", err)
+				}
+				s.MaxCodeLen = &value
+			case float64:
+				f := int(v)
+				s.MaxCodeLen = &f
+			}
+
+		case "name_type":
+			if err := dec.Decode(&s.NameType); err != nil {
+				return fmt.Errorf("%s | %w", "NameType", err)
+			}
+
+		case "replace":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Replace", err)
+				}
+				s.Replace = &value
+			case bool:
+				s.Replace = &v
+			}
+
+		case "rule_type":
+			if err := dec.Decode(&s.RuleType); err != nil {
+				return fmt.Errorf("%s | %w", "RuleType", err)
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewPhoneticTokenFilter provides a builder for the PhoneticTokenFilter struct.
-func NewPhoneticTokenFilterBuilder() *PhoneticTokenFilterBuilder {
-	r := PhoneticTokenFilterBuilder{
-		&PhoneticTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s PhoneticTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerPhoneticTokenFilter PhoneticTokenFilter
+	tmp := innerPhoneticTokenFilter{
+		Encoder:     s.Encoder,
+		Languageset: s.Languageset,
+		MaxCodeLen:  s.MaxCodeLen,
+		NameType:    s.NameType,
+		Replace:     s.Replace,
+		RuleType:    s.RuleType,
+		Type:        s.Type,
+		Version:     s.Version,
 	}
 
-	r.v.Type = "phonetic"
+	tmp.Type = "phonetic"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the PhoneticTokenFilter struct
-func (rb *PhoneticTokenFilterBuilder) Build() PhoneticTokenFilter {
-	return *rb.v
-}
+// NewPhoneticTokenFilter returns a PhoneticTokenFilter.
+func NewPhoneticTokenFilter() *PhoneticTokenFilter {
+	r := &PhoneticTokenFilter{}
 
-func (rb *PhoneticTokenFilterBuilder) Encoder(encoder phoneticencoder.PhoneticEncoder) *PhoneticTokenFilterBuilder {
-	rb.v.Encoder = encoder
-	return rb
-}
-
-func (rb *PhoneticTokenFilterBuilder) Languageset(languageset ...phoneticlanguage.PhoneticLanguage) *PhoneticTokenFilterBuilder {
-	rb.v.Languageset = languageset
-	return rb
-}
-
-func (rb *PhoneticTokenFilterBuilder) MaxCodeLen(maxcodelen int) *PhoneticTokenFilterBuilder {
-	rb.v.MaxCodeLen = &maxcodelen
-	return rb
-}
-
-func (rb *PhoneticTokenFilterBuilder) NameType(nametype phoneticnametype.PhoneticNameType) *PhoneticTokenFilterBuilder {
-	rb.v.NameType = nametype
-	return rb
-}
-
-func (rb *PhoneticTokenFilterBuilder) Replace(replace bool) *PhoneticTokenFilterBuilder {
-	rb.v.Replace = &replace
-	return rb
-}
-
-func (rb *PhoneticTokenFilterBuilder) RuleType(ruletype phoneticruletype.PhoneticRuleType) *PhoneticTokenFilterBuilder {
-	rb.v.RuleType = ruletype
-	return rb
-}
-
-func (rb *PhoneticTokenFilterBuilder) Version(version VersionString) *PhoneticTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

@@ -15,53 +15,93 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // CgroupCpuStat type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/_types/Stats.ts#L200-L204
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/_types/Stats.ts#L542-L555
 type CgroupCpuStat struct {
-	NumberOfElapsedPeriods *int64                  `json:"number_of_elapsed_periods,omitempty"`
-	NumberOfTimesThrottled *int64                  `json:"number_of_times_throttled,omitempty"`
-	TimeThrottledNanos     *DurationValueUnitNanos `json:"time_throttled_nanos,omitempty"`
+	// NumberOfElapsedPeriods The number of reporting periods (as specified by `cfs_period_micros`) that
+	// have elapsed.
+	NumberOfElapsedPeriods *int64 `json:"number_of_elapsed_periods,omitempty"`
+	// NumberOfTimesThrottled The number of times all tasks in the same cgroup as the Elasticsearch process
+	// have been throttled.
+	NumberOfTimesThrottled *int64 `json:"number_of_times_throttled,omitempty"`
+	// TimeThrottledNanos The total amount of time, in nanoseconds, for which all tasks in the same
+	// cgroup as the Elasticsearch process have been throttled.
+	TimeThrottledNanos *int64 `json:"time_throttled_nanos,omitempty"`
 }
 
-// CgroupCpuStatBuilder holds CgroupCpuStat struct and provides a builder API.
-type CgroupCpuStatBuilder struct {
-	v *CgroupCpuStat
-}
+func (s *CgroupCpuStat) UnmarshalJSON(data []byte) error {
 
-// NewCgroupCpuStat provides a builder for the CgroupCpuStat struct.
-func NewCgroupCpuStatBuilder() *CgroupCpuStatBuilder {
-	r := CgroupCpuStatBuilder{
-		&CgroupCpuStat{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "number_of_elapsed_periods":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NumberOfElapsedPeriods", err)
+				}
+				s.NumberOfElapsedPeriods = &value
+			case float64:
+				f := int64(v)
+				s.NumberOfElapsedPeriods = &f
+			}
+
+		case "number_of_times_throttled":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NumberOfTimesThrottled", err)
+				}
+				s.NumberOfTimesThrottled = &value
+			case float64:
+				f := int64(v)
+				s.NumberOfTimesThrottled = &f
+			}
+
+		case "time_throttled_nanos":
+			if err := dec.Decode(&s.TimeThrottledNanos); err != nil {
+				return fmt.Errorf("%s | %w", "TimeThrottledNanos", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the CgroupCpuStat struct
-func (rb *CgroupCpuStatBuilder) Build() CgroupCpuStat {
-	return *rb.v
-}
+// NewCgroupCpuStat returns a CgroupCpuStat.
+func NewCgroupCpuStat() *CgroupCpuStat {
+	r := &CgroupCpuStat{}
 
-func (rb *CgroupCpuStatBuilder) NumberOfElapsedPeriods(numberofelapsedperiods int64) *CgroupCpuStatBuilder {
-	rb.v.NumberOfElapsedPeriods = &numberofelapsedperiods
-	return rb
-}
-
-func (rb *CgroupCpuStatBuilder) NumberOfTimesThrottled(numberoftimesthrottled int64) *CgroupCpuStatBuilder {
-	rb.v.NumberOfTimesThrottled = &numberoftimesthrottled
-	return rb
-}
-
-func (rb *CgroupCpuStatBuilder) TimeThrottledNanos(timethrottlednanos *DurationValueUnitNanosBuilder) *CgroupCpuStatBuilder {
-	v := timethrottlednanos.Build()
-	rb.v.TimeThrottledNanos = &v
-	return rb
+	return r
 }

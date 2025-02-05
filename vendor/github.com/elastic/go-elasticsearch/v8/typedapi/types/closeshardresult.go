@@ -15,44 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // CloseShardResult type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/close/CloseIndexResponse.ts#L37-L39
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/close/CloseIndexResponse.ts#L37-L39
 type CloseShardResult struct {
 	Failures []ShardFailure `json:"failures"`
 }
 
-// CloseShardResultBuilder holds CloseShardResult struct and provides a builder API.
-type CloseShardResultBuilder struct {
-	v *CloseShardResult
-}
+// NewCloseShardResult returns a CloseShardResult.
+func NewCloseShardResult() *CloseShardResult {
+	r := &CloseShardResult{}
 
-// NewCloseShardResult provides a builder for the CloseShardResult struct.
-func NewCloseShardResultBuilder() *CloseShardResultBuilder {
-	r := CloseShardResultBuilder{
-		&CloseShardResult{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the CloseShardResult struct
-func (rb *CloseShardResultBuilder) Build() CloseShardResult {
-	return *rb.v
-}
-
-func (rb *CloseShardResultBuilder) Failures(failures []ShardFailureBuilder) *CloseShardResultBuilder {
-	tmp := make([]ShardFailure, len(failures))
-	for _, value := range failures {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Failures = tmp
-	return rb
+	return r
 }

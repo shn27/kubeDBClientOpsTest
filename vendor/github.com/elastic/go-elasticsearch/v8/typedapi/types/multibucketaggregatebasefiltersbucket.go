@@ -15,48 +15,76 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // MultiBucketAggregateBaseFiltersBucket type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L314-L316
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L357-L359
 type MultiBucketAggregateBaseFiltersBucket struct {
 	Buckets BucketsFiltersBucket `json:"buckets"`
-	Meta    *Metadata            `json:"meta,omitempty"`
+	Meta    Metadata             `json:"meta,omitempty"`
 }
 
-// MultiBucketAggregateBaseFiltersBucketBuilder holds MultiBucketAggregateBaseFiltersBucket struct and provides a builder API.
-type MultiBucketAggregateBaseFiltersBucketBuilder struct {
-	v *MultiBucketAggregateBaseFiltersBucket
-}
+func (s *MultiBucketAggregateBaseFiltersBucket) UnmarshalJSON(data []byte) error {
 
-// NewMultiBucketAggregateBaseFiltersBucket provides a builder for the MultiBucketAggregateBaseFiltersBucket struct.
-func NewMultiBucketAggregateBaseFiltersBucketBuilder() *MultiBucketAggregateBaseFiltersBucketBuilder {
-	r := MultiBucketAggregateBaseFiltersBucketBuilder{
-		&MultiBucketAggregateBaseFiltersBucket{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "buckets":
+
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			source := bytes.NewReader(rawMsg)
+			localDec := json.NewDecoder(source)
+			switch rawMsg[0] {
+			case '{':
+				o := make(map[string]FiltersBucket, 0)
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Buckets", err)
+				}
+				s.Buckets = o
+			case '[':
+				o := []FiltersBucket{}
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Buckets", err)
+				}
+				s.Buckets = o
+			}
+
+		case "meta":
+			if err := dec.Decode(&s.Meta); err != nil {
+				return fmt.Errorf("%s | %w", "Meta", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the MultiBucketAggregateBaseFiltersBucket struct
-func (rb *MultiBucketAggregateBaseFiltersBucketBuilder) Build() MultiBucketAggregateBaseFiltersBucket {
-	return *rb.v
-}
+// NewMultiBucketAggregateBaseFiltersBucket returns a MultiBucketAggregateBaseFiltersBucket.
+func NewMultiBucketAggregateBaseFiltersBucket() *MultiBucketAggregateBaseFiltersBucket {
+	r := &MultiBucketAggregateBaseFiltersBucket{}
 
-func (rb *MultiBucketAggregateBaseFiltersBucketBuilder) Buckets(buckets *BucketsFiltersBucketBuilder) *MultiBucketAggregateBaseFiltersBucketBuilder {
-	v := buckets.Build()
-	rb.v.Buckets = v
-	return rb
-}
-
-func (rb *MultiBucketAggregateBaseFiltersBucketBuilder) Meta(meta *MetadataBuilder) *MultiBucketAggregateBaseFiltersBucketBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
+	return r
 }

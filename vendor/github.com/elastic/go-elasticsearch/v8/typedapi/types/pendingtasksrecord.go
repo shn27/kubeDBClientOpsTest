@@ -15,70 +15,105 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // PendingTasksRecord type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cat/pending_tasks/types.ts#L20-L41
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cat/pending_tasks/types.ts#L20-L41
 type PendingTasksRecord struct {
-	// InsertOrder task insertion order
+	// InsertOrder The task insertion order.
 	InsertOrder *string `json:"insertOrder,omitempty"`
-	// Priority task priority
+	// Priority The task priority.
 	Priority *string `json:"priority,omitempty"`
-	// Source task source
+	// Source The task source.
 	Source *string `json:"source,omitempty"`
-	// TimeInQueue how long task has been in queue
+	// TimeInQueue Indicates how long the task has been in queue.
 	TimeInQueue *string `json:"timeInQueue,omitempty"`
 }
 
-// PendingTasksRecordBuilder holds PendingTasksRecord struct and provides a builder API.
-type PendingTasksRecordBuilder struct {
-	v *PendingTasksRecord
-}
+func (s *PendingTasksRecord) UnmarshalJSON(data []byte) error {
 
-// NewPendingTasksRecord provides a builder for the PendingTasksRecord struct.
-func NewPendingTasksRecordBuilder() *PendingTasksRecordBuilder {
-	r := PendingTasksRecordBuilder{
-		&PendingTasksRecord{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "insertOrder", "o":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "InsertOrder", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.InsertOrder = &o
+
+		case "priority", "p":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Priority", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Priority = &o
+
+		case "source", "s":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Source", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Source = &o
+
+		case "timeInQueue", "t":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "TimeInQueue", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.TimeInQueue = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the PendingTasksRecord struct
-func (rb *PendingTasksRecordBuilder) Build() PendingTasksRecord {
-	return *rb.v
-}
+// NewPendingTasksRecord returns a PendingTasksRecord.
+func NewPendingTasksRecord() *PendingTasksRecord {
+	r := &PendingTasksRecord{}
 
-// InsertOrder task insertion order
-
-func (rb *PendingTasksRecordBuilder) InsertOrder(insertorder string) *PendingTasksRecordBuilder {
-	rb.v.InsertOrder = &insertorder
-	return rb
-}
-
-// Priority task priority
-
-func (rb *PendingTasksRecordBuilder) Priority(priority string) *PendingTasksRecordBuilder {
-	rb.v.Priority = &priority
-	return rb
-}
-
-// Source task source
-
-func (rb *PendingTasksRecordBuilder) Source(source string) *PendingTasksRecordBuilder {
-	rb.v.Source = &source
-	return rb
-}
-
-// TimeInQueue how long task has been in queue
-
-func (rb *PendingTasksRecordBuilder) TimeInQueue(timeinqueue string) *PendingTasksRecordBuilder {
-	rb.v.TimeInQueue = &timeinqueue
-	return rb
+	return r
 }

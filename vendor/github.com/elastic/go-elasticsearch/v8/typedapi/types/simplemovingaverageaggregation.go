@@ -15,101 +15,161 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/gappolicy"
 )
 
 // SimpleMovingAverageAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/pipeline.ts#L195-L198
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/pipeline.ts#L273-L276
 type SimpleMovingAverageAggregation struct {
 	// BucketsPath Path to the buckets that contain one set of values to correlate.
-	BucketsPath *BucketsPath         `json:"buckets_path,omitempty"`
-	Format      *string              `json:"format,omitempty"`
-	GapPolicy   *gappolicy.GapPolicy `json:"gap_policy,omitempty"`
-	Meta        *Metadata            `json:"meta,omitempty"`
-	Minimize    *bool                `json:"minimize,omitempty"`
-	Model       string               `json:"model,omitempty"`
-	Name        *string              `json:"name,omitempty"`
-	Predict     *int                 `json:"predict,omitempty"`
-	Settings    EmptyObject          `json:"settings"`
-	Window      *int                 `json:"window,omitempty"`
+	BucketsPath BucketsPath `json:"buckets_path,omitempty"`
+	// Format `DecimalFormat` pattern for the output value.
+	// If specified, the formatted value is returned in the aggregation’s
+	// `value_as_string` property.
+	Format *string `json:"format,omitempty"`
+	// GapPolicy Policy to apply when gaps are found in the data.
+	GapPolicy *gappolicy.GapPolicy `json:"gap_policy,omitempty"`
+	Minimize  *bool                `json:"minimize,omitempty"`
+	Model     string               `json:"model,omitempty"`
+	Predict   *int                 `json:"predict,omitempty"`
+	Settings  EmptyObject          `json:"settings"`
+	Window    *int                 `json:"window,omitempty"`
 }
 
-// SimpleMovingAverageAggregationBuilder holds SimpleMovingAverageAggregation struct and provides a builder API.
-type SimpleMovingAverageAggregationBuilder struct {
-	v *SimpleMovingAverageAggregation
+func (s *SimpleMovingAverageAggregation) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "buckets_path":
+			if err := dec.Decode(&s.BucketsPath); err != nil {
+				return fmt.Errorf("%s | %w", "BucketsPath", err)
+			}
+
+		case "format":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Format", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Format = &o
+
+		case "gap_policy":
+			if err := dec.Decode(&s.GapPolicy); err != nil {
+				return fmt.Errorf("%s | %w", "GapPolicy", err)
+			}
+
+		case "minimize":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Minimize", err)
+				}
+				s.Minimize = &value
+			case bool:
+				s.Minimize = &v
+			}
+
+		case "model":
+			if err := dec.Decode(&s.Model); err != nil {
+				return fmt.Errorf("%s | %w", "Model", err)
+			}
+
+		case "predict":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Predict", err)
+				}
+				s.Predict = &value
+			case float64:
+				f := int(v)
+				s.Predict = &f
+			}
+
+		case "settings":
+			if err := dec.Decode(&s.Settings); err != nil {
+				return fmt.Errorf("%s | %w", "Settings", err)
+			}
+
+		case "window":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Window", err)
+				}
+				s.Window = &value
+			case float64:
+				f := int(v)
+				s.Window = &f
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewSimpleMovingAverageAggregation provides a builder for the SimpleMovingAverageAggregation struct.
-func NewSimpleMovingAverageAggregationBuilder() *SimpleMovingAverageAggregationBuilder {
-	r := SimpleMovingAverageAggregationBuilder{
-		&SimpleMovingAverageAggregation{},
+// MarshalJSON override marshalling to include literal value
+func (s SimpleMovingAverageAggregation) MarshalJSON() ([]byte, error) {
+	type innerSimpleMovingAverageAggregation SimpleMovingAverageAggregation
+	tmp := innerSimpleMovingAverageAggregation{
+		BucketsPath: s.BucketsPath,
+		Format:      s.Format,
+		GapPolicy:   s.GapPolicy,
+		Minimize:    s.Minimize,
+		Model:       s.Model,
+		Predict:     s.Predict,
+		Settings:    s.Settings,
+		Window:      s.Window,
 	}
 
-	r.v.Model = "simple"
+	tmp.Model = "simple"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the SimpleMovingAverageAggregation struct
-func (rb *SimpleMovingAverageAggregationBuilder) Build() SimpleMovingAverageAggregation {
-	return *rb.v
-}
+// NewSimpleMovingAverageAggregation returns a SimpleMovingAverageAggregation.
+func NewSimpleMovingAverageAggregation() *SimpleMovingAverageAggregation {
+	r := &SimpleMovingAverageAggregation{}
 
-// BucketsPath Path to the buckets that contain one set of values to correlate.
-
-func (rb *SimpleMovingAverageAggregationBuilder) BucketsPath(bucketspath *BucketsPathBuilder) *SimpleMovingAverageAggregationBuilder {
-	v := bucketspath.Build()
-	rb.v.BucketsPath = &v
-	return rb
-}
-
-func (rb *SimpleMovingAverageAggregationBuilder) Format(format string) *SimpleMovingAverageAggregationBuilder {
-	rb.v.Format = &format
-	return rb
-}
-
-func (rb *SimpleMovingAverageAggregationBuilder) GapPolicy(gappolicy gappolicy.GapPolicy) *SimpleMovingAverageAggregationBuilder {
-	rb.v.GapPolicy = &gappolicy
-	return rb
-}
-
-func (rb *SimpleMovingAverageAggregationBuilder) Meta(meta *MetadataBuilder) *SimpleMovingAverageAggregationBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *SimpleMovingAverageAggregationBuilder) Minimize(minimize bool) *SimpleMovingAverageAggregationBuilder {
-	rb.v.Minimize = &minimize
-	return rb
-}
-
-func (rb *SimpleMovingAverageAggregationBuilder) Name(name string) *SimpleMovingAverageAggregationBuilder {
-	rb.v.Name = &name
-	return rb
-}
-
-func (rb *SimpleMovingAverageAggregationBuilder) Predict(predict int) *SimpleMovingAverageAggregationBuilder {
-	rb.v.Predict = &predict
-	return rb
-}
-
-func (rb *SimpleMovingAverageAggregationBuilder) Settings(settings *EmptyObjectBuilder) *SimpleMovingAverageAggregationBuilder {
-	v := settings.Build()
-	rb.v.Settings = v
-	return rb
-}
-
-func (rb *SimpleMovingAverageAggregationBuilder) Window(window int) *SimpleMovingAverageAggregationBuilder {
-	rb.v.Window = &window
-	return rb
+	return r
 }

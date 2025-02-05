@@ -15,80 +15,195 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // SetProcessor type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ingest/_types/Processors.ts#L319-L323
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ingest/_types/Processors.ts#L1426-L1460
 type SetProcessor struct {
-	Field         Field                `json:"field"`
-	If            *string              `json:"if,omitempty"`
-	IgnoreFailure *bool                `json:"ignore_failure,omitempty"`
-	OnFailure     []ProcessorContainer `json:"on_failure,omitempty"`
-	Override      *bool                `json:"override,omitempty"`
-	Tag           *string              `json:"tag,omitempty"`
-	Value         interface{}          `json:"value,omitempty"`
+	// CopyFrom The origin field which will be copied to `field`, cannot set `value`
+	// simultaneously.
+	// Supported data types are `boolean`, `number`, `array`, `object`, `string`,
+	// `date`, etc.
+	CopyFrom *string `json:"copy_from,omitempty"`
+	// Description Description of the processor.
+	// Useful for describing the purpose of the processor or its configuration.
+	Description *string `json:"description,omitempty"`
+	// Field The field to insert, upsert, or update.
+	// Supports template snippets.
+	Field string `json:"field"`
+	// If Conditionally execute the processor.
+	If *string `json:"if,omitempty"`
+	// IgnoreEmptyValue If `true` and `value` is a template snippet that evaluates to `null` or the
+	// empty string, the processor quietly exits without modifying the document.
+	IgnoreEmptyValue *bool `json:"ignore_empty_value,omitempty"`
+	// IgnoreFailure Ignore failures for the processor.
+	IgnoreFailure *bool `json:"ignore_failure,omitempty"`
+	// MediaType The media type for encoding `value`.
+	// Applies only when value is a template snippet.
+	// Must be one of `application/json`, `text/plain`, or
+	// `application/x-www-form-urlencoded`.
+	MediaType *string `json:"media_type,omitempty"`
+	// OnFailure Handle failures for the processor.
+	OnFailure []ProcessorContainer `json:"on_failure,omitempty"`
+	// Override If `true` processor will update fields with pre-existing non-null-valued
+	// field.
+	// When set to `false`, such fields will not be touched.
+	Override *bool `json:"override,omitempty"`
+	// Tag Identifier for the processor.
+	// Useful for debugging and metrics.
+	Tag *string `json:"tag,omitempty"`
+	// Value The value to be set for the field.
+	// Supports template snippets.
+	// May specify only one of `value` or `copy_from`.
+	Value json.RawMessage `json:"value,omitempty"`
 }
 
-// SetProcessorBuilder holds SetProcessor struct and provides a builder API.
-type SetProcessorBuilder struct {
-	v *SetProcessor
-}
+func (s *SetProcessor) UnmarshalJSON(data []byte) error {
 
-// NewSetProcessor provides a builder for the SetProcessor struct.
-func NewSetProcessorBuilder() *SetProcessorBuilder {
-	r := SetProcessorBuilder{
-		&SetProcessor{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "copy_from":
+			if err := dec.Decode(&s.CopyFrom); err != nil {
+				return fmt.Errorf("%s | %w", "CopyFrom", err)
+			}
+
+		case "description":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Description", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Description = &o
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "if":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "If", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.If = &o
+
+		case "ignore_empty_value":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IgnoreEmptyValue", err)
+				}
+				s.IgnoreEmptyValue = &value
+			case bool:
+				s.IgnoreEmptyValue = &v
+			}
+
+		case "ignore_failure":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IgnoreFailure", err)
+				}
+				s.IgnoreFailure = &value
+			case bool:
+				s.IgnoreFailure = &v
+			}
+
+		case "media_type":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "MediaType", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.MediaType = &o
+
+		case "on_failure":
+			if err := dec.Decode(&s.OnFailure); err != nil {
+				return fmt.Errorf("%s | %w", "OnFailure", err)
+			}
+
+		case "override":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Override", err)
+				}
+				s.Override = &value
+			case bool:
+				s.Override = &v
+			}
+
+		case "tag":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Tag", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Tag = &o
+
+		case "value":
+			if err := dec.Decode(&s.Value); err != nil {
+				return fmt.Errorf("%s | %w", "Value", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SetProcessor struct
-func (rb *SetProcessorBuilder) Build() SetProcessor {
-	return *rb.v
-}
+// NewSetProcessor returns a SetProcessor.
+func NewSetProcessor() *SetProcessor {
+	r := &SetProcessor{}
 
-func (rb *SetProcessorBuilder) Field(field Field) *SetProcessorBuilder {
-	rb.v.Field = field
-	return rb
-}
-
-func (rb *SetProcessorBuilder) If_(if_ string) *SetProcessorBuilder {
-	rb.v.If = &if_
-	return rb
-}
-
-func (rb *SetProcessorBuilder) IgnoreFailure(ignorefailure bool) *SetProcessorBuilder {
-	rb.v.IgnoreFailure = &ignorefailure
-	return rb
-}
-
-func (rb *SetProcessorBuilder) OnFailure(on_failure []ProcessorContainerBuilder) *SetProcessorBuilder {
-	tmp := make([]ProcessorContainer, len(on_failure))
-	for _, value := range on_failure {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.OnFailure = tmp
-	return rb
-}
-
-func (rb *SetProcessorBuilder) Override(override bool) *SetProcessorBuilder {
-	rb.v.Override = &override
-	return rb
-}
-
-func (rb *SetProcessorBuilder) Tag(tag string) *SetProcessorBuilder {
-	rb.v.Tag = &tag
-	return rb
-}
-
-func (rb *SetProcessorBuilder) Value(value interface{}) *SetProcessorBuilder {
-	rb.v.Value = value
-	return rb
+	return r
 }

@@ -15,13 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
-
-// Returns the information about the capabilities of fields among multiple
-// indices.
+// Get the field capabilities.
+//
+// Get information about the capabilities of fields among multiple indices.
+//
+// For data streams, the API returns field capabilities among the stream’s
+// backing indices.
+// It returns runtime fields like any other field.
+// For example, a runtime field with a type of keyword is returned the same as
+// any other field that belongs to the `keyword` family.
 package fieldcaps
 
 import (
@@ -30,12 +35,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 
 	"github.com/elastic/elastic-transport-go/v8/elastictransport"
+	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
+	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/expandwildcard"
 )
 
 const (
@@ -52,14 +60,19 @@ type FieldCaps struct {
 	values  url.Values
 	path    url.URL
 
-	buf *gobytes.Buffer
+	raw io.Reader
 
-	req *Request
-	raw json.RawMessage
+	req      *Request
+	deferred []func(request *Request) error
+	buf      *gobytes.Buffer
 
 	paramSet int
 
 	index string
+
+	spanStarted bool
+
+	instrument elastictransport.Instrumentation
 }
 
 // NewFieldCaps type alias for index.
@@ -75,16 +88,32 @@ func NewFieldCapsFunc(tp elastictransport.Interface) NewFieldCaps {
 	}
 }
 
-// Returns the information about the capabilities of fields among multiple
-// indices.
+// Get the field capabilities.
 //
-// https://www.elastic.co/guide/en/elasticsearch/reference/master/search-field-caps.html
+// Get information about the capabilities of fields among multiple indices.
+//
+// For data streams, the API returns field capabilities among the stream’s
+// backing indices.
+// It returns runtime fields like any other field.
+// For example, a runtime field with a type of keyword is returned the same as
+// any other field that belongs to the `keyword` family.
+//
+// https://www.elastic.co/guide/en/elasticsearch/reference/current/search-field-caps.html
 func New(tp elastictransport.Interface) *FieldCaps {
 	r := &FieldCaps{
 		transport: tp,
 		values:    make(url.Values),
 		headers:   make(http.Header),
-		buf:       gobytes.NewBuffer(nil),
+
+		buf: gobytes.NewBuffer(nil),
+
+		req: NewRequest(),
+	}
+
+	if instrumented, ok := r.transport.(elastictransport.Instrumented); ok {
+		if instrument := instrumented.InstrumentationEnabled(); instrument != nil {
+			r.instrument = instrument
+		}
 	}
 
 	return r
@@ -92,7 +121,7 @@ func New(tp elastictransport.Interface) *FieldCaps {
 
 // Raw takes a json payload as input which is then passed to the http.Request
 // If specified Raw takes precedence on Request method.
-func (r *FieldCaps) Raw(raw json.RawMessage) *FieldCaps {
+func (r *FieldCaps) Raw(raw io.Reader) *FieldCaps {
 	r.raw = raw
 
 	return r
@@ -114,9 +143,17 @@ func (r *FieldCaps) HttpRequest(ctx context.Context) (*http.Request, error) {
 
 	var err error
 
-	if r.raw != nil {
-		r.buf.Write(r.raw)
-	} else if r.req != nil {
+	if len(r.deferred) > 0 {
+		for _, f := range r.deferred {
+			deferredErr := f(r.req)
+			if deferredErr != nil {
+				return nil, deferredErr
+			}
+		}
+	}
+
+	if r.raw == nil && r.req != nil {
+
 		data, err := json.Marshal(r.req)
 
 		if err != nil {
@@ -124,6 +161,11 @@ func (r *FieldCaps) HttpRequest(ctx context.Context) (*http.Request, error) {
 		}
 
 		r.buf.Write(data)
+
+	}
+
+	if r.buf.Len() > 0 {
+		r.raw = r.buf
 	}
 
 	r.path.Scheme = "http"
@@ -136,7 +178,11 @@ func (r *FieldCaps) HttpRequest(ctx context.Context) (*http.Request, error) {
 		method = http.MethodPost
 	case r.paramSet == indexMask:
 		path.WriteString("/")
-		path.WriteString(url.PathEscape(r.index))
+
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordPathPart(ctx, "index", r.index)
+		}
+		path.WriteString(r.index)
 		path.WriteString("/")
 		path.WriteString("_field_caps")
 
@@ -151,16 +197,22 @@ func (r *FieldCaps) HttpRequest(ctx context.Context) (*http.Request, error) {
 	}
 
 	if ctx != nil {
-		req, err = http.NewRequestWithContext(ctx, method, r.path.String(), r.buf)
+		req, err = http.NewRequestWithContext(ctx, method, r.path.String(), r.raw)
 	} else {
-		req, err = http.NewRequest(method, r.path.String(), r.buf)
+		req, err = http.NewRequest(method, r.path.String(), r.raw)
 	}
 
-	if r.buf.Len() > 0 {
-		req.Header.Set("content-type", "application/vnd.elasticsearch+json;compatible-with=8")
+	req.Header = r.headers.Clone()
+
+	if req.Header.Get("Content-Type") == "" {
+		if r.raw != nil {
+			req.Header.Set("Content-Type", "application/vnd.elasticsearch+json;compatible-with=8")
+		}
 	}
 
-	req.Header.Set("accept", "application/vnd.elasticsearch+json;compatible-with=8")
+	if req.Header.Get("Accept") == "" {
+		req.Header.Set("Accept", "application/vnd.elasticsearch+json;compatible-with=8")
+	}
 
 	if err != nil {
 		return req, fmt.Errorf("could not build http.Request: %w", err)
@@ -169,19 +221,100 @@ func (r *FieldCaps) HttpRequest(ctx context.Context) (*http.Request, error) {
 	return req, nil
 }
 
-// Do runs the http.Request through the provided transport.
-func (r FieldCaps) Do(ctx context.Context) (*http.Response, error) {
+// Perform runs the http.Request through the provided transport and returns an http.Response.
+func (r FieldCaps) Perform(providedCtx context.Context) (*http.Response, error) {
+	var ctx context.Context
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		if r.spanStarted == false {
+			ctx := instrument.Start(providedCtx, "field_caps")
+			defer instrument.Close(ctx)
+		}
+	}
+	if ctx == nil {
+		ctx = providedCtx
+	}
+
 	req, err := r.HttpRequest(ctx)
 	if err != nil {
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
 		return nil, err
 	}
 
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		instrument.BeforeRequest(req, "field_caps")
+		if reader := instrument.RecordRequestBody(ctx, "field_caps", r.raw); reader != nil {
+			req.Body = reader
+		}
+	}
 	res, err := r.transport.Perform(req)
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		instrument.AfterRequest(req, "elasticsearch", "field_caps")
+	}
 	if err != nil {
-		return nil, fmt.Errorf("an error happened during the FieldCaps query execution: %w", err)
+		localErr := fmt.Errorf("an error happened during the FieldCaps query execution: %w", err)
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, localErr)
+		}
+		return nil, localErr
 	}
 
 	return res, nil
+}
+
+// Do runs the request through the transport, handle the response and returns a fieldcaps.Response
+func (r FieldCaps) Do(providedCtx context.Context) (*Response, error) {
+	var ctx context.Context
+	r.spanStarted = true
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		ctx = instrument.Start(providedCtx, "field_caps")
+		defer instrument.Close(ctx)
+	}
+	if ctx == nil {
+		ctx = providedCtx
+	}
+
+	response := NewResponse()
+
+	res, err := r.Perform(ctx)
+	if err != nil {
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode < 299 {
+		err = json.NewDecoder(res.Body).Decode(response)
+		if err != nil {
+			if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+				instrument.RecordError(ctx, err)
+			}
+			return nil, err
+		}
+
+		return response, nil
+	}
+
+	errorResponse := types.NewElasticsearchError()
+	err = json.NewDecoder(res.Body).Decode(errorResponse)
+	if err != nil {
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
+		return nil, err
+	}
+
+	if errorResponse.Status == 0 {
+		errorResponse.Status = res.StatusCode
+	}
+
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		instrument.RecordError(ctx, errorResponse)
+	}
+	return nil, errorResponse
 }
 
 // Header set a key, value pair in the FieldCaps headers map.
@@ -195,9 +328,9 @@ func (r *FieldCaps) Header(key, value string) *FieldCaps {
 // request. Supports wildcards (*). To target all data streams and indices, omit
 // this parameter or use * or _all.
 // API Name: index
-func (r *FieldCaps) Index(v string) *FieldCaps {
+func (r *FieldCaps) Index(index string) *FieldCaps {
 	r.paramSet |= indexMask
-	r.index = v
+	r.index = index
 
 	return r
 }
@@ -209,8 +342,8 @@ func (r *FieldCaps) Index(v string) *FieldCaps {
 // targeting `foo*,bar*` returns an error if an index starts with foo but no
 // index starts with bar.
 // API name: allow_no_indices
-func (r *FieldCaps) AllowNoIndices(b bool) *FieldCaps {
-	r.values.Set("allow_no_indices", strconv.FormatBool(b))
+func (r *FieldCaps) AllowNoIndices(allownoindices bool) *FieldCaps {
+	r.values.Set("allow_no_indices", strconv.FormatBool(allownoindices))
 
 	return r
 }
@@ -219,33 +352,28 @@ func (r *FieldCaps) AllowNoIndices(b bool) *FieldCaps {
 // data streams, this argument determines whether wildcard expressions match
 // hidden data streams. Supports comma-separated values, such as `open,hidden`.
 // API name: expand_wildcards
-func (r *FieldCaps) ExpandWildcards(value string) *FieldCaps {
-	r.values.Set("expand_wildcards", value)
-
-	return r
-}
-
-// Fields Comma-separated list of fields to retrieve capabilities for. Wildcard (`*`)
-// expressions are supported.
-// API name: fields
-func (r *FieldCaps) Fields(value string) *FieldCaps {
-	r.values.Set("fields", value)
+func (r *FieldCaps) ExpandWildcards(expandwildcards ...expandwildcard.ExpandWildcard) *FieldCaps {
+	tmp := []string{}
+	for _, item := range expandwildcards {
+		tmp = append(tmp, item.String())
+	}
+	r.values.Set("expand_wildcards", strings.Join(tmp, ","))
 
 	return r
 }
 
 // IgnoreUnavailable If `true`, missing or closed indices are not included in the response.
 // API name: ignore_unavailable
-func (r *FieldCaps) IgnoreUnavailable(b bool) *FieldCaps {
-	r.values.Set("ignore_unavailable", strconv.FormatBool(b))
+func (r *FieldCaps) IgnoreUnavailable(ignoreunavailable bool) *FieldCaps {
+	r.values.Set("ignore_unavailable", strconv.FormatBool(ignoreunavailable))
 
 	return r
 }
 
 // IncludeUnmapped If true, unmapped fields are included in the response.
 // API name: include_unmapped
-func (r *FieldCaps) IncludeUnmapped(b bool) *FieldCaps {
-	r.values.Set("include_unmapped", strconv.FormatBool(b))
+func (r *FieldCaps) IncludeUnmapped(includeunmapped bool) *FieldCaps {
+	r.values.Set("include_unmapped", strconv.FormatBool(includeunmapped))
 
 	return r
 }
@@ -253,16 +381,102 @@ func (r *FieldCaps) IncludeUnmapped(b bool) *FieldCaps {
 // Filters An optional set of filters: can include
 // +metadata,-metadata,-nested,-multifield,-parent
 // API name: filters
-func (r *FieldCaps) Filters(value string) *FieldCaps {
-	r.values.Set("filters", value)
+func (r *FieldCaps) Filters(filters string) *FieldCaps {
+	r.values.Set("filters", filters)
 
 	return r
 }
 
 // Types Only return results for fields that have one of the types in the list
 // API name: types
-func (r *FieldCaps) Types(value string) *FieldCaps {
-	r.values.Set("types", value)
+func (r *FieldCaps) Types(types ...string) *FieldCaps {
+	tmp := []string{}
+	for _, item := range types {
+		tmp = append(tmp, fmt.Sprintf("%v", item))
+	}
+	r.values.Set("types", strings.Join(tmp, ","))
+
+	return r
+}
+
+// IncludeEmptyFields If false, empty fields are not included in the response.
+// API name: include_empty_fields
+func (r *FieldCaps) IncludeEmptyFields(includeemptyfields bool) *FieldCaps {
+	r.values.Set("include_empty_fields", strconv.FormatBool(includeemptyfields))
+
+	return r
+}
+
+// ErrorTrace When set to `true` Elasticsearch will include the full stack trace of errors
+// when they occur.
+// API name: error_trace
+func (r *FieldCaps) ErrorTrace(errortrace bool) *FieldCaps {
+	r.values.Set("error_trace", strconv.FormatBool(errortrace))
+
+	return r
+}
+
+// FilterPath Comma-separated list of filters in dot notation which reduce the response
+// returned by Elasticsearch.
+// API name: filter_path
+func (r *FieldCaps) FilterPath(filterpaths ...string) *FieldCaps {
+	tmp := []string{}
+	for _, item := range filterpaths {
+		tmp = append(tmp, fmt.Sprintf("%v", item))
+	}
+	r.values.Set("filter_path", strings.Join(tmp, ","))
+
+	return r
+}
+
+// Human When set to `true` will return statistics in a format suitable for humans.
+// For example `"exists_time": "1h"` for humans and
+// `"eixsts_time_in_millis": 3600000` for computers. When disabled the human
+// readable values will be omitted. This makes sense for responses being
+// consumed
+// only by machines.
+// API name: human
+func (r *FieldCaps) Human(human bool) *FieldCaps {
+	r.values.Set("human", strconv.FormatBool(human))
+
+	return r
+}
+
+// Pretty If set to `true` the returned JSON will be "pretty-formatted". Only use
+// this option for debugging only.
+// API name: pretty
+func (r *FieldCaps) Pretty(pretty bool) *FieldCaps {
+	r.values.Set("pretty", strconv.FormatBool(pretty))
+
+	return r
+}
+
+// Fields List of fields to retrieve capabilities for. Wildcard (`*`) expressions are
+// supported.
+// API name: fields
+func (r *FieldCaps) Fields(fields ...string) *FieldCaps {
+	r.req.Fields = fields
+
+	return r
+}
+
+// IndexFilter Allows to filter indices if the provided query rewrites to match_none on
+// every shard.
+// API name: index_filter
+func (r *FieldCaps) IndexFilter(indexfilter *types.Query) *FieldCaps {
+
+	r.req.IndexFilter = indexfilter
+
+	return r
+}
+
+// RuntimeMappings Defines ad-hoc runtime fields in the request similar to the way it is done in
+// search requests.
+// These fields exist only as part of the query and take precedence over fields
+// defined with the same name in the index mappings.
+// API name: runtime_mappings
+func (r *FieldCaps) RuntimeMappings(runtimefields types.RuntimeFields) *FieldCaps {
+	r.req.RuntimeMappings = runtimefields
 
 	return r
 }

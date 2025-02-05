@@ -15,19 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package indexingjobstate
 package indexingjobstate
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/rollup/get_jobs/types.ts#L66-L72
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/rollup/get_jobs/types.ts#L66-L72
 type IndexingJobState struct {
-	name string
+	Name string
 }
 
 var (
@@ -47,7 +45,7 @@ func (i IndexingJobState) MarshalText() (text []byte, err error) {
 }
 
 func (i *IndexingJobState) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
 	case "started":
 		*i = Started
@@ -67,5 +65,5 @@ func (i *IndexingJobState) UnmarshalText(text []byte) error {
 }
 
 func (i IndexingJobState) String() string {
-	return i.name
+	return i.Name
 }

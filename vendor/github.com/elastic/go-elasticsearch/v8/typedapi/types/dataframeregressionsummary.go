@@ -15,62 +15,31 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // DataframeRegressionSummary type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/evaluate_data_frame/types.ts#L39-L44
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/evaluate_data_frame/types.ts#L68-L85
 type DataframeRegressionSummary struct {
-	Huber    *DataframeEvaluationValue `json:"huber,omitempty"`
-	Mse      *DataframeEvaluationValue `json:"mse,omitempty"`
-	Msle     *DataframeEvaluationValue `json:"msle,omitempty"`
+	// Huber Pseudo Huber loss function.
+	Huber *DataframeEvaluationValue `json:"huber,omitempty"`
+	// Mse Average squared difference between the predicted values and the actual
+	// (`ground truth`) value.
+	Mse *DataframeEvaluationValue `json:"mse,omitempty"`
+	// Msle Average squared difference between the logarithm of the predicted values and
+	// the logarithm of the actual (`ground truth`) value.
+	Msle *DataframeEvaluationValue `json:"msle,omitempty"`
+	// RSquared Proportion of the variance in the dependent variable that is predictable from
+	// the independent variables.
 	RSquared *DataframeEvaluationValue `json:"r_squared,omitempty"`
 }
 
-// DataframeRegressionSummaryBuilder holds DataframeRegressionSummary struct and provides a builder API.
-type DataframeRegressionSummaryBuilder struct {
-	v *DataframeRegressionSummary
-}
+// NewDataframeRegressionSummary returns a DataframeRegressionSummary.
+func NewDataframeRegressionSummary() *DataframeRegressionSummary {
+	r := &DataframeRegressionSummary{}
 
-// NewDataframeRegressionSummary provides a builder for the DataframeRegressionSummary struct.
-func NewDataframeRegressionSummaryBuilder() *DataframeRegressionSummaryBuilder {
-	r := DataframeRegressionSummaryBuilder{
-		&DataframeRegressionSummary{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the DataframeRegressionSummary struct
-func (rb *DataframeRegressionSummaryBuilder) Build() DataframeRegressionSummary {
-	return *rb.v
-}
-
-func (rb *DataframeRegressionSummaryBuilder) Huber(huber *DataframeEvaluationValueBuilder) *DataframeRegressionSummaryBuilder {
-	v := huber.Build()
-	rb.v.Huber = &v
-	return rb
-}
-
-func (rb *DataframeRegressionSummaryBuilder) Mse(mse *DataframeEvaluationValueBuilder) *DataframeRegressionSummaryBuilder {
-	v := mse.Build()
-	rb.v.Mse = &v
-	return rb
-}
-
-func (rb *DataframeRegressionSummaryBuilder) Msle(msle *DataframeEvaluationValueBuilder) *DataframeRegressionSummaryBuilder {
-	v := msle.Build()
-	rb.v.Msle = &v
-	return rb
-}
-
-func (rb *DataframeRegressionSummaryBuilder) RSquared(rsquared *DataframeEvaluationValueBuilder) *DataframeRegressionSummaryBuilder {
-	v := rsquared.Build()
-	rb.v.RSquared = &v
-	return rb
+	return r
 }

@@ -15,52 +15,98 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // FieldStatistics type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/termvectors/types.ts#L28-L32
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/termvectors/types.ts#L28-L32
 type FieldStatistics struct {
 	DocCount   int   `json:"doc_count"`
 	SumDocFreq int64 `json:"sum_doc_freq"`
 	SumTtf     int64 `json:"sum_ttf"`
 }
 
-// FieldStatisticsBuilder holds FieldStatistics struct and provides a builder API.
-type FieldStatisticsBuilder struct {
-	v *FieldStatistics
-}
+func (s *FieldStatistics) UnmarshalJSON(data []byte) error {
 
-// NewFieldStatistics provides a builder for the FieldStatistics struct.
-func NewFieldStatisticsBuilder() *FieldStatisticsBuilder {
-	r := FieldStatisticsBuilder{
-		&FieldStatistics{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "doc_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DocCount", err)
+				}
+				s.DocCount = value
+			case float64:
+				f := int(v)
+				s.DocCount = f
+			}
+
+		case "sum_doc_freq":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "SumDocFreq", err)
+				}
+				s.SumDocFreq = value
+			case float64:
+				f := int64(v)
+				s.SumDocFreq = f
+			}
+
+		case "sum_ttf":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "SumTtf", err)
+				}
+				s.SumTtf = value
+			case float64:
+				f := int64(v)
+				s.SumTtf = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the FieldStatistics struct
-func (rb *FieldStatisticsBuilder) Build() FieldStatistics {
-	return *rb.v
-}
+// NewFieldStatistics returns a FieldStatistics.
+func NewFieldStatistics() *FieldStatistics {
+	r := &FieldStatistics{}
 
-func (rb *FieldStatisticsBuilder) DocCount(doccount int) *FieldStatisticsBuilder {
-	rb.v.DocCount = doccount
-	return rb
-}
-
-func (rb *FieldStatisticsBuilder) SumDocFreq(sumdocfreq int64) *FieldStatisticsBuilder {
-	rb.v.SumDocFreq = sumdocfreq
-	return rb
-}
-
-func (rb *FieldStatisticsBuilder) SumTtf(sumttf int64) *FieldStatisticsBuilder {
-	rb.v.SumTtf = sumttf
-	return rb
+	return r
 }

@@ -15,47 +15,77 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // RankEvalQuery type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/rank_eval/types.ts#L111-L114
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/rank_eval/types.ts#L111-L117
 type RankEvalQuery struct {
-	Query QueryContainer `json:"query"`
-	Size  *int           `json:"size,omitempty"`
+	Query Query `json:"query"`
+	Size  *int  `json:"size,omitempty"`
 }
 
-// RankEvalQueryBuilder holds RankEvalQuery struct and provides a builder API.
-type RankEvalQueryBuilder struct {
-	v *RankEvalQuery
-}
+func (s *RankEvalQuery) UnmarshalJSON(data []byte) error {
 
-// NewRankEvalQuery provides a builder for the RankEvalQuery struct.
-func NewRankEvalQueryBuilder() *RankEvalQueryBuilder {
-	r := RankEvalQueryBuilder{
-		&RankEvalQuery{},
+	if !bytes.HasPrefix(data, []byte(`{`)) {
+		err := json.NewDecoder(bytes.NewReader(data)).Decode(&s.Query)
+		return err
 	}
 
-	return &r
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "query":
+			if err := dec.Decode(&s.Query); err != nil {
+				return fmt.Errorf("%s | %w", "Query", err)
+			}
+
+		case "size":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Size", err)
+				}
+				s.Size = &value
+			case float64:
+				f := int(v)
+				s.Size = &f
+			}
+
+		}
+	}
+	return nil
 }
 
-// Build finalize the chain and returns the RankEvalQuery struct
-func (rb *RankEvalQueryBuilder) Build() RankEvalQuery {
-	return *rb.v
-}
+// NewRankEvalQuery returns a RankEvalQuery.
+func NewRankEvalQuery() *RankEvalQuery {
+	r := &RankEvalQuery{}
 
-func (rb *RankEvalQueryBuilder) Query(query *QueryContainerBuilder) *RankEvalQueryBuilder {
-	v := query.Build()
-	rb.v.Query = v
-	return rb
-}
-
-func (rb *RankEvalQueryBuilder) Size(size int) *RankEvalQueryBuilder {
-	rb.v.Size = &size
-	return rb
+	return r
 }

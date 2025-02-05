@@ -15,19 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package converttype
 package converttype
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ingest/_types/Processors.ts#L136-L144
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ingest/_types/Processors.ts#L661-L670
 type ConvertType struct {
-	name string
+	Name string
 }
 
 var (
@@ -35,13 +33,15 @@ var (
 
 	Long = ConvertType{"long"}
 
-	Float = ConvertType{"float"}
-
 	Double = ConvertType{"double"}
 
-	String = ConvertType{"string"}
+	Float = ConvertType{"float"}
 
 	Boolean = ConvertType{"boolean"}
+
+	Ip = ConvertType{"ip"}
+
+	String = ConvertType{"string"}
 
 	Auto = ConvertType{"auto"}
 )
@@ -51,20 +51,22 @@ func (c ConvertType) MarshalText() (text []byte, err error) {
 }
 
 func (c *ConvertType) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
 	case "integer":
 		*c = Integer
 	case "long":
 		*c = Long
-	case "float":
-		*c = Float
 	case "double":
 		*c = Double
-	case "string":
-		*c = String
+	case "float":
+		*c = Float
 	case "boolean":
 		*c = Boolean
+	case "ip":
+		*c = Ip
+	case "string":
+		*c = String
 	case "auto":
 		*c = Auto
 	default:
@@ -75,5 +77,5 @@ func (c *ConvertType) UnmarshalText(text []byte) error {
 }
 
 func (c ConvertType) String() string {
-	return c.name
+	return c.Name
 }

@@ -15,52 +15,70 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // Document type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ingest/simulate/types.ts#L39-L43
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ingest/simulate/types.ts#L62-L76
 type Document struct {
-	Id_     *Id         `json:"_id,omitempty"`
-	Index_  *IndexName  `json:"_index,omitempty"`
-	Source_ interface{} `json:"_source,omitempty"`
+	// Id_ Unique identifier for the document.
+	// This ID must be unique within the `_index`.
+	Id_ *string `json:"_id,omitempty"`
+	// Index_ Name of the index containing the document.
+	Index_ *string `json:"_index,omitempty"`
+	// Source_ JSON body for the document.
+	Source_ json.RawMessage `json:"_source,omitempty"`
 }
 
-// DocumentBuilder holds Document struct and provides a builder API.
-type DocumentBuilder struct {
-	v *Document
-}
+func (s *Document) UnmarshalJSON(data []byte) error {
 
-// NewDocument provides a builder for the Document struct.
-func NewDocumentBuilder() *DocumentBuilder {
-	r := DocumentBuilder{
-		&Document{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "_id":
+			if err := dec.Decode(&s.Id_); err != nil {
+				return fmt.Errorf("%s | %w", "Id_", err)
+			}
+
+		case "_index":
+			if err := dec.Decode(&s.Index_); err != nil {
+				return fmt.Errorf("%s | %w", "Index_", err)
+			}
+
+		case "_source":
+			if err := dec.Decode(&s.Source_); err != nil {
+				return fmt.Errorf("%s | %w", "Source_", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the Document struct
-func (rb *DocumentBuilder) Build() Document {
-	return *rb.v
-}
+// NewDocument returns a Document.
+func NewDocument() *Document {
+	r := &Document{}
 
-func (rb *DocumentBuilder) Id_(id_ Id) *DocumentBuilder {
-	rb.v.Id_ = &id_
-	return rb
-}
-
-func (rb *DocumentBuilder) Index_(index_ IndexName) *DocumentBuilder {
-	rb.v.Index_ = &index_
-	return rb
-}
-
-func (rb *DocumentBuilder) Source_(source_ interface{}) *DocumentBuilder {
-	rb.v.Source_ = source_
-	return rb
+	return r
 }

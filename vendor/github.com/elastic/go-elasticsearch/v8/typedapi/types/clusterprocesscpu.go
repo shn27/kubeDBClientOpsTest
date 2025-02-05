@@ -15,40 +15,68 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ClusterProcessCpu type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/stats/types.ts#L252-L254
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/stats/types.ts#L477-L483
 type ClusterProcessCpu struct {
+	// Percent Percentage of CPU used across all selected nodes.
+	// Returns `-1` if not supported.
 	Percent int `json:"percent"`
 }
 
-// ClusterProcessCpuBuilder holds ClusterProcessCpu struct and provides a builder API.
-type ClusterProcessCpuBuilder struct {
-	v *ClusterProcessCpu
-}
+func (s *ClusterProcessCpu) UnmarshalJSON(data []byte) error {
 
-// NewClusterProcessCpu provides a builder for the ClusterProcessCpu struct.
-func NewClusterProcessCpuBuilder() *ClusterProcessCpuBuilder {
-	r := ClusterProcessCpuBuilder{
-		&ClusterProcessCpu{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "percent":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Percent", err)
+				}
+				s.Percent = value
+			case float64:
+				f := int(v)
+				s.Percent = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ClusterProcessCpu struct
-func (rb *ClusterProcessCpuBuilder) Build() ClusterProcessCpu {
-	return *rb.v
-}
+// NewClusterProcessCpu returns a ClusterProcessCpu.
+func NewClusterProcessCpu() *ClusterProcessCpu {
+	r := &ClusterProcessCpu{}
 
-func (rb *ClusterProcessCpuBuilder) Percent(percent int) *ClusterProcessCpuBuilder {
-	rb.v.Percent = percent
-	return rb
+	return r
 }

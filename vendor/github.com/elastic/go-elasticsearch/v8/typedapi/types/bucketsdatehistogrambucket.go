@@ -15,50 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // BucketsDateHistogramBucket holds the union for the following types:
 //
-//	[]DateHistogramBucket
 //	map[string]DateHistogramBucket
+//	[]DateHistogramBucket
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L303-L312
-type BucketsDateHistogramBucket interface{}
-
-// BucketsDateHistogramBucketBuilder holds BucketsDateHistogramBucket struct and provides a builder API.
-type BucketsDateHistogramBucketBuilder struct {
-	v BucketsDateHistogramBucket
-}
-
-// NewBucketsDateHistogramBucket provides a builder for the BucketsDateHistogramBucket struct.
-func NewBucketsDateHistogramBucketBuilder() *BucketsDateHistogramBucketBuilder {
-	return &BucketsDateHistogramBucketBuilder{}
-}
-
-// Build finalize the chain and returns the BucketsDateHistogramBucket struct
-func (u *BucketsDateHistogramBucketBuilder) Build() BucketsDateHistogramBucket {
-	return u.v
-}
-
-func (u *BucketsDateHistogramBucketBuilder) DateHistogramBuckets(datehistogrambuckets []DateHistogramBucketBuilder) *BucketsDateHistogramBucketBuilder {
-	tmp := make([]DateHistogramBucket, len(datehistogrambuckets))
-	for _, value := range datehistogrambuckets {
-		tmp = append(tmp, value.Build())
-	}
-	u.v = tmp
-	return u
-}
-
-func (u *BucketsDateHistogramBucketBuilder) Map(values map[string]*DateHistogramBucketBuilder) *BucketsDateHistogramBucketBuilder {
-	tmp := make(map[string]DateHistogramBucket, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	u.v = tmp
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L346-L355
+type BucketsDateHistogramBucket any

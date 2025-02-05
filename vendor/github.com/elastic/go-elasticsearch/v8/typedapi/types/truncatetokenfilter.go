@@ -15,49 +15,92 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // TruncateTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L328-L331
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L331-L334
 type TruncateTokenFilter struct {
-	Length  *int           `json:"length,omitempty"`
-	Type    string         `json:"type,omitempty"`
-	Version *VersionString `json:"version,omitempty"`
+	Length  *int    `json:"length,omitempty"`
+	Type    string  `json:"type,omitempty"`
+	Version *string `json:"version,omitempty"`
 }
 
-// TruncateTokenFilterBuilder holds TruncateTokenFilter struct and provides a builder API.
-type TruncateTokenFilterBuilder struct {
-	v *TruncateTokenFilter
+func (s *TruncateTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "length":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Length", err)
+				}
+				s.Length = &value
+			case float64:
+				f := int(v)
+				s.Length = &f
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewTruncateTokenFilter provides a builder for the TruncateTokenFilter struct.
-func NewTruncateTokenFilterBuilder() *TruncateTokenFilterBuilder {
-	r := TruncateTokenFilterBuilder{
-		&TruncateTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s TruncateTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerTruncateTokenFilter TruncateTokenFilter
+	tmp := innerTruncateTokenFilter{
+		Length:  s.Length,
+		Type:    s.Type,
+		Version: s.Version,
 	}
 
-	r.v.Type = "truncate"
+	tmp.Type = "truncate"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the TruncateTokenFilter struct
-func (rb *TruncateTokenFilterBuilder) Build() TruncateTokenFilter {
-	return *rb.v
-}
+// NewTruncateTokenFilter returns a TruncateTokenFilter.
+func NewTruncateTokenFilter() *TruncateTokenFilter {
+	r := &TruncateTokenFilter{}
 
-func (rb *TruncateTokenFilterBuilder) Length(length int) *TruncateTokenFilterBuilder {
-	rb.v.Length = &length
-	return rb
-}
-
-func (rb *TruncateTokenFilterBuilder) Version(version VersionString) *TruncateTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

@@ -15,55 +15,95 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // TextEmbeddingInferenceOptions type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/inference.ts#L217-L223
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/inference.ts#L221-L231
 type TextEmbeddingInferenceOptions struct {
+	// EmbeddingSize The number of dimensions in the embedding output
+	EmbeddingSize *int `json:"embedding_size,omitempty"`
 	// ResultsField The field that is added to incoming documents to contain the inference
 	// prediction. Defaults to predicted_value.
 	ResultsField *string `json:"results_field,omitempty"`
 	// Tokenization The tokenization options
 	Tokenization *TokenizationConfigContainer `json:"tokenization,omitempty"`
+	Vocabulary   Vocabulary                   `json:"vocabulary"`
 }
 
-// TextEmbeddingInferenceOptionsBuilder holds TextEmbeddingInferenceOptions struct and provides a builder API.
-type TextEmbeddingInferenceOptionsBuilder struct {
-	v *TextEmbeddingInferenceOptions
-}
+func (s *TextEmbeddingInferenceOptions) UnmarshalJSON(data []byte) error {
 
-// NewTextEmbeddingInferenceOptions provides a builder for the TextEmbeddingInferenceOptions struct.
-func NewTextEmbeddingInferenceOptionsBuilder() *TextEmbeddingInferenceOptionsBuilder {
-	r := TextEmbeddingInferenceOptionsBuilder{
-		&TextEmbeddingInferenceOptions{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "embedding_size":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "EmbeddingSize", err)
+				}
+				s.EmbeddingSize = &value
+			case float64:
+				f := int(v)
+				s.EmbeddingSize = &f
+			}
+
+		case "results_field":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ResultsField", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ResultsField = &o
+
+		case "tokenization":
+			if err := dec.Decode(&s.Tokenization); err != nil {
+				return fmt.Errorf("%s | %w", "Tokenization", err)
+			}
+
+		case "vocabulary":
+			if err := dec.Decode(&s.Vocabulary); err != nil {
+				return fmt.Errorf("%s | %w", "Vocabulary", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TextEmbeddingInferenceOptions struct
-func (rb *TextEmbeddingInferenceOptionsBuilder) Build() TextEmbeddingInferenceOptions {
-	return *rb.v
-}
+// NewTextEmbeddingInferenceOptions returns a TextEmbeddingInferenceOptions.
+func NewTextEmbeddingInferenceOptions() *TextEmbeddingInferenceOptions {
+	r := &TextEmbeddingInferenceOptions{}
 
-// ResultsField The field that is added to incoming documents to contain the inference
-// prediction. Defaults to predicted_value.
-
-func (rb *TextEmbeddingInferenceOptionsBuilder) ResultsField(resultsfield string) *TextEmbeddingInferenceOptionsBuilder {
-	rb.v.ResultsField = &resultsfield
-	return rb
-}
-
-// Tokenization The tokenization options
-
-func (rb *TextEmbeddingInferenceOptionsBuilder) Tokenization(tokenization *TokenizationConfigContainerBuilder) *TextEmbeddingInferenceOptionsBuilder {
-	v := tokenization.Build()
-	rb.v.Tokenization = &v
-	return rb
+	return r
 }

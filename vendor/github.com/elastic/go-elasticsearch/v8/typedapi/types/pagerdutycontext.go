@@ -15,56 +15,83 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/pagerdutycontexttype"
 )
 
 // PagerDutyContext type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Actions.ts#L61-L65
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Actions.ts#L61-L65
 type PagerDutyContext struct {
 	Href *string                                   `json:"href,omitempty"`
 	Src  *string                                   `json:"src,omitempty"`
 	Type pagerdutycontexttype.PagerDutyContextType `json:"type"`
 }
 
-// PagerDutyContextBuilder holds PagerDutyContext struct and provides a builder API.
-type PagerDutyContextBuilder struct {
-	v *PagerDutyContext
-}
+func (s *PagerDutyContext) UnmarshalJSON(data []byte) error {
 
-// NewPagerDutyContext provides a builder for the PagerDutyContext struct.
-func NewPagerDutyContextBuilder() *PagerDutyContextBuilder {
-	r := PagerDutyContextBuilder{
-		&PagerDutyContext{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "href":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Href", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Href = &o
+
+		case "src":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Src", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Src = &o
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the PagerDutyContext struct
-func (rb *PagerDutyContextBuilder) Build() PagerDutyContext {
-	return *rb.v
-}
+// NewPagerDutyContext returns a PagerDutyContext.
+func NewPagerDutyContext() *PagerDutyContext {
+	r := &PagerDutyContext{}
 
-func (rb *PagerDutyContextBuilder) Href(href string) *PagerDutyContextBuilder {
-	rb.v.Href = &href
-	return rb
-}
-
-func (rb *PagerDutyContextBuilder) Src(src string) *PagerDutyContextBuilder {
-	rb.v.Src = &src
-	return rb
-}
-
-func (rb *PagerDutyContextBuilder) Type_(type_ pagerdutycontexttype.PagerDutyContextType) *PagerDutyContextBuilder {
-	rb.v.Type = type_
-	return rb
+	return r
 }

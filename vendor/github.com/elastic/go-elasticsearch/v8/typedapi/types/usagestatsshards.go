@@ -15,61 +15,80 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // UsageStatsShards type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/field_usage_stats/IndicesFieldUsageStatsResponse.ts#L42-L47
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/field_usage_stats/IndicesFieldUsageStatsResponse.ts#L45-L50
 type UsageStatsShards struct {
-	Routing                 ShardRouting        `json:"routing"`
-	Stats                   ShardsStats         `json:"stats"`
-	TrackingId              string              `json:"tracking_id"`
-	TrackingStartedAtMillis EpochTimeUnitMillis `json:"tracking_started_at_millis"`
+	Routing                 ShardRouting       `json:"routing"`
+	Stats                   IndicesShardsStats `json:"stats"`
+	TrackingId              string             `json:"tracking_id"`
+	TrackingStartedAtMillis int64              `json:"tracking_started_at_millis"`
 }
 
-// UsageStatsShardsBuilder holds UsageStatsShards struct and provides a builder API.
-type UsageStatsShardsBuilder struct {
-	v *UsageStatsShards
-}
+func (s *UsageStatsShards) UnmarshalJSON(data []byte) error {
 
-// NewUsageStatsShards provides a builder for the UsageStatsShards struct.
-func NewUsageStatsShardsBuilder() *UsageStatsShardsBuilder {
-	r := UsageStatsShardsBuilder{
-		&UsageStatsShards{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "routing":
+			if err := dec.Decode(&s.Routing); err != nil {
+				return fmt.Errorf("%s | %w", "Routing", err)
+			}
+
+		case "stats":
+			if err := dec.Decode(&s.Stats); err != nil {
+				return fmt.Errorf("%s | %w", "Stats", err)
+			}
+
+		case "tracking_id":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "TrackingId", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.TrackingId = o
+
+		case "tracking_started_at_millis":
+			if err := dec.Decode(&s.TrackingStartedAtMillis); err != nil {
+				return fmt.Errorf("%s | %w", "TrackingStartedAtMillis", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the UsageStatsShards struct
-func (rb *UsageStatsShardsBuilder) Build() UsageStatsShards {
-	return *rb.v
-}
+// NewUsageStatsShards returns a UsageStatsShards.
+func NewUsageStatsShards() *UsageStatsShards {
+	r := &UsageStatsShards{}
 
-func (rb *UsageStatsShardsBuilder) Routing(routing *ShardRoutingBuilder) *UsageStatsShardsBuilder {
-	v := routing.Build()
-	rb.v.Routing = v
-	return rb
-}
-
-func (rb *UsageStatsShardsBuilder) Stats(stats *ShardsStatsBuilder) *UsageStatsShardsBuilder {
-	v := stats.Build()
-	rb.v.Stats = v
-	return rb
-}
-
-func (rb *UsageStatsShardsBuilder) TrackingId(trackingid string) *UsageStatsShardsBuilder {
-	rb.v.TrackingId = trackingid
-	return rb
-}
-
-func (rb *UsageStatsShardsBuilder) TrackingStartedAtMillis(trackingstartedatmillis *EpochTimeUnitMillisBuilder) *UsageStatsShardsBuilder {
-	v := trackingstartedatmillis.Build()
-	rb.v.TrackingStartedAtMillis = v
-	return rb
+	return r
 }

@@ -15,80 +15,145 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // JoinProcessor type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ingest/_types/Processors.ts#L265-L269
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ingest/_types/Processors.ts#L1103-L1118
 type JoinProcessor struct {
-	Field         Field                `json:"field"`
-	If            *string              `json:"if,omitempty"`
-	IgnoreFailure *bool                `json:"ignore_failure,omitempty"`
-	OnFailure     []ProcessorContainer `json:"on_failure,omitempty"`
-	Separator     string               `json:"separator"`
-	Tag           *string              `json:"tag,omitempty"`
-	TargetField   *Field               `json:"target_field,omitempty"`
+	// Description Description of the processor.
+	// Useful for describing the purpose of the processor or its configuration.
+	Description *string `json:"description,omitempty"`
+	// Field Field containing array values to join.
+	Field string `json:"field"`
+	// If Conditionally execute the processor.
+	If *string `json:"if,omitempty"`
+	// IgnoreFailure Ignore failures for the processor.
+	IgnoreFailure *bool `json:"ignore_failure,omitempty"`
+	// OnFailure Handle failures for the processor.
+	OnFailure []ProcessorContainer `json:"on_failure,omitempty"`
+	// Separator The separator character.
+	Separator string `json:"separator"`
+	// Tag Identifier for the processor.
+	// Useful for debugging and metrics.
+	Tag *string `json:"tag,omitempty"`
+	// TargetField The field to assign the joined value to.
+	// By default, the field is updated in-place.
+	TargetField *string `json:"target_field,omitempty"`
 }
 
-// JoinProcessorBuilder holds JoinProcessor struct and provides a builder API.
-type JoinProcessorBuilder struct {
-	v *JoinProcessor
-}
+func (s *JoinProcessor) UnmarshalJSON(data []byte) error {
 
-// NewJoinProcessor provides a builder for the JoinProcessor struct.
-func NewJoinProcessorBuilder() *JoinProcessorBuilder {
-	r := JoinProcessorBuilder{
-		&JoinProcessor{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "description":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Description", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Description = &o
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "if":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "If", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.If = &o
+
+		case "ignore_failure":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IgnoreFailure", err)
+				}
+				s.IgnoreFailure = &value
+			case bool:
+				s.IgnoreFailure = &v
+			}
+
+		case "on_failure":
+			if err := dec.Decode(&s.OnFailure); err != nil {
+				return fmt.Errorf("%s | %w", "OnFailure", err)
+			}
+
+		case "separator":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Separator", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Separator = o
+
+		case "tag":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Tag", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Tag = &o
+
+		case "target_field":
+			if err := dec.Decode(&s.TargetField); err != nil {
+				return fmt.Errorf("%s | %w", "TargetField", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the JoinProcessor struct
-func (rb *JoinProcessorBuilder) Build() JoinProcessor {
-	return *rb.v
-}
+// NewJoinProcessor returns a JoinProcessor.
+func NewJoinProcessor() *JoinProcessor {
+	r := &JoinProcessor{}
 
-func (rb *JoinProcessorBuilder) Field(field Field) *JoinProcessorBuilder {
-	rb.v.Field = field
-	return rb
-}
-
-func (rb *JoinProcessorBuilder) If_(if_ string) *JoinProcessorBuilder {
-	rb.v.If = &if_
-	return rb
-}
-
-func (rb *JoinProcessorBuilder) IgnoreFailure(ignorefailure bool) *JoinProcessorBuilder {
-	rb.v.IgnoreFailure = &ignorefailure
-	return rb
-}
-
-func (rb *JoinProcessorBuilder) OnFailure(on_failure []ProcessorContainerBuilder) *JoinProcessorBuilder {
-	tmp := make([]ProcessorContainer, len(on_failure))
-	for _, value := range on_failure {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.OnFailure = tmp
-	return rb
-}
-
-func (rb *JoinProcessorBuilder) Separator(separator string) *JoinProcessorBuilder {
-	rb.v.Separator = separator
-	return rb
-}
-
-func (rb *JoinProcessorBuilder) Tag(tag string) *JoinProcessorBuilder {
-	rb.v.Tag = &tag
-	return rb
-}
-
-func (rb *JoinProcessorBuilder) TargetField(targetfield Field) *JoinProcessorBuilder {
-	rb.v.TargetField = &targetfield
-	return rb
+	return r
 }

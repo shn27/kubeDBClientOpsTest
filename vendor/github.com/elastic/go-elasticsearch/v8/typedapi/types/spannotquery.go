@@ -15,78 +15,156 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // SpanNotQuery type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/span.ts#L55-L63
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/span.ts#L95-L122
 type SpanNotQuery struct {
-	Boost      *float32   `json:"boost,omitempty"`
-	Dist       *int       `json:"dist,omitempty"`
-	Exclude    *SpanQuery `json:"exclude,omitempty"`
-	Include    *SpanQuery `json:"include,omitempty"`
-	Post       *int       `json:"post,omitempty"`
-	Pre        *int       `json:"pre,omitempty"`
-	QueryName_ *string    `json:"_name,omitempty"`
+	// Boost Floating point number used to decrease or increase the relevance scores of
+	// the query.
+	// Boost values are relative to the default value of 1.0.
+	// A boost value between 0 and 1.0 decreases the relevance score.
+	// A value greater than 1.0 increases the relevance score.
+	Boost *float32 `json:"boost,omitempty"`
+	// Dist The number of tokens from within the include span that can’t have overlap
+	// with the exclude span.
+	// Equivalent to setting both `pre` and `post`.
+	Dist *int `json:"dist,omitempty"`
+	// Exclude Span query whose matches must not overlap those returned.
+	Exclude *SpanQuery `json:"exclude,omitempty"`
+	// Include Span query whose matches are filtered.
+	Include *SpanQuery `json:"include,omitempty"`
+	// Post The number of tokens after the include span that can’t have overlap with the
+	// exclude span.
+	Post *int `json:"post,omitempty"`
+	// Pre The number of tokens before the include span that can’t have overlap with the
+	// exclude span.
+	Pre        *int    `json:"pre,omitempty"`
+	QueryName_ *string `json:"_name,omitempty"`
 }
 
-// SpanNotQueryBuilder holds SpanNotQuery struct and provides a builder API.
-type SpanNotQueryBuilder struct {
-	v *SpanNotQuery
-}
+func (s *SpanNotQuery) UnmarshalJSON(data []byte) error {
 
-// NewSpanNotQuery provides a builder for the SpanNotQuery struct.
-func NewSpanNotQueryBuilder() *SpanNotQueryBuilder {
-	r := SpanNotQueryBuilder{
-		&SpanNotQuery{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "boost":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Boost", err)
+				}
+				f := float32(value)
+				s.Boost = &f
+			case float64:
+				f := float32(v)
+				s.Boost = &f
+			}
+
+		case "dist":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Dist", err)
+				}
+				s.Dist = &value
+			case float64:
+				f := int(v)
+				s.Dist = &f
+			}
+
+		case "exclude":
+			if err := dec.Decode(&s.Exclude); err != nil {
+				return fmt.Errorf("%s | %w", "Exclude", err)
+			}
+
+		case "include":
+			if err := dec.Decode(&s.Include); err != nil {
+				return fmt.Errorf("%s | %w", "Include", err)
+			}
+
+		case "post":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Post", err)
+				}
+				s.Post = &value
+			case float64:
+				f := int(v)
+				s.Post = &f
+			}
+
+		case "pre":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Pre", err)
+				}
+				s.Pre = &value
+			case float64:
+				f := int(v)
+				s.Pre = &f
+			}
+
+		case "_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "QueryName_", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.QueryName_ = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SpanNotQuery struct
-func (rb *SpanNotQueryBuilder) Build() SpanNotQuery {
-	return *rb.v
-}
+// NewSpanNotQuery returns a SpanNotQuery.
+func NewSpanNotQuery() *SpanNotQuery {
+	r := &SpanNotQuery{}
 
-func (rb *SpanNotQueryBuilder) Boost(boost float32) *SpanNotQueryBuilder {
-	rb.v.Boost = &boost
-	return rb
-}
-
-func (rb *SpanNotQueryBuilder) Dist(dist int) *SpanNotQueryBuilder {
-	rb.v.Dist = &dist
-	return rb
-}
-
-func (rb *SpanNotQueryBuilder) Exclude(exclude *SpanQueryBuilder) *SpanNotQueryBuilder {
-	v := exclude.Build()
-	rb.v.Exclude = &v
-	return rb
-}
-
-func (rb *SpanNotQueryBuilder) Include(include *SpanQueryBuilder) *SpanNotQueryBuilder {
-	v := include.Build()
-	rb.v.Include = &v
-	return rb
-}
-
-func (rb *SpanNotQueryBuilder) Post(post int) *SpanNotQueryBuilder {
-	rb.v.Post = &post
-	return rb
-}
-
-func (rb *SpanNotQueryBuilder) Pre(pre int) *SpanNotQueryBuilder {
-	rb.v.Pre = &pre
-	return rb
-}
-
-func (rb *SpanNotQueryBuilder) QueryName_(queryname_ string) *SpanNotQueryBuilder {
-	rb.v.QueryName_ = &queryname_
-	return rb
+	return r
 }

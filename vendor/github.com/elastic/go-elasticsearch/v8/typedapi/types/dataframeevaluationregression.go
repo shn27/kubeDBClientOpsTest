@@ -15,70 +15,73 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // DataframeEvaluationRegression type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/DataframeEvaluation.ts#L55-L62
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/DataframeEvaluation.ts#L55-L62
 type DataframeEvaluationRegression struct {
 	// ActualField The field of the index which contains the ground truth. The data type of this
 	// field must be numerical.
-	ActualField Field `json:"actual_field"`
+	ActualField string `json:"actual_field"`
 	// Metrics Specifies the metrics that are used for the evaluation. For more information
 	// on mse, msle, and huber, consult the Jupyter notebook on regression loss
 	// functions.
 	Metrics *DataframeEvaluationRegressionMetrics `json:"metrics,omitempty"`
 	// PredictedField The field in the index that contains the predicted value, in other words the
 	// results of the regression analysis.
-	PredictedField Field `json:"predicted_field"`
+	PredictedField string `json:"predicted_field"`
 }
 
-// DataframeEvaluationRegressionBuilder holds DataframeEvaluationRegression struct and provides a builder API.
-type DataframeEvaluationRegressionBuilder struct {
-	v *DataframeEvaluationRegression
-}
+func (s *DataframeEvaluationRegression) UnmarshalJSON(data []byte) error {
 
-// NewDataframeEvaluationRegression provides a builder for the DataframeEvaluationRegression struct.
-func NewDataframeEvaluationRegressionBuilder() *DataframeEvaluationRegressionBuilder {
-	r := DataframeEvaluationRegressionBuilder{
-		&DataframeEvaluationRegression{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "actual_field":
+			if err := dec.Decode(&s.ActualField); err != nil {
+				return fmt.Errorf("%s | %w", "ActualField", err)
+			}
+
+		case "metrics":
+			if err := dec.Decode(&s.Metrics); err != nil {
+				return fmt.Errorf("%s | %w", "Metrics", err)
+			}
+
+		case "predicted_field":
+			if err := dec.Decode(&s.PredictedField); err != nil {
+				return fmt.Errorf("%s | %w", "PredictedField", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DataframeEvaluationRegression struct
-func (rb *DataframeEvaluationRegressionBuilder) Build() DataframeEvaluationRegression {
-	return *rb.v
-}
+// NewDataframeEvaluationRegression returns a DataframeEvaluationRegression.
+func NewDataframeEvaluationRegression() *DataframeEvaluationRegression {
+	r := &DataframeEvaluationRegression{}
 
-// ActualField The field of the index which contains the ground truth. The data type of this
-// field must be numerical.
-
-func (rb *DataframeEvaluationRegressionBuilder) ActualField(actualfield Field) *DataframeEvaluationRegressionBuilder {
-	rb.v.ActualField = actualfield
-	return rb
-}
-
-// Metrics Specifies the metrics that are used for the evaluation. For more information
-// on mse, msle, and huber, consult the Jupyter notebook on regression loss
-// functions.
-
-func (rb *DataframeEvaluationRegressionBuilder) Metrics(metrics *DataframeEvaluationRegressionMetricsBuilder) *DataframeEvaluationRegressionBuilder {
-	v := metrics.Build()
-	rb.v.Metrics = &v
-	return rb
-}
-
-// PredictedField The field in the index that contains the predicted value, in other words the
-// results of the regression analysis.
-
-func (rb *DataframeEvaluationRegressionBuilder) PredictedField(predictedfield Field) *DataframeEvaluationRegressionBuilder {
-	rb.v.PredictedField = predictedfield
-	return rb
+	return r
 }

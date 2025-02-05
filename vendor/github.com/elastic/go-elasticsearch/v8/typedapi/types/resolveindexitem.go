@@ -15,58 +15,72 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // ResolveIndexItem type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/resolve_index/ResolveIndexResponse.ts#L30-L35
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/resolve_index/ResolveIndexResponse.ts#L30-L35
 type ResolveIndexItem struct {
-	Aliases    []string        `json:"aliases,omitempty"`
-	Attributes []string        `json:"attributes"`
-	DataStream *DataStreamName `json:"data_stream,omitempty"`
-	Name       Name            `json:"name"`
+	Aliases    []string `json:"aliases,omitempty"`
+	Attributes []string `json:"attributes"`
+	DataStream *string  `json:"data_stream,omitempty"`
+	Name       string   `json:"name"`
 }
 
-// ResolveIndexItemBuilder holds ResolveIndexItem struct and provides a builder API.
-type ResolveIndexItemBuilder struct {
-	v *ResolveIndexItem
-}
+func (s *ResolveIndexItem) UnmarshalJSON(data []byte) error {
 
-// NewResolveIndexItem provides a builder for the ResolveIndexItem struct.
-func NewResolveIndexItemBuilder() *ResolveIndexItemBuilder {
-	r := ResolveIndexItemBuilder{
-		&ResolveIndexItem{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "aliases":
+			if err := dec.Decode(&s.Aliases); err != nil {
+				return fmt.Errorf("%s | %w", "Aliases", err)
+			}
+
+		case "attributes":
+			if err := dec.Decode(&s.Attributes); err != nil {
+				return fmt.Errorf("%s | %w", "Attributes", err)
+			}
+
+		case "data_stream":
+			if err := dec.Decode(&s.DataStream); err != nil {
+				return fmt.Errorf("%s | %w", "DataStream", err)
+			}
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ResolveIndexItem struct
-func (rb *ResolveIndexItemBuilder) Build() ResolveIndexItem {
-	return *rb.v
-}
+// NewResolveIndexItem returns a ResolveIndexItem.
+func NewResolveIndexItem() *ResolveIndexItem {
+	r := &ResolveIndexItem{}
 
-func (rb *ResolveIndexItemBuilder) Aliases(aliases ...string) *ResolveIndexItemBuilder {
-	rb.v.Aliases = aliases
-	return rb
-}
-
-func (rb *ResolveIndexItemBuilder) Attributes(attributes ...string) *ResolveIndexItemBuilder {
-	rb.v.Attributes = attributes
-	return rb
-}
-
-func (rb *ResolveIndexItemBuilder) DataStream(datastream DataStreamName) *ResolveIndexItemBuilder {
-	rb.v.DataStream = &datastream
-	return rb
-}
-
-func (rb *ResolveIndexItemBuilder) Name(name Name) *ResolveIndexItemBuilder {
-	rb.v.Name = name
-	return rb
+	return r
 }

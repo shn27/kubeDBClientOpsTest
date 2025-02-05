@@ -15,46 +15,83 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // JvmThreads type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/_types/Stats.ts#L346-L349
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/_types/Stats.ts#L968-L977
 type JvmThreads struct {
-	Count     *int64 `json:"count,omitempty"`
+	// Count Number of active threads in use by JVM.
+	Count *int64 `json:"count,omitempty"`
+	// PeakCount Highest number of threads used by JVM.
 	PeakCount *int64 `json:"peak_count,omitempty"`
 }
 
-// JvmThreadsBuilder holds JvmThreads struct and provides a builder API.
-type JvmThreadsBuilder struct {
-	v *JvmThreads
-}
+func (s *JvmThreads) UnmarshalJSON(data []byte) error {
 
-// NewJvmThreads provides a builder for the JvmThreads struct.
-func NewJvmThreadsBuilder() *JvmThreadsBuilder {
-	r := JvmThreadsBuilder{
-		&JvmThreads{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Count", err)
+				}
+				s.Count = &value
+			case float64:
+				f := int64(v)
+				s.Count = &f
+			}
+
+		case "peak_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PeakCount", err)
+				}
+				s.PeakCount = &value
+			case float64:
+				f := int64(v)
+				s.PeakCount = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the JvmThreads struct
-func (rb *JvmThreadsBuilder) Build() JvmThreads {
-	return *rb.v
-}
+// NewJvmThreads returns a JvmThreads.
+func NewJvmThreads() *JvmThreads {
+	r := &JvmThreads{}
 
-func (rb *JvmThreadsBuilder) Count(count int64) *JvmThreadsBuilder {
-	rb.v.Count = &count
-	return rb
-}
-
-func (rb *JvmThreadsBuilder) PeakCount(peakcount int64) *JvmThreadsBuilder {
-	rb.v.PeakCount = &peakcount
-	return rb
+	return r
 }

@@ -15,88 +15,118 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // RangeAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/bucket.ts#L285-L292
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/bucket.ts#L669-L689
 type RangeAggregation struct {
-	Field   *Field             `json:"field,omitempty"`
-	Format  *string            `json:"format,omitempty"`
-	Keyed   *bool              `json:"keyed,omitempty"`
-	Meta    *Metadata          `json:"meta,omitempty"`
-	Missing *int               `json:"missing,omitempty"`
-	Name    *string            `json:"name,omitempty"`
-	Ranges  []AggregationRange `json:"ranges,omitempty"`
-	Script  *Script            `json:"script,omitempty"`
+	// Field The date field whose values are use to build ranges.
+	Field  *string `json:"field,omitempty"`
+	Format *string `json:"format,omitempty"`
+	// Keyed Set to `true` to associate a unique string key with each bucket and return
+	// the ranges as a hash rather than an array.
+	Keyed *bool `json:"keyed,omitempty"`
+	// Missing The value to apply to documents that do not have a value.
+	// By default, documents without a value are ignored.
+	Missing *int `json:"missing,omitempty"`
+	// Ranges An array of ranges used to bucket documents.
+	Ranges []AggregationRange `json:"ranges,omitempty"`
+	Script *Script            `json:"script,omitempty"`
 }
 
-// RangeAggregationBuilder holds RangeAggregation struct and provides a builder API.
-type RangeAggregationBuilder struct {
-	v *RangeAggregation
-}
+func (s *RangeAggregation) UnmarshalJSON(data []byte) error {
 
-// NewRangeAggregation provides a builder for the RangeAggregation struct.
-func NewRangeAggregationBuilder() *RangeAggregationBuilder {
-	r := RangeAggregationBuilder{
-		&RangeAggregation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "format":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Format", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Format = &o
+
+		case "keyed":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Keyed", err)
+				}
+				s.Keyed = &value
+			case bool:
+				s.Keyed = &v
+			}
+
+		case "missing":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Missing", err)
+				}
+				s.Missing = &value
+			case float64:
+				f := int(v)
+				s.Missing = &f
+			}
+
+		case "ranges":
+			if err := dec.Decode(&s.Ranges); err != nil {
+				return fmt.Errorf("%s | %w", "Ranges", err)
+			}
+
+		case "script":
+			if err := dec.Decode(&s.Script); err != nil {
+				return fmt.Errorf("%s | %w", "Script", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RangeAggregation struct
-func (rb *RangeAggregationBuilder) Build() RangeAggregation {
-	return *rb.v
-}
+// NewRangeAggregation returns a RangeAggregation.
+func NewRangeAggregation() *RangeAggregation {
+	r := &RangeAggregation{}
 
-func (rb *RangeAggregationBuilder) Field(field Field) *RangeAggregationBuilder {
-	rb.v.Field = &field
-	return rb
-}
-
-func (rb *RangeAggregationBuilder) Format(format string) *RangeAggregationBuilder {
-	rb.v.Format = &format
-	return rb
-}
-
-func (rb *RangeAggregationBuilder) Keyed(keyed bool) *RangeAggregationBuilder {
-	rb.v.Keyed = &keyed
-	return rb
-}
-
-func (rb *RangeAggregationBuilder) Meta(meta *MetadataBuilder) *RangeAggregationBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *RangeAggregationBuilder) Missing(missing int) *RangeAggregationBuilder {
-	rb.v.Missing = &missing
-	return rb
-}
-
-func (rb *RangeAggregationBuilder) Name(name string) *RangeAggregationBuilder {
-	rb.v.Name = &name
-	return rb
-}
-
-func (rb *RangeAggregationBuilder) Ranges(ranges []AggregationRangeBuilder) *RangeAggregationBuilder {
-	tmp := make([]AggregationRange, len(ranges))
-	for _, value := range ranges {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Ranges = tmp
-	return rb
-}
-
-func (rb *RangeAggregationBuilder) Script(script *ScriptBuilder) *RangeAggregationBuilder {
-	v := script.Build()
-	rb.v.Script = &v
-	return rb
+	return r
 }

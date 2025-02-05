@@ -15,20 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/tokenizationtruncate"
 )
 
 // NlpBertTokenizationConfig type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/inference.ts#L116-L143
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/inference.ts#L161-L162
 type NlpBertTokenizationConfig struct {
 	// DoLowerCase Should the tokenizer lower case the text
 	DoLowerCase *bool `json:"do_lower_case,omitempty"`
@@ -44,58 +49,94 @@ type NlpBertTokenizationConfig struct {
 	WithSpecialTokens *bool `json:"with_special_tokens,omitempty"`
 }
 
-// NlpBertTokenizationConfigBuilder holds NlpBertTokenizationConfig struct and provides a builder API.
-type NlpBertTokenizationConfigBuilder struct {
-	v *NlpBertTokenizationConfig
-}
+func (s *NlpBertTokenizationConfig) UnmarshalJSON(data []byte) error {
 
-// NewNlpBertTokenizationConfig provides a builder for the NlpBertTokenizationConfig struct.
-func NewNlpBertTokenizationConfigBuilder() *NlpBertTokenizationConfigBuilder {
-	r := NlpBertTokenizationConfigBuilder{
-		&NlpBertTokenizationConfig{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "do_lower_case":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DoLowerCase", err)
+				}
+				s.DoLowerCase = &value
+			case bool:
+				s.DoLowerCase = &v
+			}
+
+		case "max_sequence_length":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxSequenceLength", err)
+				}
+				s.MaxSequenceLength = &value
+			case float64:
+				f := int(v)
+				s.MaxSequenceLength = &f
+			}
+
+		case "span":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Span", err)
+				}
+				s.Span = &value
+			case float64:
+				f := int(v)
+				s.Span = &f
+			}
+
+		case "truncate":
+			if err := dec.Decode(&s.Truncate); err != nil {
+				return fmt.Errorf("%s | %w", "Truncate", err)
+			}
+
+		case "with_special_tokens":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "WithSpecialTokens", err)
+				}
+				s.WithSpecialTokens = &value
+			case bool:
+				s.WithSpecialTokens = &v
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the NlpBertTokenizationConfig struct
-func (rb *NlpBertTokenizationConfigBuilder) Build() NlpBertTokenizationConfig {
-	return *rb.v
-}
+// NewNlpBertTokenizationConfig returns a NlpBertTokenizationConfig.
+func NewNlpBertTokenizationConfig() *NlpBertTokenizationConfig {
+	r := &NlpBertTokenizationConfig{}
 
-// DoLowerCase Should the tokenizer lower case the text
-
-func (rb *NlpBertTokenizationConfigBuilder) DoLowerCase(dolowercase bool) *NlpBertTokenizationConfigBuilder {
-	rb.v.DoLowerCase = &dolowercase
-	return rb
-}
-
-// MaxSequenceLength Maximum input sequence length for the model
-
-func (rb *NlpBertTokenizationConfigBuilder) MaxSequenceLength(maxsequencelength int) *NlpBertTokenizationConfigBuilder {
-	rb.v.MaxSequenceLength = &maxsequencelength
-	return rb
-}
-
-// Span Tokenization spanning options. Special value of -1 indicates no spanning
-// takes place
-
-func (rb *NlpBertTokenizationConfigBuilder) Span(span int) *NlpBertTokenizationConfigBuilder {
-	rb.v.Span = &span
-	return rb
-}
-
-// Truncate Should tokenization input be automatically truncated before sending to the
-// model for inference
-
-func (rb *NlpBertTokenizationConfigBuilder) Truncate(truncate tokenizationtruncate.TokenizationTruncate) *NlpBertTokenizationConfigBuilder {
-	rb.v.Truncate = &truncate
-	return rb
-}
-
-// WithSpecialTokens Is tokenization completed with special tokens
-
-func (rb *NlpBertTokenizationConfigBuilder) WithSpecialTokens(withspecialtokens bool) *NlpBertTokenizationConfigBuilder {
-	rb.v.WithSpecialTokens = &withspecialtokens
-	return rb
+	return r
 }

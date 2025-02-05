@@ -15,106 +15,137 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // RecoveryOrigin type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/recovery/types.ts#L76-L89
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/recovery/types.ts#L76-L89
 type RecoveryOrigin struct {
-	BootstrapNewHistoryUuid *bool             `json:"bootstrap_new_history_uuid,omitempty"`
-	Host                    *Host             `json:"host,omitempty"`
-	Hostname                *string           `json:"hostname,omitempty"`
-	Id                      *Id               `json:"id,omitempty"`
-	Index                   *IndexName        `json:"index,omitempty"`
-	Ip                      *Ip               `json:"ip,omitempty"`
-	Name                    *Name             `json:"name,omitempty"`
-	Repository              *Name             `json:"repository,omitempty"`
-	RestoreUUID             *Uuid             `json:"restoreUUID,omitempty"`
-	Snapshot                *Name             `json:"snapshot,omitempty"`
-	TransportAddress        *TransportAddress `json:"transport_address,omitempty"`
-	Version                 *VersionString    `json:"version,omitempty"`
+	BootstrapNewHistoryUuid *bool   `json:"bootstrap_new_history_uuid,omitempty"`
+	Host                    *string `json:"host,omitempty"`
+	Hostname                *string `json:"hostname,omitempty"`
+	Id                      *string `json:"id,omitempty"`
+	Index                   *string `json:"index,omitempty"`
+	Ip                      *string `json:"ip,omitempty"`
+	Name                    *string `json:"name,omitempty"`
+	Repository              *string `json:"repository,omitempty"`
+	RestoreUUID             *string `json:"restoreUUID,omitempty"`
+	Snapshot                *string `json:"snapshot,omitempty"`
+	TransportAddress        *string `json:"transport_address,omitempty"`
+	Version                 *string `json:"version,omitempty"`
 }
 
-// RecoveryOriginBuilder holds RecoveryOrigin struct and provides a builder API.
-type RecoveryOriginBuilder struct {
-	v *RecoveryOrigin
-}
+func (s *RecoveryOrigin) UnmarshalJSON(data []byte) error {
 
-// NewRecoveryOrigin provides a builder for the RecoveryOrigin struct.
-func NewRecoveryOriginBuilder() *RecoveryOriginBuilder {
-	r := RecoveryOriginBuilder{
-		&RecoveryOrigin{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "bootstrap_new_history_uuid":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "BootstrapNewHistoryUuid", err)
+				}
+				s.BootstrapNewHistoryUuid = &value
+			case bool:
+				s.BootstrapNewHistoryUuid = &v
+			}
+
+		case "host":
+			if err := dec.Decode(&s.Host); err != nil {
+				return fmt.Errorf("%s | %w", "Host", err)
+			}
+
+		case "hostname":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Hostname", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Hostname = &o
+
+		case "id":
+			if err := dec.Decode(&s.Id); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
+
+		case "index":
+			if err := dec.Decode(&s.Index); err != nil {
+				return fmt.Errorf("%s | %w", "Index", err)
+			}
+
+		case "ip":
+			if err := dec.Decode(&s.Ip); err != nil {
+				return fmt.Errorf("%s | %w", "Ip", err)
+			}
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		case "repository":
+			if err := dec.Decode(&s.Repository); err != nil {
+				return fmt.Errorf("%s | %w", "Repository", err)
+			}
+
+		case "restoreUUID":
+			if err := dec.Decode(&s.RestoreUUID); err != nil {
+				return fmt.Errorf("%s | %w", "RestoreUUID", err)
+			}
+
+		case "snapshot":
+			if err := dec.Decode(&s.Snapshot); err != nil {
+				return fmt.Errorf("%s | %w", "Snapshot", err)
+			}
+
+		case "transport_address":
+			if err := dec.Decode(&s.TransportAddress); err != nil {
+				return fmt.Errorf("%s | %w", "TransportAddress", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RecoveryOrigin struct
-func (rb *RecoveryOriginBuilder) Build() RecoveryOrigin {
-	return *rb.v
-}
+// NewRecoveryOrigin returns a RecoveryOrigin.
+func NewRecoveryOrigin() *RecoveryOrigin {
+	r := &RecoveryOrigin{}
 
-func (rb *RecoveryOriginBuilder) BootstrapNewHistoryUuid(bootstrapnewhistoryuuid bool) *RecoveryOriginBuilder {
-	rb.v.BootstrapNewHistoryUuid = &bootstrapnewhistoryuuid
-	return rb
-}
-
-func (rb *RecoveryOriginBuilder) Host(host Host) *RecoveryOriginBuilder {
-	rb.v.Host = &host
-	return rb
-}
-
-func (rb *RecoveryOriginBuilder) Hostname(hostname string) *RecoveryOriginBuilder {
-	rb.v.Hostname = &hostname
-	return rb
-}
-
-func (rb *RecoveryOriginBuilder) Id(id Id) *RecoveryOriginBuilder {
-	rb.v.Id = &id
-	return rb
-}
-
-func (rb *RecoveryOriginBuilder) Index(index IndexName) *RecoveryOriginBuilder {
-	rb.v.Index = &index
-	return rb
-}
-
-func (rb *RecoveryOriginBuilder) Ip(ip Ip) *RecoveryOriginBuilder {
-	rb.v.Ip = &ip
-	return rb
-}
-
-func (rb *RecoveryOriginBuilder) Name(name Name) *RecoveryOriginBuilder {
-	rb.v.Name = &name
-	return rb
-}
-
-func (rb *RecoveryOriginBuilder) Repository(repository Name) *RecoveryOriginBuilder {
-	rb.v.Repository = &repository
-	return rb
-}
-
-func (rb *RecoveryOriginBuilder) RestoreUUID(restoreuuid Uuid) *RecoveryOriginBuilder {
-	rb.v.RestoreUUID = &restoreuuid
-	return rb
-}
-
-func (rb *RecoveryOriginBuilder) Snapshot(snapshot Name) *RecoveryOriginBuilder {
-	rb.v.Snapshot = &snapshot
-	return rb
-}
-
-func (rb *RecoveryOriginBuilder) TransportAddress(transportaddress TransportAddress) *RecoveryOriginBuilder {
-	rb.v.TransportAddress = &transportaddress
-	return rb
-}
-
-func (rb *RecoveryOriginBuilder) Version(version VersionString) *RecoveryOriginBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

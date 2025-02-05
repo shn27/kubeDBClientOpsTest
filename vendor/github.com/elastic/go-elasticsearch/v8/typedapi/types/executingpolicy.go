@@ -15,47 +15,60 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // ExecutingPolicy type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/enrich/stats/types.ts#L24-L27
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/enrich/stats/types.ts#L25-L28
 type ExecutingPolicy struct {
-	Name Name     `json:"name"`
+	Name string   `json:"name"`
 	Task TaskInfo `json:"task"`
 }
 
-// ExecutingPolicyBuilder holds ExecutingPolicy struct and provides a builder API.
-type ExecutingPolicyBuilder struct {
-	v *ExecutingPolicy
-}
+func (s *ExecutingPolicy) UnmarshalJSON(data []byte) error {
 
-// NewExecutingPolicy provides a builder for the ExecutingPolicy struct.
-func NewExecutingPolicyBuilder() *ExecutingPolicyBuilder {
-	r := ExecutingPolicyBuilder{
-		&ExecutingPolicy{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		case "task":
+			if err := dec.Decode(&s.Task); err != nil {
+				return fmt.Errorf("%s | %w", "Task", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ExecutingPolicy struct
-func (rb *ExecutingPolicyBuilder) Build() ExecutingPolicy {
-	return *rb.v
-}
+// NewExecutingPolicy returns a ExecutingPolicy.
+func NewExecutingPolicy() *ExecutingPolicy {
+	r := &ExecutingPolicy{}
 
-func (rb *ExecutingPolicyBuilder) Name(name Name) *ExecutingPolicyBuilder {
-	rb.v.Name = name
-	return rb
-}
-
-func (rb *ExecutingPolicyBuilder) Task(task *TaskInfoBuilder) *ExecutingPolicyBuilder {
-	v := task.Build()
-	rb.v.Task = v
-	return rb
+	return r
 }

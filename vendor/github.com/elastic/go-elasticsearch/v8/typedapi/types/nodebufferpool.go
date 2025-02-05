@@ -15,64 +15,128 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // NodeBufferPool type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/_types/Stats.ts#L310-L316
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/_types/Stats.ts#L859-L880
 type NodeBufferPool struct {
-	Count                *int64  `json:"count,omitempty"`
-	TotalCapacity        *string `json:"total_capacity,omitempty"`
-	TotalCapacityInBytes *int64  `json:"total_capacity_in_bytes,omitempty"`
-	Used                 *string `json:"used,omitempty"`
-	UsedInBytes          *int64  `json:"used_in_bytes,omitempty"`
+	// Count Number of buffer pools.
+	Count *int64 `json:"count,omitempty"`
+	// TotalCapacity Total capacity of buffer pools.
+	TotalCapacity *string `json:"total_capacity,omitempty"`
+	// TotalCapacityInBytes Total capacity of buffer pools in bytes.
+	TotalCapacityInBytes *int64 `json:"total_capacity_in_bytes,omitempty"`
+	// Used Size of buffer pools.
+	Used *string `json:"used,omitempty"`
+	// UsedInBytes Size of buffer pools in bytes.
+	UsedInBytes *int64 `json:"used_in_bytes,omitempty"`
 }
 
-// NodeBufferPoolBuilder holds NodeBufferPool struct and provides a builder API.
-type NodeBufferPoolBuilder struct {
-	v *NodeBufferPool
-}
+func (s *NodeBufferPool) UnmarshalJSON(data []byte) error {
 
-// NewNodeBufferPool provides a builder for the NodeBufferPool struct.
-func NewNodeBufferPoolBuilder() *NodeBufferPoolBuilder {
-	r := NodeBufferPoolBuilder{
-		&NodeBufferPool{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Count", err)
+				}
+				s.Count = &value
+			case float64:
+				f := int64(v)
+				s.Count = &f
+			}
+
+		case "total_capacity":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "TotalCapacity", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.TotalCapacity = &o
+
+		case "total_capacity_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TotalCapacityInBytes", err)
+				}
+				s.TotalCapacityInBytes = &value
+			case float64:
+				f := int64(v)
+				s.TotalCapacityInBytes = &f
+			}
+
+		case "used":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Used", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Used = &o
+
+		case "used_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "UsedInBytes", err)
+				}
+				s.UsedInBytes = &value
+			case float64:
+				f := int64(v)
+				s.UsedInBytes = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the NodeBufferPool struct
-func (rb *NodeBufferPoolBuilder) Build() NodeBufferPool {
-	return *rb.v
-}
+// NewNodeBufferPool returns a NodeBufferPool.
+func NewNodeBufferPool() *NodeBufferPool {
+	r := &NodeBufferPool{}
 
-func (rb *NodeBufferPoolBuilder) Count(count int64) *NodeBufferPoolBuilder {
-	rb.v.Count = &count
-	return rb
-}
-
-func (rb *NodeBufferPoolBuilder) TotalCapacity(totalcapacity string) *NodeBufferPoolBuilder {
-	rb.v.TotalCapacity = &totalcapacity
-	return rb
-}
-
-func (rb *NodeBufferPoolBuilder) TotalCapacityInBytes(totalcapacityinbytes int64) *NodeBufferPoolBuilder {
-	rb.v.TotalCapacityInBytes = &totalcapacityinbytes
-	return rb
-}
-
-func (rb *NodeBufferPoolBuilder) Used(used string) *NodeBufferPoolBuilder {
-	rb.v.Used = &used
-	return rb
-}
-
-func (rb *NodeBufferPoolBuilder) UsedInBytes(usedinbytes int64) *NodeBufferPoolBuilder {
-	rb.v.UsedInBytes = &usedinbytes
-	return rb
+	return r
 }

@@ -15,58 +15,72 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // TermsLookup type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/term.ts#L132-L137
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/term.ts#L270-L275
 type TermsLookup struct {
-	Id      Id        `json:"id"`
-	Index   IndexName `json:"index"`
-	Path    Field     `json:"path"`
-	Routing *Routing  `json:"routing,omitempty"`
+	Id      string  `json:"id"`
+	Index   string  `json:"index"`
+	Path    string  `json:"path"`
+	Routing *string `json:"routing,omitempty"`
 }
 
-// TermsLookupBuilder holds TermsLookup struct and provides a builder API.
-type TermsLookupBuilder struct {
-	v *TermsLookup
-}
+func (s *TermsLookup) UnmarshalJSON(data []byte) error {
 
-// NewTermsLookup provides a builder for the TermsLookup struct.
-func NewTermsLookupBuilder() *TermsLookupBuilder {
-	r := TermsLookupBuilder{
-		&TermsLookup{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "id":
+			if err := dec.Decode(&s.Id); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
+
+		case "index":
+			if err := dec.Decode(&s.Index); err != nil {
+				return fmt.Errorf("%s | %w", "Index", err)
+			}
+
+		case "path":
+			if err := dec.Decode(&s.Path); err != nil {
+				return fmt.Errorf("%s | %w", "Path", err)
+			}
+
+		case "routing":
+			if err := dec.Decode(&s.Routing); err != nil {
+				return fmt.Errorf("%s | %w", "Routing", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TermsLookup struct
-func (rb *TermsLookupBuilder) Build() TermsLookup {
-	return *rb.v
-}
+// NewTermsLookup returns a TermsLookup.
+func NewTermsLookup() *TermsLookup {
+	r := &TermsLookup{}
 
-func (rb *TermsLookupBuilder) Id(id Id) *TermsLookupBuilder {
-	rb.v.Id = id
-	return rb
-}
-
-func (rb *TermsLookupBuilder) Index(index IndexName) *TermsLookupBuilder {
-	rb.v.Index = index
-	return rb
-}
-
-func (rb *TermsLookupBuilder) Path(path Field) *TermsLookupBuilder {
-	rb.v.Path = path
-	return rb
-}
-
-func (rb *TermsLookupBuilder) Routing(routing Routing) *TermsLookupBuilder {
-	rb.v.Routing = &routing
-	return rb
+	return r
 }

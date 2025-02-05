@@ -15,20 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/tokenizationtruncate"
 )
 
 // NlpTokenizationUpdateOptions type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/inference.ts#L315-L320
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/inference.ts#L344-L349
 type NlpTokenizationUpdateOptions struct {
 	// Span Span options to apply
 	Span *int `json:"span,omitempty"`
@@ -36,35 +41,50 @@ type NlpTokenizationUpdateOptions struct {
 	Truncate *tokenizationtruncate.TokenizationTruncate `json:"truncate,omitempty"`
 }
 
-// NlpTokenizationUpdateOptionsBuilder holds NlpTokenizationUpdateOptions struct and provides a builder API.
-type NlpTokenizationUpdateOptionsBuilder struct {
-	v *NlpTokenizationUpdateOptions
-}
+func (s *NlpTokenizationUpdateOptions) UnmarshalJSON(data []byte) error {
 
-// NewNlpTokenizationUpdateOptions provides a builder for the NlpTokenizationUpdateOptions struct.
-func NewNlpTokenizationUpdateOptionsBuilder() *NlpTokenizationUpdateOptionsBuilder {
-	r := NlpTokenizationUpdateOptionsBuilder{
-		&NlpTokenizationUpdateOptions{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "span":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Span", err)
+				}
+				s.Span = &value
+			case float64:
+				f := int(v)
+				s.Span = &f
+			}
+
+		case "truncate":
+			if err := dec.Decode(&s.Truncate); err != nil {
+				return fmt.Errorf("%s | %w", "Truncate", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the NlpTokenizationUpdateOptions struct
-func (rb *NlpTokenizationUpdateOptionsBuilder) Build() NlpTokenizationUpdateOptions {
-	return *rb.v
-}
+// NewNlpTokenizationUpdateOptions returns a NlpTokenizationUpdateOptions.
+func NewNlpTokenizationUpdateOptions() *NlpTokenizationUpdateOptions {
+	r := &NlpTokenizationUpdateOptions{}
 
-// Span Span options to apply
-
-func (rb *NlpTokenizationUpdateOptionsBuilder) Span(span int) *NlpTokenizationUpdateOptionsBuilder {
-	rb.v.Span = &span
-	return rb
-}
-
-// Truncate Truncate options to apply
-
-func (rb *NlpTokenizationUpdateOptionsBuilder) Truncate(truncate tokenizationtruncate.TokenizationTruncate) *NlpTokenizationUpdateOptionsBuilder {
-	rb.v.Truncate = &truncate
-	return rb
+	return r
 }

@@ -15,52 +15,100 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // MlDataFrameAnalyticsJobsAnalysis type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/usage/types.ts#L175-L179
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/xpack/usage/types.ts#L182-L186
 type MlDataFrameAnalyticsJobsAnalysis struct {
 	Classification   *int `json:"classification,omitempty"`
 	OutlierDetection *int `json:"outlier_detection,omitempty"`
 	Regression       *int `json:"regression,omitempty"`
 }
 
-// MlDataFrameAnalyticsJobsAnalysisBuilder holds MlDataFrameAnalyticsJobsAnalysis struct and provides a builder API.
-type MlDataFrameAnalyticsJobsAnalysisBuilder struct {
-	v *MlDataFrameAnalyticsJobsAnalysis
-}
+func (s *MlDataFrameAnalyticsJobsAnalysis) UnmarshalJSON(data []byte) error {
 
-// NewMlDataFrameAnalyticsJobsAnalysis provides a builder for the MlDataFrameAnalyticsJobsAnalysis struct.
-func NewMlDataFrameAnalyticsJobsAnalysisBuilder() *MlDataFrameAnalyticsJobsAnalysisBuilder {
-	r := MlDataFrameAnalyticsJobsAnalysisBuilder{
-		&MlDataFrameAnalyticsJobsAnalysis{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "classification":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Classification", err)
+				}
+				s.Classification = &value
+			case float64:
+				f := int(v)
+				s.Classification = &f
+			}
+
+		case "outlier_detection":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "OutlierDetection", err)
+				}
+				s.OutlierDetection = &value
+			case float64:
+				f := int(v)
+				s.OutlierDetection = &f
+			}
+
+		case "regression":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Regression", err)
+				}
+				s.Regression = &value
+			case float64:
+				f := int(v)
+				s.Regression = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the MlDataFrameAnalyticsJobsAnalysis struct
-func (rb *MlDataFrameAnalyticsJobsAnalysisBuilder) Build() MlDataFrameAnalyticsJobsAnalysis {
-	return *rb.v
-}
+// NewMlDataFrameAnalyticsJobsAnalysis returns a MlDataFrameAnalyticsJobsAnalysis.
+func NewMlDataFrameAnalyticsJobsAnalysis() *MlDataFrameAnalyticsJobsAnalysis {
+	r := &MlDataFrameAnalyticsJobsAnalysis{}
 
-func (rb *MlDataFrameAnalyticsJobsAnalysisBuilder) Classification(classification int) *MlDataFrameAnalyticsJobsAnalysisBuilder {
-	rb.v.Classification = &classification
-	return rb
-}
-
-func (rb *MlDataFrameAnalyticsJobsAnalysisBuilder) OutlierDetection(outlierdetection int) *MlDataFrameAnalyticsJobsAnalysisBuilder {
-	rb.v.OutlierDetection = &outlierdetection
-	return rb
-}
-
-func (rb *MlDataFrameAnalyticsJobsAnalysisBuilder) Regression(regression int) *MlDataFrameAnalyticsJobsAnalysisBuilder {
-	rb.v.Regression = &regression
-	return rb
+	return r
 }

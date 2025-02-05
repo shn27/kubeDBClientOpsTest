@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ShardQueryCache type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/stats/types.ts#L134-L142
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/stats/types.ts#L146-L154
 type ShardQueryCache struct {
 	CacheCount        int64 `json:"cache_count"`
 	CacheSize         int64 `json:"cache_size"`
@@ -35,56 +42,134 @@ type ShardQueryCache struct {
 	TotalCount        int64 `json:"total_count"`
 }
 
-// ShardQueryCacheBuilder holds ShardQueryCache struct and provides a builder API.
-type ShardQueryCacheBuilder struct {
-	v *ShardQueryCache
-}
+func (s *ShardQueryCache) UnmarshalJSON(data []byte) error {
 
-// NewShardQueryCache provides a builder for the ShardQueryCache struct.
-func NewShardQueryCacheBuilder() *ShardQueryCacheBuilder {
-	r := ShardQueryCacheBuilder{
-		&ShardQueryCache{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "cache_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CacheCount", err)
+				}
+				s.CacheCount = value
+			case float64:
+				f := int64(v)
+				s.CacheCount = f
+			}
+
+		case "cache_size":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CacheSize", err)
+				}
+				s.CacheSize = value
+			case float64:
+				f := int64(v)
+				s.CacheSize = f
+			}
+
+		case "evictions":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Evictions", err)
+				}
+				s.Evictions = value
+			case float64:
+				f := int64(v)
+				s.Evictions = f
+			}
+
+		case "hit_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "HitCount", err)
+				}
+				s.HitCount = value
+			case float64:
+				f := int64(v)
+				s.HitCount = f
+			}
+
+		case "memory_size_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MemorySizeInBytes", err)
+				}
+				s.MemorySizeInBytes = value
+			case float64:
+				f := int64(v)
+				s.MemorySizeInBytes = f
+			}
+
+		case "miss_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MissCount", err)
+				}
+				s.MissCount = value
+			case float64:
+				f := int64(v)
+				s.MissCount = f
+			}
+
+		case "total_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TotalCount", err)
+				}
+				s.TotalCount = value
+			case float64:
+				f := int64(v)
+				s.TotalCount = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ShardQueryCache struct
-func (rb *ShardQueryCacheBuilder) Build() ShardQueryCache {
-	return *rb.v
-}
+// NewShardQueryCache returns a ShardQueryCache.
+func NewShardQueryCache() *ShardQueryCache {
+	r := &ShardQueryCache{}
 
-func (rb *ShardQueryCacheBuilder) CacheCount(cachecount int64) *ShardQueryCacheBuilder {
-	rb.v.CacheCount = cachecount
-	return rb
-}
-
-func (rb *ShardQueryCacheBuilder) CacheSize(cachesize int64) *ShardQueryCacheBuilder {
-	rb.v.CacheSize = cachesize
-	return rb
-}
-
-func (rb *ShardQueryCacheBuilder) Evictions(evictions int64) *ShardQueryCacheBuilder {
-	rb.v.Evictions = evictions
-	return rb
-}
-
-func (rb *ShardQueryCacheBuilder) HitCount(hitcount int64) *ShardQueryCacheBuilder {
-	rb.v.HitCount = hitcount
-	return rb
-}
-
-func (rb *ShardQueryCacheBuilder) MemorySizeInBytes(memorysizeinbytes int64) *ShardQueryCacheBuilder {
-	rb.v.MemorySizeInBytes = memorysizeinbytes
-	return rb
-}
-
-func (rb *ShardQueryCacheBuilder) MissCount(misscount int64) *ShardQueryCacheBuilder {
-	rb.v.MissCount = misscount
-	return rb
-}
-
-func (rb *ShardQueryCacheBuilder) TotalCount(totalcount int64) *ShardQueryCacheBuilder {
-	rb.v.TotalCount = totalcount
-	return rb
+	return r
 }

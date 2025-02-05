@@ -15,109 +15,127 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // SpanQuery type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/span.ts#L79-L91
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/span.ts#L158-L200
 type SpanQuery struct {
-	FieldMaskingSpan *SpanFieldMaskingQuery  `json:"field_masking_span,omitempty"`
-	SpanContaining   *SpanContainingQuery    `json:"span_containing,omitempty"`
-	SpanFirst        *SpanFirstQuery         `json:"span_first,omitempty"`
-	SpanGap          *SpanGapQuery           `json:"span_gap,omitempty"`
-	SpanMulti        *SpanMultiTermQuery     `json:"span_multi,omitempty"`
-	SpanNear         *SpanNearQuery          `json:"span_near,omitempty"`
-	SpanNot          *SpanNotQuery           `json:"span_not,omitempty"`
-	SpanOr           *SpanOrQuery            `json:"span_or,omitempty"`
-	SpanTerm         map[Field]SpanTermQuery `json:"span_term,omitempty"`
-	SpanWithin       *SpanWithinQuery        `json:"span_within,omitempty"`
+	// SpanContaining Accepts a list of span queries, but only returns those spans which also match
+	// a second span query.
+	SpanContaining *SpanContainingQuery `json:"span_containing,omitempty"`
+	// SpanFieldMasking Allows queries like `span_near` or `span_or` across different fields.
+	SpanFieldMasking *SpanFieldMaskingQuery `json:"span_field_masking,omitempty"`
+	// SpanFirst Accepts another span query whose matches must appear within the first N
+	// positions of the field.
+	SpanFirst *SpanFirstQuery `json:"span_first,omitempty"`
+	SpanGap   SpanGapQuery    `json:"span_gap,omitempty"`
+	// SpanMulti Wraps a `term`, `range`, `prefix`, `wildcard`, `regexp`, or `fuzzy` query.
+	SpanMulti *SpanMultiTermQuery `json:"span_multi,omitempty"`
+	// SpanNear Accepts multiple span queries whose matches must be within the specified
+	// distance of each other, and possibly in the same order.
+	SpanNear *SpanNearQuery `json:"span_near,omitempty"`
+	// SpanNot Wraps another span query, and excludes any documents which match that query.
+	SpanNot *SpanNotQuery `json:"span_not,omitempty"`
+	// SpanOr Combines multiple span queries and returns documents which match any of the
+	// specified queries.
+	SpanOr *SpanOrQuery `json:"span_or,omitempty"`
+	// SpanTerm The equivalent of the `term` query but for use with other span queries.
+	SpanTerm map[string]SpanTermQuery `json:"span_term,omitempty"`
+	// SpanWithin The result from a single span query is returned as long is its span falls
+	// within the spans returned by a list of other span queries.
+	SpanWithin *SpanWithinQuery `json:"span_within,omitempty"`
 }
 
-// SpanQueryBuilder holds SpanQuery struct and provides a builder API.
-type SpanQueryBuilder struct {
-	v *SpanQuery
+func (s *SpanQuery) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "span_containing":
+			if err := dec.Decode(&s.SpanContaining); err != nil {
+				return fmt.Errorf("%s | %w", "SpanContaining", err)
+			}
+
+		case "span_field_masking":
+			if err := dec.Decode(&s.SpanFieldMasking); err != nil {
+				return fmt.Errorf("%s | %w", "SpanFieldMasking", err)
+			}
+
+		case "span_first":
+			if err := dec.Decode(&s.SpanFirst); err != nil {
+				return fmt.Errorf("%s | %w", "SpanFirst", err)
+			}
+
+		case "span_gap":
+			if err := dec.Decode(&s.SpanGap); err != nil {
+				return fmt.Errorf("%s | %w", "SpanGap", err)
+			}
+
+		case "span_multi":
+			if err := dec.Decode(&s.SpanMulti); err != nil {
+				return fmt.Errorf("%s | %w", "SpanMulti", err)
+			}
+
+		case "span_near":
+			if err := dec.Decode(&s.SpanNear); err != nil {
+				return fmt.Errorf("%s | %w", "SpanNear", err)
+			}
+
+		case "span_not":
+			if err := dec.Decode(&s.SpanNot); err != nil {
+				return fmt.Errorf("%s | %w", "SpanNot", err)
+			}
+
+		case "span_or":
+			if err := dec.Decode(&s.SpanOr); err != nil {
+				return fmt.Errorf("%s | %w", "SpanOr", err)
+			}
+
+		case "span_term":
+			if s.SpanTerm == nil {
+				s.SpanTerm = make(map[string]SpanTermQuery, 0)
+			}
+			if err := dec.Decode(&s.SpanTerm); err != nil {
+				return fmt.Errorf("%s | %w", "SpanTerm", err)
+			}
+
+		case "span_within":
+			if err := dec.Decode(&s.SpanWithin); err != nil {
+				return fmt.Errorf("%s | %w", "SpanWithin", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewSpanQuery provides a builder for the SpanQuery struct.
-func NewSpanQueryBuilder() *SpanQueryBuilder {
-	r := SpanQueryBuilder{
-		&SpanQuery{
-			SpanTerm: make(map[Field]SpanTermQuery, 0),
-		},
+// NewSpanQuery returns a SpanQuery.
+func NewSpanQuery() *SpanQuery {
+	r := &SpanQuery{
+		SpanTerm: make(map[string]SpanTermQuery, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the SpanQuery struct
-func (rb *SpanQueryBuilder) Build() SpanQuery {
-	return *rb.v
-}
-
-func (rb *SpanQueryBuilder) FieldMaskingSpan(fieldmaskingspan *SpanFieldMaskingQueryBuilder) *SpanQueryBuilder {
-	v := fieldmaskingspan.Build()
-	rb.v.FieldMaskingSpan = &v
-	return rb
-}
-
-func (rb *SpanQueryBuilder) SpanContaining(spancontaining *SpanContainingQueryBuilder) *SpanQueryBuilder {
-	v := spancontaining.Build()
-	rb.v.SpanContaining = &v
-	return rb
-}
-
-func (rb *SpanQueryBuilder) SpanFirst(spanfirst *SpanFirstQueryBuilder) *SpanQueryBuilder {
-	v := spanfirst.Build()
-	rb.v.SpanFirst = &v
-	return rb
-}
-
-func (rb *SpanQueryBuilder) SpanGap(spangap *SpanGapQueryBuilder) *SpanQueryBuilder {
-	v := spangap.Build()
-	rb.v.SpanGap = &v
-	return rb
-}
-
-func (rb *SpanQueryBuilder) SpanMulti(spanmulti *SpanMultiTermQueryBuilder) *SpanQueryBuilder {
-	v := spanmulti.Build()
-	rb.v.SpanMulti = &v
-	return rb
-}
-
-func (rb *SpanQueryBuilder) SpanNear(spannear *SpanNearQueryBuilder) *SpanQueryBuilder {
-	v := spannear.Build()
-	rb.v.SpanNear = &v
-	return rb
-}
-
-func (rb *SpanQueryBuilder) SpanNot(spannot *SpanNotQueryBuilder) *SpanQueryBuilder {
-	v := spannot.Build()
-	rb.v.SpanNot = &v
-	return rb
-}
-
-func (rb *SpanQueryBuilder) SpanOr(spanor *SpanOrQueryBuilder) *SpanQueryBuilder {
-	v := spanor.Build()
-	rb.v.SpanOr = &v
-	return rb
-}
-
-func (rb *SpanQueryBuilder) SpanTerm(values map[Field]*SpanTermQueryBuilder) *SpanQueryBuilder {
-	tmp := make(map[Field]SpanTermQuery, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.SpanTerm = tmp
-	return rb
-}
-
-func (rb *SpanQueryBuilder) SpanWithin(spanwithin *SpanWithinQueryBuilder) *SpanQueryBuilder {
-	v := spanwithin.Build()
-	rb.v.SpanWithin = &v
-	return rb
+	return r
 }

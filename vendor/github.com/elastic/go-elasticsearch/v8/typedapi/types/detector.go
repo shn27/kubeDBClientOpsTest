@@ -15,25 +15,30 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/excludefrequent"
 )
 
 // Detector type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/Detector.ts#L25-L67
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/Detector.ts#L25-L67
 type Detector struct {
 	// ByFieldName The field used to split the data. In particular, this property is used for
 	// analyzing the splits with respect to their own history. It is used for
 	// finding unusual values in the context of the split.
-	ByFieldName *Field `json:"by_field_name,omitempty"`
+	ByFieldName *string `json:"by_field_name,omitempty"`
 	// CustomRules Custom rules enable you to customize the way detectors operate. For example,
 	// a rule may dictate conditions under which results should be skipped. Kibana
 	// refers to custom rules as job rules.
@@ -52,127 +57,129 @@ type Detector struct {
 	// FieldName The field that the detector uses in the function. If you use an event rate
 	// function such as count or rare, do not specify this field. The `field_name`
 	// cannot contain double quotes or backslashes.
-	FieldName *Field `json:"field_name,omitempty"`
+	FieldName *string `json:"field_name,omitempty"`
 	// Function The analysis function that is used. For example, `count`, `rare`, `mean`,
 	// `min`, `max`, or `sum`.
-	Function string `json:"function"`
+	Function *string `json:"function,omitempty"`
 	// OverFieldName The field used to split the data. In particular, this property is used for
 	// analyzing the splits with respect to the history of all splits. It is used
 	// for finding unusual values in the population of all splits.
-	OverFieldName *Field `json:"over_field_name,omitempty"`
+	OverFieldName *string `json:"over_field_name,omitempty"`
 	// PartitionFieldName The field used to segment the analysis. When you use this property, you have
 	// completely independent baselines for each value of this field.
-	PartitionFieldName *Field `json:"partition_field_name,omitempty"`
+	PartitionFieldName *string `json:"partition_field_name,omitempty"`
 	// UseNull Defines whether a new series is used as the null series when there is no
 	// value for the by or partition fields.
 	UseNull *bool `json:"use_null,omitempty"`
 }
 
-// DetectorBuilder holds Detector struct and provides a builder API.
-type DetectorBuilder struct {
-	v *Detector
-}
+func (s *Detector) UnmarshalJSON(data []byte) error {
 
-// NewDetector provides a builder for the Detector struct.
-func NewDetectorBuilder() *DetectorBuilder {
-	r := DetectorBuilder{
-		&Detector{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "by_field_name":
+			if err := dec.Decode(&s.ByFieldName); err != nil {
+				return fmt.Errorf("%s | %w", "ByFieldName", err)
+			}
+
+		case "custom_rules":
+			if err := dec.Decode(&s.CustomRules); err != nil {
+				return fmt.Errorf("%s | %w", "CustomRules", err)
+			}
+
+		case "detector_description":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "DetectorDescription", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.DetectorDescription = &o
+
+		case "detector_index":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DetectorIndex", err)
+				}
+				s.DetectorIndex = &value
+			case float64:
+				f := int(v)
+				s.DetectorIndex = &f
+			}
+
+		case "exclude_frequent":
+			if err := dec.Decode(&s.ExcludeFrequent); err != nil {
+				return fmt.Errorf("%s | %w", "ExcludeFrequent", err)
+			}
+
+		case "field_name":
+			if err := dec.Decode(&s.FieldName); err != nil {
+				return fmt.Errorf("%s | %w", "FieldName", err)
+			}
+
+		case "function":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Function", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Function = &o
+
+		case "over_field_name":
+			if err := dec.Decode(&s.OverFieldName); err != nil {
+				return fmt.Errorf("%s | %w", "OverFieldName", err)
+			}
+
+		case "partition_field_name":
+			if err := dec.Decode(&s.PartitionFieldName); err != nil {
+				return fmt.Errorf("%s | %w", "PartitionFieldName", err)
+			}
+
+		case "use_null":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "UseNull", err)
+				}
+				s.UseNull = &value
+			case bool:
+				s.UseNull = &v
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the Detector struct
-func (rb *DetectorBuilder) Build() Detector {
-	return *rb.v
-}
+// NewDetector returns a Detector.
+func NewDetector() *Detector {
+	r := &Detector{}
 
-// ByFieldName The field used to split the data. In particular, this property is used for
-// analyzing the splits with respect to their own history. It is used for
-// finding unusual values in the context of the split.
-
-func (rb *DetectorBuilder) ByFieldName(byfieldname Field) *DetectorBuilder {
-	rb.v.ByFieldName = &byfieldname
-	return rb
-}
-
-// CustomRules Custom rules enable you to customize the way detectors operate. For example,
-// a rule may dictate conditions under which results should be skipped. Kibana
-// refers to custom rules as job rules.
-
-func (rb *DetectorBuilder) CustomRules(custom_rules []DetectionRuleBuilder) *DetectorBuilder {
-	tmp := make([]DetectionRule, len(custom_rules))
-	for _, value := range custom_rules {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.CustomRules = tmp
-	return rb
-}
-
-// DetectorDescription A description of the detector.
-
-func (rb *DetectorBuilder) DetectorDescription(detectordescription string) *DetectorBuilder {
-	rb.v.DetectorDescription = &detectordescription
-	return rb
-}
-
-// DetectorIndex A unique identifier for the detector. This identifier is based on the order
-// of the detectors in the `analysis_config`, starting at zero. If you specify a
-// value for this property, it is ignored.
-
-func (rb *DetectorBuilder) DetectorIndex(detectorindex int) *DetectorBuilder {
-	rb.v.DetectorIndex = &detectorindex
-	return rb
-}
-
-// ExcludeFrequent If set, frequent entities are excluded from influencing the anomaly results.
-// Entities can be considered frequent over time or frequent in a population. If
-// you are working with both over and by fields, you can set `exclude_frequent`
-// to `all` for both fields, or to `by` or `over` for those specific fields.
-
-func (rb *DetectorBuilder) ExcludeFrequent(excludefrequent excludefrequent.ExcludeFrequent) *DetectorBuilder {
-	rb.v.ExcludeFrequent = &excludefrequent
-	return rb
-}
-
-// FieldName The field that the detector uses in the function. If you use an event rate
-// function such as count or rare, do not specify this field. The `field_name`
-// cannot contain double quotes or backslashes.
-
-func (rb *DetectorBuilder) FieldName(fieldname Field) *DetectorBuilder {
-	rb.v.FieldName = &fieldname
-	return rb
-}
-
-// Function The analysis function that is used. For example, `count`, `rare`, `mean`,
-// `min`, `max`, or `sum`.
-
-func (rb *DetectorBuilder) Function(function string) *DetectorBuilder {
-	rb.v.Function = function
-	return rb
-}
-
-// OverFieldName The field used to split the data. In particular, this property is used for
-// analyzing the splits with respect to the history of all splits. It is used
-// for finding unusual values in the population of all splits.
-
-func (rb *DetectorBuilder) OverFieldName(overfieldname Field) *DetectorBuilder {
-	rb.v.OverFieldName = &overfieldname
-	return rb
-}
-
-// PartitionFieldName The field used to segment the analysis. When you use this property, you have
-// completely independent baselines for each value of this field.
-
-func (rb *DetectorBuilder) PartitionFieldName(partitionfieldname Field) *DetectorBuilder {
-	rb.v.PartitionFieldName = &partitionfieldname
-	return rb
-}
-
-// UseNull Defines whether a new series is used as the null series when there is no
-// value for the by or partition fields.
-
-func (rb *DetectorBuilder) UseNull(usenull bool) *DetectorBuilder {
-	rb.v.UseNull = &usenull
-	return rb
+	return r
 }

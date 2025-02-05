@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // SlackAttachment type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Actions.ts#L101-L117
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Actions.ts#L101-L117
 type SlackAttachment struct {
 	AuthorIcon *string                `json:"author_icon,omitempty"`
 	AuthorLink *string                `json:"author_link,omitempty"`
@@ -40,104 +47,198 @@ type SlackAttachment struct {
 	ThumbUrl   *string                `json:"thumb_url,omitempty"`
 	Title      string                 `json:"title"`
 	TitleLink  *string                `json:"title_link,omitempty"`
-	Ts         *EpochTimeUnitSeconds  `json:"ts,omitempty"`
+	Ts         *int64                 `json:"ts,omitempty"`
 }
 
-// SlackAttachmentBuilder holds SlackAttachment struct and provides a builder API.
-type SlackAttachmentBuilder struct {
-	v *SlackAttachment
-}
+func (s *SlackAttachment) UnmarshalJSON(data []byte) error {
 
-// NewSlackAttachment provides a builder for the SlackAttachment struct.
-func NewSlackAttachmentBuilder() *SlackAttachmentBuilder {
-	r := SlackAttachmentBuilder{
-		&SlackAttachment{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "author_icon":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "AuthorIcon", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.AuthorIcon = &o
+
+		case "author_link":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "AuthorLink", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.AuthorLink = &o
+
+		case "author_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "AuthorName", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.AuthorName = o
+
+		case "color":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Color", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Color = &o
+
+		case "fallback":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Fallback", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Fallback = &o
+
+		case "fields":
+			if err := dec.Decode(&s.Fields); err != nil {
+				return fmt.Errorf("%s | %w", "Fields", err)
+			}
+
+		case "footer":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Footer", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Footer = &o
+
+		case "footer_icon":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "FooterIcon", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.FooterIcon = &o
+
+		case "image_url":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ImageUrl", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ImageUrl = &o
+
+		case "pretext":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Pretext", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Pretext = &o
+
+		case "text":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Text", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Text = &o
+
+		case "thumb_url":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ThumbUrl", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ThumbUrl = &o
+
+		case "title":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Title", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Title = o
+
+		case "title_link":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "TitleLink", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.TitleLink = &o
+
+		case "ts":
+			if err := dec.Decode(&s.Ts); err != nil {
+				return fmt.Errorf("%s | %w", "Ts", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SlackAttachment struct
-func (rb *SlackAttachmentBuilder) Build() SlackAttachment {
-	return *rb.v
-}
+// NewSlackAttachment returns a SlackAttachment.
+func NewSlackAttachment() *SlackAttachment {
+	r := &SlackAttachment{}
 
-func (rb *SlackAttachmentBuilder) AuthorIcon(authoricon string) *SlackAttachmentBuilder {
-	rb.v.AuthorIcon = &authoricon
-	return rb
-}
-
-func (rb *SlackAttachmentBuilder) AuthorLink(authorlink string) *SlackAttachmentBuilder {
-	rb.v.AuthorLink = &authorlink
-	return rb
-}
-
-func (rb *SlackAttachmentBuilder) AuthorName(authorname string) *SlackAttachmentBuilder {
-	rb.v.AuthorName = authorname
-	return rb
-}
-
-func (rb *SlackAttachmentBuilder) Color(color string) *SlackAttachmentBuilder {
-	rb.v.Color = &color
-	return rb
-}
-
-func (rb *SlackAttachmentBuilder) Fallback(fallback string) *SlackAttachmentBuilder {
-	rb.v.Fallback = &fallback
-	return rb
-}
-
-func (rb *SlackAttachmentBuilder) Fields(fields []SlackAttachmentFieldBuilder) *SlackAttachmentBuilder {
-	tmp := make([]SlackAttachmentField, len(fields))
-	for _, value := range fields {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Fields = tmp
-	return rb
-}
-
-func (rb *SlackAttachmentBuilder) Footer(footer string) *SlackAttachmentBuilder {
-	rb.v.Footer = &footer
-	return rb
-}
-
-func (rb *SlackAttachmentBuilder) FooterIcon(footericon string) *SlackAttachmentBuilder {
-	rb.v.FooterIcon = &footericon
-	return rb
-}
-
-func (rb *SlackAttachmentBuilder) ImageUrl(imageurl string) *SlackAttachmentBuilder {
-	rb.v.ImageUrl = &imageurl
-	return rb
-}
-
-func (rb *SlackAttachmentBuilder) Pretext(pretext string) *SlackAttachmentBuilder {
-	rb.v.Pretext = &pretext
-	return rb
-}
-
-func (rb *SlackAttachmentBuilder) Text(text string) *SlackAttachmentBuilder {
-	rb.v.Text = &text
-	return rb
-}
-
-func (rb *SlackAttachmentBuilder) ThumbUrl(thumburl string) *SlackAttachmentBuilder {
-	rb.v.ThumbUrl = &thumburl
-	return rb
-}
-
-func (rb *SlackAttachmentBuilder) Title(title string) *SlackAttachmentBuilder {
-	rb.v.Title = title
-	return rb
-}
-
-func (rb *SlackAttachmentBuilder) TitleLink(titlelink string) *SlackAttachmentBuilder {
-	rb.v.TitleLink = &titlelink
-	return rb
-}
-
-func (rb *SlackAttachmentBuilder) Ts(ts *EpochTimeUnitSecondsBuilder) *SlackAttachmentBuilder {
-	v := ts.Build()
-	rb.v.Ts = &v
-	return rb
+	return r
 }

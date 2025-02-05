@@ -15,19 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package language
 package language
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/languages.ts#L20-L55
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/languages.ts#L20-L55
 type Language struct {
-	name string
+	Name string
 }
 
 var (
@@ -105,7 +103,7 @@ func (l Language) MarshalText() (text []byte, err error) {
 }
 
 func (l *Language) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
 	case "Arabic":
 		*l = Arabic
@@ -183,5 +181,5 @@ func (l *Language) UnmarshalText(text []byte) error {
 }
 
 func (l Language) String() string {
-	return l.name
+	return l.Name
 }

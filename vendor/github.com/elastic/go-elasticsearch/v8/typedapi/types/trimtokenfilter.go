@@ -15,43 +15,73 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // TrimTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L324-L326
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L327-L329
 type TrimTokenFilter struct {
-	Type    string         `json:"type,omitempty"`
-	Version *VersionString `json:"version,omitempty"`
+	Type    string  `json:"type,omitempty"`
+	Version *string `json:"version,omitempty"`
 }
 
-// TrimTokenFilterBuilder holds TrimTokenFilter struct and provides a builder API.
-type TrimTokenFilterBuilder struct {
-	v *TrimTokenFilter
+func (s *TrimTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewTrimTokenFilter provides a builder for the TrimTokenFilter struct.
-func NewTrimTokenFilterBuilder() *TrimTokenFilterBuilder {
-	r := TrimTokenFilterBuilder{
-		&TrimTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s TrimTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerTrimTokenFilter TrimTokenFilter
+	tmp := innerTrimTokenFilter{
+		Type:    s.Type,
+		Version: s.Version,
 	}
 
-	r.v.Type = "trim"
+	tmp.Type = "trim"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the TrimTokenFilter struct
-func (rb *TrimTokenFilterBuilder) Build() TrimTokenFilter {
-	return *rb.v
-}
+// NewTrimTokenFilter returns a TrimTokenFilter.
+func NewTrimTokenFilter() *TrimTokenFilter {
+	r := &TrimTokenFilter{}
 
-func (rb *TrimTokenFilterBuilder) Version(version VersionString) *TrimTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

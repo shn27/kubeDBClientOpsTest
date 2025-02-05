@@ -15,55 +15,95 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // MappingCharFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/char_filters.ts#L47-L51
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/char_filters.ts#L51-L55
 type MappingCharFilter struct {
-	Mappings     []string       `json:"mappings,omitempty"`
-	MappingsPath *string        `json:"mappings_path,omitempty"`
-	Type         string         `json:"type,omitempty"`
-	Version      *VersionString `json:"version,omitempty"`
+	Mappings     []string `json:"mappings,omitempty"`
+	MappingsPath *string  `json:"mappings_path,omitempty"`
+	Type         string   `json:"type,omitempty"`
+	Version      *string  `json:"version,omitempty"`
 }
 
-// MappingCharFilterBuilder holds MappingCharFilter struct and provides a builder API.
-type MappingCharFilterBuilder struct {
-	v *MappingCharFilter
+func (s *MappingCharFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "mappings":
+			if err := dec.Decode(&s.Mappings); err != nil {
+				return fmt.Errorf("%s | %w", "Mappings", err)
+			}
+
+		case "mappings_path":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "MappingsPath", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.MappingsPath = &o
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewMappingCharFilter provides a builder for the MappingCharFilter struct.
-func NewMappingCharFilterBuilder() *MappingCharFilterBuilder {
-	r := MappingCharFilterBuilder{
-		&MappingCharFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s MappingCharFilter) MarshalJSON() ([]byte, error) {
+	type innerMappingCharFilter MappingCharFilter
+	tmp := innerMappingCharFilter{
+		Mappings:     s.Mappings,
+		MappingsPath: s.MappingsPath,
+		Type:         s.Type,
+		Version:      s.Version,
 	}
 
-	r.v.Type = "mapping"
+	tmp.Type = "mapping"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the MappingCharFilter struct
-func (rb *MappingCharFilterBuilder) Build() MappingCharFilter {
-	return *rb.v
-}
+// NewMappingCharFilter returns a MappingCharFilter.
+func NewMappingCharFilter() *MappingCharFilter {
+	r := &MappingCharFilter{}
 
-func (rb *MappingCharFilterBuilder) Mappings(mappings ...string) *MappingCharFilterBuilder {
-	rb.v.Mappings = mappings
-	return rb
-}
-
-func (rb *MappingCharFilterBuilder) MappingsPath(mappingspath string) *MappingCharFilterBuilder {
-	rb.v.MappingsPath = &mappingspath
-	return rb
-}
-
-func (rb *MappingCharFilterBuilder) Version(version VersionString) *MappingCharFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

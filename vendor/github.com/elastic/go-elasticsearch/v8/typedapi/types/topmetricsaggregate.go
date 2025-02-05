@@ -15,51 +15,60 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // TopMetricsAggregate type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L675-L678
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L827-L830
 type TopMetricsAggregate struct {
-	Meta *Metadata    `json:"meta,omitempty"`
+	Meta Metadata     `json:"meta,omitempty"`
 	Top  []TopMetrics `json:"top"`
 }
 
-// TopMetricsAggregateBuilder holds TopMetricsAggregate struct and provides a builder API.
-type TopMetricsAggregateBuilder struct {
-	v *TopMetricsAggregate
-}
+func (s *TopMetricsAggregate) UnmarshalJSON(data []byte) error {
 
-// NewTopMetricsAggregate provides a builder for the TopMetricsAggregate struct.
-func NewTopMetricsAggregateBuilder() *TopMetricsAggregateBuilder {
-	r := TopMetricsAggregateBuilder{
-		&TopMetricsAggregate{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "meta":
+			if err := dec.Decode(&s.Meta); err != nil {
+				return fmt.Errorf("%s | %w", "Meta", err)
+			}
+
+		case "top":
+			if err := dec.Decode(&s.Top); err != nil {
+				return fmt.Errorf("%s | %w", "Top", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TopMetricsAggregate struct
-func (rb *TopMetricsAggregateBuilder) Build() TopMetricsAggregate {
-	return *rb.v
-}
+// NewTopMetricsAggregate returns a TopMetricsAggregate.
+func NewTopMetricsAggregate() *TopMetricsAggregate {
+	r := &TopMetricsAggregate{}
 
-func (rb *TopMetricsAggregateBuilder) Meta(meta *MetadataBuilder) *TopMetricsAggregateBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *TopMetricsAggregateBuilder) Top(top []TopMetricsBuilder) *TopMetricsAggregateBuilder {
-	tmp := make([]TopMetrics, len(top))
-	for _, value := range top {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Top = tmp
-	return rb
+	return r
 }

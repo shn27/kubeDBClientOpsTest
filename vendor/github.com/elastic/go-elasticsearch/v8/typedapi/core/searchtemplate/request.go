@@ -15,57 +15,54 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package searchtemplate
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
-
-	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
+	"io"
+	"strconv"
 )
 
 // Request holds the request body struct for the package searchtemplate
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search_template/SearchTemplateRequest.ts#L32-L96
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search_template/SearchTemplateRequest.ts#L32-L136
 type Request struct {
-	Explain *bool `json:"explain,omitempty"`
 
+	// Explain If `true`, returns detailed information about score calculation as part of
+	// each hit.
+	Explain *bool `json:"explain,omitempty"`
 	// Id ID of the search template to use. If no source is specified,
 	// this parameter is required.
-	Id *types.Id `json:"id,omitempty"`
-
-	Params map[string]interface{} `json:"params,omitempty"`
-
+	Id *string `json:"id,omitempty"`
+	// Params Key-value pairs used to replace Mustache variables in the template.
+	// The key is the variable name.
+	// The value is the variable value.
+	Params map[string]json.RawMessage `json:"params,omitempty"`
+	// Profile If `true`, the query execution is profiled.
 	Profile *bool `json:"profile,omitempty"`
-
 	// Source An inline search template. Supports the same parameters as the search API's
 	// request body. Also supports Mustache variables. If no id is specified, this
 	// parameter is required.
 	Source *string `json:"source,omitempty"`
 }
 
-// RequestBuilder is the builder API for the searchtemplate.Request
-type RequestBuilder struct {
-	v *Request
-}
-
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{
-			Params: make(map[string]interface{}, 0),
-		},
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{
+		Params: make(map[string]json.RawMessage, 0),
 	}
-	return &r
+
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -76,32 +73,74 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) Explain(explain bool) *RequestBuilder {
-	rb.v.Explain = &explain
-	return rb
-}
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
 
-func (rb *RequestBuilder) Id(id types.Id) *RequestBuilder {
-	rb.v.Id = &id
-	return rb
-}
+		switch t {
 
-func (rb *RequestBuilder) Params(value map[string]interface{}) *RequestBuilder {
-	rb.v.Params = value
-	return rb
-}
+		case "explain":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Explain", err)
+				}
+				s.Explain = &value
+			case bool:
+				s.Explain = &v
+			}
 
-func (rb *RequestBuilder) Profile(profile bool) *RequestBuilder {
-	rb.v.Profile = &profile
-	return rb
-}
+		case "id":
+			if err := dec.Decode(&s.Id); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
 
-func (rb *RequestBuilder) Source(source string) *RequestBuilder {
-	rb.v.Source = &source
-	return rb
+		case "params":
+			if s.Params == nil {
+				s.Params = make(map[string]json.RawMessage, 0)
+			}
+			if err := dec.Decode(&s.Params); err != nil {
+				return fmt.Errorf("%s | %w", "Params", err)
+			}
+
+		case "profile":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Profile", err)
+				}
+				s.Profile = &value
+			case bool:
+				s.Profile = &v
+			}
+
+		case "source":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Source", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Source = &o
+
+		}
+	}
+	return nil
 }

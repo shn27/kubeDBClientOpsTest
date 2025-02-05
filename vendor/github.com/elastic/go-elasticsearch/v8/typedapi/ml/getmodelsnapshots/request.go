@@ -15,55 +15,47 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package getmodelsnapshots
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"strconv"
 
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 )
 
 // Request holds the request body struct for the package getmodelsnapshots
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/get_model_snapshots/MlGetModelSnapshotsRequest.ts#L26-L96
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/get_model_snapshots/MlGetModelSnapshotsRequest.ts#L26-L97
 type Request struct {
 
 	// Desc Refer to the description for the `desc` query parameter.
 	Desc *bool `json:"desc,omitempty"`
-
 	// End Refer to the description for the `end` query parameter.
-	End *types.DateTime `json:"end,omitempty"`
-
-	Page *types.Page `json:"page,omitempty"`
-
+	End  types.DateTime `json:"end,omitempty"`
+	Page *types.Page    `json:"page,omitempty"`
 	// Sort Refer to the description for the `sort` query parameter.
-	Sort *types.Field `json:"sort,omitempty"`
-
+	Sort *string `json:"sort,omitempty"`
 	// Start Refer to the description for the `start` query parameter.
-	Start *types.DateTime `json:"start,omitempty"`
+	Start types.DateTime `json:"start,omitempty"`
 }
 
-// RequestBuilder is the builder API for the getmodelsnapshots.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -74,35 +66,55 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) Desc(desc bool) *RequestBuilder {
-	rb.v.Desc = &desc
-	return rb
-}
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
 
-func (rb *RequestBuilder) End(end *types.DateTimeBuilder) *RequestBuilder {
-	v := end.Build()
-	rb.v.End = &v
-	return rb
-}
+		switch t {
 
-func (rb *RequestBuilder) Page(page *types.PageBuilder) *RequestBuilder {
-	v := page.Build()
-	rb.v.Page = &v
-	return rb
-}
+		case "desc":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Desc", err)
+				}
+				s.Desc = &value
+			case bool:
+				s.Desc = &v
+			}
 
-func (rb *RequestBuilder) Sort(sort types.Field) *RequestBuilder {
-	rb.v.Sort = &sort
-	return rb
-}
+		case "end":
+			if err := dec.Decode(&s.End); err != nil {
+				return fmt.Errorf("%s | %w", "End", err)
+			}
 
-func (rb *RequestBuilder) Start(start *types.DateTimeBuilder) *RequestBuilder {
-	v := start.Build()
-	rb.v.Start = &v
-	return rb
+		case "page":
+			if err := dec.Decode(&s.Page); err != nil {
+				return fmt.Errorf("%s | %w", "Page", err)
+			}
+
+		case "sort":
+			if err := dec.Decode(&s.Sort); err != nil {
+				return fmt.Errorf("%s | %w", "Sort", err)
+			}
+
+		case "start":
+			if err := dec.Decode(&s.Start); err != nil {
+				return fmt.Errorf("%s | %w", "Start", err)
+			}
+
+		}
+	}
+	return nil
 }

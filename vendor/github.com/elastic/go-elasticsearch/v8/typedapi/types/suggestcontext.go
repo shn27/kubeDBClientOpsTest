@@ -15,58 +15,87 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // SuggestContext type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/mapping/specialized.ts#L36-L41
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/mapping/specialized.ts#L43-L48
 type SuggestContext struct {
-	Name      Name   `json:"name"`
-	Path      *Field `json:"path,omitempty"`
-	Precision string `json:"precision,omitempty"`
-	Type      string `json:"type"`
+	Name      string  `json:"name"`
+	Path      *string `json:"path,omitempty"`
+	Precision string  `json:"precision,omitempty"`
+	Type      string  `json:"type"`
 }
 
-// SuggestContextBuilder holds SuggestContext struct and provides a builder API.
-type SuggestContextBuilder struct {
-	v *SuggestContext
-}
+func (s *SuggestContext) UnmarshalJSON(data []byte) error {
 
-// NewSuggestContext provides a builder for the SuggestContext struct.
-func NewSuggestContextBuilder() *SuggestContextBuilder {
-	r := SuggestContextBuilder{
-		&SuggestContext{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		case "path":
+			if err := dec.Decode(&s.Path); err != nil {
+				return fmt.Errorf("%s | %w", "Path", err)
+			}
+
+		case "precision":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Precision", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Precision = o
+
+		case "type":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Type = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SuggestContext struct
-func (rb *SuggestContextBuilder) Build() SuggestContext {
-	return *rb.v
-}
+// NewSuggestContext returns a SuggestContext.
+func NewSuggestContext() *SuggestContext {
+	r := &SuggestContext{}
 
-func (rb *SuggestContextBuilder) Name(name Name) *SuggestContextBuilder {
-	rb.v.Name = name
-	return rb
-}
-
-func (rb *SuggestContextBuilder) Path(path Field) *SuggestContextBuilder {
-	rb.v.Path = &path
-	return rb
-}
-
-func (rb *SuggestContextBuilder) Precision(arg string) *SuggestContextBuilder {
-	rb.v.Precision = arg
-	return rb
-}
-
-func (rb *SuggestContextBuilder) Type_(type_ string) *SuggestContextBuilder {
-	rb.v.Type = type_
-	return rb
+	return r
 }

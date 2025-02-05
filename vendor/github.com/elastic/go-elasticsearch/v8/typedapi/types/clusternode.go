@@ -15,40 +15,54 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // ClusterNode type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/_types/ClusterNode.ts#L22-L24
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/_types/ClusterNode.ts#L22-L24
 type ClusterNode struct {
-	Name Name `json:"name"`
+	Name string `json:"name"`
 }
 
-// ClusterNodeBuilder holds ClusterNode struct and provides a builder API.
-type ClusterNodeBuilder struct {
-	v *ClusterNode
-}
+func (s *ClusterNode) UnmarshalJSON(data []byte) error {
 
-// NewClusterNode provides a builder for the ClusterNode struct.
-func NewClusterNodeBuilder() *ClusterNodeBuilder {
-	r := ClusterNodeBuilder{
-		&ClusterNode{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ClusterNode struct
-func (rb *ClusterNodeBuilder) Build() ClusterNode {
-	return *rb.v
-}
+// NewClusterNode returns a ClusterNode.
+func NewClusterNode() *ClusterNode {
+	r := &ClusterNode{}
 
-func (rb *ClusterNodeBuilder) Name(name Name) *ClusterNodeBuilder {
-	rb.v.Name = name
-	return rb
+	return r
 }

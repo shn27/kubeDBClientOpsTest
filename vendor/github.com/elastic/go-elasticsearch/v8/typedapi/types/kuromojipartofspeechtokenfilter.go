@@ -15,49 +15,80 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // KuromojiPartOfSpeechTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/kuromoji-plugin.ts#L37-L40
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/kuromoji-plugin.ts#L37-L40
 type KuromojiPartOfSpeechTokenFilter struct {
-	Stoptags []string       `json:"stoptags"`
-	Type     string         `json:"type,omitempty"`
-	Version  *VersionString `json:"version,omitempty"`
+	Stoptags []string `json:"stoptags"`
+	Type     string   `json:"type,omitempty"`
+	Version  *string  `json:"version,omitempty"`
 }
 
-// KuromojiPartOfSpeechTokenFilterBuilder holds KuromojiPartOfSpeechTokenFilter struct and provides a builder API.
-type KuromojiPartOfSpeechTokenFilterBuilder struct {
-	v *KuromojiPartOfSpeechTokenFilter
+func (s *KuromojiPartOfSpeechTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "stoptags":
+			if err := dec.Decode(&s.Stoptags); err != nil {
+				return fmt.Errorf("%s | %w", "Stoptags", err)
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewKuromojiPartOfSpeechTokenFilter provides a builder for the KuromojiPartOfSpeechTokenFilter struct.
-func NewKuromojiPartOfSpeechTokenFilterBuilder() *KuromojiPartOfSpeechTokenFilterBuilder {
-	r := KuromojiPartOfSpeechTokenFilterBuilder{
-		&KuromojiPartOfSpeechTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s KuromojiPartOfSpeechTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerKuromojiPartOfSpeechTokenFilter KuromojiPartOfSpeechTokenFilter
+	tmp := innerKuromojiPartOfSpeechTokenFilter{
+		Stoptags: s.Stoptags,
+		Type:     s.Type,
+		Version:  s.Version,
 	}
 
-	r.v.Type = "kuromoji_part_of_speech"
+	tmp.Type = "kuromoji_part_of_speech"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the KuromojiPartOfSpeechTokenFilter struct
-func (rb *KuromojiPartOfSpeechTokenFilterBuilder) Build() KuromojiPartOfSpeechTokenFilter {
-	return *rb.v
-}
+// NewKuromojiPartOfSpeechTokenFilter returns a KuromojiPartOfSpeechTokenFilter.
+func NewKuromojiPartOfSpeechTokenFilter() *KuromojiPartOfSpeechTokenFilter {
+	r := &KuromojiPartOfSpeechTokenFilter{}
 
-func (rb *KuromojiPartOfSpeechTokenFilterBuilder) Stoptags(stoptags ...string) *KuromojiPartOfSpeechTokenFilterBuilder {
-	rb.v.Stoptags = stoptags
-	return rb
-}
-
-func (rb *KuromojiPartOfSpeechTokenFilterBuilder) Version(version VersionString) *KuromojiPartOfSpeechTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

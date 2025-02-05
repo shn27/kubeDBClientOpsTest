@@ -15,41 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // SecurityRolesDls type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/usage/types.ts#L291-L293
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/xpack/usage/types.ts#L306-L308
 type SecurityRolesDls struct {
 	BitSetCache SecurityRolesDlsBitSetCache `json:"bit_set_cache"`
 }
 
-// SecurityRolesDlsBuilder holds SecurityRolesDls struct and provides a builder API.
-type SecurityRolesDlsBuilder struct {
-	v *SecurityRolesDls
-}
+// NewSecurityRolesDls returns a SecurityRolesDls.
+func NewSecurityRolesDls() *SecurityRolesDls {
+	r := &SecurityRolesDls{}
 
-// NewSecurityRolesDls provides a builder for the SecurityRolesDls struct.
-func NewSecurityRolesDlsBuilder() *SecurityRolesDlsBuilder {
-	r := SecurityRolesDlsBuilder{
-		&SecurityRolesDls{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the SecurityRolesDls struct
-func (rb *SecurityRolesDlsBuilder) Build() SecurityRolesDls {
-	return *rb.v
-}
-
-func (rb *SecurityRolesDlsBuilder) BitSetCache(bitsetcache *SecurityRolesDlsBitSetCacheBuilder) *SecurityRolesDlsBuilder {
-	v := bitsetcache.Build()
-	rb.v.BitSetCache = v
-	return rb
+	return r
 }

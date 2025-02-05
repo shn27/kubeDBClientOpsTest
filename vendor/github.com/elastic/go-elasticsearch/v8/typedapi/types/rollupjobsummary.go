@@ -15,60 +15,85 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // RollupJobSummary type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/rollup/get_rollup_index_caps/types.ts#L28-L33
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/rollup/get_rollup_index_caps/types.ts#L28-L33
 type RollupJobSummary struct {
-	Fields       map[Field][]RollupJobSummaryField `json:"fields"`
-	IndexPattern string                            `json:"index_pattern"`
-	JobId        Id                                `json:"job_id"`
-	RollupIndex  IndexName                         `json:"rollup_index"`
+	Fields       map[string][]RollupJobSummaryField `json:"fields"`
+	IndexPattern string                             `json:"index_pattern"`
+	JobId        string                             `json:"job_id"`
+	RollupIndex  string                             `json:"rollup_index"`
 }
 
-// RollupJobSummaryBuilder holds RollupJobSummary struct and provides a builder API.
-type RollupJobSummaryBuilder struct {
-	v *RollupJobSummary
+func (s *RollupJobSummary) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "fields":
+			if s.Fields == nil {
+				s.Fields = make(map[string][]RollupJobSummaryField, 0)
+			}
+			if err := dec.Decode(&s.Fields); err != nil {
+				return fmt.Errorf("%s | %w", "Fields", err)
+			}
+
+		case "index_pattern":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "IndexPattern", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.IndexPattern = o
+
+		case "job_id":
+			if err := dec.Decode(&s.JobId); err != nil {
+				return fmt.Errorf("%s | %w", "JobId", err)
+			}
+
+		case "rollup_index":
+			if err := dec.Decode(&s.RollupIndex); err != nil {
+				return fmt.Errorf("%s | %w", "RollupIndex", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewRollupJobSummary provides a builder for the RollupJobSummary struct.
-func NewRollupJobSummaryBuilder() *RollupJobSummaryBuilder {
-	r := RollupJobSummaryBuilder{
-		&RollupJobSummary{
-			Fields: make(map[Field][]RollupJobSummaryField, 0),
-		},
+// NewRollupJobSummary returns a RollupJobSummary.
+func NewRollupJobSummary() *RollupJobSummary {
+	r := &RollupJobSummary{
+		Fields: make(map[string][]RollupJobSummaryField, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the RollupJobSummary struct
-func (rb *RollupJobSummaryBuilder) Build() RollupJobSummary {
-	return *rb.v
-}
-
-func (rb *RollupJobSummaryBuilder) Fields(value map[Field][]RollupJobSummaryField) *RollupJobSummaryBuilder {
-	rb.v.Fields = value
-	return rb
-}
-
-func (rb *RollupJobSummaryBuilder) IndexPattern(indexpattern string) *RollupJobSummaryBuilder {
-	rb.v.IndexPattern = indexpattern
-	return rb
-}
-
-func (rb *RollupJobSummaryBuilder) JobId(jobid Id) *RollupJobSummaryBuilder {
-	rb.v.JobId = jobid
-	return rb
-}
-
-func (rb *RollupJobSummaryBuilder) RollupIndex(rollupindex IndexName) *RollupJobSummaryBuilder {
-	rb.v.RollupIndex = rollupindex
-	return rb
+	return r
 }

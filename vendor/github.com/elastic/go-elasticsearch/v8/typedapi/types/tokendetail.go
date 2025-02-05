@@ -15,50 +15,68 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // TokenDetail type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/analyze/types.ts#L68-L71
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/analyze/types.ts#L71-L74
 type TokenDetail struct {
 	Name   string                `json:"name"`
 	Tokens []ExplainAnalyzeToken `json:"tokens"`
 }
 
-// TokenDetailBuilder holds TokenDetail struct and provides a builder API.
-type TokenDetailBuilder struct {
-	v *TokenDetail
-}
+func (s *TokenDetail) UnmarshalJSON(data []byte) error {
 
-// NewTokenDetail provides a builder for the TokenDetail struct.
-func NewTokenDetailBuilder() *TokenDetailBuilder {
-	r := TokenDetailBuilder{
-		&TokenDetail{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Name = o
+
+		case "tokens":
+			if err := dec.Decode(&s.Tokens); err != nil {
+				return fmt.Errorf("%s | %w", "Tokens", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TokenDetail struct
-func (rb *TokenDetailBuilder) Build() TokenDetail {
-	return *rb.v
-}
+// NewTokenDetail returns a TokenDetail.
+func NewTokenDetail() *TokenDetail {
+	r := &TokenDetail{}
 
-func (rb *TokenDetailBuilder) Name(name string) *TokenDetailBuilder {
-	rb.v.Name = name
-	return rb
-}
-
-func (rb *TokenDetailBuilder) Tokens(tokens []ExplainAnalyzeTokenBuilder) *TokenDetailBuilder {
-	tmp := make([]ExplainAnalyzeToken, len(tokens))
-	for _, value := range tokens {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Tokens = tmp
-	return rb
+	return r
 }

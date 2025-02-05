@@ -15,40 +15,64 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // CreatedStatus type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/_types/CreatedStatus.ts#L20-L22
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/_types/CreatedStatus.ts#L20-L22
 type CreatedStatus struct {
 	Created bool `json:"created"`
 }
 
-// CreatedStatusBuilder holds CreatedStatus struct and provides a builder API.
-type CreatedStatusBuilder struct {
-	v *CreatedStatus
-}
+func (s *CreatedStatus) UnmarshalJSON(data []byte) error {
 
-// NewCreatedStatus provides a builder for the CreatedStatus struct.
-func NewCreatedStatusBuilder() *CreatedStatusBuilder {
-	r := CreatedStatusBuilder{
-		&CreatedStatus{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "created":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Created", err)
+				}
+				s.Created = value
+			case bool:
+				s.Created = v
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the CreatedStatus struct
-func (rb *CreatedStatusBuilder) Build() CreatedStatus {
-	return *rb.v
-}
+// NewCreatedStatus returns a CreatedStatus.
+func NewCreatedStatus() *CreatedStatus {
+	r := &CreatedStatus{}
 
-func (rb *CreatedStatusBuilder) Created(created bool) *CreatedStatusBuilder {
-	rb.v.Created = created
-	return rb
+	return r
 }

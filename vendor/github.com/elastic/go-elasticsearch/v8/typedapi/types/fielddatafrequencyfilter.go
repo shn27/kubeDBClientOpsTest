@@ -15,52 +15,100 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // FielddataFrequencyFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/FielddataFrequencyFilter.ts#L22-L26
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/FielddataFrequencyFilter.ts#L22-L26
 type FielddataFrequencyFilter struct {
-	Max            float64 `json:"max"`
-	Min            float64 `json:"min"`
+	Max            Float64 `json:"max"`
+	Min            Float64 `json:"min"`
 	MinSegmentSize int     `json:"min_segment_size"`
 }
 
-// FielddataFrequencyFilterBuilder holds FielddataFrequencyFilter struct and provides a builder API.
-type FielddataFrequencyFilterBuilder struct {
-	v *FielddataFrequencyFilter
-}
+func (s *FielddataFrequencyFilter) UnmarshalJSON(data []byte) error {
 
-// NewFielddataFrequencyFilter provides a builder for the FielddataFrequencyFilter struct.
-func NewFielddataFrequencyFilterBuilder() *FielddataFrequencyFilterBuilder {
-	r := FielddataFrequencyFilterBuilder{
-		&FielddataFrequencyFilter{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "max":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Max", err)
+				}
+				f := Float64(value)
+				s.Max = f
+			case float64:
+				f := Float64(v)
+				s.Max = f
+			}
+
+		case "min":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Min", err)
+				}
+				f := Float64(value)
+				s.Min = f
+			case float64:
+				f := Float64(v)
+				s.Min = f
+			}
+
+		case "min_segment_size":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MinSegmentSize", err)
+				}
+				s.MinSegmentSize = value
+			case float64:
+				f := int(v)
+				s.MinSegmentSize = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the FielddataFrequencyFilter struct
-func (rb *FielddataFrequencyFilterBuilder) Build() FielddataFrequencyFilter {
-	return *rb.v
-}
+// NewFielddataFrequencyFilter returns a FielddataFrequencyFilter.
+func NewFielddataFrequencyFilter() *FielddataFrequencyFilter {
+	r := &FielddataFrequencyFilter{}
 
-func (rb *FielddataFrequencyFilterBuilder) Max(max float64) *FielddataFrequencyFilterBuilder {
-	rb.v.Max = max
-	return rb
-}
-
-func (rb *FielddataFrequencyFilterBuilder) Min(min float64) *FielddataFrequencyFilterBuilder {
-	rb.v.Min = min
-	return rb
-}
-
-func (rb *FielddataFrequencyFilterBuilder) MinSegmentSize(minsegmentsize int) *FielddataFrequencyFilterBuilder {
-	rb.v.MinSegmentSize = minsegmentsize
-	return rb
+	return r
 }

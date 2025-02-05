@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package updatedataframeanalytics
 
@@ -29,22 +27,19 @@ import (
 
 // Request holds the request body struct for the package updatedataframeanalytics
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/update_data_frame_analytics/MlUpdateDataFrameAnalyticsRequest.ts#L24-L72
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/update_data_frame_analytics/MlUpdateDataFrameAnalyticsRequest.ts#L24-L73
 type Request struct {
 
 	// AllowLazyStart Specifies whether this job can start when there is insufficient machine
 	// learning node capacity for it to be immediately assigned to a node.
 	AllowLazyStart *bool `json:"allow_lazy_start,omitempty"`
-
 	// Description A description of the job.
 	Description *string `json:"description,omitempty"`
-
 	// MaxNumThreads The maximum number of threads to be used by the analysis. Using more
 	// threads may decrease the time necessary to complete the analysis at the
 	// cost of using more CPU. Note that the process may use additional threads
 	// for operational functionality other than the analysis itself.
 	MaxNumThreads *int `json:"max_num_threads,omitempty"`
-
 	// ModelMemoryLimit The approximate maximum amount of memory resources that are permitted for
 	// analytical processing. If your `elasticsearch.yml` file contains an
 	// `xpack.ml.max_model_memory_limit` setting, an error occurs when you try
@@ -53,21 +48,15 @@ type Request struct {
 	ModelMemoryLimit *string `json:"model_memory_limit,omitempty"`
 }
 
-// RequestBuilder is the builder API for the updatedataframeanalytics.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -76,29 +65,4 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	}
 
 	return &req, nil
-}
-
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
-
-func (rb *RequestBuilder) AllowLazyStart(allowlazystart bool) *RequestBuilder {
-	rb.v.AllowLazyStart = &allowlazystart
-	return rb
-}
-
-func (rb *RequestBuilder) Description(description string) *RequestBuilder {
-	rb.v.Description = &description
-	return rb
-}
-
-func (rb *RequestBuilder) MaxNumThreads(maxnumthreads int) *RequestBuilder {
-	rb.v.MaxNumThreads = &maxnumthreads
-	return rb
-}
-
-func (rb *RequestBuilder) ModelMemoryLimit(modelmemorylimit string) *RequestBuilder {
-	rb.v.ModelMemoryLimit = &modelmemorylimit
-	return rb
 }

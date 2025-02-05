@@ -15,50 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // BucketsAdjacencyMatrixBucket holds the union for the following types:
 //
-//	[]AdjacencyMatrixBucket
 //	map[string]AdjacencyMatrixBucket
+//	[]AdjacencyMatrixBucket
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L303-L312
-type BucketsAdjacencyMatrixBucket interface{}
-
-// BucketsAdjacencyMatrixBucketBuilder holds BucketsAdjacencyMatrixBucket struct and provides a builder API.
-type BucketsAdjacencyMatrixBucketBuilder struct {
-	v BucketsAdjacencyMatrixBucket
-}
-
-// NewBucketsAdjacencyMatrixBucket provides a builder for the BucketsAdjacencyMatrixBucket struct.
-func NewBucketsAdjacencyMatrixBucketBuilder() *BucketsAdjacencyMatrixBucketBuilder {
-	return &BucketsAdjacencyMatrixBucketBuilder{}
-}
-
-// Build finalize the chain and returns the BucketsAdjacencyMatrixBucket struct
-func (u *BucketsAdjacencyMatrixBucketBuilder) Build() BucketsAdjacencyMatrixBucket {
-	return u.v
-}
-
-func (u *BucketsAdjacencyMatrixBucketBuilder) AdjacencyMatrixBuckets(adjacencymatrixbuckets []AdjacencyMatrixBucketBuilder) *BucketsAdjacencyMatrixBucketBuilder {
-	tmp := make([]AdjacencyMatrixBucket, len(adjacencymatrixbuckets))
-	for _, value := range adjacencymatrixbuckets {
-		tmp = append(tmp, value.Build())
-	}
-	u.v = tmp
-	return u
-}
-
-func (u *BucketsAdjacencyMatrixBucketBuilder) Map(values map[string]*AdjacencyMatrixBucketBuilder) *BucketsAdjacencyMatrixBucketBuilder {
-	tmp := make(map[string]AdjacencyMatrixBucket, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	u.v = tmp
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L346-L355
+type BucketsAdjacencyMatrixBucket any

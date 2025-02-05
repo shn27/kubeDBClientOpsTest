@@ -15,55 +15,33 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // Groupings type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/rollup/_types/Groupings.ts#L24-L28
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/rollup/_types/Groupings.ts#L24-L40
 type Groupings struct {
+	// DateHistogram A date histogram group aggregates a date field into time-based buckets.
+	// This group is mandatory; you currently cannot roll up documents without a
+	// timestamp and a `date_histogram` group.
 	DateHistogram *DateHistogramGrouping `json:"date_histogram,omitempty"`
-	Histogram     *HistogramGrouping     `json:"histogram,omitempty"`
-	Terms         *TermsGrouping         `json:"terms,omitempty"`
+	// Histogram The histogram group aggregates one or more numeric fields into numeric
+	// histogram intervals.
+	Histogram *HistogramGrouping `json:"histogram,omitempty"`
+	// Terms The terms group can be used on keyword or numeric fields to allow bucketing
+	// via the terms aggregation at a later point.
+	// The indexer enumerates and stores all values of a field for each time-period.
+	// This can be potentially costly for high-cardinality groups such as IP
+	// addresses, especially if the time-bucket is particularly sparse.
+	Terms *TermsGrouping `json:"terms,omitempty"`
 }
 
-// GroupingsBuilder holds Groupings struct and provides a builder API.
-type GroupingsBuilder struct {
-	v *Groupings
-}
+// NewGroupings returns a Groupings.
+func NewGroupings() *Groupings {
+	r := &Groupings{}
 
-// NewGroupings provides a builder for the Groupings struct.
-func NewGroupingsBuilder() *GroupingsBuilder {
-	r := GroupingsBuilder{
-		&Groupings{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the Groupings struct
-func (rb *GroupingsBuilder) Build() Groupings {
-	return *rb.v
-}
-
-func (rb *GroupingsBuilder) DateHistogram(datehistogram *DateHistogramGroupingBuilder) *GroupingsBuilder {
-	v := datehistogram.Build()
-	rb.v.DateHistogram = &v
-	return rb
-}
-
-func (rb *GroupingsBuilder) Histogram(histogram *HistogramGroupingBuilder) *GroupingsBuilder {
-	v := histogram.Build()
-	rb.v.Histogram = &v
-	return rb
-}
-
-func (rb *GroupingsBuilder) Terms(terms *TermsGroupingBuilder) *GroupingsBuilder {
-	v := terms.Build()
-	rb.v.Terms = &v
-	return rb
+	return r
 }

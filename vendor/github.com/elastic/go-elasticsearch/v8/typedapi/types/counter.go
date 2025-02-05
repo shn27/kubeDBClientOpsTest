@@ -15,46 +15,81 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // Counter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/usage/types.ts#L34-L37
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/xpack/usage/types.ts#L33-L36
 type Counter struct {
 	Active int64 `json:"active"`
 	Total  int64 `json:"total"`
 }
 
-// CounterBuilder holds Counter struct and provides a builder API.
-type CounterBuilder struct {
-	v *Counter
-}
+func (s *Counter) UnmarshalJSON(data []byte) error {
 
-// NewCounter provides a builder for the Counter struct.
-func NewCounterBuilder() *CounterBuilder {
-	r := CounterBuilder{
-		&Counter{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "active":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Active", err)
+				}
+				s.Active = value
+			case float64:
+				f := int64(v)
+				s.Active = f
+			}
+
+		case "total":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Total", err)
+				}
+				s.Total = value
+			case float64:
+				f := int64(v)
+				s.Total = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the Counter struct
-func (rb *CounterBuilder) Build() Counter {
-	return *rb.v
-}
+// NewCounter returns a Counter.
+func NewCounter() *Counter {
+	r := &Counter{}
 
-func (rb *CounterBuilder) Active(active int64) *CounterBuilder {
-	rb.v.Active = active
-	return rb
-}
-
-func (rb *CounterBuilder) Total(total int64) *CounterBuilder {
-	rb.v.Total = total
-	return rb
+	return r
 }

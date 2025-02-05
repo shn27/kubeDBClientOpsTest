@@ -15,50 +15,72 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DataframeClassificationSummaryPrecision type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/evaluate_data_frame/types.ts#L60-L63
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/evaluate_data_frame/types.ts#L101-L104
 type DataframeClassificationSummaryPrecision struct {
-	AvgPrecision float64                    `json:"avg_precision"`
+	AvgPrecision Float64                    `json:"avg_precision"`
 	Classes      []DataframeEvaluationClass `json:"classes"`
 }
 
-// DataframeClassificationSummaryPrecisionBuilder holds DataframeClassificationSummaryPrecision struct and provides a builder API.
-type DataframeClassificationSummaryPrecisionBuilder struct {
-	v *DataframeClassificationSummaryPrecision
-}
+func (s *DataframeClassificationSummaryPrecision) UnmarshalJSON(data []byte) error {
 
-// NewDataframeClassificationSummaryPrecision provides a builder for the DataframeClassificationSummaryPrecision struct.
-func NewDataframeClassificationSummaryPrecisionBuilder() *DataframeClassificationSummaryPrecisionBuilder {
-	r := DataframeClassificationSummaryPrecisionBuilder{
-		&DataframeClassificationSummaryPrecision{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "avg_precision":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "AvgPrecision", err)
+				}
+				f := Float64(value)
+				s.AvgPrecision = f
+			case float64:
+				f := Float64(v)
+				s.AvgPrecision = f
+			}
+
+		case "classes":
+			if err := dec.Decode(&s.Classes); err != nil {
+				return fmt.Errorf("%s | %w", "Classes", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DataframeClassificationSummaryPrecision struct
-func (rb *DataframeClassificationSummaryPrecisionBuilder) Build() DataframeClassificationSummaryPrecision {
-	return *rb.v
-}
+// NewDataframeClassificationSummaryPrecision returns a DataframeClassificationSummaryPrecision.
+func NewDataframeClassificationSummaryPrecision() *DataframeClassificationSummaryPrecision {
+	r := &DataframeClassificationSummaryPrecision{}
 
-func (rb *DataframeClassificationSummaryPrecisionBuilder) AvgPrecision(avgprecision float64) *DataframeClassificationSummaryPrecisionBuilder {
-	rb.v.AvgPrecision = avgprecision
-	return rb
-}
-
-func (rb *DataframeClassificationSummaryPrecisionBuilder) Classes(classes []DataframeEvaluationClassBuilder) *DataframeClassificationSummaryPrecisionBuilder {
-	tmp := make([]DataframeEvaluationClass, len(classes))
-	for _, value := range classes {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Classes = tmp
-	return rb
+	return r
 }

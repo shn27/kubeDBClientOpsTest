@@ -15,19 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package threadtype
 package threadtype
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/common.ts#L255-L261
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/common.ts#L298-L304
 type ThreadType struct {
-	name string
+	Name string
 }
 
 var (
@@ -47,7 +45,7 @@ func (t ThreadType) MarshalText() (text []byte, err error) {
 }
 
 func (t *ThreadType) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
 	case "cpu":
 		*t = Cpu
@@ -67,5 +65,5 @@ func (t *ThreadType) UnmarshalText(text []byte) error {
 }
 
 func (t ThreadType) String() string {
-	return t.name
+	return t.Name
 }

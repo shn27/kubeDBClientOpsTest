@@ -15,20 +15,24 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/chunkingmode"
 )
 
 // ChunkingConfig type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/Datafeed.ts#L177-L190
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/Datafeed.ts#L251-L264
 type ChunkingConfig struct {
 	// Mode If the mode is `auto`, the chunk size is dynamically calculated;
 	// this is the recommended value when the datafeed does not use aggregations.
@@ -39,45 +43,42 @@ type ChunkingConfig struct {
 	Mode chunkingmode.ChunkingMode `json:"mode"`
 	// TimeSpan The time span that each search will be querying. This setting is applicable
 	// only when the `mode` is set to `manual`.
-	TimeSpan *Duration `json:"time_span,omitempty"`
+	TimeSpan Duration `json:"time_span,omitempty"`
 }
 
-// ChunkingConfigBuilder holds ChunkingConfig struct and provides a builder API.
-type ChunkingConfigBuilder struct {
-	v *ChunkingConfig
-}
+func (s *ChunkingConfig) UnmarshalJSON(data []byte) error {
 
-// NewChunkingConfig provides a builder for the ChunkingConfig struct.
-func NewChunkingConfigBuilder() *ChunkingConfigBuilder {
-	r := ChunkingConfigBuilder{
-		&ChunkingConfig{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "mode":
+			if err := dec.Decode(&s.Mode); err != nil {
+				return fmt.Errorf("%s | %w", "Mode", err)
+			}
+
+		case "time_span":
+			if err := dec.Decode(&s.TimeSpan); err != nil {
+				return fmt.Errorf("%s | %w", "TimeSpan", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ChunkingConfig struct
-func (rb *ChunkingConfigBuilder) Build() ChunkingConfig {
-	return *rb.v
-}
+// NewChunkingConfig returns a ChunkingConfig.
+func NewChunkingConfig() *ChunkingConfig {
+	r := &ChunkingConfig{}
 
-// Mode If the mode is `auto`, the chunk size is dynamically calculated;
-// this is the recommended value when the datafeed does not use aggregations.
-// If the mode is `manual`, chunking is applied according to the specified
-// `time_span`;
-// use this mode when the datafeed uses aggregations. If the mode is `off`, no
-// chunking is applied.
-
-func (rb *ChunkingConfigBuilder) Mode(mode chunkingmode.ChunkingMode) *ChunkingConfigBuilder {
-	rb.v.Mode = mode
-	return rb
-}
-
-// TimeSpan The time span that each search will be querying. This setting is applicable
-// only when the `mode` is set to `manual`.
-
-func (rb *ChunkingConfigBuilder) TimeSpan(timespan *DurationBuilder) *ChunkingConfigBuilder {
-	v := timespan.Build()
-	rb.v.TimeSpan = &v
-	return rb
+	return r
 }

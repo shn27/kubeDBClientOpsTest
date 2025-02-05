@@ -15,55 +15,87 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // PatternCaptureTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L277-L281
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L279-L283
 type PatternCaptureTokenFilter struct {
-	Patterns         []string       `json:"patterns"`
-	PreserveOriginal *bool          `json:"preserve_original,omitempty"`
-	Type             string         `json:"type,omitempty"`
-	Version          *VersionString `json:"version,omitempty"`
+	Patterns         []string           `json:"patterns"`
+	PreserveOriginal Stringifiedboolean `json:"preserve_original,omitempty"`
+	Type             string             `json:"type,omitempty"`
+	Version          *string            `json:"version,omitempty"`
 }
 
-// PatternCaptureTokenFilterBuilder holds PatternCaptureTokenFilter struct and provides a builder API.
-type PatternCaptureTokenFilterBuilder struct {
-	v *PatternCaptureTokenFilter
+func (s *PatternCaptureTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "patterns":
+			if err := dec.Decode(&s.Patterns); err != nil {
+				return fmt.Errorf("%s | %w", "Patterns", err)
+			}
+
+		case "preserve_original":
+			if err := dec.Decode(&s.PreserveOriginal); err != nil {
+				return fmt.Errorf("%s | %w", "PreserveOriginal", err)
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewPatternCaptureTokenFilter provides a builder for the PatternCaptureTokenFilter struct.
-func NewPatternCaptureTokenFilterBuilder() *PatternCaptureTokenFilterBuilder {
-	r := PatternCaptureTokenFilterBuilder{
-		&PatternCaptureTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s PatternCaptureTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerPatternCaptureTokenFilter PatternCaptureTokenFilter
+	tmp := innerPatternCaptureTokenFilter{
+		Patterns:         s.Patterns,
+		PreserveOriginal: s.PreserveOriginal,
+		Type:             s.Type,
+		Version:          s.Version,
 	}
 
-	r.v.Type = "pattern_capture"
+	tmp.Type = "pattern_capture"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the PatternCaptureTokenFilter struct
-func (rb *PatternCaptureTokenFilterBuilder) Build() PatternCaptureTokenFilter {
-	return *rb.v
-}
+// NewPatternCaptureTokenFilter returns a PatternCaptureTokenFilter.
+func NewPatternCaptureTokenFilter() *PatternCaptureTokenFilter {
+	r := &PatternCaptureTokenFilter{}
 
-func (rb *PatternCaptureTokenFilterBuilder) Patterns(patterns ...string) *PatternCaptureTokenFilterBuilder {
-	rb.v.Patterns = patterns
-	return rb
-}
-
-func (rb *PatternCaptureTokenFilterBuilder) PreserveOriginal(preserveoriginal bool) *PatternCaptureTokenFilterBuilder {
-	rb.v.PreserveOriginal = &preserveoriginal
-	return rb
-}
-
-func (rb *PatternCaptureTokenFilterBuilder) Version(version VersionString) *PatternCaptureTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

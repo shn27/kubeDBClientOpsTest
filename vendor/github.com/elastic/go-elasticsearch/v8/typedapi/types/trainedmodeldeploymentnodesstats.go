@@ -15,150 +15,290 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // TrainedModelDeploymentNodesStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/TrainedModel.ts#L127-L154
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/TrainedModel.ts#L144-L189
 type TrainedModelDeploymentNodesStats struct {
 	// AverageInferenceTimeMs The average time for each inference call to complete on this node.
-	AverageInferenceTimeMs DurationValueUnitFloatMillis `json:"average_inference_time_ms"`
+	AverageInferenceTimeMs Float64 `json:"average_inference_time_ms,omitempty"`
+	// AverageInferenceTimeMsExcludingCacheHits The average time for each inference call to complete on this node, excluding
+	// cache
+	AverageInferenceTimeMsExcludingCacheHits Float64 `json:"average_inference_time_ms_excluding_cache_hits,omitempty"`
+	AverageInferenceTimeMsLastMinute         Float64 `json:"average_inference_time_ms_last_minute,omitempty"`
 	// ErrorCount The number of errors when evaluating the trained model.
-	ErrorCount int `json:"error_count"`
+	ErrorCount                       *int   `json:"error_count,omitempty"`
+	InferenceCacheHitCount           *int64 `json:"inference_cache_hit_count,omitempty"`
+	InferenceCacheHitCountLastMinute *int64 `json:"inference_cache_hit_count_last_minute,omitempty"`
 	// InferenceCount The total number of inference calls made against this node for this model.
-	InferenceCount int `json:"inference_count"`
+	InferenceCount *int64 `json:"inference_count,omitempty"`
 	// LastAccess The epoch time stamp of the last inference call for the model on this node.
-	LastAccess int64 `json:"last_access"`
+	LastAccess *int64 `json:"last_access,omitempty"`
 	// Node Information pertaining to the node.
-	Node DiscoveryNode `json:"node"`
+	Node DiscoveryNode `json:"node,omitempty"`
 	// NumberOfAllocations The number of allocations assigned to this node.
-	NumberOfAllocations int `json:"number_of_allocations"`
+	NumberOfAllocations *int `json:"number_of_allocations,omitempty"`
 	// NumberOfPendingRequests The number of inference requests queued to be processed.
-	NumberOfPendingRequests int `json:"number_of_pending_requests"`
+	NumberOfPendingRequests *int  `json:"number_of_pending_requests,omitempty"`
+	PeakThroughputPerMinute int64 `json:"peak_throughput_per_minute"`
 	// RejectionExecutionCount The number of inference requests that were not processed because the queue
 	// was full.
-	RejectionExecutionCount int `json:"rejection_execution_count"`
+	RejectionExecutionCount *int `json:"rejection_execution_count,omitempty"`
 	// RoutingState The current routing state and reason for the current routing state for this
 	// allocation.
 	RoutingState TrainedModelAssignmentRoutingTable `json:"routing_state"`
 	// StartTime The epoch timestamp when the allocation started.
-	StartTime EpochTimeUnitMillis `json:"start_time"`
+	StartTime *int64 `json:"start_time,omitempty"`
 	// ThreadsPerAllocation The number of threads used by each allocation during inference.
-	ThreadsPerAllocation int `json:"threads_per_allocation"`
+	ThreadsPerAllocation *int `json:"threads_per_allocation,omitempty"`
+	ThroughputLastMinute int  `json:"throughput_last_minute"`
 	// TimeoutCount The number of inference requests that timed out before being processed.
-	TimeoutCount int `json:"timeout_count"`
+	TimeoutCount *int `json:"timeout_count,omitempty"`
 }
 
-// TrainedModelDeploymentNodesStatsBuilder holds TrainedModelDeploymentNodesStats struct and provides a builder API.
-type TrainedModelDeploymentNodesStatsBuilder struct {
-	v *TrainedModelDeploymentNodesStats
-}
+func (s *TrainedModelDeploymentNodesStats) UnmarshalJSON(data []byte) error {
 
-// NewTrainedModelDeploymentNodesStats provides a builder for the TrainedModelDeploymentNodesStats struct.
-func NewTrainedModelDeploymentNodesStatsBuilder() *TrainedModelDeploymentNodesStatsBuilder {
-	r := TrainedModelDeploymentNodesStatsBuilder{
-		&TrainedModelDeploymentNodesStats{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "average_inference_time_ms":
+			if err := dec.Decode(&s.AverageInferenceTimeMs); err != nil {
+				return fmt.Errorf("%s | %w", "AverageInferenceTimeMs", err)
+			}
+
+		case "average_inference_time_ms_excluding_cache_hits":
+			if err := dec.Decode(&s.AverageInferenceTimeMsExcludingCacheHits); err != nil {
+				return fmt.Errorf("%s | %w", "AverageInferenceTimeMsExcludingCacheHits", err)
+			}
+
+		case "average_inference_time_ms_last_minute":
+			if err := dec.Decode(&s.AverageInferenceTimeMsLastMinute); err != nil {
+				return fmt.Errorf("%s | %w", "AverageInferenceTimeMsLastMinute", err)
+			}
+
+		case "error_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ErrorCount", err)
+				}
+				s.ErrorCount = &value
+			case float64:
+				f := int(v)
+				s.ErrorCount = &f
+			}
+
+		case "inference_cache_hit_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "InferenceCacheHitCount", err)
+				}
+				s.InferenceCacheHitCount = &value
+			case float64:
+				f := int64(v)
+				s.InferenceCacheHitCount = &f
+			}
+
+		case "inference_cache_hit_count_last_minute":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "InferenceCacheHitCountLastMinute", err)
+				}
+				s.InferenceCacheHitCountLastMinute = &value
+			case float64:
+				f := int64(v)
+				s.InferenceCacheHitCountLastMinute = &f
+			}
+
+		case "inference_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "InferenceCount", err)
+				}
+				s.InferenceCount = &value
+			case float64:
+				f := int64(v)
+				s.InferenceCount = &f
+			}
+
+		case "last_access":
+			if err := dec.Decode(&s.LastAccess); err != nil {
+				return fmt.Errorf("%s | %w", "LastAccess", err)
+			}
+
+		case "node":
+			if err := dec.Decode(&s.Node); err != nil {
+				return fmt.Errorf("%s | %w", "Node", err)
+			}
+
+		case "number_of_allocations":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NumberOfAllocations", err)
+				}
+				s.NumberOfAllocations = &value
+			case float64:
+				f := int(v)
+				s.NumberOfAllocations = &f
+			}
+
+		case "number_of_pending_requests":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NumberOfPendingRequests", err)
+				}
+				s.NumberOfPendingRequests = &value
+			case float64:
+				f := int(v)
+				s.NumberOfPendingRequests = &f
+			}
+
+		case "peak_throughput_per_minute":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PeakThroughputPerMinute", err)
+				}
+				s.PeakThroughputPerMinute = value
+			case float64:
+				f := int64(v)
+				s.PeakThroughputPerMinute = f
+			}
+
+		case "rejection_execution_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "RejectionExecutionCount", err)
+				}
+				s.RejectionExecutionCount = &value
+			case float64:
+				f := int(v)
+				s.RejectionExecutionCount = &f
+			}
+
+		case "routing_state":
+			if err := dec.Decode(&s.RoutingState); err != nil {
+				return fmt.Errorf("%s | %w", "RoutingState", err)
+			}
+
+		case "start_time":
+			if err := dec.Decode(&s.StartTime); err != nil {
+				return fmt.Errorf("%s | %w", "StartTime", err)
+			}
+
+		case "threads_per_allocation":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ThreadsPerAllocation", err)
+				}
+				s.ThreadsPerAllocation = &value
+			case float64:
+				f := int(v)
+				s.ThreadsPerAllocation = &f
+			}
+
+		case "throughput_last_minute":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ThroughputLastMinute", err)
+				}
+				s.ThroughputLastMinute = value
+			case float64:
+				f := int(v)
+				s.ThroughputLastMinute = f
+			}
+
+		case "timeout_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TimeoutCount", err)
+				}
+				s.TimeoutCount = &value
+			case float64:
+				f := int(v)
+				s.TimeoutCount = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TrainedModelDeploymentNodesStats struct
-func (rb *TrainedModelDeploymentNodesStatsBuilder) Build() TrainedModelDeploymentNodesStats {
-	return *rb.v
-}
+// NewTrainedModelDeploymentNodesStats returns a TrainedModelDeploymentNodesStats.
+func NewTrainedModelDeploymentNodesStats() *TrainedModelDeploymentNodesStats {
+	r := &TrainedModelDeploymentNodesStats{}
 
-// AverageInferenceTimeMs The average time for each inference call to complete on this node.
-
-func (rb *TrainedModelDeploymentNodesStatsBuilder) AverageInferenceTimeMs(averageinferencetimems *DurationValueUnitFloatMillisBuilder) *TrainedModelDeploymentNodesStatsBuilder {
-	v := averageinferencetimems.Build()
-	rb.v.AverageInferenceTimeMs = v
-	return rb
-}
-
-// ErrorCount The number of errors when evaluating the trained model.
-
-func (rb *TrainedModelDeploymentNodesStatsBuilder) ErrorCount(errorcount int) *TrainedModelDeploymentNodesStatsBuilder {
-	rb.v.ErrorCount = errorcount
-	return rb
-}
-
-// InferenceCount The total number of inference calls made against this node for this model.
-
-func (rb *TrainedModelDeploymentNodesStatsBuilder) InferenceCount(inferencecount int) *TrainedModelDeploymentNodesStatsBuilder {
-	rb.v.InferenceCount = inferencecount
-	return rb
-}
-
-// LastAccess The epoch time stamp of the last inference call for the model on this node.
-
-func (rb *TrainedModelDeploymentNodesStatsBuilder) LastAccess(lastaccess int64) *TrainedModelDeploymentNodesStatsBuilder {
-	rb.v.LastAccess = lastaccess
-	return rb
-}
-
-// Node Information pertaining to the node.
-
-func (rb *TrainedModelDeploymentNodesStatsBuilder) Node(node *DiscoveryNodeBuilder) *TrainedModelDeploymentNodesStatsBuilder {
-	v := node.Build()
-	rb.v.Node = v
-	return rb
-}
-
-// NumberOfAllocations The number of allocations assigned to this node.
-
-func (rb *TrainedModelDeploymentNodesStatsBuilder) NumberOfAllocations(numberofallocations int) *TrainedModelDeploymentNodesStatsBuilder {
-	rb.v.NumberOfAllocations = numberofallocations
-	return rb
-}
-
-// NumberOfPendingRequests The number of inference requests queued to be processed.
-
-func (rb *TrainedModelDeploymentNodesStatsBuilder) NumberOfPendingRequests(numberofpendingrequests int) *TrainedModelDeploymentNodesStatsBuilder {
-	rb.v.NumberOfPendingRequests = numberofpendingrequests
-	return rb
-}
-
-// RejectionExecutionCount The number of inference requests that were not processed because the queue
-// was full.
-
-func (rb *TrainedModelDeploymentNodesStatsBuilder) RejectionExecutionCount(rejectionexecutioncount int) *TrainedModelDeploymentNodesStatsBuilder {
-	rb.v.RejectionExecutionCount = rejectionexecutioncount
-	return rb
-}
-
-// RoutingState The current routing state and reason for the current routing state for this
-// allocation.
-
-func (rb *TrainedModelDeploymentNodesStatsBuilder) RoutingState(routingstate *TrainedModelAssignmentRoutingTableBuilder) *TrainedModelDeploymentNodesStatsBuilder {
-	v := routingstate.Build()
-	rb.v.RoutingState = v
-	return rb
-}
-
-// StartTime The epoch timestamp when the allocation started.
-
-func (rb *TrainedModelDeploymentNodesStatsBuilder) StartTime(starttime *EpochTimeUnitMillisBuilder) *TrainedModelDeploymentNodesStatsBuilder {
-	v := starttime.Build()
-	rb.v.StartTime = v
-	return rb
-}
-
-// ThreadsPerAllocation The number of threads used by each allocation during inference.
-
-func (rb *TrainedModelDeploymentNodesStatsBuilder) ThreadsPerAllocation(threadsperallocation int) *TrainedModelDeploymentNodesStatsBuilder {
-	rb.v.ThreadsPerAllocation = threadsperallocation
-	return rb
-}
-
-// TimeoutCount The number of inference requests that timed out before being processed.
-
-func (rb *TrainedModelDeploymentNodesStatsBuilder) TimeoutCount(timeoutcount int) *TrainedModelDeploymentNodesStatsBuilder {
-	rb.v.TimeoutCount = timeoutcount
-	return rb
+	return r
 }

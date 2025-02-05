@@ -15,65 +15,123 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/deprecationlevel"
 )
 
 // Deprecation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/migration/deprecations/types.ts#L29-L35
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/migration/deprecations/types.ts#L32-L40
 type Deprecation struct {
-	Details string `json:"details"`
+	Details *string `json:"details,omitempty"`
 	// Level The level property describes the significance of the issue.
-	Level   deprecationlevel.DeprecationLevel `json:"level"`
-	Message string                            `json:"message"`
-	Url     string                            `json:"url"`
+	Level                       deprecationlevel.DeprecationLevel `json:"level"`
+	Message                     string                            `json:"message"`
+	Meta_                       map[string]json.RawMessage        `json:"_meta,omitempty"`
+	ResolveDuringRollingUpgrade bool                              `json:"resolve_during_rolling_upgrade"`
+	Url                         string                            `json:"url"`
 }
 
-// DeprecationBuilder holds Deprecation struct and provides a builder API.
-type DeprecationBuilder struct {
-	v *Deprecation
+func (s *Deprecation) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "details":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Details", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Details = &o
+
+		case "level":
+			if err := dec.Decode(&s.Level); err != nil {
+				return fmt.Errorf("%s | %w", "Level", err)
+			}
+
+		case "message":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Message", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Message = o
+
+		case "_meta":
+			if s.Meta_ == nil {
+				s.Meta_ = make(map[string]json.RawMessage, 0)
+			}
+			if err := dec.Decode(&s.Meta_); err != nil {
+				return fmt.Errorf("%s | %w", "Meta_", err)
+			}
+
+		case "resolve_during_rolling_upgrade":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ResolveDuringRollingUpgrade", err)
+				}
+				s.ResolveDuringRollingUpgrade = value
+			case bool:
+				s.ResolveDuringRollingUpgrade = v
+			}
+
+		case "url":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Url", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Url = o
+
+		}
+	}
+	return nil
 }
 
-// NewDeprecation provides a builder for the Deprecation struct.
-func NewDeprecationBuilder() *DeprecationBuilder {
-	r := DeprecationBuilder{
-		&Deprecation{},
+// NewDeprecation returns a Deprecation.
+func NewDeprecation() *Deprecation {
+	r := &Deprecation{
+		Meta_: make(map[string]json.RawMessage, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the Deprecation struct
-func (rb *DeprecationBuilder) Build() Deprecation {
-	return *rb.v
-}
-
-func (rb *DeprecationBuilder) Details(details string) *DeprecationBuilder {
-	rb.v.Details = details
-	return rb
-}
-
-// Level The level property describes the significance of the issue.
-
-func (rb *DeprecationBuilder) Level(level deprecationlevel.DeprecationLevel) *DeprecationBuilder {
-	rb.v.Level = level
-	return rb
-}
-
-func (rb *DeprecationBuilder) Message(message string) *DeprecationBuilder {
-	rb.v.Message = message
-	return rb
-}
-
-func (rb *DeprecationBuilder) Url(url string) *DeprecationBuilder {
-	rb.v.Url = url
-	return rb
+	return r
 }

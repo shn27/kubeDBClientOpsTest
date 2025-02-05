@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package scriptspainlessexecute
 
@@ -31,30 +29,26 @@ import (
 
 // Request holds the request body struct for the package scriptspainlessexecute
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/scripts_painless_execute/ExecutePainlessScriptRequest.ts#L24-L35
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/scripts_painless_execute/ExecutePainlessScriptRequest.ts#L24-L48
 type Request struct {
+
+	// Context The context that the script should run in.
 	Context *string `json:"context,omitempty"`
-
+	// ContextSetup Additional parameters for the `context`.
 	ContextSetup *types.PainlessContextSetup `json:"context_setup,omitempty"`
-
-	Script *types.InlineScript `json:"script,omitempty"`
+	// Script The Painless script to execute.
+	Script *types.Script `json:"script,omitempty"`
 }
 
-// RequestBuilder is the builder API for the scriptspainlessexecute.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -63,26 +57,4 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	}
 
 	return &req, nil
-}
-
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
-
-func (rb *RequestBuilder) Context(context string) *RequestBuilder {
-	rb.v.Context = &context
-	return rb
-}
-
-func (rb *RequestBuilder) ContextSetup(contextsetup *types.PainlessContextSetupBuilder) *RequestBuilder {
-	v := contextsetup.Build()
-	rb.v.ContextSetup = &v
-	return rb
-}
-
-func (rb *RequestBuilder) Script(script *types.InlineScriptBuilder) *RequestBuilder {
-	v := script.Build()
-	rb.v.Script = &v
-	return rb
 }

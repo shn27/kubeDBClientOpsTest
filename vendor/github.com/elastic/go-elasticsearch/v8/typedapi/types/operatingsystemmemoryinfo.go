@@ -15,70 +15,155 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // OperatingSystemMemoryInfo type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/stats/types.ts#L282-L290
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/stats/types.ts#L541-L568
 type OperatingSystemMemoryInfo struct {
+	// AdjustedTotalInBytes Total amount, in bytes, of memory across all selected nodes, but using the
+	// value specified using the `es.total_memory_bytes` system property instead of
+	// measured total memory for those nodes where that system property was set.
 	AdjustedTotalInBytes *int64 `json:"adjusted_total_in_bytes,omitempty"`
-	FreeInBytes          int64  `json:"free_in_bytes"`
-	FreePercent          int    `json:"free_percent"`
-	TotalInBytes         int64  `json:"total_in_bytes"`
-	UsedInBytes          int64  `json:"used_in_bytes"`
-	UsedPercent          int    `json:"used_percent"`
+	// FreeInBytes Amount, in bytes, of free physical memory across all selected nodes.
+	FreeInBytes int64 `json:"free_in_bytes"`
+	// FreePercent Percentage of free physical memory across all selected nodes.
+	FreePercent int `json:"free_percent"`
+	// TotalInBytes Total amount, in bytes, of physical memory across all selected nodes.
+	TotalInBytes int64 `json:"total_in_bytes"`
+	// UsedInBytes Amount, in bytes, of physical memory in use across all selected nodes.
+	UsedInBytes int64 `json:"used_in_bytes"`
+	// UsedPercent Percentage of physical memory in use across all selected nodes.
+	UsedPercent int `json:"used_percent"`
 }
 
-// OperatingSystemMemoryInfoBuilder holds OperatingSystemMemoryInfo struct and provides a builder API.
-type OperatingSystemMemoryInfoBuilder struct {
-	v *OperatingSystemMemoryInfo
-}
+func (s *OperatingSystemMemoryInfo) UnmarshalJSON(data []byte) error {
 
-// NewOperatingSystemMemoryInfo provides a builder for the OperatingSystemMemoryInfo struct.
-func NewOperatingSystemMemoryInfoBuilder() *OperatingSystemMemoryInfoBuilder {
-	r := OperatingSystemMemoryInfoBuilder{
-		&OperatingSystemMemoryInfo{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "adjusted_total_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "AdjustedTotalInBytes", err)
+				}
+				s.AdjustedTotalInBytes = &value
+			case float64:
+				f := int64(v)
+				s.AdjustedTotalInBytes = &f
+			}
+
+		case "free_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "FreeInBytes", err)
+				}
+				s.FreeInBytes = value
+			case float64:
+				f := int64(v)
+				s.FreeInBytes = f
+			}
+
+		case "free_percent":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "FreePercent", err)
+				}
+				s.FreePercent = value
+			case float64:
+				f := int(v)
+				s.FreePercent = f
+			}
+
+		case "total_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TotalInBytes", err)
+				}
+				s.TotalInBytes = value
+			case float64:
+				f := int64(v)
+				s.TotalInBytes = f
+			}
+
+		case "used_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "UsedInBytes", err)
+				}
+				s.UsedInBytes = value
+			case float64:
+				f := int64(v)
+				s.UsedInBytes = f
+			}
+
+		case "used_percent":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "UsedPercent", err)
+				}
+				s.UsedPercent = value
+			case float64:
+				f := int(v)
+				s.UsedPercent = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the OperatingSystemMemoryInfo struct
-func (rb *OperatingSystemMemoryInfoBuilder) Build() OperatingSystemMemoryInfo {
-	return *rb.v
-}
+// NewOperatingSystemMemoryInfo returns a OperatingSystemMemoryInfo.
+func NewOperatingSystemMemoryInfo() *OperatingSystemMemoryInfo {
+	r := &OperatingSystemMemoryInfo{}
 
-func (rb *OperatingSystemMemoryInfoBuilder) AdjustedTotalInBytes(adjustedtotalinbytes int64) *OperatingSystemMemoryInfoBuilder {
-	rb.v.AdjustedTotalInBytes = &adjustedtotalinbytes
-	return rb
-}
-
-func (rb *OperatingSystemMemoryInfoBuilder) FreeInBytes(freeinbytes int64) *OperatingSystemMemoryInfoBuilder {
-	rb.v.FreeInBytes = freeinbytes
-	return rb
-}
-
-func (rb *OperatingSystemMemoryInfoBuilder) FreePercent(freepercent int) *OperatingSystemMemoryInfoBuilder {
-	rb.v.FreePercent = freepercent
-	return rb
-}
-
-func (rb *OperatingSystemMemoryInfoBuilder) TotalInBytes(totalinbytes int64) *OperatingSystemMemoryInfoBuilder {
-	rb.v.TotalInBytes = totalinbytes
-	return rb
-}
-
-func (rb *OperatingSystemMemoryInfoBuilder) UsedInBytes(usedinbytes int64) *OperatingSystemMemoryInfoBuilder {
-	rb.v.UsedInBytes = usedinbytes
-	return rb
-}
-
-func (rb *OperatingSystemMemoryInfoBuilder) UsedPercent(usedpercent int) *OperatingSystemMemoryInfoBuilder {
-	rb.v.UsedPercent = usedpercent
-	return rb
+	return r
 }

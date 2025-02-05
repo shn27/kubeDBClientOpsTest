@@ -15,25 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package scriptsorttype
 package scriptsorttype
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/sort.ts#L75-L78
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/sort.ts#L80-L84
 type ScriptSortType struct {
-	name string
+	Name string
 }
 
 var (
 	String = ScriptSortType{"string"}
 
 	Number = ScriptSortType{"number"}
+
+	Version = ScriptSortType{"version"}
 )
 
 func (s ScriptSortType) MarshalText() (text []byte, err error) {
@@ -41,12 +41,14 @@ func (s ScriptSortType) MarshalText() (text []byte, err error) {
 }
 
 func (s *ScriptSortType) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
 	case "string":
 		*s = String
 	case "number":
 		*s = Number
+	case "version":
+		*s = Version
 	default:
 		*s = ScriptSortType{string(text)}
 	}
@@ -55,5 +57,5 @@ func (s *ScriptSortType) UnmarshalText(text []byte) error {
 }
 
 func (s ScriptSortType) String() string {
-	return s.name
+	return s.Name
 }

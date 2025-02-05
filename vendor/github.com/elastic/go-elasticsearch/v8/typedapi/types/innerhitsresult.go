@@ -15,41 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // InnerHitsResult type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/hits.ts#L80-L82
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/hits.ts#L86-L88
 type InnerHitsResult struct {
 	Hits *HitsMetadata `json:"hits,omitempty"`
 }
 
-// InnerHitsResultBuilder holds InnerHitsResult struct and provides a builder API.
-type InnerHitsResultBuilder struct {
-	v *InnerHitsResult
-}
+// NewInnerHitsResult returns a InnerHitsResult.
+func NewInnerHitsResult() *InnerHitsResult {
+	r := &InnerHitsResult{}
 
-// NewInnerHitsResult provides a builder for the InnerHitsResult struct.
-func NewInnerHitsResultBuilder() *InnerHitsResultBuilder {
-	r := InnerHitsResultBuilder{
-		&InnerHitsResult{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the InnerHitsResult struct
-func (rb *InnerHitsResultBuilder) Build() InnerHitsResult {
-	return *rb.v
-}
-
-func (rb *InnerHitsResultBuilder) Hits(hits *HitsMetadataBuilder) *InnerHitsResultBuilder {
-	v := hits.Build()
-	rb.v.Hits = &v
-	return rb
+	return r
 }

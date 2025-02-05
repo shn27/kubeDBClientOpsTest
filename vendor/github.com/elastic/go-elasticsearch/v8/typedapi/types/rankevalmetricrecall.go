@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // RankEvalMetricRecall type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/rank_eval/types.ts#L54-L58
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/rank_eval/types.ts#L54-L58
 type RankEvalMetricRecall struct {
 	// K Sets the maximum number of documents retrieved per query. This value will act
 	// in place of the usual size parameter in the query.
@@ -34,37 +41,61 @@ type RankEvalMetricRecall struct {
 	RelevantRatingThreshold *int `json:"relevant_rating_threshold,omitempty"`
 }
 
-// RankEvalMetricRecallBuilder holds RankEvalMetricRecall struct and provides a builder API.
-type RankEvalMetricRecallBuilder struct {
-	v *RankEvalMetricRecall
-}
+func (s *RankEvalMetricRecall) UnmarshalJSON(data []byte) error {
 
-// NewRankEvalMetricRecall provides a builder for the RankEvalMetricRecall struct.
-func NewRankEvalMetricRecallBuilder() *RankEvalMetricRecallBuilder {
-	r := RankEvalMetricRecallBuilder{
-		&RankEvalMetricRecall{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "k":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "K", err)
+				}
+				s.K = &value
+			case float64:
+				f := int(v)
+				s.K = &f
+			}
+
+		case "relevant_rating_threshold":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "RelevantRatingThreshold", err)
+				}
+				s.RelevantRatingThreshold = &value
+			case float64:
+				f := int(v)
+				s.RelevantRatingThreshold = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RankEvalMetricRecall struct
-func (rb *RankEvalMetricRecallBuilder) Build() RankEvalMetricRecall {
-	return *rb.v
-}
+// NewRankEvalMetricRecall returns a RankEvalMetricRecall.
+func NewRankEvalMetricRecall() *RankEvalMetricRecall {
+	r := &RankEvalMetricRecall{}
 
-// K Sets the maximum number of documents retrieved per query. This value will act
-// in place of the usual size parameter in the query.
-
-func (rb *RankEvalMetricRecallBuilder) K(k int) *RankEvalMetricRecallBuilder {
-	rb.v.K = &k
-	return rb
-}
-
-// RelevantRatingThreshold Sets the rating threshold above which documents are considered to be
-// "relevant".
-
-func (rb *RankEvalMetricRecallBuilder) RelevantRatingThreshold(relevantratingthreshold int) *RankEvalMetricRecallBuilder {
-	rb.v.RelevantRatingThreshold = &relevantratingthreshold
-	return rb
+	return r
 }

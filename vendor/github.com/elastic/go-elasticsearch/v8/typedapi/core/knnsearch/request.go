@@ -15,72 +15,62 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package knnsearch
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 )
 
 // Request holds the request body struct for the package knnsearch
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/knn_search/KnnSearchRequest.ts#L27-L79
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/knn_search/KnnSearchRequest.ts#L26-L96
 type Request struct {
 
 	// DocvalueFields The request returns doc values for field names matching these patterns
 	// in the hits.fields property of the response. Accepts wildcard (*) patterns.
 	DocvalueFields []types.FieldAndFormat `json:"docvalue_fields,omitempty"`
-
 	// Fields The request returns values for field names matching these patterns
 	// in the hits.fields property of the response. Accepts wildcard (*) patterns.
-	Fields *types.Fields `json:"fields,omitempty"`
-
+	Fields []string `json:"fields,omitempty"`
 	// Filter Query to filter the documents that can match. The kNN search will return the
 	// top
 	// `k` documents that also match this filter. The value can be a single query or
 	// a
 	// list of queries. If `filter` isn't provided, all documents are allowed to
 	// match.
-	Filter []types.QueryContainer `json:"filter,omitempty"`
-
+	Filter []types.Query `json:"filter,omitempty"`
 	// Knn kNN query to execute
-	Knn types.Query `json:"knn"`
-
+	Knn types.CoreKnnQuery `json:"knn"`
 	// Source_ Indicates which source fields are returned for matching documents. These
 	// fields are returned in the hits._source property of the search response.
-	Source_ *types.SourceConfig `json:"_source,omitempty"`
-
+	Source_ types.SourceConfig `json:"_source,omitempty"`
 	// StoredFields List of stored fields to return as part of a hit. If no fields are specified,
 	// no stored fields are included in the response. If this field is specified,
 	// the _source
 	// parameter defaults to false. You can pass _source: true to return both source
 	// fields
 	// and stored fields in the search response.
-	StoredFields *types.Fields `json:"stored_fields,omitempty"`
+	StoredFields []string `json:"stored_fields,omitempty"`
 }
 
-// RequestBuilder is the builder API for the knnsearch.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -91,45 +81,115 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) DocvalueFields(docvalue_fields []types.FieldAndFormatBuilder) *RequestBuilder {
-	tmp := make([]types.FieldAndFormat, len(docvalue_fields))
-	for _, value := range docvalue_fields {
-		tmp = append(tmp, value.Build())
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "docvalue_fields":
+			if err := dec.Decode(&s.DocvalueFields); err != nil {
+				return fmt.Errorf("%s | %w", "DocvalueFields", err)
+			}
+
+		case "fields":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Fields", err)
+				}
+
+				s.Fields = append(s.Fields, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Fields); err != nil {
+					return fmt.Errorf("%s | %w", "Fields", err)
+				}
+			}
+
+		case "filter":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := types.NewQuery()
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Filter", err)
+				}
+
+				s.Filter = append(s.Filter, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Filter); err != nil {
+					return fmt.Errorf("%s | %w", "Filter", err)
+				}
+			}
+
+		case "knn":
+			if err := dec.Decode(&s.Knn); err != nil {
+				return fmt.Errorf("%s | %w", "Knn", err)
+			}
+
+		case "_source":
+			message := json.RawMessage{}
+			if err := dec.Decode(&message); err != nil {
+				return fmt.Errorf("%s | %w", "Source_", err)
+			}
+			keyDec := json.NewDecoder(bytes.NewReader(message))
+		source__field:
+			for {
+				t, err := keyDec.Token()
+				if err != nil {
+					if errors.Is(err, io.EOF) {
+						break
+					}
+					return fmt.Errorf("%s | %w", "Source_", err)
+				}
+
+				switch t {
+
+				case "excludes", "includes":
+					o := types.NewSourceFilter()
+					localDec := json.NewDecoder(bytes.NewReader(message))
+					if err := localDec.Decode(&o); err != nil {
+						return fmt.Errorf("%s | %w", "Source_", err)
+					}
+					s.Source_ = o
+					break source__field
+
+				}
+			}
+			if s.Source_ == nil {
+				localDec := json.NewDecoder(bytes.NewReader(message))
+				if err := localDec.Decode(&s.Source_); err != nil {
+					return fmt.Errorf("%s | %w", "Source_", err)
+				}
+			}
+
+		case "stored_fields":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "StoredFields", err)
+				}
+
+				s.StoredFields = append(s.StoredFields, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.StoredFields); err != nil {
+					return fmt.Errorf("%s | %w", "StoredFields", err)
+				}
+			}
+
+		}
 	}
-	rb.v.DocvalueFields = tmp
-	return rb
-}
-
-func (rb *RequestBuilder) Fields(fields *types.FieldsBuilder) *RequestBuilder {
-	v := fields.Build()
-	rb.v.Fields = &v
-	return rb
-}
-
-func (rb *RequestBuilder) Filter(arg []types.QueryContainer) *RequestBuilder {
-	rb.v.Filter = arg
-	return rb
-}
-
-func (rb *RequestBuilder) Knn(knn *types.QueryBuilder) *RequestBuilder {
-	v := knn.Build()
-	rb.v.Knn = v
-	return rb
-}
-
-func (rb *RequestBuilder) Source_(source_ *types.SourceConfigBuilder) *RequestBuilder {
-	v := source_.Build()
-	rb.v.Source_ = &v
-	return rb
-}
-
-func (rb *RequestBuilder) StoredFields(storedfields *types.FieldsBuilder) *RequestBuilder {
-	v := storedfields.Build()
-	rb.v.StoredFields = &v
-	return rb
+	return nil
 }

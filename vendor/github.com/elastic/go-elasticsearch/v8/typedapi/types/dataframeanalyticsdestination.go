@@ -15,56 +15,64 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // DataframeAnalyticsDestination type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/DataframeAnalytics.ts#L77-L82
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/DataframeAnalytics.ts#L77-L82
 type DataframeAnalyticsDestination struct {
 	// Index Defines the destination index to store the results of the data frame
 	// analytics job.
-	Index IndexName `json:"index"`
+	Index string `json:"index"`
 	// ResultsField Defines the name of the field in which to store the results of the analysis.
 	// Defaults to `ml`.
-	ResultsField *Field `json:"results_field,omitempty"`
+	ResultsField *string `json:"results_field,omitempty"`
 }
 
-// DataframeAnalyticsDestinationBuilder holds DataframeAnalyticsDestination struct and provides a builder API.
-type DataframeAnalyticsDestinationBuilder struct {
-	v *DataframeAnalyticsDestination
-}
+func (s *DataframeAnalyticsDestination) UnmarshalJSON(data []byte) error {
 
-// NewDataframeAnalyticsDestination provides a builder for the DataframeAnalyticsDestination struct.
-func NewDataframeAnalyticsDestinationBuilder() *DataframeAnalyticsDestinationBuilder {
-	r := DataframeAnalyticsDestinationBuilder{
-		&DataframeAnalyticsDestination{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "index":
+			if err := dec.Decode(&s.Index); err != nil {
+				return fmt.Errorf("%s | %w", "Index", err)
+			}
+
+		case "results_field":
+			if err := dec.Decode(&s.ResultsField); err != nil {
+				return fmt.Errorf("%s | %w", "ResultsField", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DataframeAnalyticsDestination struct
-func (rb *DataframeAnalyticsDestinationBuilder) Build() DataframeAnalyticsDestination {
-	return *rb.v
-}
+// NewDataframeAnalyticsDestination returns a DataframeAnalyticsDestination.
+func NewDataframeAnalyticsDestination() *DataframeAnalyticsDestination {
+	r := &DataframeAnalyticsDestination{}
 
-// Index Defines the destination index to store the results of the data frame
-// analytics job.
-
-func (rb *DataframeAnalyticsDestinationBuilder) Index(index IndexName) *DataframeAnalyticsDestinationBuilder {
-	rb.v.Index = index
-	return rb
-}
-
-// ResultsField Defines the name of the field in which to store the results of the analysis.
-// Defaults to `ml`.
-
-func (rb *DataframeAnalyticsDestinationBuilder) ResultsField(resultsfield Field) *DataframeAnalyticsDestinationBuilder {
-	rb.v.ResultsField = &resultsfield
-	return rb
+	return r
 }

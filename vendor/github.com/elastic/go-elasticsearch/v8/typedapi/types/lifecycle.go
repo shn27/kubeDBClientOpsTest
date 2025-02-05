@@ -15,54 +15,66 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // Lifecycle type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ilm/get_lifecycle/types.ts#L24-L28
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ilm/get_lifecycle/types.ts#L24-L28
 type Lifecycle struct {
-	ModifiedDate DateTime      `json:"modified_date"`
-	Policy       Policy        `json:"policy"`
-	Version      VersionNumber `json:"version"`
+	ModifiedDate DateTime  `json:"modified_date"`
+	Policy       IlmPolicy `json:"policy"`
+	Version      int64     `json:"version"`
 }
 
-// LifecycleBuilder holds Lifecycle struct and provides a builder API.
-type LifecycleBuilder struct {
-	v *Lifecycle
-}
+func (s *Lifecycle) UnmarshalJSON(data []byte) error {
 
-// NewLifecycle provides a builder for the Lifecycle struct.
-func NewLifecycleBuilder() *LifecycleBuilder {
-	r := LifecycleBuilder{
-		&Lifecycle{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "modified_date":
+			if err := dec.Decode(&s.ModifiedDate); err != nil {
+				return fmt.Errorf("%s | %w", "ModifiedDate", err)
+			}
+
+		case "policy":
+			if err := dec.Decode(&s.Policy); err != nil {
+				return fmt.Errorf("%s | %w", "Policy", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the Lifecycle struct
-func (rb *LifecycleBuilder) Build() Lifecycle {
-	return *rb.v
-}
+// NewLifecycle returns a Lifecycle.
+func NewLifecycle() *Lifecycle {
+	r := &Lifecycle{}
 
-func (rb *LifecycleBuilder) ModifiedDate(modifieddate *DateTimeBuilder) *LifecycleBuilder {
-	v := modifieddate.Build()
-	rb.v.ModifiedDate = v
-	return rb
-}
-
-func (rb *LifecycleBuilder) Policy(policy *PolicyBuilder) *LifecycleBuilder {
-	v := policy.Build()
-	rb.v.Policy = v
-	return rb
-}
-
-func (rb *LifecycleBuilder) Version(version VersionNumber) *LifecycleBuilder {
-	rb.v.Version = version
-	return rb
+	return r
 }

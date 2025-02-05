@@ -15,52 +15,88 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // StepKey type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ilm/move_to_step/types.ts#L20-L24
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ilm/move_to_step/types.ts#L20-L25
 type StepKey struct {
-	Action string `json:"action"`
-	Name   string `json:"name"`
-	Phase  string `json:"phase"`
+	Action *string `json:"action,omitempty"`
+	Name   *string `json:"name,omitempty"`
+	Phase  string  `json:"phase"`
 }
 
-// StepKeyBuilder holds StepKey struct and provides a builder API.
-type StepKeyBuilder struct {
-	v *StepKey
-}
+func (s *StepKey) UnmarshalJSON(data []byte) error {
 
-// NewStepKey provides a builder for the StepKey struct.
-func NewStepKeyBuilder() *StepKeyBuilder {
-	r := StepKeyBuilder{
-		&StepKey{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "action":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Action", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Action = &o
+
+		case "name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Name = &o
+
+		case "phase":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Phase", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Phase = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the StepKey struct
-func (rb *StepKeyBuilder) Build() StepKey {
-	return *rb.v
-}
+// NewStepKey returns a StepKey.
+func NewStepKey() *StepKey {
+	r := &StepKey{}
 
-func (rb *StepKeyBuilder) Action(action string) *StepKeyBuilder {
-	rb.v.Action = action
-	return rb
-}
-
-func (rb *StepKeyBuilder) Name(name string) *StepKeyBuilder {
-	rb.v.Name = name
-	return rb
-}
-
-func (rb *StepKeyBuilder) Phase(phase string) *StepKeyBuilder {
-	rb.v.Phase = phase
-	return rb
+	return r
 }

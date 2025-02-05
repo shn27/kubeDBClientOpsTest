@@ -15,34 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // HttpHeaders type alias.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/common.ts#L131-L131
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/common.ts#L159-L159
 type HttpHeaders map[string][]string
-
-// HttpHeadersBuilder holds HttpHeaders struct and provides a builder API.
-type HttpHeadersBuilder struct {
-	v HttpHeaders
-}
-
-// NewHttpHeaders provides a builder for the HttpHeaders struct.
-func NewHttpHeadersBuilder() *HttpHeadersBuilder {
-	return &HttpHeadersBuilder{}
-}
-
-// Build finalize the chain and returns the HttpHeaders struct
-func (b *HttpHeadersBuilder) Build() HttpHeaders {
-	return b.v
-}
-
-func (b *HttpHeadersBuilder) HttpHeaders(value HttpHeaders) *HttpHeadersBuilder {
-	b.v = value
-	return b
-}

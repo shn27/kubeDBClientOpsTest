@@ -15,60 +15,98 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DanglingIndex type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/dangling_indices/list_dangling_indices/ListDanglingIndicesResponse.ts#L29-L34
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/dangling_indices/list_dangling_indices/ListDanglingIndicesResponse.ts#L29-L34
 type DanglingIndex struct {
-	CreationDateMillis EpochTimeUnitMillis `json:"creation_date_millis"`
-	IndexName          string              `json:"index_name"`
-	IndexUuid          string              `json:"index_uuid"`
-	NodeIds            Ids                 `json:"node_ids"`
+	CreationDateMillis int64    `json:"creation_date_millis"`
+	IndexName          string   `json:"index_name"`
+	IndexUuid          string   `json:"index_uuid"`
+	NodeIds            []string `json:"node_ids"`
 }
 
-// DanglingIndexBuilder holds DanglingIndex struct and provides a builder API.
-type DanglingIndexBuilder struct {
-	v *DanglingIndex
-}
+func (s *DanglingIndex) UnmarshalJSON(data []byte) error {
 
-// NewDanglingIndex provides a builder for the DanglingIndex struct.
-func NewDanglingIndexBuilder() *DanglingIndexBuilder {
-	r := DanglingIndexBuilder{
-		&DanglingIndex{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "creation_date_millis":
+			if err := dec.Decode(&s.CreationDateMillis); err != nil {
+				return fmt.Errorf("%s | %w", "CreationDateMillis", err)
+			}
+
+		case "index_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "IndexName", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.IndexName = o
+
+		case "index_uuid":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "IndexUuid", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.IndexUuid = o
+
+		case "node_ids":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "NodeIds", err)
+				}
+
+				s.NodeIds = append(s.NodeIds, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.NodeIds); err != nil {
+					return fmt.Errorf("%s | %w", "NodeIds", err)
+				}
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DanglingIndex struct
-func (rb *DanglingIndexBuilder) Build() DanglingIndex {
-	return *rb.v
-}
+// NewDanglingIndex returns a DanglingIndex.
+func NewDanglingIndex() *DanglingIndex {
+	r := &DanglingIndex{}
 
-func (rb *DanglingIndexBuilder) CreationDateMillis(creationdatemillis *EpochTimeUnitMillisBuilder) *DanglingIndexBuilder {
-	v := creationdatemillis.Build()
-	rb.v.CreationDateMillis = v
-	return rb
-}
-
-func (rb *DanglingIndexBuilder) IndexName(indexname string) *DanglingIndexBuilder {
-	rb.v.IndexName = indexname
-	return rb
-}
-
-func (rb *DanglingIndexBuilder) IndexUuid(indexuuid string) *DanglingIndexBuilder {
-	rb.v.IndexUuid = indexuuid
-	return rb
-}
-
-func (rb *DanglingIndexBuilder) NodeIds(nodeids *IdsBuilder) *DanglingIndexBuilder {
-	v := nodeids.Build()
-	rb.v.NodeIds = v
-	return rb
+	return r
 }

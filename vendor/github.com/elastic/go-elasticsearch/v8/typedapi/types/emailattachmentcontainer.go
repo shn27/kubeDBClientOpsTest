@@ -15,55 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // EmailAttachmentContainer type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Actions.ts#L211-L216
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Actions.ts#L211-L216
 type EmailAttachmentContainer struct {
 	Data      *DataEmailAttachment      `json:"data,omitempty"`
 	Http      *HttpEmailAttachment      `json:"http,omitempty"`
 	Reporting *ReportingEmailAttachment `json:"reporting,omitempty"`
 }
 
-// EmailAttachmentContainerBuilder holds EmailAttachmentContainer struct and provides a builder API.
-type EmailAttachmentContainerBuilder struct {
-	v *EmailAttachmentContainer
-}
+// NewEmailAttachmentContainer returns a EmailAttachmentContainer.
+func NewEmailAttachmentContainer() *EmailAttachmentContainer {
+	r := &EmailAttachmentContainer{}
 
-// NewEmailAttachmentContainer provides a builder for the EmailAttachmentContainer struct.
-func NewEmailAttachmentContainerBuilder() *EmailAttachmentContainerBuilder {
-	r := EmailAttachmentContainerBuilder{
-		&EmailAttachmentContainer{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the EmailAttachmentContainer struct
-func (rb *EmailAttachmentContainerBuilder) Build() EmailAttachmentContainer {
-	return *rb.v
-}
-
-func (rb *EmailAttachmentContainerBuilder) Data(data *DataEmailAttachmentBuilder) *EmailAttachmentContainerBuilder {
-	v := data.Build()
-	rb.v.Data = &v
-	return rb
-}
-
-func (rb *EmailAttachmentContainerBuilder) Http(http *HttpEmailAttachmentBuilder) *EmailAttachmentContainerBuilder {
-	v := http.Build()
-	rb.v.Http = &v
-	return rb
-}
-
-func (rb *EmailAttachmentContainerBuilder) Reporting(reporting *ReportingEmailAttachmentBuilder) *EmailAttachmentContainerBuilder {
-	v := reporting.Build()
-	rb.v.Reporting = &v
-	return rb
+	return r
 }

@@ -15,40 +15,65 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // MlCounter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/usage/types.ts#L238-L240
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/xpack/usage/types.ts#L253-L255
 type MlCounter struct {
 	Count int64 `json:"count"`
 }
 
-// MlCounterBuilder holds MlCounter struct and provides a builder API.
-type MlCounterBuilder struct {
-	v *MlCounter
-}
+func (s *MlCounter) UnmarshalJSON(data []byte) error {
 
-// NewMlCounter provides a builder for the MlCounter struct.
-func NewMlCounterBuilder() *MlCounterBuilder {
-	r := MlCounterBuilder{
-		&MlCounter{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Count", err)
+				}
+				s.Count = value
+			case float64:
+				f := int64(v)
+				s.Count = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the MlCounter struct
-func (rb *MlCounterBuilder) Build() MlCounter {
-	return *rb.v
-}
+// NewMlCounter returns a MlCounter.
+func NewMlCounter() *MlCounter {
+	r := &MlCounter{}
 
-func (rb *MlCounterBuilder) Count(count int64) *MlCounterBuilder {
-	rb.v.Count = count
-	return rb
+	return r
 }

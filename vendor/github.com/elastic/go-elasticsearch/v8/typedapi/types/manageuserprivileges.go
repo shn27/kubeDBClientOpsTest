@@ -15,40 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // ManageUserPrivileges type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/_types/Privileges.ts#L168-L170
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/_types/Privileges.ts#L414-L416
 type ManageUserPrivileges struct {
 	Applications []string `json:"applications"`
 }
 
-// ManageUserPrivilegesBuilder holds ManageUserPrivileges struct and provides a builder API.
-type ManageUserPrivilegesBuilder struct {
-	v *ManageUserPrivileges
-}
+// NewManageUserPrivileges returns a ManageUserPrivileges.
+func NewManageUserPrivileges() *ManageUserPrivileges {
+	r := &ManageUserPrivileges{}
 
-// NewManageUserPrivileges provides a builder for the ManageUserPrivileges struct.
-func NewManageUserPrivilegesBuilder() *ManageUserPrivilegesBuilder {
-	r := ManageUserPrivilegesBuilder{
-		&ManageUserPrivileges{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the ManageUserPrivileges struct
-func (rb *ManageUserPrivilegesBuilder) Build() ManageUserPrivileges {
-	return *rb.v
-}
-
-func (rb *ManageUserPrivilegesBuilder) Applications(applications ...string) *ManageUserPrivilegesBuilder {
-	rb.v.Applications = applications
-	return rb
+	return r
 }

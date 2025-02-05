@@ -15,47 +15,60 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // NodeReloadError type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/_types/NodeReloadResult.ts#L24-L27
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/_types/NodeReloadResult.ts#L24-L27
 type NodeReloadError struct {
-	Name            Name        `json:"name"`
+	Name            string      `json:"name"`
 	ReloadException *ErrorCause `json:"reload_exception,omitempty"`
 }
 
-// NodeReloadErrorBuilder holds NodeReloadError struct and provides a builder API.
-type NodeReloadErrorBuilder struct {
-	v *NodeReloadError
-}
+func (s *NodeReloadError) UnmarshalJSON(data []byte) error {
 
-// NewNodeReloadError provides a builder for the NodeReloadError struct.
-func NewNodeReloadErrorBuilder() *NodeReloadErrorBuilder {
-	r := NodeReloadErrorBuilder{
-		&NodeReloadError{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		case "reload_exception":
+			if err := dec.Decode(&s.ReloadException); err != nil {
+				return fmt.Errorf("%s | %w", "ReloadException", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the NodeReloadError struct
-func (rb *NodeReloadErrorBuilder) Build() NodeReloadError {
-	return *rb.v
-}
+// NewNodeReloadError returns a NodeReloadError.
+func NewNodeReloadError() *NodeReloadError {
+	r := &NodeReloadError{}
 
-func (rb *NodeReloadErrorBuilder) Name(name Name) *NodeReloadErrorBuilder {
-	rb.v.Name = name
-	return rb
-}
-
-func (rb *NodeReloadErrorBuilder) ReloadException(reloadexception *ErrorCauseBuilder) *NodeReloadErrorBuilder {
-	v := reloadexception.Build()
-	rb.v.ReloadException = &v
-	return rb
+	return r
 }

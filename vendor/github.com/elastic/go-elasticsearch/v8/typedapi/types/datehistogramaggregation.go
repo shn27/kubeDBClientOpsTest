@@ -15,151 +15,213 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/calendarinterval"
+	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/sortorder"
 )
 
 // DateHistogramAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/bucket.ts#L90-L107
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/bucket.ts#L202-L260
 type DateHistogramAggregation struct {
+	// CalendarInterval Calendar-aware interval.
+	// Can be specified using the unit name, such as `month`, or as a single unit
+	// quantity, such as `1M`.
 	CalendarInterval *calendarinterval.CalendarInterval `json:"calendar_interval,omitempty"`
-	ExtendedBounds   *ExtendedBoundsFieldDateMath       `json:"extended_bounds,omitempty"`
-	Field            *Field                             `json:"field,omitempty"`
-	FixedInterval    *Duration                          `json:"fixed_interval,omitempty"`
-	Format           *string                            `json:"format,omitempty"`
-	HardBounds       *ExtendedBoundsFieldDateMath       `json:"hard_bounds,omitempty"`
-	Interval         *Duration                          `json:"interval,omitempty"`
-	Keyed            *bool                              `json:"keyed,omitempty"`
-	Meta             *Metadata                          `json:"meta,omitempty"`
-	MinDocCount      *int                               `json:"min_doc_count,omitempty"`
-	Missing          *DateTime                          `json:"missing,omitempty"`
-	Name             *string                            `json:"name,omitempty"`
-	Offset           *Duration                          `json:"offset,omitempty"`
-	Order            *AggregateOrder                    `json:"order,omitempty"`
-	Params           map[string]interface{}             `json:"params,omitempty"`
-	Script           *Script                            `json:"script,omitempty"`
-	TimeZone         *TimeZone                          `json:"time_zone,omitempty"`
+	// ExtendedBounds Enables extending the bounds of the histogram beyond the data itself.
+	ExtendedBounds *ExtendedBoundsFieldDateMath `json:"extended_bounds,omitempty"`
+	// Field The date field whose values are use to build a histogram.
+	Field *string `json:"field,omitempty"`
+	// FixedInterval Fixed intervals: a fixed number of SI units and never deviate, regardless of
+	// where they fall on the calendar.
+	FixedInterval Duration `json:"fixed_interval,omitempty"`
+	// Format The date format used to format `key_as_string` in the response.
+	// If no `format` is specified, the first date format specified in the field
+	// mapping is used.
+	Format *string `json:"format,omitempty"`
+	// HardBounds Limits the histogram to specified bounds.
+	HardBounds *ExtendedBoundsFieldDateMath `json:"hard_bounds,omitempty"`
+	Interval   Duration                     `json:"interval,omitempty"`
+	// Keyed Set to `true` to associate a unique string key with each bucket and return
+	// the ranges as a hash rather than an array.
+	Keyed *bool `json:"keyed,omitempty"`
+	// MinDocCount Only returns buckets that have `min_doc_count` number of documents.
+	// By default, all buckets between the first bucket that matches documents and
+	// the last one are returned.
+	MinDocCount *int `json:"min_doc_count,omitempty"`
+	// Missing The value to apply to documents that do not have a value.
+	// By default, documents without a value are ignored.
+	Missing DateTime `json:"missing,omitempty"`
+	// Offset Changes the start value of each bucket by the specified positive (`+`) or
+	// negative offset (`-`) duration.
+	Offset Duration `json:"offset,omitempty"`
+	// Order The sort order of the returned buckets.
+	Order  AggregateOrder             `json:"order,omitempty"`
+	Params map[string]json.RawMessage `json:"params,omitempty"`
+	Script *Script                    `json:"script,omitempty"`
+	// TimeZone Time zone used for bucketing and rounding.
+	// Defaults to Coordinated Universal Time (UTC).
+	TimeZone *string `json:"time_zone,omitempty"`
 }
 
-// DateHistogramAggregationBuilder holds DateHistogramAggregation struct and provides a builder API.
-type DateHistogramAggregationBuilder struct {
-	v *DateHistogramAggregation
+func (s *DateHistogramAggregation) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "calendar_interval":
+			if err := dec.Decode(&s.CalendarInterval); err != nil {
+				return fmt.Errorf("%s | %w", "CalendarInterval", err)
+			}
+
+		case "extended_bounds":
+			if err := dec.Decode(&s.ExtendedBounds); err != nil {
+				return fmt.Errorf("%s | %w", "ExtendedBounds", err)
+			}
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "fixed_interval":
+			if err := dec.Decode(&s.FixedInterval); err != nil {
+				return fmt.Errorf("%s | %w", "FixedInterval", err)
+			}
+
+		case "format":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Format", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Format = &o
+
+		case "hard_bounds":
+			if err := dec.Decode(&s.HardBounds); err != nil {
+				return fmt.Errorf("%s | %w", "HardBounds", err)
+			}
+
+		case "interval":
+			if err := dec.Decode(&s.Interval); err != nil {
+				return fmt.Errorf("%s | %w", "Interval", err)
+			}
+
+		case "keyed":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Keyed", err)
+				}
+				s.Keyed = &value
+			case bool:
+				s.Keyed = &v
+			}
+
+		case "min_doc_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MinDocCount", err)
+				}
+				s.MinDocCount = &value
+			case float64:
+				f := int(v)
+				s.MinDocCount = &f
+			}
+
+		case "missing":
+			if err := dec.Decode(&s.Missing); err != nil {
+				return fmt.Errorf("%s | %w", "Missing", err)
+			}
+
+		case "offset":
+			if err := dec.Decode(&s.Offset); err != nil {
+				return fmt.Errorf("%s | %w", "Offset", err)
+			}
+
+		case "order":
+
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			source := bytes.NewReader(rawMsg)
+			localDec := json.NewDecoder(source)
+			switch rawMsg[0] {
+			case '{':
+				o := make(map[string]sortorder.SortOrder, 0)
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Order", err)
+				}
+				s.Order = o
+			case '[':
+				o := make([]map[string]sortorder.SortOrder, 0)
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Order", err)
+				}
+				s.Order = o
+			}
+
+		case "params":
+			if s.Params == nil {
+				s.Params = make(map[string]json.RawMessage, 0)
+			}
+			if err := dec.Decode(&s.Params); err != nil {
+				return fmt.Errorf("%s | %w", "Params", err)
+			}
+
+		case "script":
+			if err := dec.Decode(&s.Script); err != nil {
+				return fmt.Errorf("%s | %w", "Script", err)
+			}
+
+		case "time_zone":
+			if err := dec.Decode(&s.TimeZone); err != nil {
+				return fmt.Errorf("%s | %w", "TimeZone", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewDateHistogramAggregation provides a builder for the DateHistogramAggregation struct.
-func NewDateHistogramAggregationBuilder() *DateHistogramAggregationBuilder {
-	r := DateHistogramAggregationBuilder{
-		&DateHistogramAggregation{
-			Params: make(map[string]interface{}, 0),
-		},
+// NewDateHistogramAggregation returns a DateHistogramAggregation.
+func NewDateHistogramAggregation() *DateHistogramAggregation {
+	r := &DateHistogramAggregation{
+		Params: make(map[string]json.RawMessage, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the DateHistogramAggregation struct
-func (rb *DateHistogramAggregationBuilder) Build() DateHistogramAggregation {
-	return *rb.v
-}
-
-func (rb *DateHistogramAggregationBuilder) CalendarInterval(calendarinterval calendarinterval.CalendarInterval) *DateHistogramAggregationBuilder {
-	rb.v.CalendarInterval = &calendarinterval
-	return rb
-}
-
-func (rb *DateHistogramAggregationBuilder) ExtendedBounds(extendedbounds *ExtendedBoundsFieldDateMathBuilder) *DateHistogramAggregationBuilder {
-	v := extendedbounds.Build()
-	rb.v.ExtendedBounds = &v
-	return rb
-}
-
-func (rb *DateHistogramAggregationBuilder) Field(field Field) *DateHistogramAggregationBuilder {
-	rb.v.Field = &field
-	return rb
-}
-
-func (rb *DateHistogramAggregationBuilder) FixedInterval(fixedinterval *DurationBuilder) *DateHistogramAggregationBuilder {
-	v := fixedinterval.Build()
-	rb.v.FixedInterval = &v
-	return rb
-}
-
-func (rb *DateHistogramAggregationBuilder) Format(format string) *DateHistogramAggregationBuilder {
-	rb.v.Format = &format
-	return rb
-}
-
-func (rb *DateHistogramAggregationBuilder) HardBounds(hardbounds *ExtendedBoundsFieldDateMathBuilder) *DateHistogramAggregationBuilder {
-	v := hardbounds.Build()
-	rb.v.HardBounds = &v
-	return rb
-}
-
-func (rb *DateHistogramAggregationBuilder) Interval(interval *DurationBuilder) *DateHistogramAggregationBuilder {
-	v := interval.Build()
-	rb.v.Interval = &v
-	return rb
-}
-
-func (rb *DateHistogramAggregationBuilder) Keyed(keyed bool) *DateHistogramAggregationBuilder {
-	rb.v.Keyed = &keyed
-	return rb
-}
-
-func (rb *DateHistogramAggregationBuilder) Meta(meta *MetadataBuilder) *DateHistogramAggregationBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *DateHistogramAggregationBuilder) MinDocCount(mindoccount int) *DateHistogramAggregationBuilder {
-	rb.v.MinDocCount = &mindoccount
-	return rb
-}
-
-func (rb *DateHistogramAggregationBuilder) Missing(missing *DateTimeBuilder) *DateHistogramAggregationBuilder {
-	v := missing.Build()
-	rb.v.Missing = &v
-	return rb
-}
-
-func (rb *DateHistogramAggregationBuilder) Name(name string) *DateHistogramAggregationBuilder {
-	rb.v.Name = &name
-	return rb
-}
-
-func (rb *DateHistogramAggregationBuilder) Offset(offset *DurationBuilder) *DateHistogramAggregationBuilder {
-	v := offset.Build()
-	rb.v.Offset = &v
-	return rb
-}
-
-func (rb *DateHistogramAggregationBuilder) Order(order *AggregateOrderBuilder) *DateHistogramAggregationBuilder {
-	v := order.Build()
-	rb.v.Order = &v
-	return rb
-}
-
-func (rb *DateHistogramAggregationBuilder) Params(value map[string]interface{}) *DateHistogramAggregationBuilder {
-	rb.v.Params = value
-	return rb
-}
-
-func (rb *DateHistogramAggregationBuilder) Script(script *ScriptBuilder) *DateHistogramAggregationBuilder {
-	v := script.Build()
-	rb.v.Script = &v
-	return rb
-}
-
-func (rb *DateHistogramAggregationBuilder) TimeZone(timezone TimeZone) *DateHistogramAggregationBuilder {
-	rb.v.TimeZone = &timezone
-	return rb
+	return r
 }

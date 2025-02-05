@@ -15,16 +15,22 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // DataframeAnalysisAnalyzedFields type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/DataframeAnalytics.ts#L238-L244
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/DataframeAnalytics.ts#L238-L244
 type DataframeAnalysisAnalyzedFields struct {
 	// Excludes An array of strings that defines the fields that will be included in the
 	// analysis.
@@ -35,38 +41,49 @@ type DataframeAnalysisAnalyzedFields struct {
 	Includes []string `json:"includes"`
 }
 
-// DataframeAnalysisAnalyzedFieldsBuilder holds DataframeAnalysisAnalyzedFields struct and provides a builder API.
-type DataframeAnalysisAnalyzedFieldsBuilder struct {
-	v *DataframeAnalysisAnalyzedFields
-}
+func (s *DataframeAnalysisAnalyzedFields) UnmarshalJSON(data []byte) error {
 
-// NewDataframeAnalysisAnalyzedFields provides a builder for the DataframeAnalysisAnalyzedFields struct.
-func NewDataframeAnalysisAnalyzedFieldsBuilder() *DataframeAnalysisAnalyzedFieldsBuilder {
-	r := DataframeAnalysisAnalyzedFieldsBuilder{
-		&DataframeAnalysisAnalyzedFields{},
+	if !bytes.HasPrefix(data, []byte(`{`)) {
+		var item string
+		err := json.NewDecoder(bytes.NewReader(data)).Decode(&item)
+		if err != nil {
+			return err
+		}
+		s.Includes = append(s.Includes, item)
+		return nil
 	}
 
-	return &r
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "excludes":
+			if err := dec.Decode(&s.Excludes); err != nil {
+				return fmt.Errorf("%s | %w", "Excludes", err)
+			}
+
+		case "includes":
+			if err := dec.Decode(&s.Includes); err != nil {
+				return fmt.Errorf("%s | %w", "Includes", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// Build finalize the chain and returns the DataframeAnalysisAnalyzedFields struct
-func (rb *DataframeAnalysisAnalyzedFieldsBuilder) Build() DataframeAnalysisAnalyzedFields {
-	return *rb.v
-}
+// NewDataframeAnalysisAnalyzedFields returns a DataframeAnalysisAnalyzedFields.
+func NewDataframeAnalysisAnalyzedFields() *DataframeAnalysisAnalyzedFields {
+	r := &DataframeAnalysisAnalyzedFields{}
 
-// Excludes An array of strings that defines the fields that will be included in the
-// analysis.
-
-func (rb *DataframeAnalysisAnalyzedFieldsBuilder) Excludes(excludes ...string) *DataframeAnalysisAnalyzedFieldsBuilder {
-	rb.v.Excludes = excludes
-	return rb
-}
-
-// Includes An array of strings that defines the fields that will be excluded from the
-// analysis. You do not need to add fields with unsupported data types to
-// excludes, these fields are excluded from the analysis automatically.
-
-func (rb *DataframeAnalysisAnalyzedFieldsBuilder) Includes(includes ...string) *DataframeAnalysisAnalyzedFieldsBuilder {
-	rb.v.Includes = includes
-	return rb
+	return r
 }

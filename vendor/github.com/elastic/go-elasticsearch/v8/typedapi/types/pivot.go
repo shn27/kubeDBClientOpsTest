@@ -15,16 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // Pivot type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/transform/_types/Transform.ts#L54-L68
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/transform/_types/Transform.ts#L54-L68
 type Pivot struct {
 	// Aggregations Defines how to aggregate the grouped data. The following aggregations are
 	// currently supported: average, bucket
@@ -33,61 +31,19 @@ type Pivot struct {
 	// min, missing, percentiles, rare terms, scripted metric, stats, sum, terms,
 	// top metrics, value count, weighted
 	// average.
-	Aggregations map[string]AggregationContainer `json:"aggregations,omitempty"`
+	Aggregations map[string]Aggregations `json:"aggregations,omitempty"`
 	// GroupBy Defines how to group the data. More than one grouping can be defined per
 	// pivot. The following groupings are
 	// currently supported: date histogram, geotile grid, histogram, terms.
 	GroupBy map[string]PivotGroupByContainer `json:"group_by,omitempty"`
 }
 
-// PivotBuilder holds Pivot struct and provides a builder API.
-type PivotBuilder struct {
-	v *Pivot
-}
-
-// NewPivot provides a builder for the Pivot struct.
-func NewPivotBuilder() *PivotBuilder {
-	r := PivotBuilder{
-		&Pivot{
-			Aggregations: make(map[string]AggregationContainer, 0),
-			GroupBy:      make(map[string]PivotGroupByContainer, 0),
-		},
+// NewPivot returns a Pivot.
+func NewPivot() *Pivot {
+	r := &Pivot{
+		Aggregations: make(map[string]Aggregations, 0),
+		GroupBy:      make(map[string]PivotGroupByContainer, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the Pivot struct
-func (rb *PivotBuilder) Build() Pivot {
-	return *rb.v
-}
-
-// Aggregations Defines how to aggregate the grouped data. The following aggregations are
-// currently supported: average, bucket
-// script, bucket selector, cardinality, filter, geo bounds, geo centroid, geo
-// line, max, median absolute deviation,
-// min, missing, percentiles, rare terms, scripted metric, stats, sum, terms,
-// top metrics, value count, weighted
-// average.
-
-func (rb *PivotBuilder) Aggregations(values map[string]*AggregationContainerBuilder) *PivotBuilder {
-	tmp := make(map[string]AggregationContainer, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Aggregations = tmp
-	return rb
-}
-
-// GroupBy Defines how to group the data. More than one grouping can be defined per
-// pivot. The following groupings are
-// currently supported: date histogram, geotile grid, histogram, terms.
-
-func (rb *PivotBuilder) GroupBy(values map[string]*PivotGroupByContainerBuilder) *PivotBuilder {
-	tmp := make(map[string]PivotGroupByContainer, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.GroupBy = tmp
-	return rb
+	return r
 }

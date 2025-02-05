@@ -15,59 +15,115 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // TermQuery type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/term.ts#L116-L121
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/term.ts#L238-L255
 type TermQuery struct {
-	Boost           *float32   `json:"boost,omitempty"`
-	CaseInsensitive *bool      `json:"case_insensitive,omitempty"`
-	QueryName_      *string    `json:"_name,omitempty"`
-	Value           FieldValue `json:"value"`
+	// Boost Floating point number used to decrease or increase the relevance scores of
+	// the query.
+	// Boost values are relative to the default value of 1.0.
+	// A boost value between 0 and 1.0 decreases the relevance score.
+	// A value greater than 1.0 increases the relevance score.
+	Boost *float32 `json:"boost,omitempty"`
+	// CaseInsensitive Allows ASCII case insensitive matching of the value with the indexed field
+	// values when set to `true`.
+	// When `false`, the case sensitivity of matching depends on the underlying
+	// field’s mapping.
+	CaseInsensitive *bool   `json:"case_insensitive,omitempty"`
+	QueryName_      *string `json:"_name,omitempty"`
+	// Value Term you wish to find in the provided field.
+	Value FieldValue `json:"value"`
 }
 
-// TermQueryBuilder holds TermQuery struct and provides a builder API.
-type TermQueryBuilder struct {
-	v *TermQuery
-}
+func (s *TermQuery) UnmarshalJSON(data []byte) error {
 
-// NewTermQuery provides a builder for the TermQuery struct.
-func NewTermQueryBuilder() *TermQueryBuilder {
-	r := TermQueryBuilder{
-		&TermQuery{},
+	if !bytes.HasPrefix(data, []byte(`{`)) {
+		err := json.NewDecoder(bytes.NewReader(data)).Decode(&s.Value)
+		return err
 	}
 
-	return &r
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "boost":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Boost", err)
+				}
+				f := float32(value)
+				s.Boost = &f
+			case float64:
+				f := float32(v)
+				s.Boost = &f
+			}
+
+		case "case_insensitive":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CaseInsensitive", err)
+				}
+				s.CaseInsensitive = &value
+			case bool:
+				s.CaseInsensitive = &v
+			}
+
+		case "_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "QueryName_", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.QueryName_ = &o
+
+		case "value":
+			if err := dec.Decode(&s.Value); err != nil {
+				return fmt.Errorf("%s | %w", "Value", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// Build finalize the chain and returns the TermQuery struct
-func (rb *TermQueryBuilder) Build() TermQuery {
-	return *rb.v
-}
+// NewTermQuery returns a TermQuery.
+func NewTermQuery() *TermQuery {
+	r := &TermQuery{}
 
-func (rb *TermQueryBuilder) Boost(boost float32) *TermQueryBuilder {
-	rb.v.Boost = &boost
-	return rb
-}
-
-func (rb *TermQueryBuilder) CaseInsensitive(caseinsensitive bool) *TermQueryBuilder {
-	rb.v.CaseInsensitive = &caseinsensitive
-	return rb
-}
-
-func (rb *TermQueryBuilder) QueryName_(queryname_ string) *TermQueryBuilder {
-	rb.v.QueryName_ = &queryname_
-	return rb
-}
-
-func (rb *TermQueryBuilder) Value(value *FieldValueBuilder) *TermQueryBuilder {
-	v := value.Build()
-	rb.v.Value = v
-	return rb
+	return r
 }

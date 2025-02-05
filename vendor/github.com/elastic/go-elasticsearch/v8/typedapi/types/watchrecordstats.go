@@ -15,76 +15,86 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/executionphase"
 )
 
 // WatchRecordStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/stats/types.ts#L54-L60
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/stats/types.ts#L54-L60
 type WatchRecordStats struct {
 	ExecutedActions []string                      `json:"executed_actions,omitempty"`
 	ExecutionPhase  executionphase.ExecutionPhase `json:"execution_phase"`
 	ExecutionTime   DateTime                      `json:"execution_time"`
 	TriggeredTime   DateTime                      `json:"triggered_time"`
-	WatchId         Id                            `json:"watch_id"`
-	WatchRecordId   Id                            `json:"watch_record_id"`
+	WatchId         string                        `json:"watch_id"`
+	WatchRecordId   string                        `json:"watch_record_id"`
 }
 
-// WatchRecordStatsBuilder holds WatchRecordStats struct and provides a builder API.
-type WatchRecordStatsBuilder struct {
-	v *WatchRecordStats
-}
+func (s *WatchRecordStats) UnmarshalJSON(data []byte) error {
 
-// NewWatchRecordStats provides a builder for the WatchRecordStats struct.
-func NewWatchRecordStatsBuilder() *WatchRecordStatsBuilder {
-	r := WatchRecordStatsBuilder{
-		&WatchRecordStats{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "executed_actions":
+			if err := dec.Decode(&s.ExecutedActions); err != nil {
+				return fmt.Errorf("%s | %w", "ExecutedActions", err)
+			}
+
+		case "execution_phase":
+			if err := dec.Decode(&s.ExecutionPhase); err != nil {
+				return fmt.Errorf("%s | %w", "ExecutionPhase", err)
+			}
+
+		case "execution_time":
+			if err := dec.Decode(&s.ExecutionTime); err != nil {
+				return fmt.Errorf("%s | %w", "ExecutionTime", err)
+			}
+
+		case "triggered_time":
+			if err := dec.Decode(&s.TriggeredTime); err != nil {
+				return fmt.Errorf("%s | %w", "TriggeredTime", err)
+			}
+
+		case "watch_id":
+			if err := dec.Decode(&s.WatchId); err != nil {
+				return fmt.Errorf("%s | %w", "WatchId", err)
+			}
+
+		case "watch_record_id":
+			if err := dec.Decode(&s.WatchRecordId); err != nil {
+				return fmt.Errorf("%s | %w", "WatchRecordId", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the WatchRecordStats struct
-func (rb *WatchRecordStatsBuilder) Build() WatchRecordStats {
-	return *rb.v
-}
+// NewWatchRecordStats returns a WatchRecordStats.
+func NewWatchRecordStats() *WatchRecordStats {
+	r := &WatchRecordStats{}
 
-func (rb *WatchRecordStatsBuilder) ExecutedActions(executed_actions ...string) *WatchRecordStatsBuilder {
-	rb.v.ExecutedActions = executed_actions
-	return rb
-}
-
-func (rb *WatchRecordStatsBuilder) ExecutionPhase(executionphase executionphase.ExecutionPhase) *WatchRecordStatsBuilder {
-	rb.v.ExecutionPhase = executionphase
-	return rb
-}
-
-func (rb *WatchRecordStatsBuilder) ExecutionTime(executiontime *DateTimeBuilder) *WatchRecordStatsBuilder {
-	v := executiontime.Build()
-	rb.v.ExecutionTime = v
-	return rb
-}
-
-func (rb *WatchRecordStatsBuilder) TriggeredTime(triggeredtime *DateTimeBuilder) *WatchRecordStatsBuilder {
-	v := triggeredtime.Build()
-	rb.v.TriggeredTime = v
-	return rb
-}
-
-func (rb *WatchRecordStatsBuilder) WatchId(watchid Id) *WatchRecordStatsBuilder {
-	rb.v.WatchId = watchid
-	return rb
-}
-
-func (rb *WatchRecordStatsBuilder) WatchRecordId(watchrecordid Id) *WatchRecordStatsBuilder {
-	rb.v.WatchRecordId = watchrecordid
-	return rb
+	return r
 }

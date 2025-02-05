@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
@@ -27,38 +25,5 @@ package types
 //	map[string]SignificantLongTermsBucket
 //	[]SignificantLongTermsBucket
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L303-L312
-type BucketsSignificantLongTermsBucket interface{}
-
-// BucketsSignificantLongTermsBucketBuilder holds BucketsSignificantLongTermsBucket struct and provides a builder API.
-type BucketsSignificantLongTermsBucketBuilder struct {
-	v BucketsSignificantLongTermsBucket
-}
-
-// NewBucketsSignificantLongTermsBucket provides a builder for the BucketsSignificantLongTermsBucket struct.
-func NewBucketsSignificantLongTermsBucketBuilder() *BucketsSignificantLongTermsBucketBuilder {
-	return &BucketsSignificantLongTermsBucketBuilder{}
-}
-
-// Build finalize the chain and returns the BucketsSignificantLongTermsBucket struct
-func (u *BucketsSignificantLongTermsBucketBuilder) Build() BucketsSignificantLongTermsBucket {
-	return u.v
-}
-
-func (u *BucketsSignificantLongTermsBucketBuilder) Map(values map[string]*SignificantLongTermsBucketBuilder) *BucketsSignificantLongTermsBucketBuilder {
-	tmp := make(map[string]SignificantLongTermsBucket, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	u.v = tmp
-	return u
-}
-
-func (u *BucketsSignificantLongTermsBucketBuilder) SignificantLongTermsBuckets(significantlongtermsbuckets []SignificantLongTermsBucketBuilder) *BucketsSignificantLongTermsBucketBuilder {
-	tmp := make([]SignificantLongTermsBucket, len(significantlongtermsbuckets))
-	for _, value := range significantlongtermsbuckets {
-		tmp = append(tmp, value.Build())
-	}
-	u.v = tmp
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L346-L355
+type BucketsSignificantLongTermsBucket any

@@ -15,55 +15,106 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // FingerprintTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L193-L197
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L195-L199
 type FingerprintTokenFilter struct {
-	MaxOutputSize *int           `json:"max_output_size,omitempty"`
-	Separator     *string        `json:"separator,omitempty"`
-	Type          string         `json:"type,omitempty"`
-	Version       *VersionString `json:"version,omitempty"`
+	MaxOutputSize *int    `json:"max_output_size,omitempty"`
+	Separator     *string `json:"separator,omitempty"`
+	Type          string  `json:"type,omitempty"`
+	Version       *string `json:"version,omitempty"`
 }
 
-// FingerprintTokenFilterBuilder holds FingerprintTokenFilter struct and provides a builder API.
-type FingerprintTokenFilterBuilder struct {
-	v *FingerprintTokenFilter
+func (s *FingerprintTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "max_output_size":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxOutputSize", err)
+				}
+				s.MaxOutputSize = &value
+			case float64:
+				f := int(v)
+				s.MaxOutputSize = &f
+			}
+
+		case "separator":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Separator", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Separator = &o
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewFingerprintTokenFilter provides a builder for the FingerprintTokenFilter struct.
-func NewFingerprintTokenFilterBuilder() *FingerprintTokenFilterBuilder {
-	r := FingerprintTokenFilterBuilder{
-		&FingerprintTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s FingerprintTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerFingerprintTokenFilter FingerprintTokenFilter
+	tmp := innerFingerprintTokenFilter{
+		MaxOutputSize: s.MaxOutputSize,
+		Separator:     s.Separator,
+		Type:          s.Type,
+		Version:       s.Version,
 	}
 
-	r.v.Type = "fingerprint"
+	tmp.Type = "fingerprint"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the FingerprintTokenFilter struct
-func (rb *FingerprintTokenFilterBuilder) Build() FingerprintTokenFilter {
-	return *rb.v
-}
+// NewFingerprintTokenFilter returns a FingerprintTokenFilter.
+func NewFingerprintTokenFilter() *FingerprintTokenFilter {
+	r := &FingerprintTokenFilter{}
 
-func (rb *FingerprintTokenFilterBuilder) MaxOutputSize(maxoutputsize int) *FingerprintTokenFilterBuilder {
-	rb.v.MaxOutputSize = &maxoutputsize
-	return rb
-}
-
-func (rb *FingerprintTokenFilterBuilder) Separator(separator string) *FingerprintTokenFilterBuilder {
-	rb.v.Separator = &separator
-	return rb
-}
-
-func (rb *FingerprintTokenFilterBuilder) Version(version VersionString) *FingerprintTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

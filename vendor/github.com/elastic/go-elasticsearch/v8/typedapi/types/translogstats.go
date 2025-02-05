@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // TranslogStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Stats.ts#L242-L250
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Stats.ts#L397-L405
 type TranslogStats struct {
 	EarliestLastModifiedAge int64   `json:"earliest_last_modified_age"`
 	Operations              int64   `json:"operations"`
@@ -35,56 +42,129 @@ type TranslogStats struct {
 	UncommittedSizeInBytes  int64   `json:"uncommitted_size_in_bytes"`
 }
 
-// TranslogStatsBuilder holds TranslogStats struct and provides a builder API.
-type TranslogStatsBuilder struct {
-	v *TranslogStats
-}
+func (s *TranslogStats) UnmarshalJSON(data []byte) error {
 
-// NewTranslogStats provides a builder for the TranslogStats struct.
-func NewTranslogStatsBuilder() *TranslogStatsBuilder {
-	r := TranslogStatsBuilder{
-		&TranslogStats{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "earliest_last_modified_age":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "EarliestLastModifiedAge", err)
+				}
+				s.EarliestLastModifiedAge = value
+			case float64:
+				f := int64(v)
+				s.EarliestLastModifiedAge = f
+			}
+
+		case "operations":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Operations", err)
+				}
+				s.Operations = value
+			case float64:
+				f := int64(v)
+				s.Operations = f
+			}
+
+		case "size":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Size", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Size = &o
+
+		case "size_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "SizeInBytes", err)
+				}
+				s.SizeInBytes = value
+			case float64:
+				f := int64(v)
+				s.SizeInBytes = f
+			}
+
+		case "uncommitted_operations":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "UncommittedOperations", err)
+				}
+				s.UncommittedOperations = value
+			case float64:
+				f := int(v)
+				s.UncommittedOperations = f
+			}
+
+		case "uncommitted_size":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "UncommittedSize", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.UncommittedSize = &o
+
+		case "uncommitted_size_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "UncommittedSizeInBytes", err)
+				}
+				s.UncommittedSizeInBytes = value
+			case float64:
+				f := int64(v)
+				s.UncommittedSizeInBytes = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TranslogStats struct
-func (rb *TranslogStatsBuilder) Build() TranslogStats {
-	return *rb.v
-}
+// NewTranslogStats returns a TranslogStats.
+func NewTranslogStats() *TranslogStats {
+	r := &TranslogStats{}
 
-func (rb *TranslogStatsBuilder) EarliestLastModifiedAge(earliestlastmodifiedage int64) *TranslogStatsBuilder {
-	rb.v.EarliestLastModifiedAge = earliestlastmodifiedage
-	return rb
-}
-
-func (rb *TranslogStatsBuilder) Operations(operations int64) *TranslogStatsBuilder {
-	rb.v.Operations = operations
-	return rb
-}
-
-func (rb *TranslogStatsBuilder) Size(size string) *TranslogStatsBuilder {
-	rb.v.Size = &size
-	return rb
-}
-
-func (rb *TranslogStatsBuilder) SizeInBytes(sizeinbytes int64) *TranslogStatsBuilder {
-	rb.v.SizeInBytes = sizeinbytes
-	return rb
-}
-
-func (rb *TranslogStatsBuilder) UncommittedOperations(uncommittedoperations int) *TranslogStatsBuilder {
-	rb.v.UncommittedOperations = uncommittedoperations
-	return rb
-}
-
-func (rb *TranslogStatsBuilder) UncommittedSize(uncommittedsize string) *TranslogStatsBuilder {
-	rb.v.UncommittedSize = &uncommittedsize
-	return rb
-}
-
-func (rb *TranslogStatsBuilder) UncommittedSizeInBytes(uncommittedsizeinbytes int64) *TranslogStatsBuilder {
-	rb.v.UncommittedSizeInBytes = uncommittedsizeinbytes
-	return rb
+	return r
 }

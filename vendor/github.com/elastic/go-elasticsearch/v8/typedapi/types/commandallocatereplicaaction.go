@@ -15,52 +15,85 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // CommandAllocateReplicaAction type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/reroute/types.ts#L69-L76
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/reroute/types.ts#L69-L76
 type CommandAllocateReplicaAction struct {
-	Index IndexName `json:"index"`
-	Node  string    `json:"node"`
-	Shard int       `json:"shard"`
+	Index string `json:"index"`
+	Node  string `json:"node"`
+	Shard int    `json:"shard"`
 }
 
-// CommandAllocateReplicaActionBuilder holds CommandAllocateReplicaAction struct and provides a builder API.
-type CommandAllocateReplicaActionBuilder struct {
-	v *CommandAllocateReplicaAction
-}
+func (s *CommandAllocateReplicaAction) UnmarshalJSON(data []byte) error {
 
-// NewCommandAllocateReplicaAction provides a builder for the CommandAllocateReplicaAction struct.
-func NewCommandAllocateReplicaActionBuilder() *CommandAllocateReplicaActionBuilder {
-	r := CommandAllocateReplicaActionBuilder{
-		&CommandAllocateReplicaAction{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "index":
+			if err := dec.Decode(&s.Index); err != nil {
+				return fmt.Errorf("%s | %w", "Index", err)
+			}
+
+		case "node":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Node", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Node = o
+
+		case "shard":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Shard", err)
+				}
+				s.Shard = value
+			case float64:
+				f := int(v)
+				s.Shard = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the CommandAllocateReplicaAction struct
-func (rb *CommandAllocateReplicaActionBuilder) Build() CommandAllocateReplicaAction {
-	return *rb.v
-}
+// NewCommandAllocateReplicaAction returns a CommandAllocateReplicaAction.
+func NewCommandAllocateReplicaAction() *CommandAllocateReplicaAction {
+	r := &CommandAllocateReplicaAction{}
 
-func (rb *CommandAllocateReplicaActionBuilder) Index(index IndexName) *CommandAllocateReplicaActionBuilder {
-	rb.v.Index = index
-	return rb
-}
-
-func (rb *CommandAllocateReplicaActionBuilder) Node(node string) *CommandAllocateReplicaActionBuilder {
-	rb.v.Node = node
-	return rb
-}
-
-func (rb *CommandAllocateReplicaActionBuilder) Shard(shard int) *CommandAllocateReplicaActionBuilder {
-	rb.v.Shard = shard
-	return rb
+	return r
 }

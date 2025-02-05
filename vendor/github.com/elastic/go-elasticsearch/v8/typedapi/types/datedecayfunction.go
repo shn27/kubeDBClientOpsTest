@@ -15,32 +15,33 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/multivaluemode"
 )
 
 // DateDecayFunction type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/compound.ts#L92-L94
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/compound.ts#L209-L209
 type DateDecayFunction struct {
-	DateDecayFunction map[Field]DecayPlacementDateMathDuration `json:"-"`
-	MultiValueMode    *multivaluemode.MultiValueMode           `json:"multi_value_mode,omitempty"`
+	DecayFunctionBaseDateMathDuration map[string]DecayPlacementDateMathDuration `json:"-"`
+	// MultiValueMode Determines how the distance is calculated when a field used for computing the
+	// decay contains multiple values.
+	MultiValueMode *multivaluemode.MultiValueMode `json:"multi_value_mode,omitempty"`
 }
 
 // MarhsalJSON overrides marshalling for types with additional properties
 func (s DateDecayFunction) MarshalJSON() ([]byte, error) {
 	type opt DateDecayFunction
 	// We transform the struct to a map without the embedded additional properties map
-	tmp := make(map[string]interface{}, 0)
+	tmp := make(map[string]any, 0)
 
 	data, err := json.Marshal(opt(s))
 	if err != nil {
@@ -52,9 +53,10 @@ func (s DateDecayFunction) MarshalJSON() ([]byte, error) {
 	}
 
 	// We inline the additional fields from the underlying map
-	for key, value := range s.DateDecayFunction {
-		tmp[string(key)] = value
+	for key, value := range s.DecayFunctionBaseDateMathDuration {
+		tmp[fmt.Sprintf("%s", key)] = value
 	}
+	delete(tmp, "DecayFunctionBaseDateMathDuration")
 
 	data, err = json.Marshal(tmp)
 	if err != nil {
@@ -64,37 +66,11 @@ func (s DateDecayFunction) MarshalJSON() ([]byte, error) {
 	return data, nil
 }
 
-// DateDecayFunctionBuilder holds DateDecayFunction struct and provides a builder API.
-type DateDecayFunctionBuilder struct {
-	v *DateDecayFunction
-}
-
-// NewDateDecayFunction provides a builder for the DateDecayFunction struct.
-func NewDateDecayFunctionBuilder() *DateDecayFunctionBuilder {
-	r := DateDecayFunctionBuilder{
-		&DateDecayFunction{
-			DateDecayFunction: make(map[Field]DecayPlacementDateMathDuration, 0),
-		},
+// NewDateDecayFunction returns a DateDecayFunction.
+func NewDateDecayFunction() *DateDecayFunction {
+	r := &DateDecayFunction{
+		DecayFunctionBaseDateMathDuration: make(map[string]DecayPlacementDateMathDuration, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the DateDecayFunction struct
-func (rb *DateDecayFunctionBuilder) Build() DateDecayFunction {
-	return *rb.v
-}
-
-func (rb *DateDecayFunctionBuilder) DateDecayFunction(values map[Field]*DecayPlacementDateMathDurationBuilder) *DateDecayFunctionBuilder {
-	tmp := make(map[Field]DecayPlacementDateMathDuration, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.DateDecayFunction = tmp
-	return rb
-}
-
-func (rb *DateDecayFunctionBuilder) MultiValueMode(multivaluemode multivaluemode.MultiValueMode) *DateDecayFunctionBuilder {
-	rb.v.MultiValueMode = &multivaluemode
-	return rb
+	return r
 }

@@ -15,14 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"encoding/json"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/dfraftereffect"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/dfrbasicmodel"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/normalization"
@@ -30,7 +30,7 @@ import (
 
 // SettingsSimilarityDfr type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/IndexSettings.ts#L192-L197
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/IndexSettings.ts#L200-L205
 type SettingsSimilarityDfr struct {
 	AfterEffect   dfraftereffect.DFRAfterEffect `json:"after_effect"`
 	BasicModel    dfrbasicmodel.DFRBasicModel   `json:"basic_model"`
@@ -38,38 +38,24 @@ type SettingsSimilarityDfr struct {
 	Type          string                        `json:"type,omitempty"`
 }
 
-// SettingsSimilarityDfrBuilder holds SettingsSimilarityDfr struct and provides a builder API.
-type SettingsSimilarityDfrBuilder struct {
-	v *SettingsSimilarityDfr
-}
-
-// NewSettingsSimilarityDfr provides a builder for the SettingsSimilarityDfr struct.
-func NewSettingsSimilarityDfrBuilder() *SettingsSimilarityDfrBuilder {
-	r := SettingsSimilarityDfrBuilder{
-		&SettingsSimilarityDfr{},
+// MarshalJSON override marshalling to include literal value
+func (s SettingsSimilarityDfr) MarshalJSON() ([]byte, error) {
+	type innerSettingsSimilarityDfr SettingsSimilarityDfr
+	tmp := innerSettingsSimilarityDfr{
+		AfterEffect:   s.AfterEffect,
+		BasicModel:    s.BasicModel,
+		Normalization: s.Normalization,
+		Type:          s.Type,
 	}
 
-	r.v.Type = "DFR"
+	tmp.Type = "DFR"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the SettingsSimilarityDfr struct
-func (rb *SettingsSimilarityDfrBuilder) Build() SettingsSimilarityDfr {
-	return *rb.v
-}
+// NewSettingsSimilarityDfr returns a SettingsSimilarityDfr.
+func NewSettingsSimilarityDfr() *SettingsSimilarityDfr {
+	r := &SettingsSimilarityDfr{}
 
-func (rb *SettingsSimilarityDfrBuilder) AfterEffect(aftereffect dfraftereffect.DFRAfterEffect) *SettingsSimilarityDfrBuilder {
-	rb.v.AfterEffect = aftereffect
-	return rb
-}
-
-func (rb *SettingsSimilarityDfrBuilder) BasicModel(basicmodel dfrbasicmodel.DFRBasicModel) *SettingsSimilarityDfrBuilder {
-	rb.v.BasicModel = basicmodel
-	return rb
-}
-
-func (rb *SettingsSimilarityDfrBuilder) Normalization(normalization normalization.Normalization) *SettingsSimilarityDfrBuilder {
-	rb.v.Normalization = normalization
-	return rb
+	return r
 }

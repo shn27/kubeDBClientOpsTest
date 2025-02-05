@@ -15,60 +15,98 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // FieldAndFormat type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/abstractions.ts#L212-L226
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/abstractions.ts#L528-L542
 type FieldAndFormat struct {
 	// Field Wildcard pattern. The request returns values for field names matching this
 	// pattern.
-	Field Field `json:"field"`
+	Field string `json:"field"`
 	// Format Format in which the values are returned.
 	Format          *string `json:"format,omitempty"`
 	IncludeUnmapped *bool   `json:"include_unmapped,omitempty"`
 }
 
-// FieldAndFormatBuilder holds FieldAndFormat struct and provides a builder API.
-type FieldAndFormatBuilder struct {
-	v *FieldAndFormat
-}
+func (s *FieldAndFormat) UnmarshalJSON(data []byte) error {
 
-// NewFieldAndFormat provides a builder for the FieldAndFormat struct.
-func NewFieldAndFormatBuilder() *FieldAndFormatBuilder {
-	r := FieldAndFormatBuilder{
-		&FieldAndFormat{},
+	if !bytes.HasPrefix(data, []byte(`{`)) {
+		if !bytes.HasPrefix(data, []byte(`"`)) {
+			data = append([]byte{'"'}, data...)
+			data = append(data, []byte{'"'}...)
+		}
+		err := json.NewDecoder(bytes.NewReader(data)).Decode(&s.Field)
+		if err != nil {
+			return err
+		}
+		return nil
 	}
 
-	return &r
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "format":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Format", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Format = &o
+
+		case "include_unmapped":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IncludeUnmapped", err)
+				}
+				s.IncludeUnmapped = &value
+			case bool:
+				s.IncludeUnmapped = &v
+			}
+
+		}
+	}
+	return nil
 }
 
-// Build finalize the chain and returns the FieldAndFormat struct
-func (rb *FieldAndFormatBuilder) Build() FieldAndFormat {
-	return *rb.v
-}
+// NewFieldAndFormat returns a FieldAndFormat.
+func NewFieldAndFormat() *FieldAndFormat {
+	r := &FieldAndFormat{}
 
-// Field Wildcard pattern. The request returns values for field names matching this
-// pattern.
-
-func (rb *FieldAndFormatBuilder) Field(field Field) *FieldAndFormatBuilder {
-	rb.v.Field = field
-	return rb
-}
-
-// Format Format in which the values are returned.
-
-func (rb *FieldAndFormatBuilder) Format(format string) *FieldAndFormatBuilder {
-	rb.v.Format = &format
-	return rb
-}
-
-func (rb *FieldAndFormatBuilder) IncludeUnmapped(includeunmapped bool) *FieldAndFormatBuilder {
-	rb.v.IncludeUnmapped = &includeunmapped
-	return rb
+	return r
 }

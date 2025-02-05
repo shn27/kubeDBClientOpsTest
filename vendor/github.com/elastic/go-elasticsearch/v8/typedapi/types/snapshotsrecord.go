@@ -15,155 +15,236 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // SnapshotsRecord type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cat/snapshots/types.ts#L24-L90
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cat/snapshots/types.ts#L24-L96
 type SnapshotsRecord struct {
-	// Duration duration
-	Duration *Duration `json:"duration,omitempty"`
-	// EndEpoch end time in seconds since 1970-01-01 00:00:00
-	EndEpoch *StringifiedEpochTimeUnitSeconds `json:"end_epoch,omitempty"`
-	// EndTime end time in HH:MM:SS
-	EndTime *TimeOfDay `json:"end_time,omitempty"`
-	// FailedShards number of failed shards
+	// Duration The time it took the snapshot process to complete, in time units.
+	Duration Duration `json:"duration,omitempty"`
+	// EndEpoch The Unix epoch time (seconds since 1970-01-01 00:00:00) at which the snapshot
+	// process ended.
+	EndEpoch StringifiedEpochTimeUnitSeconds `json:"end_epoch,omitempty"`
+	// EndTime The time (HH:MM:SS) at which the snapshot process ended.
+	EndTime *string `json:"end_time,omitempty"`
+	// FailedShards The number of failed shards in the snapshot.
 	FailedShards *string `json:"failed_shards,omitempty"`
-	// Id unique snapshot
+	// Id The unique identifier for the snapshot.
 	Id *string `json:"id,omitempty"`
-	// Indices number of indices
+	// Indices The number of indices in the snapshot.
 	Indices *string `json:"indices,omitempty"`
-	// Reason reason for failures
+	// Reason The reason for any snapshot failures.
 	Reason *string `json:"reason,omitempty"`
-	// Repository repository name
+	// Repository The repository name.
 	Repository *string `json:"repository,omitempty"`
-	// StartEpoch start time in seconds since 1970-01-01 00:00:00
-	StartEpoch *StringifiedEpochTimeUnitSeconds `json:"start_epoch,omitempty"`
-	// StartTime start time in HH:MM:SS
-	StartTime *ScheduleTimeOfDay `json:"start_time,omitempty"`
-	// Status snapshot name
+	// StartEpoch The Unix epoch time (seconds since 1970-01-01 00:00:00) at which the snapshot
+	// process started.
+	StartEpoch StringifiedEpochTimeUnitSeconds `json:"start_epoch,omitempty"`
+	// StartTime The time (HH:MM:SS) at which the snapshot process started.
+	StartTime ScheduleTimeOfDay `json:"start_time,omitempty"`
+	// Status The state of the snapshot process.
+	// Returned values include:
+	// `FAILED`: The snapshot process failed.
+	// `INCOMPATIBLE`: The snapshot process is incompatible with the current cluster
+	// version.
+	// `IN_PROGRESS`: The snapshot process started but has not completed.
+	// `PARTIAL`: The snapshot process completed with a partial success.
+	// `SUCCESS`: The snapshot process completed with a full success.
 	Status *string `json:"status,omitempty"`
-	// SuccessfulShards number of successful shards
+	// SuccessfulShards The number of successful shards in the snapshot.
 	SuccessfulShards *string `json:"successful_shards,omitempty"`
-	// TotalShards number of total shards
+	// TotalShards The total number of shards in the snapshot.
 	TotalShards *string `json:"total_shards,omitempty"`
 }
 
-// SnapshotsRecordBuilder holds SnapshotsRecord struct and provides a builder API.
-type SnapshotsRecordBuilder struct {
-	v *SnapshotsRecord
-}
+func (s *SnapshotsRecord) UnmarshalJSON(data []byte) error {
 
-// NewSnapshotsRecord provides a builder for the SnapshotsRecord struct.
-func NewSnapshotsRecordBuilder() *SnapshotsRecordBuilder {
-	r := SnapshotsRecordBuilder{
-		&SnapshotsRecord{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "duration", "dur":
+			if err := dec.Decode(&s.Duration); err != nil {
+				return fmt.Errorf("%s | %w", "Duration", err)
+			}
+
+		case "end_epoch", "ete", "endEpoch":
+			if err := dec.Decode(&s.EndEpoch); err != nil {
+				return fmt.Errorf("%s | %w", "EndEpoch", err)
+			}
+
+		case "end_time", "eti", "endTime":
+			if err := dec.Decode(&s.EndTime); err != nil {
+				return fmt.Errorf("%s | %w", "EndTime", err)
+			}
+
+		case "failed_shards", "fs":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "FailedShards", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.FailedShards = &o
+
+		case "id", "snapshot":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Id = &o
+
+		case "indices", "i":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Indices", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Indices = &o
+
+		case "reason", "r":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Reason", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Reason = &o
+
+		case "repository", "re", "repo":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Repository", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Repository = &o
+
+		case "start_epoch", "ste", "startEpoch":
+			if err := dec.Decode(&s.StartEpoch); err != nil {
+				return fmt.Errorf("%s | %w", "StartEpoch", err)
+			}
+
+		case "start_time", "sti", "startTime":
+			message := json.RawMessage{}
+			if err := dec.Decode(&message); err != nil {
+				return fmt.Errorf("%s | %w", "StartTime", err)
+			}
+			keyDec := json.NewDecoder(bytes.NewReader(message))
+		starttime_field:
+			for {
+				t, err := keyDec.Token()
+				if err != nil {
+					if errors.Is(err, io.EOF) {
+						break
+					}
+					return fmt.Errorf("%s | %w", "StartTime", err)
+				}
+
+				switch t {
+
+				case "hour", "minute":
+					o := NewHourAndMinute()
+					localDec := json.NewDecoder(bytes.NewReader(message))
+					if err := localDec.Decode(&o); err != nil {
+						return fmt.Errorf("%s | %w", "StartTime", err)
+					}
+					s.StartTime = o
+					break starttime_field
+
+				}
+			}
+			if s.StartTime == nil {
+				localDec := json.NewDecoder(bytes.NewReader(message))
+				if err := localDec.Decode(&s.StartTime); err != nil {
+					return fmt.Errorf("%s | %w", "StartTime", err)
+				}
+			}
+
+		case "status", "s":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Status", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Status = &o
+
+		case "successful_shards", "ss":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SuccessfulShards", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SuccessfulShards = &o
+
+		case "total_shards", "ts":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "TotalShards", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.TotalShards = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SnapshotsRecord struct
-func (rb *SnapshotsRecordBuilder) Build() SnapshotsRecord {
-	return *rb.v
-}
+// NewSnapshotsRecord returns a SnapshotsRecord.
+func NewSnapshotsRecord() *SnapshotsRecord {
+	r := &SnapshotsRecord{}
 
-// Duration duration
-
-func (rb *SnapshotsRecordBuilder) Duration(duration *DurationBuilder) *SnapshotsRecordBuilder {
-	v := duration.Build()
-	rb.v.Duration = &v
-	return rb
-}
-
-// EndEpoch end time in seconds since 1970-01-01 00:00:00
-
-func (rb *SnapshotsRecordBuilder) EndEpoch(endepoch *StringifiedEpochTimeUnitSecondsBuilder) *SnapshotsRecordBuilder {
-	v := endepoch.Build()
-	rb.v.EndEpoch = &v
-	return rb
-}
-
-// EndTime end time in HH:MM:SS
-
-func (rb *SnapshotsRecordBuilder) EndTime(endtime TimeOfDay) *SnapshotsRecordBuilder {
-	rb.v.EndTime = &endtime
-	return rb
-}
-
-// FailedShards number of failed shards
-
-func (rb *SnapshotsRecordBuilder) FailedShards(failedshards string) *SnapshotsRecordBuilder {
-	rb.v.FailedShards = &failedshards
-	return rb
-}
-
-// Id unique snapshot
-
-func (rb *SnapshotsRecordBuilder) Id(id string) *SnapshotsRecordBuilder {
-	rb.v.Id = &id
-	return rb
-}
-
-// Indices number of indices
-
-func (rb *SnapshotsRecordBuilder) Indices(indices string) *SnapshotsRecordBuilder {
-	rb.v.Indices = &indices
-	return rb
-}
-
-// Reason reason for failures
-
-func (rb *SnapshotsRecordBuilder) Reason(reason string) *SnapshotsRecordBuilder {
-	rb.v.Reason = &reason
-	return rb
-}
-
-// Repository repository name
-
-func (rb *SnapshotsRecordBuilder) Repository(repository string) *SnapshotsRecordBuilder {
-	rb.v.Repository = &repository
-	return rb
-}
-
-// StartEpoch start time in seconds since 1970-01-01 00:00:00
-
-func (rb *SnapshotsRecordBuilder) StartEpoch(startepoch *StringifiedEpochTimeUnitSecondsBuilder) *SnapshotsRecordBuilder {
-	v := startepoch.Build()
-	rb.v.StartEpoch = &v
-	return rb
-}
-
-// StartTime start time in HH:MM:SS
-
-func (rb *SnapshotsRecordBuilder) StartTime(starttime *ScheduleTimeOfDayBuilder) *SnapshotsRecordBuilder {
-	v := starttime.Build()
-	rb.v.StartTime = &v
-	return rb
-}
-
-// Status snapshot name
-
-func (rb *SnapshotsRecordBuilder) Status(status string) *SnapshotsRecordBuilder {
-	rb.v.Status = &status
-	return rb
-}
-
-// SuccessfulShards number of successful shards
-
-func (rb *SnapshotsRecordBuilder) SuccessfulShards(successfulshards string) *SnapshotsRecordBuilder {
-	rb.v.SuccessfulShards = &successfulshards
-	return rb
-}
-
-// TotalShards number of total shards
-
-func (rb *SnapshotsRecordBuilder) TotalShards(totalshards string) *SnapshotsRecordBuilder {
-	rb.v.TotalShards = &totalshards
-	return rb
+	return r
 }

@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
@@ -27,30 +25,5 @@ package types
 //	int64
 //	string
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/common.ts#L81-L82
-type ByteSize interface{}
-
-// ByteSizeBuilder holds ByteSize struct and provides a builder API.
-type ByteSizeBuilder struct {
-	v ByteSize
-}
-
-// NewByteSize provides a builder for the ByteSize struct.
-func NewByteSizeBuilder() *ByteSizeBuilder {
-	return &ByteSizeBuilder{}
-}
-
-// Build finalize the chain and returns the ByteSize struct
-func (u *ByteSizeBuilder) Build() ByteSize {
-	return u.v
-}
-
-func (u *ByteSizeBuilder) Int64(int64 int64) *ByteSizeBuilder {
-	u.v = &int64
-	return u
-}
-
-func (u *ByteSizeBuilder) String(string string) *ByteSizeBuilder {
-	u.v = &string
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/common.ts#L97-L98
+type ByteSize any

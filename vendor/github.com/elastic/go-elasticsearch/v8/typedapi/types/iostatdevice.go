@@ -15,70 +15,153 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // IoStatDevice type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/_types/Stats.ts#L292-L299
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/_types/Stats.ts#L801-L826
 type IoStatDevice struct {
-	DeviceName      *string `json:"device_name,omitempty"`
-	Operations      *int64  `json:"operations,omitempty"`
-	ReadKilobytes   *int64  `json:"read_kilobytes,omitempty"`
-	ReadOperations  *int64  `json:"read_operations,omitempty"`
-	WriteKilobytes  *int64  `json:"write_kilobytes,omitempty"`
-	WriteOperations *int64  `json:"write_operations,omitempty"`
+	// DeviceName The Linux device name.
+	DeviceName *string `json:"device_name,omitempty"`
+	// Operations The total number of read and write operations for the device completed since
+	// starting Elasticsearch.
+	Operations *int64 `json:"operations,omitempty"`
+	// ReadKilobytes The total number of kilobytes read for the device since starting
+	// Elasticsearch.
+	ReadKilobytes *int64 `json:"read_kilobytes,omitempty"`
+	// ReadOperations The total number of read operations for the device completed since starting
+	// Elasticsearch.
+	ReadOperations *int64 `json:"read_operations,omitempty"`
+	// WriteKilobytes The total number of kilobytes written for the device since starting
+	// Elasticsearch.
+	WriteKilobytes *int64 `json:"write_kilobytes,omitempty"`
+	// WriteOperations The total number of write operations for the device completed since starting
+	// Elasticsearch.
+	WriteOperations *int64 `json:"write_operations,omitempty"`
 }
 
-// IoStatDeviceBuilder holds IoStatDevice struct and provides a builder API.
-type IoStatDeviceBuilder struct {
-	v *IoStatDevice
-}
+func (s *IoStatDevice) UnmarshalJSON(data []byte) error {
 
-// NewIoStatDevice provides a builder for the IoStatDevice struct.
-func NewIoStatDeviceBuilder() *IoStatDeviceBuilder {
-	r := IoStatDeviceBuilder{
-		&IoStatDevice{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "device_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "DeviceName", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.DeviceName = &o
+
+		case "operations":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Operations", err)
+				}
+				s.Operations = &value
+			case float64:
+				f := int64(v)
+				s.Operations = &f
+			}
+
+		case "read_kilobytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ReadKilobytes", err)
+				}
+				s.ReadKilobytes = &value
+			case float64:
+				f := int64(v)
+				s.ReadKilobytes = &f
+			}
+
+		case "read_operations":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ReadOperations", err)
+				}
+				s.ReadOperations = &value
+			case float64:
+				f := int64(v)
+				s.ReadOperations = &f
+			}
+
+		case "write_kilobytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "WriteKilobytes", err)
+				}
+				s.WriteKilobytes = &value
+			case float64:
+				f := int64(v)
+				s.WriteKilobytes = &f
+			}
+
+		case "write_operations":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "WriteOperations", err)
+				}
+				s.WriteOperations = &value
+			case float64:
+				f := int64(v)
+				s.WriteOperations = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the IoStatDevice struct
-func (rb *IoStatDeviceBuilder) Build() IoStatDevice {
-	return *rb.v
-}
+// NewIoStatDevice returns a IoStatDevice.
+func NewIoStatDevice() *IoStatDevice {
+	r := &IoStatDevice{}
 
-func (rb *IoStatDeviceBuilder) DeviceName(devicename string) *IoStatDeviceBuilder {
-	rb.v.DeviceName = &devicename
-	return rb
-}
-
-func (rb *IoStatDeviceBuilder) Operations(operations int64) *IoStatDeviceBuilder {
-	rb.v.Operations = &operations
-	return rb
-}
-
-func (rb *IoStatDeviceBuilder) ReadKilobytes(readkilobytes int64) *IoStatDeviceBuilder {
-	rb.v.ReadKilobytes = &readkilobytes
-	return rb
-}
-
-func (rb *IoStatDeviceBuilder) ReadOperations(readoperations int64) *IoStatDeviceBuilder {
-	rb.v.ReadOperations = &readoperations
-	return rb
-}
-
-func (rb *IoStatDeviceBuilder) WriteKilobytes(writekilobytes int64) *IoStatDeviceBuilder {
-	rb.v.WriteKilobytes = &writekilobytes
-	return rb
-}
-
-func (rb *IoStatDeviceBuilder) WriteOperations(writeoperations int64) *IoStatDeviceBuilder {
-	rb.v.WriteOperations = &writeoperations
-	return rb
+	return r
 }

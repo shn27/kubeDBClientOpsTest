@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DataframeAnalyticsAuthorization type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/Authorization.ts#L45-L57
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/Authorization.ts#L45-L57
 type DataframeAnalyticsAuthorization struct {
 	// ApiKey If an API key was used for the most recent update to the job, its name and
 	// identifier are listed in the response.
@@ -37,46 +44,51 @@ type DataframeAnalyticsAuthorization struct {
 	ServiceAccount *string `json:"service_account,omitempty"`
 }
 
-// DataframeAnalyticsAuthorizationBuilder holds DataframeAnalyticsAuthorization struct and provides a builder API.
-type DataframeAnalyticsAuthorizationBuilder struct {
-	v *DataframeAnalyticsAuthorization
-}
+func (s *DataframeAnalyticsAuthorization) UnmarshalJSON(data []byte) error {
 
-// NewDataframeAnalyticsAuthorization provides a builder for the DataframeAnalyticsAuthorization struct.
-func NewDataframeAnalyticsAuthorizationBuilder() *DataframeAnalyticsAuthorizationBuilder {
-	r := DataframeAnalyticsAuthorizationBuilder{
-		&DataframeAnalyticsAuthorization{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "api_key":
+			if err := dec.Decode(&s.ApiKey); err != nil {
+				return fmt.Errorf("%s | %w", "ApiKey", err)
+			}
+
+		case "roles":
+			if err := dec.Decode(&s.Roles); err != nil {
+				return fmt.Errorf("%s | %w", "Roles", err)
+			}
+
+		case "service_account":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ServiceAccount", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ServiceAccount = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DataframeAnalyticsAuthorization struct
-func (rb *DataframeAnalyticsAuthorizationBuilder) Build() DataframeAnalyticsAuthorization {
-	return *rb.v
-}
+// NewDataframeAnalyticsAuthorization returns a DataframeAnalyticsAuthorization.
+func NewDataframeAnalyticsAuthorization() *DataframeAnalyticsAuthorization {
+	r := &DataframeAnalyticsAuthorization{}
 
-// ApiKey If an API key was used for the most recent update to the job, its name and
-// identifier are listed in the response.
-
-func (rb *DataframeAnalyticsAuthorizationBuilder) ApiKey(apikey *ApiKeyAuthorizationBuilder) *DataframeAnalyticsAuthorizationBuilder {
-	v := apikey.Build()
-	rb.v.ApiKey = &v
-	return rb
-}
-
-// Roles If a user ID was used for the most recent update to the job, its roles at the
-// time of the update are listed in the response.
-
-func (rb *DataframeAnalyticsAuthorizationBuilder) Roles(roles ...string) *DataframeAnalyticsAuthorizationBuilder {
-	rb.v.Roles = roles
-	return rb
-}
-
-// ServiceAccount If a service account was used for the most recent update to the job, the
-// account name is listed in the response.
-
-func (rb *DataframeAnalyticsAuthorizationBuilder) ServiceAccount(serviceaccount string) *DataframeAnalyticsAuthorizationBuilder {
-	rb.v.ServiceAccount = &serviceaccount
-	return rb
+	return r
 }

@@ -15,73 +15,154 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
+	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/versiontype"
+)
+
 // DocumentSimulation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ingest/simulate/types.ts#L45-L52
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ingest/simulate/types.ts#L78-L108
 type DocumentSimulation struct {
-	Id_      Id                     `json:"_id"`
-	Index_   IndexName              `json:"_index"`
-	Ingest_  Ingest                 `json:"_ingest"`
-	Parent_  *string                `json:"_parent,omitempty"`
-	Routing_ *string                `json:"_routing,omitempty"`
-	Source_  map[string]interface{} `json:"_source"`
+	DocumentSimulation map[string]string `json:"-"`
+	// Id_ Unique identifier for the document. This ID must be unique within the
+	// `_index`.
+	Id_ string `json:"_id"`
+	// Index_ Name of the index containing the document.
+	Index_  string         `json:"_index"`
+	Ingest_ SimulateIngest `json:"_ingest"`
+	// Routing_ Value used to send the document to a specific primary shard.
+	Routing_ *string `json:"_routing,omitempty"`
+	// Source_ JSON body for the document.
+	Source_      map[string]json.RawMessage `json:"_source"`
+	VersionType_ *versiontype.VersionType   `json:"_version_type,omitempty"`
+	Version_     StringifiedVersionNumber   `json:"_version,omitempty"`
 }
 
-// DocumentSimulationBuilder holds DocumentSimulation struct and provides a builder API.
-type DocumentSimulationBuilder struct {
-	v *DocumentSimulation
+func (s *DocumentSimulation) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "_id":
+			if err := dec.Decode(&s.Id_); err != nil {
+				return fmt.Errorf("%s | %w", "Id_", err)
+			}
+
+		case "_index":
+			if err := dec.Decode(&s.Index_); err != nil {
+				return fmt.Errorf("%s | %w", "Index_", err)
+			}
+
+		case "_ingest":
+			if err := dec.Decode(&s.Ingest_); err != nil {
+				return fmt.Errorf("%s | %w", "Ingest_", err)
+			}
+
+		case "_routing":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Routing_", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Routing_ = &o
+
+		case "_source":
+			if s.Source_ == nil {
+				s.Source_ = make(map[string]json.RawMessage, 0)
+			}
+			if err := dec.Decode(&s.Source_); err != nil {
+				return fmt.Errorf("%s | %w", "Source_", err)
+			}
+
+		case "_version_type":
+			if err := dec.Decode(&s.VersionType_); err != nil {
+				return fmt.Errorf("%s | %w", "VersionType_", err)
+			}
+
+		case "_version":
+			if err := dec.Decode(&s.Version_); err != nil {
+				return fmt.Errorf("%s | %w", "Version_", err)
+			}
+
+		default:
+
+			if key, ok := t.(string); ok {
+				if s.DocumentSimulation == nil {
+					s.DocumentSimulation = make(map[string]string, 0)
+				}
+				raw := new(string)
+				if err := dec.Decode(&raw); err != nil {
+					return fmt.Errorf("%s | %w", "DocumentSimulation", err)
+				}
+				s.DocumentSimulation[key] = *raw
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewDocumentSimulation provides a builder for the DocumentSimulation struct.
-func NewDocumentSimulationBuilder() *DocumentSimulationBuilder {
-	r := DocumentSimulationBuilder{
-		&DocumentSimulation{
-			Source_: make(map[string]interface{}, 0),
-		},
+// MarhsalJSON overrides marshalling for types with additional properties
+func (s DocumentSimulation) MarshalJSON() ([]byte, error) {
+	type opt DocumentSimulation
+	// We transform the struct to a map without the embedded additional properties map
+	tmp := make(map[string]any, 0)
+
+	data, err := json.Marshal(opt(s))
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(data, &tmp)
+	if err != nil {
+		return nil, err
 	}
 
-	return &r
+	// We inline the additional fields from the underlying map
+	for key, value := range s.DocumentSimulation {
+		tmp[fmt.Sprintf("%s", key)] = value
+	}
+	delete(tmp, "DocumentSimulation")
+
+	data, err = json.Marshal(tmp)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }
 
-// Build finalize the chain and returns the DocumentSimulation struct
-func (rb *DocumentSimulationBuilder) Build() DocumentSimulation {
-	return *rb.v
-}
+// NewDocumentSimulation returns a DocumentSimulation.
+func NewDocumentSimulation() *DocumentSimulation {
+	r := &DocumentSimulation{
+		DocumentSimulation: make(map[string]string, 0),
+		Source_:            make(map[string]json.RawMessage, 0),
+	}
 
-func (rb *DocumentSimulationBuilder) Id_(id_ Id) *DocumentSimulationBuilder {
-	rb.v.Id_ = id_
-	return rb
-}
-
-func (rb *DocumentSimulationBuilder) Index_(index_ IndexName) *DocumentSimulationBuilder {
-	rb.v.Index_ = index_
-	return rb
-}
-
-func (rb *DocumentSimulationBuilder) Ingest_(ingest_ *IngestBuilder) *DocumentSimulationBuilder {
-	v := ingest_.Build()
-	rb.v.Ingest_ = v
-	return rb
-}
-
-func (rb *DocumentSimulationBuilder) Parent_(parent_ string) *DocumentSimulationBuilder {
-	rb.v.Parent_ = &parent_
-	return rb
-}
-
-func (rb *DocumentSimulationBuilder) Routing_(routing_ string) *DocumentSimulationBuilder {
-	rb.v.Routing_ = &routing_
-	return rb
-}
-
-func (rb *DocumentSimulationBuilder) Source_(value map[string]interface{}) *DocumentSimulationBuilder {
-	rb.v.Source_ = value
-	return rb
+	return r
 }

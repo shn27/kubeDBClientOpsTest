@@ -15,64 +15,136 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // PrefixQuery type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/term.ts#L57-L66
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/term.ts#L98-L120
 type PrefixQuery struct {
-	Boost           *float32               `json:"boost,omitempty"`
-	CaseInsensitive *bool                  `json:"case_insensitive,omitempty"`
-	QueryName_      *string                `json:"_name,omitempty"`
-	Rewrite         *MultiTermQueryRewrite `json:"rewrite,omitempty"`
-	Value           string                 `json:"value"`
+	// Boost Floating point number used to decrease or increase the relevance scores of
+	// the query.
+	// Boost values are relative to the default value of 1.0.
+	// A boost value between 0 and 1.0 decreases the relevance score.
+	// A value greater than 1.0 increases the relevance score.
+	Boost *float32 `json:"boost,omitempty"`
+	// CaseInsensitive Allows ASCII case insensitive matching of the value with the indexed field
+	// values when set to `true`.
+	// Default is `false` which means the case sensitivity of matching depends on
+	// the underlying field’s mapping.
+	CaseInsensitive *bool   `json:"case_insensitive,omitempty"`
+	QueryName_      *string `json:"_name,omitempty"`
+	// Rewrite Method used to rewrite the query.
+	Rewrite *string `json:"rewrite,omitempty"`
+	// Value Beginning characters of terms you wish to find in the provided field.
+	Value string `json:"value"`
 }
 
-// PrefixQueryBuilder holds PrefixQuery struct and provides a builder API.
-type PrefixQueryBuilder struct {
-	v *PrefixQuery
-}
+func (s *PrefixQuery) UnmarshalJSON(data []byte) error {
 
-// NewPrefixQuery provides a builder for the PrefixQuery struct.
-func NewPrefixQueryBuilder() *PrefixQueryBuilder {
-	r := PrefixQueryBuilder{
-		&PrefixQuery{},
+	if !bytes.HasPrefix(data, []byte(`{`)) {
+		if !bytes.HasPrefix(data, []byte(`"`)) {
+			data = append([]byte{'"'}, data...)
+			data = append(data, []byte{'"'}...)
+		}
+		err := json.NewDecoder(bytes.NewReader(data)).Decode(&s.Value)
+		if err != nil {
+			return err
+		}
+		return nil
 	}
 
-	return &r
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "boost":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Boost", err)
+				}
+				f := float32(value)
+				s.Boost = &f
+			case float64:
+				f := float32(v)
+				s.Boost = &f
+			}
+
+		case "case_insensitive":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CaseInsensitive", err)
+				}
+				s.CaseInsensitive = &value
+			case bool:
+				s.CaseInsensitive = &v
+			}
+
+		case "_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "QueryName_", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.QueryName_ = &o
+
+		case "rewrite":
+			if err := dec.Decode(&s.Rewrite); err != nil {
+				return fmt.Errorf("%s | %w", "Rewrite", err)
+			}
+
+		case "value":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Value", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Value = o
+
+		}
+	}
+	return nil
 }
 
-// Build finalize the chain and returns the PrefixQuery struct
-func (rb *PrefixQueryBuilder) Build() PrefixQuery {
-	return *rb.v
-}
+// NewPrefixQuery returns a PrefixQuery.
+func NewPrefixQuery() *PrefixQuery {
+	r := &PrefixQuery{}
 
-func (rb *PrefixQueryBuilder) Boost(boost float32) *PrefixQueryBuilder {
-	rb.v.Boost = &boost
-	return rb
-}
-
-func (rb *PrefixQueryBuilder) CaseInsensitive(caseinsensitive bool) *PrefixQueryBuilder {
-	rb.v.CaseInsensitive = &caseinsensitive
-	return rb
-}
-
-func (rb *PrefixQueryBuilder) QueryName_(queryname_ string) *PrefixQueryBuilder {
-	rb.v.QueryName_ = &queryname_
-	return rb
-}
-
-func (rb *PrefixQueryBuilder) Rewrite(rewrite MultiTermQueryRewrite) *PrefixQueryBuilder {
-	rb.v.Rewrite = &rewrite
-	return rb
-}
-
-func (rb *PrefixQueryBuilder) Value(value string) *PrefixQueryBuilder {
-	rb.v.Value = value
-	return rb
+	return r
 }

@@ -15,64 +15,121 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // CoordinatorStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/enrich/stats/types.ts#L29-L35
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/enrich/stats/types.ts#L30-L36
 type CoordinatorStats struct {
-	ExecutedSearchesTotal int64 `json:"executed_searches_total"`
-	NodeId                Id    `json:"node_id"`
-	QueueSize             int   `json:"queue_size"`
-	RemoteRequestsCurrent int   `json:"remote_requests_current"`
-	RemoteRequestsTotal   int64 `json:"remote_requests_total"`
+	ExecutedSearchesTotal int64  `json:"executed_searches_total"`
+	NodeId                string `json:"node_id"`
+	QueueSize             int    `json:"queue_size"`
+	RemoteRequestsCurrent int    `json:"remote_requests_current"`
+	RemoteRequestsTotal   int64  `json:"remote_requests_total"`
 }
 
-// CoordinatorStatsBuilder holds CoordinatorStats struct and provides a builder API.
-type CoordinatorStatsBuilder struct {
-	v *CoordinatorStats
-}
+func (s *CoordinatorStats) UnmarshalJSON(data []byte) error {
 
-// NewCoordinatorStats provides a builder for the CoordinatorStats struct.
-func NewCoordinatorStatsBuilder() *CoordinatorStatsBuilder {
-	r := CoordinatorStatsBuilder{
-		&CoordinatorStats{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "executed_searches_total":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ExecutedSearchesTotal", err)
+				}
+				s.ExecutedSearchesTotal = value
+			case float64:
+				f := int64(v)
+				s.ExecutedSearchesTotal = f
+			}
+
+		case "node_id":
+			if err := dec.Decode(&s.NodeId); err != nil {
+				return fmt.Errorf("%s | %w", "NodeId", err)
+			}
+
+		case "queue_size":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "QueueSize", err)
+				}
+				s.QueueSize = value
+			case float64:
+				f := int(v)
+				s.QueueSize = f
+			}
+
+		case "remote_requests_current":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "RemoteRequestsCurrent", err)
+				}
+				s.RemoteRequestsCurrent = value
+			case float64:
+				f := int(v)
+				s.RemoteRequestsCurrent = f
+			}
+
+		case "remote_requests_total":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "RemoteRequestsTotal", err)
+				}
+				s.RemoteRequestsTotal = value
+			case float64:
+				f := int64(v)
+				s.RemoteRequestsTotal = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the CoordinatorStats struct
-func (rb *CoordinatorStatsBuilder) Build() CoordinatorStats {
-	return *rb.v
-}
+// NewCoordinatorStats returns a CoordinatorStats.
+func NewCoordinatorStats() *CoordinatorStats {
+	r := &CoordinatorStats{}
 
-func (rb *CoordinatorStatsBuilder) ExecutedSearchesTotal(executedsearchestotal int64) *CoordinatorStatsBuilder {
-	rb.v.ExecutedSearchesTotal = executedsearchestotal
-	return rb
-}
-
-func (rb *CoordinatorStatsBuilder) NodeId(nodeid Id) *CoordinatorStatsBuilder {
-	rb.v.NodeId = nodeid
-	return rb
-}
-
-func (rb *CoordinatorStatsBuilder) QueueSize(queuesize int) *CoordinatorStatsBuilder {
-	rb.v.QueueSize = queuesize
-	return rb
-}
-
-func (rb *CoordinatorStatsBuilder) RemoteRequestsCurrent(remoterequestscurrent int) *CoordinatorStatsBuilder {
-	rb.v.RemoteRequestsCurrent = remoterequestscurrent
-	return rb
-}
-
-func (rb *CoordinatorStatsBuilder) RemoteRequestsTotal(remoterequeststotal int64) *CoordinatorStatsBuilder {
-	rb.v.RemoteRequestsTotal = remoterequeststotal
-	return rb
+	return r
 }

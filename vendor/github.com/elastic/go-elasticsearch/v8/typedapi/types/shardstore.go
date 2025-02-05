@@ -15,89 +15,113 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/shardstoreallocation"
 )
 
 // ShardStore type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/shard_stores/types.ts#L29-L38
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/shard_stores/types.ts#L29-L36
 type ShardStore struct {
-	Allocation       shardstoreallocation.ShardStoreAllocation `json:"allocation"`
-	AllocationId     Id                                        `json:"allocation_id"`
-	Attributes       map[string]interface{}                    `json:"attributes"`
-	Id               Id                                        `json:"id"`
-	LegacyVersion    VersionNumber                             `json:"legacy_version"`
-	Name             Name                                      `json:"name"`
-	StoreException   ShardStoreException                       `json:"store_exception"`
-	TransportAddress TransportAddress                          `json:"transport_address"`
+	Allocation     shardstoreallocation.ShardStoreAllocation `json:"allocation"`
+	AllocationId   *string                                   `json:"allocation_id,omitempty"`
+	ShardStore     map[string]ShardStoreNode                 `json:"-"`
+	StoreException *ShardStoreException                      `json:"store_exception,omitempty"`
 }
 
-// ShardStoreBuilder holds ShardStore struct and provides a builder API.
-type ShardStoreBuilder struct {
-	v *ShardStore
+func (s *ShardStore) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "allocation":
+			if err := dec.Decode(&s.Allocation); err != nil {
+				return fmt.Errorf("%s | %w", "Allocation", err)
+			}
+
+		case "allocation_id":
+			if err := dec.Decode(&s.AllocationId); err != nil {
+				return fmt.Errorf("%s | %w", "AllocationId", err)
+			}
+
+		case "store_exception":
+			if err := dec.Decode(&s.StoreException); err != nil {
+				return fmt.Errorf("%s | %w", "StoreException", err)
+			}
+
+		default:
+
+			if key, ok := t.(string); ok {
+				if s.ShardStore == nil {
+					s.ShardStore = make(map[string]ShardStoreNode, 0)
+				}
+				raw := NewShardStoreNode()
+				if err := dec.Decode(&raw); err != nil {
+					return fmt.Errorf("%s | %w", "ShardStore", err)
+				}
+				s.ShardStore[key] = *raw
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewShardStore provides a builder for the ShardStore struct.
-func NewShardStoreBuilder() *ShardStoreBuilder {
-	r := ShardStoreBuilder{
-		&ShardStore{
-			Attributes: make(map[string]interface{}, 0),
-		},
+// MarhsalJSON overrides marshalling for types with additional properties
+func (s ShardStore) MarshalJSON() ([]byte, error) {
+	type opt ShardStore
+	// We transform the struct to a map without the embedded additional properties map
+	tmp := make(map[string]any, 0)
+
+	data, err := json.Marshal(opt(s))
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(data, &tmp)
+	if err != nil {
+		return nil, err
 	}
 
-	return &r
+	// We inline the additional fields from the underlying map
+	for key, value := range s.ShardStore {
+		tmp[fmt.Sprintf("%s", key)] = value
+	}
+	delete(tmp, "ShardStore")
+
+	data, err = json.Marshal(tmp)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }
 
-// Build finalize the chain and returns the ShardStore struct
-func (rb *ShardStoreBuilder) Build() ShardStore {
-	return *rb.v
-}
+// NewShardStore returns a ShardStore.
+func NewShardStore() *ShardStore {
+	r := &ShardStore{
+		ShardStore: make(map[string]ShardStoreNode, 0),
+	}
 
-func (rb *ShardStoreBuilder) Allocation(allocation shardstoreallocation.ShardStoreAllocation) *ShardStoreBuilder {
-	rb.v.Allocation = allocation
-	return rb
-}
-
-func (rb *ShardStoreBuilder) AllocationId(allocationid Id) *ShardStoreBuilder {
-	rb.v.AllocationId = allocationid
-	return rb
-}
-
-func (rb *ShardStoreBuilder) Attributes(value map[string]interface{}) *ShardStoreBuilder {
-	rb.v.Attributes = value
-	return rb
-}
-
-func (rb *ShardStoreBuilder) Id(id Id) *ShardStoreBuilder {
-	rb.v.Id = id
-	return rb
-}
-
-func (rb *ShardStoreBuilder) LegacyVersion(legacyversion VersionNumber) *ShardStoreBuilder {
-	rb.v.LegacyVersion = legacyversion
-	return rb
-}
-
-func (rb *ShardStoreBuilder) Name(name Name) *ShardStoreBuilder {
-	rb.v.Name = name
-	return rb
-}
-
-func (rb *ShardStoreBuilder) StoreException(storeexception *ShardStoreExceptionBuilder) *ShardStoreBuilder {
-	v := storeexception.Build()
-	rb.v.StoreException = v
-	return rb
-}
-
-func (rb *ShardStoreBuilder) TransportAddress(transportaddress TransportAddress) *ShardStoreBuilder {
-	rb.v.TransportAddress = transportaddress
-	return rb
+	return r
 }

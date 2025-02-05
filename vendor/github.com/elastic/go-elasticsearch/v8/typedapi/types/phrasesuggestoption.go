@@ -15,52 +15,107 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // PhraseSuggestOption type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/suggester.ts#L86-L90
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/suggester.ts#L86-L91
 type PhraseSuggestOption struct {
-	Highlighted string  `json:"highlighted"`
-	Score       float64 `json:"score"`
-	Text        string  `json:"text"`
+	CollateMatch *bool   `json:"collate_match,omitempty"`
+	Highlighted  *string `json:"highlighted,omitempty"`
+	Score        Float64 `json:"score"`
+	Text         string  `json:"text"`
 }
 
-// PhraseSuggestOptionBuilder holds PhraseSuggestOption struct and provides a builder API.
-type PhraseSuggestOptionBuilder struct {
-	v *PhraseSuggestOption
-}
+func (s *PhraseSuggestOption) UnmarshalJSON(data []byte) error {
 
-// NewPhraseSuggestOption provides a builder for the PhraseSuggestOption struct.
-func NewPhraseSuggestOptionBuilder() *PhraseSuggestOptionBuilder {
-	r := PhraseSuggestOptionBuilder{
-		&PhraseSuggestOption{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "collate_match":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CollateMatch", err)
+				}
+				s.CollateMatch = &value
+			case bool:
+				s.CollateMatch = &v
+			}
+
+		case "highlighted":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Highlighted", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Highlighted = &o
+
+		case "score":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Score", err)
+				}
+				f := Float64(value)
+				s.Score = f
+			case float64:
+				f := Float64(v)
+				s.Score = f
+			}
+
+		case "text":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Text", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Text = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the PhraseSuggestOption struct
-func (rb *PhraseSuggestOptionBuilder) Build() PhraseSuggestOption {
-	return *rb.v
-}
+// NewPhraseSuggestOption returns a PhraseSuggestOption.
+func NewPhraseSuggestOption() *PhraseSuggestOption {
+	r := &PhraseSuggestOption{}
 
-func (rb *PhraseSuggestOptionBuilder) Highlighted(highlighted string) *PhraseSuggestOptionBuilder {
-	rb.v.Highlighted = highlighted
-	return rb
-}
-
-func (rb *PhraseSuggestOptionBuilder) Score(score float64) *PhraseSuggestOptionBuilder {
-	rb.v.Score = score
-	return rb
-}
-
-func (rb *PhraseSuggestOptionBuilder) Text(text string) *PhraseSuggestOptionBuilder {
-	rb.v.Text = text
-	return rb
+	return r
 }

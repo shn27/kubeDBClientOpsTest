@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 //
-// Code generated from specification version 8.4.0: DO NOT EDIT
+// Code generated from specification version 8.17.0: DO NOT EDIT
 
 package esapi
 
@@ -34,6 +34,11 @@ func newMLGetRecordsFunc(t Transport) MLGetRecords {
 		for _, f := range o {
 			f(&r)
 		}
+
+		if transport, ok := t.(Instrumented); ok {
+			r.instrument = transport.InstrumentationEnabled()
+		}
+
 		return r.Do(r.ctx, t)
 	}
 }
@@ -68,15 +73,26 @@ type MLGetRecordsRequest struct {
 	Header http.Header
 
 	ctx context.Context
+
+	instrument Instrumentation
 }
 
 // Do executes the request and returns response or error.
-func (r MLGetRecordsRequest) Do(ctx context.Context, transport Transport) (*Response, error) {
+func (r MLGetRecordsRequest) Do(providedCtx context.Context, transport Transport) (*Response, error) {
 	var (
 		method string
 		path   strings.Builder
 		params map[string]string
+		ctx    context.Context
 	)
+
+	if instrument, ok := r.instrument.(Instrumentation); ok {
+		ctx = instrument.Start(providedCtx, "ml.get_records")
+		defer instrument.Close(ctx)
+	}
+	if ctx == nil {
+		ctx = providedCtx
+	}
 
 	method = "POST"
 
@@ -88,6 +104,9 @@ func (r MLGetRecordsRequest) Do(ctx context.Context, transport Transport) (*Resp
 	path.WriteString("anomaly_detectors")
 	path.WriteString("/")
 	path.WriteString(r.JobID)
+	if instrument, ok := r.instrument.(Instrumentation); ok {
+		instrument.RecordPathPart(ctx, "job_id", r.JobID)
+	}
 	path.WriteString("/")
 	path.WriteString("results")
 	path.WriteString("/")
@@ -145,6 +164,9 @@ func (r MLGetRecordsRequest) Do(ctx context.Context, transport Transport) (*Resp
 
 	req, err := newRequest(method, path.String(), r.Body)
 	if err != nil {
+		if instrument, ok := r.instrument.(Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
 		return nil, err
 	}
 
@@ -154,10 +176,6 @@ func (r MLGetRecordsRequest) Do(ctx context.Context, transport Transport) (*Resp
 			q.Set(k, v)
 		}
 		req.URL.RawQuery = q.Encode()
-	}
-
-	if r.Body != nil {
-		req.Header[headerContentType] = headerContentTypeJSON
 	}
 
 	if len(r.Header) > 0 {
@@ -172,12 +190,28 @@ func (r MLGetRecordsRequest) Do(ctx context.Context, transport Transport) (*Resp
 		}
 	}
 
+	if r.Body != nil && req.Header.Get(headerContentType) == "" {
+		req.Header[headerContentType] = headerContentTypeJSON
+	}
+
 	if ctx != nil {
 		req = req.WithContext(ctx)
 	}
 
+	if instrument, ok := r.instrument.(Instrumentation); ok {
+		instrument.BeforeRequest(req, "ml.get_records")
+		if reader := instrument.RecordRequestBody(ctx, "ml.get_records", r.Body); reader != nil {
+			req.Body = reader
+		}
+	}
 	res, err := transport.Perform(req)
+	if instrument, ok := r.instrument.(Instrumentation); ok {
+		instrument.AfterRequest(req, "elasticsearch", "ml.get_records")
+	}
 	if err != nil {
+		if instrument, ok := r.instrument.(Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
 		return nil, err
 	}
 

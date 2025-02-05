@@ -15,98 +15,149 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ReindexTask type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/reindex_rethrottle/types.ts#L53-L64
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/reindex_rethrottle/types.ts#L87-L98
 type ReindexTask struct {
-	Action             string                 `json:"action"`
-	Cancellable        bool                   `json:"cancellable"`
-	Description        string                 `json:"description"`
-	Headers            HttpHeaders            `json:"headers"`
-	Id                 int64                  `json:"id"`
-	Node               Name                   `json:"node"`
-	RunningTimeInNanos DurationValueUnitNanos `json:"running_time_in_nanos"`
-	StartTimeInMillis  EpochTimeUnitMillis    `json:"start_time_in_millis"`
-	Status             ReindexStatus          `json:"status"`
-	Type               string                 `json:"type"`
+	Action             string        `json:"action"`
+	Cancellable        bool          `json:"cancellable"`
+	Description        string        `json:"description"`
+	Headers            HttpHeaders   `json:"headers"`
+	Id                 int64         `json:"id"`
+	Node               string        `json:"node"`
+	RunningTimeInNanos int64         `json:"running_time_in_nanos"`
+	StartTimeInMillis  int64         `json:"start_time_in_millis"`
+	Status             ReindexStatus `json:"status"`
+	Type               string        `json:"type"`
 }
 
-// ReindexTaskBuilder holds ReindexTask struct and provides a builder API.
-type ReindexTaskBuilder struct {
-	v *ReindexTask
-}
+func (s *ReindexTask) UnmarshalJSON(data []byte) error {
 
-// NewReindexTask provides a builder for the ReindexTask struct.
-func NewReindexTaskBuilder() *ReindexTaskBuilder {
-	r := ReindexTaskBuilder{
-		&ReindexTask{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "action":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Action", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Action = o
+
+		case "cancellable":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Cancellable", err)
+				}
+				s.Cancellable = value
+			case bool:
+				s.Cancellable = v
+			}
+
+		case "description":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Description", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Description = o
+
+		case "headers":
+			if err := dec.Decode(&s.Headers); err != nil {
+				return fmt.Errorf("%s | %w", "Headers", err)
+			}
+
+		case "id":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Id", err)
+				}
+				s.Id = value
+			case float64:
+				f := int64(v)
+				s.Id = f
+			}
+
+		case "node":
+			if err := dec.Decode(&s.Node); err != nil {
+				return fmt.Errorf("%s | %w", "Node", err)
+			}
+
+		case "running_time_in_nanos":
+			if err := dec.Decode(&s.RunningTimeInNanos); err != nil {
+				return fmt.Errorf("%s | %w", "RunningTimeInNanos", err)
+			}
+
+		case "start_time_in_millis":
+			if err := dec.Decode(&s.StartTimeInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "StartTimeInMillis", err)
+			}
+
+		case "status":
+			if err := dec.Decode(&s.Status); err != nil {
+				return fmt.Errorf("%s | %w", "Status", err)
+			}
+
+		case "type":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Type = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ReindexTask struct
-func (rb *ReindexTaskBuilder) Build() ReindexTask {
-	return *rb.v
-}
+// NewReindexTask returns a ReindexTask.
+func NewReindexTask() *ReindexTask {
+	r := &ReindexTask{}
 
-func (rb *ReindexTaskBuilder) Action(action string) *ReindexTaskBuilder {
-	rb.v.Action = action
-	return rb
-}
-
-func (rb *ReindexTaskBuilder) Cancellable(cancellable bool) *ReindexTaskBuilder {
-	rb.v.Cancellable = cancellable
-	return rb
-}
-
-func (rb *ReindexTaskBuilder) Description(description string) *ReindexTaskBuilder {
-	rb.v.Description = description
-	return rb
-}
-
-func (rb *ReindexTaskBuilder) Headers(headers *HttpHeadersBuilder) *ReindexTaskBuilder {
-	v := headers.Build()
-	rb.v.Headers = v
-	return rb
-}
-
-func (rb *ReindexTaskBuilder) Id(id int64) *ReindexTaskBuilder {
-	rb.v.Id = id
-	return rb
-}
-
-func (rb *ReindexTaskBuilder) Node(node Name) *ReindexTaskBuilder {
-	rb.v.Node = node
-	return rb
-}
-
-func (rb *ReindexTaskBuilder) RunningTimeInNanos(runningtimeinnanos *DurationValueUnitNanosBuilder) *ReindexTaskBuilder {
-	v := runningtimeinnanos.Build()
-	rb.v.RunningTimeInNanos = v
-	return rb
-}
-
-func (rb *ReindexTaskBuilder) StartTimeInMillis(starttimeinmillis *EpochTimeUnitMillisBuilder) *ReindexTaskBuilder {
-	v := starttimeinmillis.Build()
-	rb.v.StartTimeInMillis = v
-	return rb
-}
-
-func (rb *ReindexTaskBuilder) Status(status *ReindexStatusBuilder) *ReindexTaskBuilder {
-	v := status.Build()
-	rb.v.Status = v
-	return rb
-}
-
-func (rb *ReindexTaskBuilder) Type_(type_ string) *ReindexTaskBuilder {
-	rb.v.Type = type_
-	return rb
+	return r
 }

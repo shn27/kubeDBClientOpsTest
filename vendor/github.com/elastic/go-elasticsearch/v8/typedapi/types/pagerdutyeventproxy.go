@@ -15,46 +15,72 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // PagerDutyEventProxy type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Actions.ts#L56-L59
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Actions.ts#L56-L59
 type PagerDutyEventProxy struct {
-	Host *Host `json:"host,omitempty"`
-	Port *int  `json:"port,omitempty"`
+	Host *string `json:"host,omitempty"`
+	Port *int    `json:"port,omitempty"`
 }
 
-// PagerDutyEventProxyBuilder holds PagerDutyEventProxy struct and provides a builder API.
-type PagerDutyEventProxyBuilder struct {
-	v *PagerDutyEventProxy
-}
+func (s *PagerDutyEventProxy) UnmarshalJSON(data []byte) error {
 
-// NewPagerDutyEventProxy provides a builder for the PagerDutyEventProxy struct.
-func NewPagerDutyEventProxyBuilder() *PagerDutyEventProxyBuilder {
-	r := PagerDutyEventProxyBuilder{
-		&PagerDutyEventProxy{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "host":
+			if err := dec.Decode(&s.Host); err != nil {
+				return fmt.Errorf("%s | %w", "Host", err)
+			}
+
+		case "port":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Port", err)
+				}
+				s.Port = &value
+			case float64:
+				f := int(v)
+				s.Port = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the PagerDutyEventProxy struct
-func (rb *PagerDutyEventProxyBuilder) Build() PagerDutyEventProxy {
-	return *rb.v
-}
+// NewPagerDutyEventProxy returns a PagerDutyEventProxy.
+func NewPagerDutyEventProxy() *PagerDutyEventProxy {
+	r := &PagerDutyEventProxy{}
 
-func (rb *PagerDutyEventProxyBuilder) Host(host Host) *PagerDutyEventProxyBuilder {
-	rb.v.Host = &host
-	return rb
-}
-
-func (rb *PagerDutyEventProxyBuilder) Port(port int) *PagerDutyEventProxyBuilder {
-	rb.v.Port = &port
-	return rb
+	return r
 }

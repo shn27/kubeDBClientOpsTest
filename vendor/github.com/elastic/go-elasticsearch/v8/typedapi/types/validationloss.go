@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ValidationLoss type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/DataframeAnalytics.ts#L428-L433
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/DataframeAnalytics.ts#L571-L576
 type ValidationLoss struct {
 	// FoldValues Validation loss values for every added decision tree during the forest
 	// growing procedure.
@@ -33,36 +40,46 @@ type ValidationLoss struct {
 	LossType string `json:"loss_type"`
 }
 
-// ValidationLossBuilder holds ValidationLoss struct and provides a builder API.
-type ValidationLossBuilder struct {
-	v *ValidationLoss
-}
+func (s *ValidationLoss) UnmarshalJSON(data []byte) error {
 
-// NewValidationLoss provides a builder for the ValidationLoss struct.
-func NewValidationLossBuilder() *ValidationLossBuilder {
-	r := ValidationLossBuilder{
-		&ValidationLoss{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "fold_values":
+			if err := dec.Decode(&s.FoldValues); err != nil {
+				return fmt.Errorf("%s | %w", "FoldValues", err)
+			}
+
+		case "loss_type":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "LossType", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.LossType = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ValidationLoss struct
-func (rb *ValidationLossBuilder) Build() ValidationLoss {
-	return *rb.v
-}
+// NewValidationLoss returns a ValidationLoss.
+func NewValidationLoss() *ValidationLoss {
+	r := &ValidationLoss{}
 
-// FoldValues Validation loss values for every added decision tree during the forest
-// growing procedure.
-
-func (rb *ValidationLossBuilder) FoldValues(fold_values ...string) *ValidationLossBuilder {
-	rb.v.FoldValues = fold_values
-	return rb
-}
-
-// LossType The type of the loss metric. For example, binomial_logistic.
-
-func (rb *ValidationLossBuilder) LossType(losstype string) *ValidationLossBuilder {
-	rb.v.LossType = losstype
-	return rb
+	return r
 }

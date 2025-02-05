@@ -15,16 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // AutoscalingDeciders type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/autoscaling/get_autoscaling_capacity/GetAutoscalingCapacityResponse.ts#L31-L36
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/autoscaling/get_autoscaling_capacity/GetAutoscalingCapacityResponse.ts#L31-L36
 type AutoscalingDeciders struct {
 	CurrentCapacity  AutoscalingCapacity           `json:"current_capacity"`
 	CurrentNodes     []AutoscalingNode             `json:"current_nodes"`
@@ -32,53 +30,11 @@ type AutoscalingDeciders struct {
 	RequiredCapacity AutoscalingCapacity           `json:"required_capacity"`
 }
 
-// AutoscalingDecidersBuilder holds AutoscalingDeciders struct and provides a builder API.
-type AutoscalingDecidersBuilder struct {
-	v *AutoscalingDeciders
-}
-
-// NewAutoscalingDeciders provides a builder for the AutoscalingDeciders struct.
-func NewAutoscalingDecidersBuilder() *AutoscalingDecidersBuilder {
-	r := AutoscalingDecidersBuilder{
-		&AutoscalingDeciders{
-			Deciders: make(map[string]AutoscalingDecider, 0),
-		},
+// NewAutoscalingDeciders returns a AutoscalingDeciders.
+func NewAutoscalingDeciders() *AutoscalingDeciders {
+	r := &AutoscalingDeciders{
+		Deciders: make(map[string]AutoscalingDecider, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the AutoscalingDeciders struct
-func (rb *AutoscalingDecidersBuilder) Build() AutoscalingDeciders {
-	return *rb.v
-}
-
-func (rb *AutoscalingDecidersBuilder) CurrentCapacity(currentcapacity *AutoscalingCapacityBuilder) *AutoscalingDecidersBuilder {
-	v := currentcapacity.Build()
-	rb.v.CurrentCapacity = v
-	return rb
-}
-
-func (rb *AutoscalingDecidersBuilder) CurrentNodes(current_nodes []AutoscalingNodeBuilder) *AutoscalingDecidersBuilder {
-	tmp := make([]AutoscalingNode, len(current_nodes))
-	for _, value := range current_nodes {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.CurrentNodes = tmp
-	return rb
-}
-
-func (rb *AutoscalingDecidersBuilder) Deciders(values map[string]*AutoscalingDeciderBuilder) *AutoscalingDecidersBuilder {
-	tmp := make(map[string]AutoscalingDecider, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Deciders = tmp
-	return rb
-}
-
-func (rb *AutoscalingDecidersBuilder) RequiredCapacity(requiredcapacity *AutoscalingCapacityBuilder) *AutoscalingDecidersBuilder {
-	v := requiredcapacity.Build()
-	rb.v.RequiredCapacity = v
-	return rb
+	return r
 }

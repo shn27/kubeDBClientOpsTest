@@ -15,71 +15,133 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // AliasDefinition type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/AliasDefinition.ts#L22-L30
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/AliasDefinition.ts#L22-L54
 type AliasDefinition struct {
-	Filter        *QueryContainer `json:"filter,omitempty"`
-	IndexRouting  *string         `json:"index_routing,omitempty"`
-	IsHidden      *bool           `json:"is_hidden,omitempty"`
-	IsWriteIndex  *bool           `json:"is_write_index,omitempty"`
-	Routing       *string         `json:"routing,omitempty"`
-	SearchRouting *string         `json:"search_routing,omitempty"`
+	// Filter Query used to limit documents the alias can access.
+	Filter *Query `json:"filter,omitempty"`
+	// IndexRouting Value used to route indexing operations to a specific shard.
+	// If specified, this overwrites the `routing` value for indexing operations.
+	IndexRouting *string `json:"index_routing,omitempty"`
+	// IsHidden If `true`, the alias is hidden.
+	// All indices for the alias must have the same `is_hidden` value.
+	IsHidden *bool `json:"is_hidden,omitempty"`
+	// IsWriteIndex If `true`, the index is the write index for the alias.
+	IsWriteIndex *bool `json:"is_write_index,omitempty"`
+	// Routing Value used to route indexing and search operations to a specific shard.
+	Routing *string `json:"routing,omitempty"`
+	// SearchRouting Value used to route search operations to a specific shard.
+	// If specified, this overwrites the `routing` value for search operations.
+	SearchRouting *string `json:"search_routing,omitempty"`
 }
 
-// AliasDefinitionBuilder holds AliasDefinition struct and provides a builder API.
-type AliasDefinitionBuilder struct {
-	v *AliasDefinition
-}
+func (s *AliasDefinition) UnmarshalJSON(data []byte) error {
 
-// NewAliasDefinition provides a builder for the AliasDefinition struct.
-func NewAliasDefinitionBuilder() *AliasDefinitionBuilder {
-	r := AliasDefinitionBuilder{
-		&AliasDefinition{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "filter":
+			if err := dec.Decode(&s.Filter); err != nil {
+				return fmt.Errorf("%s | %w", "Filter", err)
+			}
+
+		case "index_routing":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "IndexRouting", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.IndexRouting = &o
+
+		case "is_hidden":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IsHidden", err)
+				}
+				s.IsHidden = &value
+			case bool:
+				s.IsHidden = &v
+			}
+
+		case "is_write_index":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IsWriteIndex", err)
+				}
+				s.IsWriteIndex = &value
+			case bool:
+				s.IsWriteIndex = &v
+			}
+
+		case "routing":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Routing", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Routing = &o
+
+		case "search_routing":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SearchRouting", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SearchRouting = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the AliasDefinition struct
-func (rb *AliasDefinitionBuilder) Build() AliasDefinition {
-	return *rb.v
-}
+// NewAliasDefinition returns a AliasDefinition.
+func NewAliasDefinition() *AliasDefinition {
+	r := &AliasDefinition{}
 
-func (rb *AliasDefinitionBuilder) Filter(filter *QueryContainerBuilder) *AliasDefinitionBuilder {
-	v := filter.Build()
-	rb.v.Filter = &v
-	return rb
-}
-
-func (rb *AliasDefinitionBuilder) IndexRouting(indexrouting string) *AliasDefinitionBuilder {
-	rb.v.IndexRouting = &indexrouting
-	return rb
-}
-
-func (rb *AliasDefinitionBuilder) IsHidden(ishidden bool) *AliasDefinitionBuilder {
-	rb.v.IsHidden = &ishidden
-	return rb
-}
-
-func (rb *AliasDefinitionBuilder) IsWriteIndex(iswriteindex bool) *AliasDefinitionBuilder {
-	rb.v.IsWriteIndex = &iswriteindex
-	return rb
-}
-
-func (rb *AliasDefinitionBuilder) Routing(routing string) *AliasDefinitionBuilder {
-	rb.v.Routing = &routing
-	return rb
-}
-
-func (rb *AliasDefinitionBuilder) SearchRouting(searchrouting string) *AliasDefinitionBuilder {
-	rb.v.SearchRouting = &searchrouting
-	return rb
+	return r
 }

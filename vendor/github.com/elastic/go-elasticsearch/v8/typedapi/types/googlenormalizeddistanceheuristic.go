@@ -15,40 +15,66 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // GoogleNormalizedDistanceHeuristic type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/bucket.ts#L323-L325
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/bucket.ts#L793-L798
 type GoogleNormalizedDistanceHeuristic struct {
+	// BackgroundIsSuperset Set to `false` if you defined a custom background filter that represents a
+	// different set of documents that you want to compare to.
 	BackgroundIsSuperset *bool `json:"background_is_superset,omitempty"`
 }
 
-// GoogleNormalizedDistanceHeuristicBuilder holds GoogleNormalizedDistanceHeuristic struct and provides a builder API.
-type GoogleNormalizedDistanceHeuristicBuilder struct {
-	v *GoogleNormalizedDistanceHeuristic
-}
+func (s *GoogleNormalizedDistanceHeuristic) UnmarshalJSON(data []byte) error {
 
-// NewGoogleNormalizedDistanceHeuristic provides a builder for the GoogleNormalizedDistanceHeuristic struct.
-func NewGoogleNormalizedDistanceHeuristicBuilder() *GoogleNormalizedDistanceHeuristicBuilder {
-	r := GoogleNormalizedDistanceHeuristicBuilder{
-		&GoogleNormalizedDistanceHeuristic{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "background_is_superset":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "BackgroundIsSuperset", err)
+				}
+				s.BackgroundIsSuperset = &value
+			case bool:
+				s.BackgroundIsSuperset = &v
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the GoogleNormalizedDistanceHeuristic struct
-func (rb *GoogleNormalizedDistanceHeuristicBuilder) Build() GoogleNormalizedDistanceHeuristic {
-	return *rb.v
-}
+// NewGoogleNormalizedDistanceHeuristic returns a GoogleNormalizedDistanceHeuristic.
+func NewGoogleNormalizedDistanceHeuristic() *GoogleNormalizedDistanceHeuristic {
+	r := &GoogleNormalizedDistanceHeuristic{}
 
-func (rb *GoogleNormalizedDistanceHeuristicBuilder) BackgroundIsSuperset(backgroundissuperset bool) *GoogleNormalizedDistanceHeuristicBuilder {
-	rb.v.BackgroundIsSuperset = &backgroundissuperset
-	return rb
+	return r
 }

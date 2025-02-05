@@ -15,92 +15,177 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/rangerelation"
 )
 
 // NumberRangeQuery type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/term.ts#L83-L90
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/term.ts#L172-L172
 type NumberRangeQuery struct {
-	Boost      *float32                     `json:"boost,omitempty"`
-	From       float64                      `json:"from,omitempty"`
-	Gt         *float64                     `json:"gt,omitempty"`
-	Gte        *float64                     `json:"gte,omitempty"`
-	Lt         *float64                     `json:"lt,omitempty"`
-	Lte        *float64                     `json:"lte,omitempty"`
-	QueryName_ *string                      `json:"_name,omitempty"`
-	Relation   *rangerelation.RangeRelation `json:"relation,omitempty"`
-	To         float64                      `json:"to,omitempty"`
+	// Boost Floating point number used to decrease or increase the relevance scores of
+	// the query.
+	// Boost values are relative to the default value of 1.0.
+	// A boost value between 0 and 1.0 decreases the relevance score.
+	// A value greater than 1.0 increases the relevance score.
+	Boost *float32 `json:"boost,omitempty"`
+	From  *Float64 `json:"from,omitempty"`
+	// Gt Greater than.
+	Gt *Float64 `json:"gt,omitempty"`
+	// Gte Greater than or equal to.
+	Gte *Float64 `json:"gte,omitempty"`
+	// Lt Less than.
+	Lt *Float64 `json:"lt,omitempty"`
+	// Lte Less than or equal to.
+	Lte        *Float64 `json:"lte,omitempty"`
+	QueryName_ *string  `json:"_name,omitempty"`
+	// Relation Indicates how the range query matches values for `range` fields.
+	Relation *rangerelation.RangeRelation `json:"relation,omitempty"`
+	To       *Float64                     `json:"to,omitempty"`
 }
 
-// NumberRangeQueryBuilder holds NumberRangeQuery struct and provides a builder API.
-type NumberRangeQueryBuilder struct {
-	v *NumberRangeQuery
-}
+func (s *NumberRangeQuery) UnmarshalJSON(data []byte) error {
 
-// NewNumberRangeQuery provides a builder for the NumberRangeQuery struct.
-func NewNumberRangeQueryBuilder() *NumberRangeQueryBuilder {
-	r := NumberRangeQueryBuilder{
-		&NumberRangeQuery{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "boost":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Boost", err)
+				}
+				f := float32(value)
+				s.Boost = &f
+			case float64:
+				f := float32(v)
+				s.Boost = &f
+			}
+
+		case "from":
+			if err := dec.Decode(&s.From); err != nil {
+				return fmt.Errorf("%s | %w", "From", err)
+			}
+
+		case "gt":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Gt", err)
+				}
+				f := Float64(value)
+				s.Gt = &f
+			case float64:
+				f := Float64(v)
+				s.Gt = &f
+			}
+
+		case "gte":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Gte", err)
+				}
+				f := Float64(value)
+				s.Gte = &f
+			case float64:
+				f := Float64(v)
+				s.Gte = &f
+			}
+
+		case "lt":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Lt", err)
+				}
+				f := Float64(value)
+				s.Lt = &f
+			case float64:
+				f := Float64(v)
+				s.Lt = &f
+			}
+
+		case "lte":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Lte", err)
+				}
+				f := Float64(value)
+				s.Lte = &f
+			case float64:
+				f := Float64(v)
+				s.Lte = &f
+			}
+
+		case "_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "QueryName_", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.QueryName_ = &o
+
+		case "relation":
+			if err := dec.Decode(&s.Relation); err != nil {
+				return fmt.Errorf("%s | %w", "Relation", err)
+			}
+
+		case "to":
+			if err := dec.Decode(&s.To); err != nil {
+				return fmt.Errorf("%s | %w", "To", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the NumberRangeQuery struct
-func (rb *NumberRangeQueryBuilder) Build() NumberRangeQuery {
-	return *rb.v
-}
+// NewNumberRangeQuery returns a NumberRangeQuery.
+func NewNumberRangeQuery() *NumberRangeQuery {
+	r := &NumberRangeQuery{}
 
-func (rb *NumberRangeQueryBuilder) Boost(boost float32) *NumberRangeQueryBuilder {
-	rb.v.Boost = &boost
-	return rb
-}
-
-func (rb *NumberRangeQueryBuilder) From(from float64) *NumberRangeQueryBuilder {
-	rb.v.From = from
-	return rb
-}
-
-func (rb *NumberRangeQueryBuilder) Gt(gt float64) *NumberRangeQueryBuilder {
-	rb.v.Gt = &gt
-	return rb
-}
-
-func (rb *NumberRangeQueryBuilder) Gte(gte float64) *NumberRangeQueryBuilder {
-	rb.v.Gte = &gte
-	return rb
-}
-
-func (rb *NumberRangeQueryBuilder) Lt(lt float64) *NumberRangeQueryBuilder {
-	rb.v.Lt = &lt
-	return rb
-}
-
-func (rb *NumberRangeQueryBuilder) Lte(lte float64) *NumberRangeQueryBuilder {
-	rb.v.Lte = &lte
-	return rb
-}
-
-func (rb *NumberRangeQueryBuilder) QueryName_(queryname_ string) *NumberRangeQueryBuilder {
-	rb.v.QueryName_ = &queryname_
-	return rb
-}
-
-func (rb *NumberRangeQueryBuilder) Relation(relation rangerelation.RangeRelation) *NumberRangeQueryBuilder {
-	rb.v.Relation = &relation
-	return rb
-}
-
-func (rb *NumberRangeQueryBuilder) To(to float64) *NumberRangeQueryBuilder {
-	rb.v.To = to
-	return rb
+	return r
 }

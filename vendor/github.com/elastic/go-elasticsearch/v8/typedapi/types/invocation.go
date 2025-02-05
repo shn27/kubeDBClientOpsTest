@@ -15,47 +15,60 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // Invocation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/slm/_types/SnapshotLifecycle.ts#L138-L141
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/slm/_types/SnapshotLifecycle.ts#L138-L141
 type Invocation struct {
-	SnapshotName Name     `json:"snapshot_name"`
+	SnapshotName string   `json:"snapshot_name"`
 	Time         DateTime `json:"time"`
 }
 
-// InvocationBuilder holds Invocation struct and provides a builder API.
-type InvocationBuilder struct {
-	v *Invocation
-}
+func (s *Invocation) UnmarshalJSON(data []byte) error {
 
-// NewInvocation provides a builder for the Invocation struct.
-func NewInvocationBuilder() *InvocationBuilder {
-	r := InvocationBuilder{
-		&Invocation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "snapshot_name":
+			if err := dec.Decode(&s.SnapshotName); err != nil {
+				return fmt.Errorf("%s | %w", "SnapshotName", err)
+			}
+
+		case "time":
+			if err := dec.Decode(&s.Time); err != nil {
+				return fmt.Errorf("%s | %w", "Time", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the Invocation struct
-func (rb *InvocationBuilder) Build() Invocation {
-	return *rb.v
-}
+// NewInvocation returns a Invocation.
+func NewInvocation() *Invocation {
+	r := &Invocation{}
 
-func (rb *InvocationBuilder) SnapshotName(snapshotname Name) *InvocationBuilder {
-	rb.v.SnapshotName = snapshotname
-	return rb
-}
-
-func (rb *InvocationBuilder) Time(time *DateTimeBuilder) *InvocationBuilder {
-	v := time.Build()
-	rb.v.Time = v
-	return rb
+	return r
 }

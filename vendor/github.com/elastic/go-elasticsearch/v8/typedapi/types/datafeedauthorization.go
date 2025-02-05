@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DatafeedAuthorization type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/Authorization.ts#L31-L43
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/Authorization.ts#L31-L43
 type DatafeedAuthorization struct {
 	// ApiKey If an API key was used for the most recent update to the datafeed, its name
 	// and identifier are listed in the response.
@@ -37,46 +44,51 @@ type DatafeedAuthorization struct {
 	ServiceAccount *string `json:"service_account,omitempty"`
 }
 
-// DatafeedAuthorizationBuilder holds DatafeedAuthorization struct and provides a builder API.
-type DatafeedAuthorizationBuilder struct {
-	v *DatafeedAuthorization
-}
+func (s *DatafeedAuthorization) UnmarshalJSON(data []byte) error {
 
-// NewDatafeedAuthorization provides a builder for the DatafeedAuthorization struct.
-func NewDatafeedAuthorizationBuilder() *DatafeedAuthorizationBuilder {
-	r := DatafeedAuthorizationBuilder{
-		&DatafeedAuthorization{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "api_key":
+			if err := dec.Decode(&s.ApiKey); err != nil {
+				return fmt.Errorf("%s | %w", "ApiKey", err)
+			}
+
+		case "roles":
+			if err := dec.Decode(&s.Roles); err != nil {
+				return fmt.Errorf("%s | %w", "Roles", err)
+			}
+
+		case "service_account":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ServiceAccount", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ServiceAccount = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DatafeedAuthorization struct
-func (rb *DatafeedAuthorizationBuilder) Build() DatafeedAuthorization {
-	return *rb.v
-}
+// NewDatafeedAuthorization returns a DatafeedAuthorization.
+func NewDatafeedAuthorization() *DatafeedAuthorization {
+	r := &DatafeedAuthorization{}
 
-// ApiKey If an API key was used for the most recent update to the datafeed, its name
-// and identifier are listed in the response.
-
-func (rb *DatafeedAuthorizationBuilder) ApiKey(apikey *ApiKeyAuthorizationBuilder) *DatafeedAuthorizationBuilder {
-	v := apikey.Build()
-	rb.v.ApiKey = &v
-	return rb
-}
-
-// Roles If a user ID was used for the most recent update to the datafeed, its roles
-// at the time of the update are listed in the response.
-
-func (rb *DatafeedAuthorizationBuilder) Roles(roles ...string) *DatafeedAuthorizationBuilder {
-	rb.v.Roles = roles
-	return rb
-}
-
-// ServiceAccount If a service account was used for the most recent update to the datafeed, the
-// account name is listed in the response.
-
-func (rb *DatafeedAuthorizationBuilder) ServiceAccount(serviceaccount string) *DatafeedAuthorizationBuilder {
-	rb.v.ServiceAccount = &serviceaccount
-	return rb
+	return r
 }

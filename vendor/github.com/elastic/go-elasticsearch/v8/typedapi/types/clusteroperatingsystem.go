@@ -15,83 +15,118 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ClusterOperatingSystem type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/stats/types.ts#L228-L235
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/stats/types.ts#L415-L442
 type ClusterOperatingSystem struct {
-	AllocatedProcessors int                                  `json:"allocated_processors"`
-	Architectures       []ClusterOperatingSystemArchitecture `json:"architectures,omitempty"`
-	AvailableProcessors int                                  `json:"available_processors"`
-	Mem                 OperatingSystemMemoryInfo            `json:"mem"`
-	Names               []ClusterOperatingSystemName         `json:"names"`
-	PrettyNames         []ClusterOperatingSystemPrettyName   `json:"pretty_names"`
+	// AllocatedProcessors Number of processors used to calculate thread pool size across all selected
+	// nodes.
+	// This number can be set with the processors setting of a node and defaults to
+	// the number of processors reported by the operating system.
+	// In both cases, this number will never be larger than 32.
+	AllocatedProcessors int `json:"allocated_processors"`
+	// Architectures Contains statistics about processor architectures (for example, x86_64 or
+	// aarch64) used by selected nodes.
+	Architectures []ClusterOperatingSystemArchitecture `json:"architectures,omitempty"`
+	// AvailableProcessors Number of processors available to JVM across all selected nodes.
+	AvailableProcessors int `json:"available_processors"`
+	// Mem Contains statistics about memory used by selected nodes.
+	Mem OperatingSystemMemoryInfo `json:"mem"`
+	// Names Contains statistics about operating systems used by selected nodes.
+	Names []ClusterOperatingSystemName `json:"names"`
+	// PrettyNames Contains statistics about operating systems used by selected nodes.
+	PrettyNames []ClusterOperatingSystemPrettyName `json:"pretty_names"`
 }
 
-// ClusterOperatingSystemBuilder holds ClusterOperatingSystem struct and provides a builder API.
-type ClusterOperatingSystemBuilder struct {
-	v *ClusterOperatingSystem
-}
+func (s *ClusterOperatingSystem) UnmarshalJSON(data []byte) error {
 
-// NewClusterOperatingSystem provides a builder for the ClusterOperatingSystem struct.
-func NewClusterOperatingSystemBuilder() *ClusterOperatingSystemBuilder {
-	r := ClusterOperatingSystemBuilder{
-		&ClusterOperatingSystem{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "allocated_processors":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "AllocatedProcessors", err)
+				}
+				s.AllocatedProcessors = value
+			case float64:
+				f := int(v)
+				s.AllocatedProcessors = f
+			}
+
+		case "architectures":
+			if err := dec.Decode(&s.Architectures); err != nil {
+				return fmt.Errorf("%s | %w", "Architectures", err)
+			}
+
+		case "available_processors":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "AvailableProcessors", err)
+				}
+				s.AvailableProcessors = value
+			case float64:
+				f := int(v)
+				s.AvailableProcessors = f
+			}
+
+		case "mem":
+			if err := dec.Decode(&s.Mem); err != nil {
+				return fmt.Errorf("%s | %w", "Mem", err)
+			}
+
+		case "names":
+			if err := dec.Decode(&s.Names); err != nil {
+				return fmt.Errorf("%s | %w", "Names", err)
+			}
+
+		case "pretty_names":
+			if err := dec.Decode(&s.PrettyNames); err != nil {
+				return fmt.Errorf("%s | %w", "PrettyNames", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ClusterOperatingSystem struct
-func (rb *ClusterOperatingSystemBuilder) Build() ClusterOperatingSystem {
-	return *rb.v
-}
+// NewClusterOperatingSystem returns a ClusterOperatingSystem.
+func NewClusterOperatingSystem() *ClusterOperatingSystem {
+	r := &ClusterOperatingSystem{}
 
-func (rb *ClusterOperatingSystemBuilder) AllocatedProcessors(allocatedprocessors int) *ClusterOperatingSystemBuilder {
-	rb.v.AllocatedProcessors = allocatedprocessors
-	return rb
-}
-
-func (rb *ClusterOperatingSystemBuilder) Architectures(architectures []ClusterOperatingSystemArchitectureBuilder) *ClusterOperatingSystemBuilder {
-	tmp := make([]ClusterOperatingSystemArchitecture, len(architectures))
-	for _, value := range architectures {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Architectures = tmp
-	return rb
-}
-
-func (rb *ClusterOperatingSystemBuilder) AvailableProcessors(availableprocessors int) *ClusterOperatingSystemBuilder {
-	rb.v.AvailableProcessors = availableprocessors
-	return rb
-}
-
-func (rb *ClusterOperatingSystemBuilder) Mem(mem *OperatingSystemMemoryInfoBuilder) *ClusterOperatingSystemBuilder {
-	v := mem.Build()
-	rb.v.Mem = v
-	return rb
-}
-
-func (rb *ClusterOperatingSystemBuilder) Names(names []ClusterOperatingSystemNameBuilder) *ClusterOperatingSystemBuilder {
-	tmp := make([]ClusterOperatingSystemName, len(names))
-	for _, value := range names {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Names = tmp
-	return rb
-}
-
-func (rb *ClusterOperatingSystemBuilder) PrettyNames(pretty_names []ClusterOperatingSystemPrettyNameBuilder) *ClusterOperatingSystemBuilder {
-	tmp := make([]ClusterOperatingSystemPrettyName, len(pretty_names))
-	for _, value := range pretty_names {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.PrettyNames = tmp
-	return rb
+	return r
 }

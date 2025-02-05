@@ -15,46 +15,70 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // IndicesBlockStatus type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/add_block/IndicesAddBlockResponse.ts#L30-L33
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/add_block/IndicesAddBlockResponse.ts#L30-L33
 type IndicesBlockStatus struct {
-	Blocked bool      `json:"blocked"`
-	Name    IndexName `json:"name"`
+	Blocked bool   `json:"blocked"`
+	Name    string `json:"name"`
 }
 
-// IndicesBlockStatusBuilder holds IndicesBlockStatus struct and provides a builder API.
-type IndicesBlockStatusBuilder struct {
-	v *IndicesBlockStatus
-}
+func (s *IndicesBlockStatus) UnmarshalJSON(data []byte) error {
 
-// NewIndicesBlockStatus provides a builder for the IndicesBlockStatus struct.
-func NewIndicesBlockStatusBuilder() *IndicesBlockStatusBuilder {
-	r := IndicesBlockStatusBuilder{
-		&IndicesBlockStatus{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "blocked":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Blocked", err)
+				}
+				s.Blocked = value
+			case bool:
+				s.Blocked = v
+			}
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the IndicesBlockStatus struct
-func (rb *IndicesBlockStatusBuilder) Build() IndicesBlockStatus {
-	return *rb.v
-}
+// NewIndicesBlockStatus returns a IndicesBlockStatus.
+func NewIndicesBlockStatus() *IndicesBlockStatus {
+	r := &IndicesBlockStatus{}
 
-func (rb *IndicesBlockStatusBuilder) Blocked(blocked bool) *IndicesBlockStatusBuilder {
-	rb.v.Blocked = blocked
-	return rb
-}
-
-func (rb *IndicesBlockStatusBuilder) Name(name IndexName) *IndicesBlockStatusBuilder {
-	rb.v.Name = name
-	return rb
+	return r
 }

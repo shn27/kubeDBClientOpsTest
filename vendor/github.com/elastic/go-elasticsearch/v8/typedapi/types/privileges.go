@@ -15,34 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // Privileges type alias.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/has_privileges/types.ts#L48-L48
-type Privileges map[bool]string
-
-// PrivilegesBuilder holds Privileges struct and provides a builder API.
-type PrivilegesBuilder struct {
-	v Privileges
-}
-
-// NewPrivileges provides a builder for the Privileges struct.
-func NewPrivilegesBuilder() *PrivilegesBuilder {
-	return &PrivilegesBuilder{}
-}
-
-// Build finalize the chain and returns the Privileges struct
-func (b *PrivilegesBuilder) Build() Privileges {
-	return b.v
-}
-
-func (b *PrivilegesBuilder) Privileges(value Privileges) *PrivilegesBuilder {
-	b.v = value
-	return b
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/has_privileges/types.ts#L48-L48
+type Privileges map[string]bool

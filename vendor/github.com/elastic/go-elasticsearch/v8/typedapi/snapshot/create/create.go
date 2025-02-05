@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Creates a snapshot in a repository.
 package create
@@ -29,12 +27,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 
 	"github.com/elastic/elastic-transport-go/v8/elastictransport"
+	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 )
 
 const (
@@ -53,15 +53,20 @@ type Create struct {
 	values  url.Values
 	path    url.URL
 
-	buf *gobytes.Buffer
+	raw io.Reader
 
-	req *Request
-	raw json.RawMessage
+	req      *Request
+	deferred []func(request *Request) error
+	buf      *gobytes.Buffer
 
 	paramSet int
 
 	repository string
 	snapshot   string
+
+	spanStarted bool
+
+	instrument elastictransport.Instrumentation
 }
 
 // NewCreate type alias for index.
@@ -73,9 +78,9 @@ func NewCreateFunc(tp elastictransport.Interface) NewCreate {
 	return func(repository, snapshot string) *Create {
 		n := New(tp)
 
-		n.Repository(repository)
+		n._repository(repository)
 
-		n.Snapshot(snapshot)
+		n._snapshot(snapshot)
 
 		return n
 	}
@@ -83,13 +88,22 @@ func NewCreateFunc(tp elastictransport.Interface) NewCreate {
 
 // Creates a snapshot in a repository.
 //
-// https://www.elastic.co/guide/en/elasticsearch/reference/master/modules-snapshots.html
+// https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-snapshots.html
 func New(tp elastictransport.Interface) *Create {
 	r := &Create{
 		transport: tp,
 		values:    make(url.Values),
 		headers:   make(http.Header),
-		buf:       gobytes.NewBuffer(nil),
+
+		buf: gobytes.NewBuffer(nil),
+
+		req: NewRequest(),
+	}
+
+	if instrumented, ok := r.transport.(elastictransport.Instrumented); ok {
+		if instrument := instrumented.InstrumentationEnabled(); instrument != nil {
+			r.instrument = instrument
+		}
 	}
 
 	return r
@@ -97,7 +111,7 @@ func New(tp elastictransport.Interface) *Create {
 
 // Raw takes a json payload as input which is then passed to the http.Request
 // If specified Raw takes precedence on Request method.
-func (r *Create) Raw(raw json.RawMessage) *Create {
+func (r *Create) Raw(raw io.Reader) *Create {
 	r.raw = raw
 
 	return r
@@ -119,9 +133,17 @@ func (r *Create) HttpRequest(ctx context.Context) (*http.Request, error) {
 
 	var err error
 
-	if r.raw != nil {
-		r.buf.Write(r.raw)
-	} else if r.req != nil {
+	if len(r.deferred) > 0 {
+		for _, f := range r.deferred {
+			deferredErr := f(r.req)
+			if deferredErr != nil {
+				return nil, deferredErr
+			}
+		}
+	}
+
+	if r.raw == nil && r.req != nil {
+
 		data, err := json.Marshal(r.req)
 
 		if err != nil {
@@ -129,6 +151,11 @@ func (r *Create) HttpRequest(ctx context.Context) (*http.Request, error) {
 		}
 
 		r.buf.Write(data)
+
+	}
+
+	if r.buf.Len() > 0 {
+		r.raw = r.buf
 	}
 
 	r.path.Scheme = "http"
@@ -138,9 +165,17 @@ func (r *Create) HttpRequest(ctx context.Context) (*http.Request, error) {
 		path.WriteString("/")
 		path.WriteString("_snapshot")
 		path.WriteString("/")
-		path.WriteString(url.PathEscape(r.repository))
+
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordPathPart(ctx, "repository", r.repository)
+		}
+		path.WriteString(r.repository)
 		path.WriteString("/")
-		path.WriteString(url.PathEscape(r.snapshot))
+
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordPathPart(ctx, "snapshot", r.snapshot)
+		}
+		path.WriteString(r.snapshot)
 
 		method = http.MethodPut
 	}
@@ -153,16 +188,22 @@ func (r *Create) HttpRequest(ctx context.Context) (*http.Request, error) {
 	}
 
 	if ctx != nil {
-		req, err = http.NewRequestWithContext(ctx, method, r.path.String(), r.buf)
+		req, err = http.NewRequestWithContext(ctx, method, r.path.String(), r.raw)
 	} else {
-		req, err = http.NewRequest(method, r.path.String(), r.buf)
+		req, err = http.NewRequest(method, r.path.String(), r.raw)
 	}
 
-	if r.buf.Len() > 0 {
-		req.Header.Set("content-type", "application/vnd.elasticsearch+json;compatible-with=8")
+	req.Header = r.headers.Clone()
+
+	if req.Header.Get("Content-Type") == "" {
+		if r.raw != nil {
+			req.Header.Set("Content-Type", "application/vnd.elasticsearch+json;compatible-with=8")
+		}
 	}
 
-	req.Header.Set("accept", "application/vnd.elasticsearch+json;compatible-with=8")
+	if req.Header.Get("Accept") == "" {
+		req.Header.Set("Accept", "application/vnd.elasticsearch+json;compatible-with=8")
+	}
 
 	if err != nil {
 		return req, fmt.Errorf("could not build http.Request: %w", err)
@@ -171,19 +212,100 @@ func (r *Create) HttpRequest(ctx context.Context) (*http.Request, error) {
 	return req, nil
 }
 
-// Do runs the http.Request through the provided transport.
-func (r Create) Do(ctx context.Context) (*http.Response, error) {
+// Perform runs the http.Request through the provided transport and returns an http.Response.
+func (r Create) Perform(providedCtx context.Context) (*http.Response, error) {
+	var ctx context.Context
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		if r.spanStarted == false {
+			ctx := instrument.Start(providedCtx, "snapshot.create")
+			defer instrument.Close(ctx)
+		}
+	}
+	if ctx == nil {
+		ctx = providedCtx
+	}
+
 	req, err := r.HttpRequest(ctx)
 	if err != nil {
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
 		return nil, err
 	}
 
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		instrument.BeforeRequest(req, "snapshot.create")
+		if reader := instrument.RecordRequestBody(ctx, "snapshot.create", r.raw); reader != nil {
+			req.Body = reader
+		}
+	}
 	res, err := r.transport.Perform(req)
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		instrument.AfterRequest(req, "elasticsearch", "snapshot.create")
+	}
 	if err != nil {
-		return nil, fmt.Errorf("an error happened during the Create query execution: %w", err)
+		localErr := fmt.Errorf("an error happened during the Create query execution: %w", err)
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, localErr)
+		}
+		return nil, localErr
 	}
 
 	return res, nil
+}
+
+// Do runs the request through the transport, handle the response and returns a create.Response
+func (r Create) Do(providedCtx context.Context) (*Response, error) {
+	var ctx context.Context
+	r.spanStarted = true
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		ctx = instrument.Start(providedCtx, "snapshot.create")
+		defer instrument.Close(ctx)
+	}
+	if ctx == nil {
+		ctx = providedCtx
+	}
+
+	response := NewResponse()
+
+	res, err := r.Perform(ctx)
+	if err != nil {
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode < 299 {
+		err = json.NewDecoder(res.Body).Decode(response)
+		if err != nil {
+			if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+				instrument.RecordError(ctx, err)
+			}
+			return nil, err
+		}
+
+		return response, nil
+	}
+
+	errorResponse := types.NewElasticsearchError()
+	err = json.NewDecoder(res.Body).Decode(errorResponse)
+	if err != nil {
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
+		return nil, err
+	}
+
+	if errorResponse.Status == 0 {
+		errorResponse.Status = res.StatusCode
+	}
+
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		instrument.RecordError(ctx, errorResponse)
+	}
+	return nil, errorResponse
 }
 
 // Header set a key, value pair in the Create headers map.
@@ -195,18 +317,18 @@ func (r *Create) Header(key, value string) *Create {
 
 // Repository Repository for the snapshot.
 // API Name: repository
-func (r *Create) Repository(v string) *Create {
+func (r *Create) _repository(repository string) *Create {
 	r.paramSet |= repositoryMask
-	r.repository = v
+	r.repository = repository
 
 	return r
 }
 
 // Snapshot Name of the snapshot. Must be unique in the repository.
 // API Name: snapshot
-func (r *Create) Snapshot(v string) *Create {
+func (r *Create) _snapshot(snapshot string) *Create {
 	r.paramSet |= snapshotMask
-	r.snapshot = v
+	r.snapshot = snapshot
 
 	return r
 }
@@ -214,8 +336,8 @@ func (r *Create) Snapshot(v string) *Create {
 // MasterTimeout Period to wait for a connection to the master node. If no response is
 // received before the timeout expires, the request fails and returns an error.
 // API name: master_timeout
-func (r *Create) MasterTimeout(value string) *Create {
-	r.values.Set("master_timeout", value)
+func (r *Create) MasterTimeout(duration string) *Create {
+	r.values.Set("master_timeout", duration)
 
 	return r
 }
@@ -223,8 +345,116 @@ func (r *Create) MasterTimeout(value string) *Create {
 // WaitForCompletion If `true`, the request returns a response when the snapshot is complete. If
 // `false`, the request returns a response when the snapshot initializes.
 // API name: wait_for_completion
-func (r *Create) WaitForCompletion(b bool) *Create {
-	r.values.Set("wait_for_completion", strconv.FormatBool(b))
+func (r *Create) WaitForCompletion(waitforcompletion bool) *Create {
+	r.values.Set("wait_for_completion", strconv.FormatBool(waitforcompletion))
+
+	return r
+}
+
+// ErrorTrace When set to `true` Elasticsearch will include the full stack trace of errors
+// when they occur.
+// API name: error_trace
+func (r *Create) ErrorTrace(errortrace bool) *Create {
+	r.values.Set("error_trace", strconv.FormatBool(errortrace))
+
+	return r
+}
+
+// FilterPath Comma-separated list of filters in dot notation which reduce the response
+// returned by Elasticsearch.
+// API name: filter_path
+func (r *Create) FilterPath(filterpaths ...string) *Create {
+	tmp := []string{}
+	for _, item := range filterpaths {
+		tmp = append(tmp, fmt.Sprintf("%v", item))
+	}
+	r.values.Set("filter_path", strings.Join(tmp, ","))
+
+	return r
+}
+
+// Human When set to `true` will return statistics in a format suitable for humans.
+// For example `"exists_time": "1h"` for humans and
+// `"eixsts_time_in_millis": 3600000` for computers. When disabled the human
+// readable values will be omitted. This makes sense for responses being
+// consumed
+// only by machines.
+// API name: human
+func (r *Create) Human(human bool) *Create {
+	r.values.Set("human", strconv.FormatBool(human))
+
+	return r
+}
+
+// Pretty If set to `true` the returned JSON will be "pretty-formatted". Only use
+// this option for debugging only.
+// API name: pretty
+func (r *Create) Pretty(pretty bool) *Create {
+	r.values.Set("pretty", strconv.FormatBool(pretty))
+
+	return r
+}
+
+// FeatureStates Feature states to include in the snapshot. Each feature state includes one or
+// more system indices containing related data. You can view a list of eligible
+// features using the get features API. If `include_global_state` is `true`, all
+// current feature states are included by default. If `include_global_state` is
+// `false`, no feature states are included by default.
+// API name: feature_states
+func (r *Create) FeatureStates(featurestates ...string) *Create {
+	r.req.FeatureStates = featurestates
+
+	return r
+}
+
+// IgnoreUnavailable If `true`, the request ignores data streams and indices in `indices` that are
+// missing or closed. If `false`, the request returns an error for any data
+// stream or index that is missing or closed.
+// API name: ignore_unavailable
+func (r *Create) IgnoreUnavailable(ignoreunavailable bool) *Create {
+	r.req.IgnoreUnavailable = &ignoreunavailable
+
+	return r
+}
+
+// IncludeGlobalState If `true`, the current cluster state is included in the snapshot. The cluster
+// state includes persistent cluster settings, composable index templates,
+// legacy index templates, ingest pipelines, and ILM policies. It also includes
+// data stored in system indices, such as Watches and task records (configurable
+// via `feature_states`).
+// API name: include_global_state
+func (r *Create) IncludeGlobalState(includeglobalstate bool) *Create {
+	r.req.IncludeGlobalState = &includeglobalstate
+
+	return r
+}
+
+// Indices Data streams and indices to include in the snapshot. Supports multi-target
+// syntax. Includes all data streams and indices by default.
+// API name: indices
+func (r *Create) Indices(indices ...string) *Create {
+	r.req.Indices = indices
+
+	return r
+}
+
+// Metadata Optional metadata for the snapshot. May have any contents. Must be less than
+// 1024 bytes. This map is not automatically generated by Elasticsearch.
+// API name: metadata
+func (r *Create) Metadata(metadata types.Metadata) *Create {
+	r.req.Metadata = metadata
+
+	return r
+}
+
+// Partial If `true`, allows restoring a partial snapshot of indices with unavailable
+// shards. Only shards that were successfully included in the snapshot will be
+// restored. All missing shards will be recreated as empty. If `false`, the
+// entire restore operation will fail if one or more indices included in the
+// snapshot do not have all primary shards available.
+// API name: partial
+func (r *Create) Partial(partial bool) *Create {
+	r.req.Partial = &partial
 
 	return r
 }

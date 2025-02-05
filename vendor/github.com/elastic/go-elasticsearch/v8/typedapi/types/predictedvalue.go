@@ -15,54 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
-// PredictedValue holds the union for the following types:
+// PredictedValue type alias.
 //
-//	bool
-//	float64
-//	int
-//	string
-//
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/inference.ts#L410-L410
-type PredictedValue interface{}
-
-// PredictedValueBuilder holds PredictedValue struct and provides a builder API.
-type PredictedValueBuilder struct {
-	v PredictedValue
-}
-
-// NewPredictedValue provides a builder for the PredictedValue struct.
-func NewPredictedValueBuilder() *PredictedValueBuilder {
-	return &PredictedValueBuilder{}
-}
-
-// Build finalize the chain and returns the PredictedValue struct
-func (u *PredictedValueBuilder) Build() PredictedValue {
-	return u.v
-}
-
-func (u *PredictedValueBuilder) Bool(bool bool) *PredictedValueBuilder {
-	u.v = &bool
-	return u
-}
-
-func (u *PredictedValueBuilder) Float64(float64 float64) *PredictedValueBuilder {
-	u.v = &float64
-	return u
-}
-
-func (u *PredictedValueBuilder) Int(int int) *PredictedValueBuilder {
-	u.v = &int
-	return u
-}
-
-func (u *PredictedValueBuilder) String(string string) *PredictedValueBuilder {
-	u.v = &string
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/inference.ts#L445-L445
+type PredictedValue []ScalarValue

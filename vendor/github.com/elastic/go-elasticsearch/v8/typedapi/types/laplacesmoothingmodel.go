@@ -15,40 +15,67 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // LaplaceSmoothingModel type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/suggester.ts#L209-L211
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/suggester.ts#L430-L435
 type LaplaceSmoothingModel struct {
-	Alpha float64 `json:"alpha"`
+	// Alpha A constant that is added to all counts to balance weights.
+	Alpha Float64 `json:"alpha"`
 }
 
-// LaplaceSmoothingModelBuilder holds LaplaceSmoothingModel struct and provides a builder API.
-type LaplaceSmoothingModelBuilder struct {
-	v *LaplaceSmoothingModel
-}
+func (s *LaplaceSmoothingModel) UnmarshalJSON(data []byte) error {
 
-// NewLaplaceSmoothingModel provides a builder for the LaplaceSmoothingModel struct.
-func NewLaplaceSmoothingModelBuilder() *LaplaceSmoothingModelBuilder {
-	r := LaplaceSmoothingModelBuilder{
-		&LaplaceSmoothingModel{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "alpha":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Alpha", err)
+				}
+				f := Float64(value)
+				s.Alpha = f
+			case float64:
+				f := Float64(v)
+				s.Alpha = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the LaplaceSmoothingModel struct
-func (rb *LaplaceSmoothingModelBuilder) Build() LaplaceSmoothingModel {
-	return *rb.v
-}
+// NewLaplaceSmoothingModel returns a LaplaceSmoothingModel.
+func NewLaplaceSmoothingModel() *LaplaceSmoothingModel {
+	r := &LaplaceSmoothingModel{}
 
-func (rb *LaplaceSmoothingModelBuilder) Alpha(alpha float64) *LaplaceSmoothingModelBuilder {
-	rb.v.Alpha = alpha
-	return rb
+	return r
 }

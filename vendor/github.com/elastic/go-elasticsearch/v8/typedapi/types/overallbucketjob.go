@@ -15,46 +15,72 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // OverallBucketJob type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/Bucket.ts#L146-L149
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/Bucket.ts#L145-L148
 type OverallBucketJob struct {
-	JobId           Id      `json:"job_id"`
-	MaxAnomalyScore float64 `json:"max_anomaly_score"`
+	JobId           string  `json:"job_id"`
+	MaxAnomalyScore Float64 `json:"max_anomaly_score"`
 }
 
-// OverallBucketJobBuilder holds OverallBucketJob struct and provides a builder API.
-type OverallBucketJobBuilder struct {
-	v *OverallBucketJob
-}
+func (s *OverallBucketJob) UnmarshalJSON(data []byte) error {
 
-// NewOverallBucketJob provides a builder for the OverallBucketJob struct.
-func NewOverallBucketJobBuilder() *OverallBucketJobBuilder {
-	r := OverallBucketJobBuilder{
-		&OverallBucketJob{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "job_id":
+			if err := dec.Decode(&s.JobId); err != nil {
+				return fmt.Errorf("%s | %w", "JobId", err)
+			}
+
+		case "max_anomaly_score":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxAnomalyScore", err)
+				}
+				f := Float64(value)
+				s.MaxAnomalyScore = f
+			case float64:
+				f := Float64(v)
+				s.MaxAnomalyScore = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the OverallBucketJob struct
-func (rb *OverallBucketJobBuilder) Build() OverallBucketJob {
-	return *rb.v
-}
+// NewOverallBucketJob returns a OverallBucketJob.
+func NewOverallBucketJob() *OverallBucketJob {
+	r := &OverallBucketJob{}
 
-func (rb *OverallBucketJobBuilder) JobId(jobid Id) *OverallBucketJobBuilder {
-	rb.v.JobId = jobid
-	return rb
-}
-
-func (rb *OverallBucketJobBuilder) MaxAnomalyScore(maxanomalyscore float64) *OverallBucketJobBuilder {
-	rb.v.MaxAnomalyScore = maxanomalyscore
-	return rb
+	return r
 }

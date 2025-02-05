@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // TrainedModelTree type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/put_trained_model/types.ts#L74-L79
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/put_trained_model/types.ts#L74-L79
 type TrainedModelTree struct {
 	ClassificationLabels []string               `json:"classification_labels,omitempty"`
 	FeatureNames         []string               `json:"feature_names"`
@@ -32,45 +39,56 @@ type TrainedModelTree struct {
 	TreeStructure        []TrainedModelTreeNode `json:"tree_structure"`
 }
 
-// TrainedModelTreeBuilder holds TrainedModelTree struct and provides a builder API.
-type TrainedModelTreeBuilder struct {
-	v *TrainedModelTree
-}
+func (s *TrainedModelTree) UnmarshalJSON(data []byte) error {
 
-// NewTrainedModelTree provides a builder for the TrainedModelTree struct.
-func NewTrainedModelTreeBuilder() *TrainedModelTreeBuilder {
-	r := TrainedModelTreeBuilder{
-		&TrainedModelTree{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "classification_labels":
+			if err := dec.Decode(&s.ClassificationLabels); err != nil {
+				return fmt.Errorf("%s | %w", "ClassificationLabels", err)
+			}
+
+		case "feature_names":
+			if err := dec.Decode(&s.FeatureNames); err != nil {
+				return fmt.Errorf("%s | %w", "FeatureNames", err)
+			}
+
+		case "target_type":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "TargetType", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.TargetType = &o
+
+		case "tree_structure":
+			if err := dec.Decode(&s.TreeStructure); err != nil {
+				return fmt.Errorf("%s | %w", "TreeStructure", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TrainedModelTree struct
-func (rb *TrainedModelTreeBuilder) Build() TrainedModelTree {
-	return *rb.v
-}
+// NewTrainedModelTree returns a TrainedModelTree.
+func NewTrainedModelTree() *TrainedModelTree {
+	r := &TrainedModelTree{}
 
-func (rb *TrainedModelTreeBuilder) ClassificationLabels(classification_labels ...string) *TrainedModelTreeBuilder {
-	rb.v.ClassificationLabels = classification_labels
-	return rb
-}
-
-func (rb *TrainedModelTreeBuilder) FeatureNames(feature_names ...string) *TrainedModelTreeBuilder {
-	rb.v.FeatureNames = feature_names
-	return rb
-}
-
-func (rb *TrainedModelTreeBuilder) TargetType(targettype string) *TrainedModelTreeBuilder {
-	rb.v.TargetType = &targettype
-	return rb
-}
-
-func (rb *TrainedModelTreeBuilder) TreeStructure(tree_structure []TrainedModelTreeNodeBuilder) *TrainedModelTreeBuilder {
-	tmp := make([]TrainedModelTreeNode, len(tree_structure))
-	for _, value := range tree_structure {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.TreeStructure = tmp
-	return rb
+	return r
 }

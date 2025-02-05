@@ -15,104 +15,148 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/rangerelation"
 )
 
 // DateRangeQuery type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/term.ts#L72-L81
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/term.ts#L161-L170
 type DateRangeQuery struct {
-	Boost      *float32                     `json:"boost,omitempty"`
-	Format     *DateFormat                  `json:"format,omitempty"`
-	From       DateMath                     `json:"from,omitempty"`
-	Gt         *DateMath                    `json:"gt,omitempty"`
-	Gte        *DateMath                    `json:"gte,omitempty"`
-	Lt         *DateMath                    `json:"lt,omitempty"`
-	Lte        *DateMath                    `json:"lte,omitempty"`
-	QueryName_ *string                      `json:"_name,omitempty"`
-	Relation   *rangerelation.RangeRelation `json:"relation,omitempty"`
-	TimeZone   *TimeZone                    `json:"time_zone,omitempty"`
-	To         DateMath                     `json:"to,omitempty"`
+	// Boost Floating point number used to decrease or increase the relevance scores of
+	// the query.
+	// Boost values are relative to the default value of 1.0.
+	// A boost value between 0 and 1.0 decreases the relevance score.
+	// A value greater than 1.0 increases the relevance score.
+	Boost *float32 `json:"boost,omitempty"`
+	// Format Date format used to convert `date` values in the query.
+	Format *string `json:"format,omitempty"`
+	From   *string `json:"from,omitempty"`
+	// Gt Greater than.
+	Gt *string `json:"gt,omitempty"`
+	// Gte Greater than or equal to.
+	Gte *string `json:"gte,omitempty"`
+	// Lt Less than.
+	Lt *string `json:"lt,omitempty"`
+	// Lte Less than or equal to.
+	Lte        *string `json:"lte,omitempty"`
+	QueryName_ *string `json:"_name,omitempty"`
+	// Relation Indicates how the range query matches values for `range` fields.
+	Relation *rangerelation.RangeRelation `json:"relation,omitempty"`
+	// TimeZone Coordinated Universal Time (UTC) offset or IANA time zone used to convert
+	// `date` values in the query to UTC.
+	TimeZone *string `json:"time_zone,omitempty"`
+	To       *string `json:"to,omitempty"`
 }
 
-// DateRangeQueryBuilder holds DateRangeQuery struct and provides a builder API.
-type DateRangeQueryBuilder struct {
-	v *DateRangeQuery
-}
+func (s *DateRangeQuery) UnmarshalJSON(data []byte) error {
 
-// NewDateRangeQuery provides a builder for the DateRangeQuery struct.
-func NewDateRangeQueryBuilder() *DateRangeQueryBuilder {
-	r := DateRangeQueryBuilder{
-		&DateRangeQuery{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "boost":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Boost", err)
+				}
+				f := float32(value)
+				s.Boost = &f
+			case float64:
+				f := float32(v)
+				s.Boost = &f
+			}
+
+		case "format":
+			if err := dec.Decode(&s.Format); err != nil {
+				return fmt.Errorf("%s | %w", "Format", err)
+			}
+
+		case "from":
+			if err := dec.Decode(&s.From); err != nil {
+				return fmt.Errorf("%s | %w", "From", err)
+			}
+
+		case "gt":
+			if err := dec.Decode(&s.Gt); err != nil {
+				return fmt.Errorf("%s | %w", "Gt", err)
+			}
+
+		case "gte":
+			if err := dec.Decode(&s.Gte); err != nil {
+				return fmt.Errorf("%s | %w", "Gte", err)
+			}
+
+		case "lt":
+			if err := dec.Decode(&s.Lt); err != nil {
+				return fmt.Errorf("%s | %w", "Lt", err)
+			}
+
+		case "lte":
+			if err := dec.Decode(&s.Lte); err != nil {
+				return fmt.Errorf("%s | %w", "Lte", err)
+			}
+
+		case "_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "QueryName_", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.QueryName_ = &o
+
+		case "relation":
+			if err := dec.Decode(&s.Relation); err != nil {
+				return fmt.Errorf("%s | %w", "Relation", err)
+			}
+
+		case "time_zone":
+			if err := dec.Decode(&s.TimeZone); err != nil {
+				return fmt.Errorf("%s | %w", "TimeZone", err)
+			}
+
+		case "to":
+			if err := dec.Decode(&s.To); err != nil {
+				return fmt.Errorf("%s | %w", "To", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DateRangeQuery struct
-func (rb *DateRangeQueryBuilder) Build() DateRangeQuery {
-	return *rb.v
-}
+// NewDateRangeQuery returns a DateRangeQuery.
+func NewDateRangeQuery() *DateRangeQuery {
+	r := &DateRangeQuery{}
 
-func (rb *DateRangeQueryBuilder) Boost(boost float32) *DateRangeQueryBuilder {
-	rb.v.Boost = &boost
-	return rb
-}
-
-func (rb *DateRangeQueryBuilder) Format(format DateFormat) *DateRangeQueryBuilder {
-	rb.v.Format = &format
-	return rb
-}
-
-func (rb *DateRangeQueryBuilder) From(from DateMath) *DateRangeQueryBuilder {
-	rb.v.From = from
-	return rb
-}
-
-func (rb *DateRangeQueryBuilder) Gt(gt DateMath) *DateRangeQueryBuilder {
-	rb.v.Gt = &gt
-	return rb
-}
-
-func (rb *DateRangeQueryBuilder) Gte(gte DateMath) *DateRangeQueryBuilder {
-	rb.v.Gte = &gte
-	return rb
-}
-
-func (rb *DateRangeQueryBuilder) Lt(lt DateMath) *DateRangeQueryBuilder {
-	rb.v.Lt = &lt
-	return rb
-}
-
-func (rb *DateRangeQueryBuilder) Lte(lte DateMath) *DateRangeQueryBuilder {
-	rb.v.Lte = &lte
-	return rb
-}
-
-func (rb *DateRangeQueryBuilder) QueryName_(queryname_ string) *DateRangeQueryBuilder {
-	rb.v.QueryName_ = &queryname_
-	return rb
-}
-
-func (rb *DateRangeQueryBuilder) Relation(relation rangerelation.RangeRelation) *DateRangeQueryBuilder {
-	rb.v.Relation = &relation
-	return rb
-}
-
-func (rb *DateRangeQueryBuilder) TimeZone(timezone TimeZone) *DateRangeQueryBuilder {
-	rb.v.TimeZone = &timezone
-	return rb
-}
-
-func (rb *DateRangeQueryBuilder) To(to DateMath) *DateRangeQueryBuilder {
-	rb.v.To = to
-	return rb
+	return r
 }

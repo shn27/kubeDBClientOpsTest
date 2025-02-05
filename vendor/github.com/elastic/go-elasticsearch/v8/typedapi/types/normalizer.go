@@ -15,44 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // Normalizer holds the union for the following types:
 //
-//	CustomNormalizer
 //	LowercaseNormalizer
+//	CustomNormalizer
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/normalizers.ts#L20-L24
-type Normalizer interface{}
-
-// NormalizerBuilder holds Normalizer struct and provides a builder API.
-type NormalizerBuilder struct {
-	v Normalizer
-}
-
-// NewNormalizer provides a builder for the Normalizer struct.
-func NewNormalizerBuilder() *NormalizerBuilder {
-	return &NormalizerBuilder{}
-}
-
-// Build finalize the chain and returns the Normalizer struct
-func (u *NormalizerBuilder) Build() Normalizer {
-	return u.v
-}
-
-func (u *NormalizerBuilder) CustomNormalizer(customnormalizer *CustomNormalizerBuilder) *NormalizerBuilder {
-	v := customnormalizer.Build()
-	u.v = &v
-	return u
-}
-
-func (u *NormalizerBuilder) LowercaseNormalizer(lowercasenormalizer *LowercaseNormalizerBuilder) *NormalizerBuilder {
-	v := lowercasenormalizer.Build()
-	u.v = &v
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/normalizers.ts#L20-L24
+type Normalizer any

@@ -15,60 +15,86 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // StringStatsAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/metric.ts#L147-L149
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/metric.ts#L293-L299
 type StringStatsAggregation struct {
-	Field            *Field   `json:"field,omitempty"`
-	Missing          *Missing `json:"missing,omitempty"`
-	Script           *Script  `json:"script,omitempty"`
-	ShowDistribution *bool    `json:"show_distribution,omitempty"`
+	// Field The field on which to run the aggregation.
+	Field *string `json:"field,omitempty"`
+	// Missing The value to apply to documents that do not have a value.
+	// By default, documents without a value are ignored.
+	Missing Missing `json:"missing,omitempty"`
+	Script  *Script `json:"script,omitempty"`
+	// ShowDistribution Shows the probability distribution for all characters.
+	ShowDistribution *bool `json:"show_distribution,omitempty"`
 }
 
-// StringStatsAggregationBuilder holds StringStatsAggregation struct and provides a builder API.
-type StringStatsAggregationBuilder struct {
-	v *StringStatsAggregation
-}
+func (s *StringStatsAggregation) UnmarshalJSON(data []byte) error {
 
-// NewStringStatsAggregation provides a builder for the StringStatsAggregation struct.
-func NewStringStatsAggregationBuilder() *StringStatsAggregationBuilder {
-	r := StringStatsAggregationBuilder{
-		&StringStatsAggregation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "missing":
+			if err := dec.Decode(&s.Missing); err != nil {
+				return fmt.Errorf("%s | %w", "Missing", err)
+			}
+
+		case "script":
+			if err := dec.Decode(&s.Script); err != nil {
+				return fmt.Errorf("%s | %w", "Script", err)
+			}
+
+		case "show_distribution":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ShowDistribution", err)
+				}
+				s.ShowDistribution = &value
+			case bool:
+				s.ShowDistribution = &v
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the StringStatsAggregation struct
-func (rb *StringStatsAggregationBuilder) Build() StringStatsAggregation {
-	return *rb.v
-}
+// NewStringStatsAggregation returns a StringStatsAggregation.
+func NewStringStatsAggregation() *StringStatsAggregation {
+	r := &StringStatsAggregation{}
 
-func (rb *StringStatsAggregationBuilder) Field(field Field) *StringStatsAggregationBuilder {
-	rb.v.Field = &field
-	return rb
-}
-
-func (rb *StringStatsAggregationBuilder) Missing(missing *MissingBuilder) *StringStatsAggregationBuilder {
-	v := missing.Build()
-	rb.v.Missing = &v
-	return rb
-}
-
-func (rb *StringStatsAggregationBuilder) Script(script *ScriptBuilder) *StringStatsAggregationBuilder {
-	v := script.Build()
-	rb.v.Script = &v
-	return rb
-}
-
-func (rb *StringStatsAggregationBuilder) ShowDistribution(showdistribution bool) *StringStatsAggregationBuilder {
-	rb.v.ShowDistribution = &showdistribution
-	return rb
+	return r
 }

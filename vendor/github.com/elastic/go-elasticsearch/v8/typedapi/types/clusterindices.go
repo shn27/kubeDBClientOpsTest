@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ClusterIndices type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/stats/types.ts#L63-L94
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/stats/types.ts#L74-L107
 type ClusterIndices struct {
 	// Analysis Contains statistics about analyzers and analyzer components used in selected
 	// nodes.
@@ -46,114 +53,100 @@ type ClusterIndices struct {
 	// Shards Contains statistics about indices with shards assigned to selected nodes.
 	Shards ClusterIndicesShards `json:"shards"`
 	// Store Contains statistics about the size of shards assigned to selected nodes.
-	Store    StoreStats        `json:"store"`
+	Store StoreStats `json:"store"`
+	// Versions Contains statistics about analyzers and analyzer components used in selected
+	// nodes.
 	Versions []IndicesVersions `json:"versions,omitempty"`
 }
 
-// ClusterIndicesBuilder holds ClusterIndices struct and provides a builder API.
-type ClusterIndicesBuilder struct {
-	v *ClusterIndices
-}
+func (s *ClusterIndices) UnmarshalJSON(data []byte) error {
 
-// NewClusterIndices provides a builder for the ClusterIndices struct.
-func NewClusterIndicesBuilder() *ClusterIndicesBuilder {
-	r := ClusterIndicesBuilder{
-		&ClusterIndices{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "analysis":
+			if err := dec.Decode(&s.Analysis); err != nil {
+				return fmt.Errorf("%s | %w", "Analysis", err)
+			}
+
+		case "completion":
+			if err := dec.Decode(&s.Completion); err != nil {
+				return fmt.Errorf("%s | %w", "Completion", err)
+			}
+
+		case "count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Count", err)
+				}
+				s.Count = value
+			case float64:
+				f := int64(v)
+				s.Count = f
+			}
+
+		case "docs":
+			if err := dec.Decode(&s.Docs); err != nil {
+				return fmt.Errorf("%s | %w", "Docs", err)
+			}
+
+		case "fielddata":
+			if err := dec.Decode(&s.Fielddata); err != nil {
+				return fmt.Errorf("%s | %w", "Fielddata", err)
+			}
+
+		case "mappings":
+			if err := dec.Decode(&s.Mappings); err != nil {
+				return fmt.Errorf("%s | %w", "Mappings", err)
+			}
+
+		case "query_cache":
+			if err := dec.Decode(&s.QueryCache); err != nil {
+				return fmt.Errorf("%s | %w", "QueryCache", err)
+			}
+
+		case "segments":
+			if err := dec.Decode(&s.Segments); err != nil {
+				return fmt.Errorf("%s | %w", "Segments", err)
+			}
+
+		case "shards":
+			if err := dec.Decode(&s.Shards); err != nil {
+				return fmt.Errorf("%s | %w", "Shards", err)
+			}
+
+		case "store":
+			if err := dec.Decode(&s.Store); err != nil {
+				return fmt.Errorf("%s | %w", "Store", err)
+			}
+
+		case "versions":
+			if err := dec.Decode(&s.Versions); err != nil {
+				return fmt.Errorf("%s | %w", "Versions", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ClusterIndices struct
-func (rb *ClusterIndicesBuilder) Build() ClusterIndices {
-	return *rb.v
-}
+// NewClusterIndices returns a ClusterIndices.
+func NewClusterIndices() *ClusterIndices {
+	r := &ClusterIndices{}
 
-// Analysis Contains statistics about analyzers and analyzer components used in selected
-// nodes.
-
-func (rb *ClusterIndicesBuilder) Analysis(analysis *CharFilterTypesBuilder) *ClusterIndicesBuilder {
-	v := analysis.Build()
-	rb.v.Analysis = v
-	return rb
-}
-
-// Completion Contains statistics about memory used for completion in selected nodes.
-
-func (rb *ClusterIndicesBuilder) Completion(completion *CompletionStatsBuilder) *ClusterIndicesBuilder {
-	v := completion.Build()
-	rb.v.Completion = v
-	return rb
-}
-
-// Count Total number of indices with shards assigned to selected nodes.
-
-func (rb *ClusterIndicesBuilder) Count(count int64) *ClusterIndicesBuilder {
-	rb.v.Count = count
-	return rb
-}
-
-// Docs Contains counts for documents in selected nodes.
-
-func (rb *ClusterIndicesBuilder) Docs(docs *DocStatsBuilder) *ClusterIndicesBuilder {
-	v := docs.Build()
-	rb.v.Docs = v
-	return rb
-}
-
-// Fielddata Contains statistics about the field data cache of selected nodes.
-
-func (rb *ClusterIndicesBuilder) Fielddata(fielddata *FielddataStatsBuilder) *ClusterIndicesBuilder {
-	v := fielddata.Build()
-	rb.v.Fielddata = v
-	return rb
-}
-
-// Mappings Contains statistics about field mappings in selected nodes.
-
-func (rb *ClusterIndicesBuilder) Mappings(mappings *FieldTypesMappingsBuilder) *ClusterIndicesBuilder {
-	v := mappings.Build()
-	rb.v.Mappings = v
-	return rb
-}
-
-// QueryCache Contains statistics about the query cache of selected nodes.
-
-func (rb *ClusterIndicesBuilder) QueryCache(querycache *QueryCacheStatsBuilder) *ClusterIndicesBuilder {
-	v := querycache.Build()
-	rb.v.QueryCache = v
-	return rb
-}
-
-// Segments Contains statistics about segments in selected nodes.
-
-func (rb *ClusterIndicesBuilder) Segments(segments *SegmentsStatsBuilder) *ClusterIndicesBuilder {
-	v := segments.Build()
-	rb.v.Segments = v
-	return rb
-}
-
-// Shards Contains statistics about indices with shards assigned to selected nodes.
-
-func (rb *ClusterIndicesBuilder) Shards(shards *ClusterIndicesShardsBuilder) *ClusterIndicesBuilder {
-	v := shards.Build()
-	rb.v.Shards = v
-	return rb
-}
-
-// Store Contains statistics about the size of shards assigned to selected nodes.
-
-func (rb *ClusterIndicesBuilder) Store(store *StoreStatsBuilder) *ClusterIndicesBuilder {
-	v := store.Build()
-	rb.v.Store = v
-	return rb
-}
-
-func (rb *ClusterIndicesBuilder) Versions(versions []IndicesVersionsBuilder) *ClusterIndicesBuilder {
-	tmp := make([]IndicesVersions, len(versions))
-	for _, value := range versions {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Versions = tmp
-	return rb
+	return r
 }

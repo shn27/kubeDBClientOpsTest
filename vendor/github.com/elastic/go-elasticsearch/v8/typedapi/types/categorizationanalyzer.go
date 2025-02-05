@@ -15,43 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // CategorizationAnalyzer holds the union for the following types:
 //
-//	CategorizationAnalyzerDefinition
 //	string
+//	CategorizationAnalyzerDefinition
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/Analysis.ts#L124-L125
-type CategorizationAnalyzer interface{}
-
-// CategorizationAnalyzerBuilder holds CategorizationAnalyzer struct and provides a builder API.
-type CategorizationAnalyzerBuilder struct {
-	v CategorizationAnalyzer
-}
-
-// NewCategorizationAnalyzer provides a builder for the CategorizationAnalyzer struct.
-func NewCategorizationAnalyzerBuilder() *CategorizationAnalyzerBuilder {
-	return &CategorizationAnalyzerBuilder{}
-}
-
-// Build finalize the chain and returns the CategorizationAnalyzer struct
-func (u *CategorizationAnalyzerBuilder) Build() CategorizationAnalyzer {
-	return u.v
-}
-
-func (u *CategorizationAnalyzerBuilder) CategorizationAnalyzerDefinition(categorizationanalyzerdefinition *CategorizationAnalyzerDefinitionBuilder) *CategorizationAnalyzerBuilder {
-	v := categorizationanalyzerdefinition.Build()
-	u.v = &v
-	return u
-}
-
-func (u *CategorizationAnalyzerBuilder) String(string string) *CategorizationAnalyzerBuilder {
-	u.v = &string
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/Analysis.ts#L181-L182
+type CategorizationAnalyzer any

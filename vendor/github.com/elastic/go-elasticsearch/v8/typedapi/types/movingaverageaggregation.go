@@ -15,65 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // MovingAverageAggregation holds the union for the following types:
 //
+//	LinearMovingAverageAggregation
+//	SimpleMovingAverageAggregation
 //	EwmaMovingAverageAggregation
 //	HoltMovingAverageAggregation
 //	HoltWintersMovingAverageAggregation
-//	LinearMovingAverageAggregation
-//	SimpleMovingAverageAggregation
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/pipeline.ts#L176-L182
-type MovingAverageAggregation interface{}
-
-// MovingAverageAggregationBuilder holds MovingAverageAggregation struct and provides a builder API.
-type MovingAverageAggregationBuilder struct {
-	v MovingAverageAggregation
-}
-
-// NewMovingAverageAggregation provides a builder for the MovingAverageAggregation struct.
-func NewMovingAverageAggregationBuilder() *MovingAverageAggregationBuilder {
-	return &MovingAverageAggregationBuilder{}
-}
-
-// Build finalize the chain and returns the MovingAverageAggregation struct
-func (u *MovingAverageAggregationBuilder) Build() MovingAverageAggregation {
-	return u.v
-}
-
-func (u *MovingAverageAggregationBuilder) EwmaMovingAverageAggregation(ewmamovingaverageaggregation *EwmaMovingAverageAggregationBuilder) *MovingAverageAggregationBuilder {
-	v := ewmamovingaverageaggregation.Build()
-	u.v = &v
-	return u
-}
-
-func (u *MovingAverageAggregationBuilder) HoltMovingAverageAggregation(holtmovingaverageaggregation *HoltMovingAverageAggregationBuilder) *MovingAverageAggregationBuilder {
-	v := holtmovingaverageaggregation.Build()
-	u.v = &v
-	return u
-}
-
-func (u *MovingAverageAggregationBuilder) HoltWintersMovingAverageAggregation(holtwintersmovingaverageaggregation *HoltWintersMovingAverageAggregationBuilder) *MovingAverageAggregationBuilder {
-	v := holtwintersmovingaverageaggregation.Build()
-	u.v = &v
-	return u
-}
-
-func (u *MovingAverageAggregationBuilder) LinearMovingAverageAggregation(linearmovingaverageaggregation *LinearMovingAverageAggregationBuilder) *MovingAverageAggregationBuilder {
-	v := linearmovingaverageaggregation.Build()
-	u.v = &v
-	return u
-}
-
-func (u *MovingAverageAggregationBuilder) SimpleMovingAverageAggregation(simplemovingaverageaggregation *SimpleMovingAverageAggregationBuilder) *MovingAverageAggregationBuilder {
-	v := simplemovingaverageaggregation.Build()
-	u.v = &v
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/pipeline.ts#L254-L260
+type MovingAverageAggregation any

@@ -15,40 +15,119 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // NodeInfoDiscover type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/info/types.ts#L169-L171
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/info/types.ts#L173-L182
 type NodeInfoDiscover struct {
-	SeedHosts string `json:"seed_hosts"`
+	NodeInfoDiscover map[string]json.RawMessage `json:"-"`
+	SeedHosts        []string                   `json:"seed_hosts,omitempty"`
+	SeedProviders    []string                   `json:"seed_providers,omitempty"`
+	Type             *string                    `json:"type,omitempty"`
 }
 
-// NodeInfoDiscoverBuilder holds NodeInfoDiscover struct and provides a builder API.
-type NodeInfoDiscoverBuilder struct {
-	v *NodeInfoDiscover
+func (s *NodeInfoDiscover) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "seed_hosts":
+			if err := dec.Decode(&s.SeedHosts); err != nil {
+				return fmt.Errorf("%s | %w", "SeedHosts", err)
+			}
+
+		case "seed_providers":
+			if err := dec.Decode(&s.SeedProviders); err != nil {
+				return fmt.Errorf("%s | %w", "SeedProviders", err)
+			}
+
+		case "type":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Type = &o
+
+		default:
+
+			if key, ok := t.(string); ok {
+				if s.NodeInfoDiscover == nil {
+					s.NodeInfoDiscover = make(map[string]json.RawMessage, 0)
+				}
+				raw := new(json.RawMessage)
+				if err := dec.Decode(&raw); err != nil {
+					return fmt.Errorf("%s | %w", "NodeInfoDiscover", err)
+				}
+				s.NodeInfoDiscover[key] = *raw
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewNodeInfoDiscover provides a builder for the NodeInfoDiscover struct.
-func NewNodeInfoDiscoverBuilder() *NodeInfoDiscoverBuilder {
-	r := NodeInfoDiscoverBuilder{
-		&NodeInfoDiscover{},
+// MarhsalJSON overrides marshalling for types with additional properties
+func (s NodeInfoDiscover) MarshalJSON() ([]byte, error) {
+	type opt NodeInfoDiscover
+	// We transform the struct to a map without the embedded additional properties map
+	tmp := make(map[string]any, 0)
+
+	data, err := json.Marshal(opt(s))
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(data, &tmp)
+	if err != nil {
+		return nil, err
 	}
 
-	return &r
+	// We inline the additional fields from the underlying map
+	for key, value := range s.NodeInfoDiscover {
+		tmp[fmt.Sprintf("%s", key)] = value
+	}
+	delete(tmp, "NodeInfoDiscover")
+
+	data, err = json.Marshal(tmp)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }
 
-// Build finalize the chain and returns the NodeInfoDiscover struct
-func (rb *NodeInfoDiscoverBuilder) Build() NodeInfoDiscover {
-	return *rb.v
-}
+// NewNodeInfoDiscover returns a NodeInfoDiscover.
+func NewNodeInfoDiscover() *NodeInfoDiscover {
+	r := &NodeInfoDiscover{
+		NodeInfoDiscover: make(map[string]json.RawMessage, 0),
+	}
 
-func (rb *NodeInfoDiscoverBuilder) SeedHosts(seedhosts string) *NodeInfoDiscoverBuilder {
-	rb.v.SeedHosts = seedhosts
-	return rb
+	return r
 }

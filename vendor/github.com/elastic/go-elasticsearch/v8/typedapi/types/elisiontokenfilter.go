@@ -15,61 +15,102 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ElisionTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L186-L191
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L188-L193
 type ElisionTokenFilter struct {
-	Articles     []string       `json:"articles,omitempty"`
-	ArticlesCase *bool          `json:"articles_case,omitempty"`
-	ArticlesPath *string        `json:"articles_path,omitempty"`
-	Type         string         `json:"type,omitempty"`
-	Version      *VersionString `json:"version,omitempty"`
+	Articles     []string           `json:"articles,omitempty"`
+	ArticlesCase Stringifiedboolean `json:"articles_case,omitempty"`
+	ArticlesPath *string            `json:"articles_path,omitempty"`
+	Type         string             `json:"type,omitempty"`
+	Version      *string            `json:"version,omitempty"`
 }
 
-// ElisionTokenFilterBuilder holds ElisionTokenFilter struct and provides a builder API.
-type ElisionTokenFilterBuilder struct {
-	v *ElisionTokenFilter
+func (s *ElisionTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "articles":
+			if err := dec.Decode(&s.Articles); err != nil {
+				return fmt.Errorf("%s | %w", "Articles", err)
+			}
+
+		case "articles_case":
+			if err := dec.Decode(&s.ArticlesCase); err != nil {
+				return fmt.Errorf("%s | %w", "ArticlesCase", err)
+			}
+
+		case "articles_path":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ArticlesPath", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ArticlesPath = &o
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewElisionTokenFilter provides a builder for the ElisionTokenFilter struct.
-func NewElisionTokenFilterBuilder() *ElisionTokenFilterBuilder {
-	r := ElisionTokenFilterBuilder{
-		&ElisionTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s ElisionTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerElisionTokenFilter ElisionTokenFilter
+	tmp := innerElisionTokenFilter{
+		Articles:     s.Articles,
+		ArticlesCase: s.ArticlesCase,
+		ArticlesPath: s.ArticlesPath,
+		Type:         s.Type,
+		Version:      s.Version,
 	}
 
-	r.v.Type = "elision"
+	tmp.Type = "elision"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the ElisionTokenFilter struct
-func (rb *ElisionTokenFilterBuilder) Build() ElisionTokenFilter {
-	return *rb.v
-}
+// NewElisionTokenFilter returns a ElisionTokenFilter.
+func NewElisionTokenFilter() *ElisionTokenFilter {
+	r := &ElisionTokenFilter{}
 
-func (rb *ElisionTokenFilterBuilder) Articles(articles ...string) *ElisionTokenFilterBuilder {
-	rb.v.Articles = articles
-	return rb
-}
-
-func (rb *ElisionTokenFilterBuilder) ArticlesCase(articlescase bool) *ElisionTokenFilterBuilder {
-	rb.v.ArticlesCase = &articlescase
-	return rb
-}
-
-func (rb *ElisionTokenFilterBuilder) ArticlesPath(articlespath string) *ElisionTokenFilterBuilder {
-	rb.v.ArticlesPath = &articlespath
-	return rb
-}
-
-func (rb *ElisionTokenFilterBuilder) Version(version VersionString) *ElisionTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

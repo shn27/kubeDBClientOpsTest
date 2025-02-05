@@ -15,35 +15,126 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
 )
 
 // InlineGetDictUserDefined type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/common.ts#L279-L288
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/common.ts#L321-L334
 type InlineGetDictUserDefined struct {
-	Fields                   map[string]interface{} `json:"fields,omitempty"`
-	Found                    bool                   `json:"found"`
-	InlineGetDictUserDefined map[string]interface{} `json:"-"`
-	PrimaryTerm_             *int64                 `json:"_primary_term,omitempty"`
-	Routing_                 *Routing               `json:"_routing,omitempty"`
-	SeqNo_                   *SequenceNumber        `json:"_seq_no,omitempty"`
-	Source_                  map[string]interface{} `json:"_source"`
+	Fields                   map[string]json.RawMessage `json:"fields,omitempty"`
+	Found                    bool                       `json:"found"`
+	InlineGetDictUserDefined map[string]json.RawMessage `json:"-"`
+	PrimaryTerm_             *int64                     `json:"_primary_term,omitempty"`
+	Routing_                 *string                    `json:"_routing,omitempty"`
+	SeqNo_                   *int64                     `json:"_seq_no,omitempty"`
+	Source_                  map[string]json.RawMessage `json:"_source,omitempty"`
+}
+
+func (s *InlineGetDictUserDefined) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "fields":
+			if s.Fields == nil {
+				s.Fields = make(map[string]json.RawMessage, 0)
+			}
+			if err := dec.Decode(&s.Fields); err != nil {
+				return fmt.Errorf("%s | %w", "Fields", err)
+			}
+
+		case "found":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Found", err)
+				}
+				s.Found = value
+			case bool:
+				s.Found = v
+			}
+
+		case "_primary_term":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PrimaryTerm_", err)
+				}
+				s.PrimaryTerm_ = &value
+			case float64:
+				f := int64(v)
+				s.PrimaryTerm_ = &f
+			}
+
+		case "_routing":
+			if err := dec.Decode(&s.Routing_); err != nil {
+				return fmt.Errorf("%s | %w", "Routing_", err)
+			}
+
+		case "_seq_no":
+			if err := dec.Decode(&s.SeqNo_); err != nil {
+				return fmt.Errorf("%s | %w", "SeqNo_", err)
+			}
+
+		case "_source":
+			if s.Source_ == nil {
+				s.Source_ = make(map[string]json.RawMessage, 0)
+			}
+			if err := dec.Decode(&s.Source_); err != nil {
+				return fmt.Errorf("%s | %w", "Source_", err)
+			}
+
+		default:
+
+			if key, ok := t.(string); ok {
+				if s.InlineGetDictUserDefined == nil {
+					s.InlineGetDictUserDefined = make(map[string]json.RawMessage, 0)
+				}
+				raw := new(json.RawMessage)
+				if err := dec.Decode(&raw); err != nil {
+					return fmt.Errorf("%s | %w", "InlineGetDictUserDefined", err)
+				}
+				s.InlineGetDictUserDefined[key] = *raw
+			}
+
+		}
+	}
+	return nil
 }
 
 // MarhsalJSON overrides marshalling for types with additional properties
 func (s InlineGetDictUserDefined) MarshalJSON() ([]byte, error) {
 	type opt InlineGetDictUserDefined
 	// We transform the struct to a map without the embedded additional properties map
-	tmp := make(map[string]interface{}, 0)
+	tmp := make(map[string]any, 0)
 
 	data, err := json.Marshal(opt(s))
 	if err != nil {
@@ -56,8 +147,9 @@ func (s InlineGetDictUserDefined) MarshalJSON() ([]byte, error) {
 
 	// We inline the additional fields from the underlying map
 	for key, value := range s.InlineGetDictUserDefined {
-		tmp[string(key)] = value
+		tmp[fmt.Sprintf("%s", key)] = value
 	}
+	delete(tmp, "InlineGetDictUserDefined")
 
 	data, err = json.Marshal(tmp)
 	if err != nil {
@@ -67,60 +159,13 @@ func (s InlineGetDictUserDefined) MarshalJSON() ([]byte, error) {
 	return data, nil
 }
 
-// InlineGetDictUserDefinedBuilder holds InlineGetDictUserDefined struct and provides a builder API.
-type InlineGetDictUserDefinedBuilder struct {
-	v *InlineGetDictUserDefined
-}
-
-// NewInlineGetDictUserDefined provides a builder for the InlineGetDictUserDefined struct.
-func NewInlineGetDictUserDefinedBuilder() *InlineGetDictUserDefinedBuilder {
-	r := InlineGetDictUserDefinedBuilder{
-		&InlineGetDictUserDefined{
-			Fields:                   make(map[string]interface{}, 0),
-			InlineGetDictUserDefined: make(map[string]interface{}, 0),
-			Source_:                  make(map[string]interface{}, 0),
-		},
+// NewInlineGetDictUserDefined returns a InlineGetDictUserDefined.
+func NewInlineGetDictUserDefined() *InlineGetDictUserDefined {
+	r := &InlineGetDictUserDefined{
+		Fields:                   make(map[string]json.RawMessage, 0),
+		InlineGetDictUserDefined: make(map[string]json.RawMessage, 0),
+		Source_:                  make(map[string]json.RawMessage, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the InlineGetDictUserDefined struct
-func (rb *InlineGetDictUserDefinedBuilder) Build() InlineGetDictUserDefined {
-	return *rb.v
-}
-
-func (rb *InlineGetDictUserDefinedBuilder) Fields(value map[string]interface{}) *InlineGetDictUserDefinedBuilder {
-	rb.v.Fields = value
-	return rb
-}
-
-func (rb *InlineGetDictUserDefinedBuilder) Found(found bool) *InlineGetDictUserDefinedBuilder {
-	rb.v.Found = found
-	return rb
-}
-
-func (rb *InlineGetDictUserDefinedBuilder) InlineGetDictUserDefined(value map[string]interface{}) *InlineGetDictUserDefinedBuilder {
-	rb.v.InlineGetDictUserDefined = value
-	return rb
-}
-
-func (rb *InlineGetDictUserDefinedBuilder) PrimaryTerm_(primaryterm_ int64) *InlineGetDictUserDefinedBuilder {
-	rb.v.PrimaryTerm_ = &primaryterm_
-	return rb
-}
-
-func (rb *InlineGetDictUserDefinedBuilder) Routing_(routing_ Routing) *InlineGetDictUserDefinedBuilder {
-	rb.v.Routing_ = &routing_
-	return rb
-}
-
-func (rb *InlineGetDictUserDefinedBuilder) SeqNo_(seqno_ SequenceNumber) *InlineGetDictUserDefinedBuilder {
-	rb.v.SeqNo_ = &seqno_
-	return rb
-}
-
-func (rb *InlineGetDictUserDefinedBuilder) Source_(value map[string]interface{}) *InlineGetDictUserDefinedBuilder {
-	rb.v.Source_ = value
-	return rb
+	return r
 }

@@ -15,41 +15,65 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // Input type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/put_trained_model/types.ts#L56-L58
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/put_trained_model/types.ts#L56-L58
 type Input struct {
-	FieldNames Names `json:"field_names"`
+	FieldNames []string `json:"field_names"`
 }
 
-// InputBuilder holds Input struct and provides a builder API.
-type InputBuilder struct {
-	v *Input
-}
+func (s *Input) UnmarshalJSON(data []byte) error {
 
-// NewInput provides a builder for the Input struct.
-func NewInputBuilder() *InputBuilder {
-	r := InputBuilder{
-		&Input{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "field_names":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "FieldNames", err)
+				}
+
+				s.FieldNames = append(s.FieldNames, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.FieldNames); err != nil {
+					return fmt.Errorf("%s | %w", "FieldNames", err)
+				}
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the Input struct
-func (rb *InputBuilder) Build() Input {
-	return *rb.v
-}
+// NewInput returns a Input.
+func NewInput() *Input {
+	r := &Input{}
 
-func (rb *InputBuilder) FieldNames(fieldnames *NamesBuilder) *InputBuilder {
-	v := fieldnames.Build()
-	rb.v.FieldNames = v
-	return rb
+	return r
 }

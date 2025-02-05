@@ -15,23 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package putdataframeanalytics
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"strconv"
 
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 )
 
 // Request holds the request body struct for the package putdataframeanalytics
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/put_data_frame_analytics/MlPutDataFrameAnalyticsRequest.ts#L30-L139
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/put_data_frame_analytics/MlPutDataFrameAnalyticsRequest.ts#L30-L144
 type Request struct {
 
 	// AllowLazyStart Specifies whether this job can start when there is insufficient machine
@@ -43,12 +45,10 @@ type Request struct {
 	// behavior is also affected by the cluster-wide
 	// `xpack.ml.max_lazy_ml_nodes` setting.
 	AllowLazyStart *bool `json:"allow_lazy_start,omitempty"`
-
 	// Analysis The analysis configuration, which contains the information necessary to
 	// perform one of the following types of analysis: classification, outlier
 	// detection, or regression.
 	Analysis types.DataframeAnalysisContainer `json:"analysis"`
-
 	// AnalyzedFields Specifies `includes` and/or `excludes` patterns to select which fields
 	// will be included in the analysis. The patterns specified in `excludes`
 	// are applied last, therefore `excludes` takes precedence. In other words,
@@ -78,49 +78,37 @@ type Request struct {
 	// values to a single number. For example, in case of age ranges, you can
 	// model the values as `0-14 = 0`, `15-24 = 1`, `25-34 = 2`, and so on.
 	AnalyzedFields *types.DataframeAnalysisAnalyzedFields `json:"analyzed_fields,omitempty"`
-
 	// Description A description of the job.
 	Description *string `json:"description,omitempty"`
-
 	// Dest The destination configuration.
-	Dest types.DataframeAnalyticsDestination `json:"dest"`
-
-	Headers *types.HttpHeaders `json:"headers,omitempty"`
-
+	Dest    types.DataframeAnalyticsDestination `json:"dest"`
+	Headers types.HttpHeaders                   `json:"headers,omitempty"`
 	// MaxNumThreads The maximum number of threads to be used by the analysis. Using more
 	// threads may decrease the time necessary to complete the analysis at the
 	// cost of using more CPU. Note that the process may use additional threads
 	// for operational functionality other than the analysis itself.
-	MaxNumThreads *int `json:"max_num_threads,omitempty"`
-
+	MaxNumThreads *int           `json:"max_num_threads,omitempty"`
+	Meta_         types.Metadata `json:"_meta,omitempty"`
 	// ModelMemoryLimit The approximate maximum amount of memory resources that are permitted for
 	// analytical processing. If your `elasticsearch.yml` file contains an
 	// `xpack.ml.max_model_memory_limit` setting, an error occurs when you try
 	// to create data frame analytics jobs that have `model_memory_limit` values
 	// greater than that setting.
 	ModelMemoryLimit *string `json:"model_memory_limit,omitempty"`
-
 	// Source The configuration of how to source the analysis data.
-	Source types.DataframeAnalyticsSource `json:"source"`
-
-	Version *types.VersionString `json:"version,omitempty"`
+	Source  types.DataframeAnalyticsSource `json:"source"`
+	Version *string                        `json:"version,omitempty"`
 }
 
-// RequestBuilder is the builder API for the putdataframeanalytics.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -131,62 +119,110 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) AllowLazyStart(allowlazystart bool) *RequestBuilder {
-	rb.v.AllowLazyStart = &allowlazystart
-	return rb
-}
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
 
-func (rb *RequestBuilder) Analysis(analysis *types.DataframeAnalysisContainerBuilder) *RequestBuilder {
-	v := analysis.Build()
-	rb.v.Analysis = v
-	return rb
-}
+		switch t {
 
-func (rb *RequestBuilder) AnalyzedFields(analyzedfields *types.DataframeAnalysisAnalyzedFieldsBuilder) *RequestBuilder {
-	v := analyzedfields.Build()
-	rb.v.AnalyzedFields = &v
-	return rb
-}
+		case "allow_lazy_start":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "AllowLazyStart", err)
+				}
+				s.AllowLazyStart = &value
+			case bool:
+				s.AllowLazyStart = &v
+			}
 
-func (rb *RequestBuilder) Description(description string) *RequestBuilder {
-	rb.v.Description = &description
-	return rb
-}
+		case "analysis":
+			if err := dec.Decode(&s.Analysis); err != nil {
+				return fmt.Errorf("%s | %w", "Analysis", err)
+			}
 
-func (rb *RequestBuilder) Dest(dest *types.DataframeAnalyticsDestinationBuilder) *RequestBuilder {
-	v := dest.Build()
-	rb.v.Dest = v
-	return rb
-}
+		case "analyzed_fields":
+			if err := dec.Decode(&s.AnalyzedFields); err != nil {
+				return fmt.Errorf("%s | %w", "AnalyzedFields", err)
+			}
 
-func (rb *RequestBuilder) Headers(headers *types.HttpHeadersBuilder) *RequestBuilder {
-	v := headers.Build()
-	rb.v.Headers = &v
-	return rb
-}
+		case "description":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Description", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Description = &o
 
-func (rb *RequestBuilder) MaxNumThreads(maxnumthreads int) *RequestBuilder {
-	rb.v.MaxNumThreads = &maxnumthreads
-	return rb
-}
+		case "dest":
+			if err := dec.Decode(&s.Dest); err != nil {
+				return fmt.Errorf("%s | %w", "Dest", err)
+			}
 
-func (rb *RequestBuilder) ModelMemoryLimit(modelmemorylimit string) *RequestBuilder {
-	rb.v.ModelMemoryLimit = &modelmemorylimit
-	return rb
-}
+		case "headers":
+			if err := dec.Decode(&s.Headers); err != nil {
+				return fmt.Errorf("%s | %w", "Headers", err)
+			}
 
-func (rb *RequestBuilder) Source(source *types.DataframeAnalyticsSourceBuilder) *RequestBuilder {
-	v := source.Build()
-	rb.v.Source = v
-	return rb
-}
+		case "max_num_threads":
 
-func (rb *RequestBuilder) Version(version types.VersionString) *RequestBuilder {
-	rb.v.Version = &version
-	return rb
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxNumThreads", err)
+				}
+				s.MaxNumThreads = &value
+			case float64:
+				f := int(v)
+				s.MaxNumThreads = &f
+			}
+
+		case "_meta":
+			if err := dec.Decode(&s.Meta_); err != nil {
+				return fmt.Errorf("%s | %w", "Meta_", err)
+			}
+
+		case "model_memory_limit":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ModelMemoryLimit", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ModelMemoryLimit = &o
+
+		case "source":
+			if err := dec.Decode(&s.Source); err != nil {
+				return fmt.Errorf("%s | %w", "Source", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }

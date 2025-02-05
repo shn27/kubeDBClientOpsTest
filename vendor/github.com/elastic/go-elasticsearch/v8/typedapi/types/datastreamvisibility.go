@@ -15,40 +15,79 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DataStreamVisibility type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/DataStream.ts#L57-L59
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/DataStream.ts#L159-L162
 type DataStreamVisibility struct {
-	Hidden *bool `json:"hidden,omitempty"`
+	AllowCustomRouting *bool `json:"allow_custom_routing,omitempty"`
+	Hidden             *bool `json:"hidden,omitempty"`
 }
 
-// DataStreamVisibilityBuilder holds DataStreamVisibility struct and provides a builder API.
-type DataStreamVisibilityBuilder struct {
-	v *DataStreamVisibility
-}
+func (s *DataStreamVisibility) UnmarshalJSON(data []byte) error {
 
-// NewDataStreamVisibility provides a builder for the DataStreamVisibility struct.
-func NewDataStreamVisibilityBuilder() *DataStreamVisibilityBuilder {
-	r := DataStreamVisibilityBuilder{
-		&DataStreamVisibility{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "allow_custom_routing":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "AllowCustomRouting", err)
+				}
+				s.AllowCustomRouting = &value
+			case bool:
+				s.AllowCustomRouting = &v
+			}
+
+		case "hidden":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Hidden", err)
+				}
+				s.Hidden = &value
+			case bool:
+				s.Hidden = &v
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DataStreamVisibility struct
-func (rb *DataStreamVisibilityBuilder) Build() DataStreamVisibility {
-	return *rb.v
-}
+// NewDataStreamVisibility returns a DataStreamVisibility.
+func NewDataStreamVisibility() *DataStreamVisibility {
+	r := &DataStreamVisibility{}
 
-func (rb *DataStreamVisibilityBuilder) Hidden(hidden bool) *DataStreamVisibilityBuilder {
-	rb.v.Hidden = &hidden
-	return rb
+	return r
 }

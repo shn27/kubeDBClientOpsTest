@@ -15,52 +15,105 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ClusterProcessOpenFileDescriptors type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/stats/types.ts#L256-L260
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/stats/types.ts#L485-L501
 type ClusterProcessOpenFileDescriptors struct {
+	// Avg Average number of concurrently open file descriptors.
+	// Returns `-1` if not supported.
 	Avg int64 `json:"avg"`
+	// Max Maximum number of concurrently open file descriptors allowed across all
+	// selected nodes.
+	// Returns `-1` if not supported.
 	Max int64 `json:"max"`
+	// Min Minimum number of concurrently open file descriptors across all selected
+	// nodes.
+	// Returns -1 if not supported.
 	Min int64 `json:"min"`
 }
 
-// ClusterProcessOpenFileDescriptorsBuilder holds ClusterProcessOpenFileDescriptors struct and provides a builder API.
-type ClusterProcessOpenFileDescriptorsBuilder struct {
-	v *ClusterProcessOpenFileDescriptors
-}
+func (s *ClusterProcessOpenFileDescriptors) UnmarshalJSON(data []byte) error {
 
-// NewClusterProcessOpenFileDescriptors provides a builder for the ClusterProcessOpenFileDescriptors struct.
-func NewClusterProcessOpenFileDescriptorsBuilder() *ClusterProcessOpenFileDescriptorsBuilder {
-	r := ClusterProcessOpenFileDescriptorsBuilder{
-		&ClusterProcessOpenFileDescriptors{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "avg":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Avg", err)
+				}
+				s.Avg = value
+			case float64:
+				f := int64(v)
+				s.Avg = f
+			}
+
+		case "max":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Max", err)
+				}
+				s.Max = value
+			case float64:
+				f := int64(v)
+				s.Max = f
+			}
+
+		case "min":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Min", err)
+				}
+				s.Min = value
+			case float64:
+				f := int64(v)
+				s.Min = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ClusterProcessOpenFileDescriptors struct
-func (rb *ClusterProcessOpenFileDescriptorsBuilder) Build() ClusterProcessOpenFileDescriptors {
-	return *rb.v
-}
+// NewClusterProcessOpenFileDescriptors returns a ClusterProcessOpenFileDescriptors.
+func NewClusterProcessOpenFileDescriptors() *ClusterProcessOpenFileDescriptors {
+	r := &ClusterProcessOpenFileDescriptors{}
 
-func (rb *ClusterProcessOpenFileDescriptorsBuilder) Avg(avg int64) *ClusterProcessOpenFileDescriptorsBuilder {
-	rb.v.Avg = avg
-	return rb
-}
-
-func (rb *ClusterProcessOpenFileDescriptorsBuilder) Max(max int64) *ClusterProcessOpenFileDescriptorsBuilder {
-	rb.v.Max = max
-	return rb
-}
-
-func (rb *ClusterProcessOpenFileDescriptorsBuilder) Min(min int64) *ClusterProcessOpenFileDescriptorsBuilder {
-	rb.v.Min = min
-	return rb
+	return r
 }

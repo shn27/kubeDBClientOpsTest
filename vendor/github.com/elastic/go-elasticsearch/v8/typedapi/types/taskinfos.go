@@ -15,50 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // TaskInfos holds the union for the following types:
 //
-//	map[string]ParentTaskInfo
 //	[]TaskInfo
+//	map[string]ParentTaskInfo
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/tasks/_types/TaskListResponseBase.ts#L40-L43
-type TaskInfos interface{}
-
-// TaskInfosBuilder holds TaskInfos struct and provides a builder API.
-type TaskInfosBuilder struct {
-	v TaskInfos
-}
-
-// NewTaskInfos provides a builder for the TaskInfos struct.
-func NewTaskInfosBuilder() *TaskInfosBuilder {
-	return &TaskInfosBuilder{}
-}
-
-// Build finalize the chain and returns the TaskInfos struct
-func (u *TaskInfosBuilder) Build() TaskInfos {
-	return u.v
-}
-
-func (u *TaskInfosBuilder) Map(values map[string]*ParentTaskInfoBuilder) *TaskInfosBuilder {
-	tmp := make(map[string]ParentTaskInfo, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	u.v = tmp
-	return u
-}
-
-func (u *TaskInfosBuilder) TaskInfos(taskinfos []TaskInfoBuilder) *TaskInfosBuilder {
-	tmp := make([]TaskInfo, len(taskinfos))
-	for _, value := range taskinfos {
-		tmp = append(tmp, value.Build())
-	}
-	u.v = tmp
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/tasks/_types/TaskListResponseBase.ts#L40-L43
+type TaskInfos any

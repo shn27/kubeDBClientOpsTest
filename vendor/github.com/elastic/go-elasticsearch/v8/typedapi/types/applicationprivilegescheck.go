@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ApplicationPrivilegesCheck type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/has_privileges/types.ts#L24-L31
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/has_privileges/types.ts#L24-L31
 type ApplicationPrivilegesCheck struct {
 	// Application The name of the application.
 	Application string `json:"application"`
@@ -36,44 +43,51 @@ type ApplicationPrivilegesCheck struct {
 	Resources []string `json:"resources"`
 }
 
-// ApplicationPrivilegesCheckBuilder holds ApplicationPrivilegesCheck struct and provides a builder API.
-type ApplicationPrivilegesCheckBuilder struct {
-	v *ApplicationPrivilegesCheck
-}
+func (s *ApplicationPrivilegesCheck) UnmarshalJSON(data []byte) error {
 
-// NewApplicationPrivilegesCheck provides a builder for the ApplicationPrivilegesCheck struct.
-func NewApplicationPrivilegesCheckBuilder() *ApplicationPrivilegesCheckBuilder {
-	r := ApplicationPrivilegesCheckBuilder{
-		&ApplicationPrivilegesCheck{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "application":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Application", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Application = o
+
+		case "privileges":
+			if err := dec.Decode(&s.Privileges); err != nil {
+				return fmt.Errorf("%s | %w", "Privileges", err)
+			}
+
+		case "resources":
+			if err := dec.Decode(&s.Resources); err != nil {
+				return fmt.Errorf("%s | %w", "Resources", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ApplicationPrivilegesCheck struct
-func (rb *ApplicationPrivilegesCheckBuilder) Build() ApplicationPrivilegesCheck {
-	return *rb.v
-}
+// NewApplicationPrivilegesCheck returns a ApplicationPrivilegesCheck.
+func NewApplicationPrivilegesCheck() *ApplicationPrivilegesCheck {
+	r := &ApplicationPrivilegesCheck{}
 
-// Application The name of the application.
-
-func (rb *ApplicationPrivilegesCheckBuilder) Application(application string) *ApplicationPrivilegesCheckBuilder {
-	rb.v.Application = application
-	return rb
-}
-
-// Privileges A list of the privileges that you want to check for the specified resources.
-// May be either application privilege names, or the names of actions that are
-// granted by those privileges
-
-func (rb *ApplicationPrivilegesCheckBuilder) Privileges(privileges ...string) *ApplicationPrivilegesCheckBuilder {
-	rb.v.Privileges = privileges
-	return rb
-}
-
-// Resources A list of resource names against which the privileges should be checked
-
-func (rb *ApplicationPrivilegesCheckBuilder) Resources(resources ...string) *ApplicationPrivilegesCheckBuilder {
-	rb.v.Resources = resources
-	return rb
+	return r
 }

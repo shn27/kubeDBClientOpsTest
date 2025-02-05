@@ -15,63 +15,62 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // IpRangeAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/bucket.ts#L246-L249
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/bucket.ts#L567-L576
 type IpRangeAggregation struct {
-	Field  *Field                    `json:"field,omitempty"`
-	Meta   *Metadata                 `json:"meta,omitempty"`
-	Name   *string                   `json:"name,omitempty"`
+	// Field The date field whose values are used to build ranges.
+	Field *string `json:"field,omitempty"`
+	// Ranges Array of IP ranges.
 	Ranges []IpRangeAggregationRange `json:"ranges,omitempty"`
 }
 
-// IpRangeAggregationBuilder holds IpRangeAggregation struct and provides a builder API.
-type IpRangeAggregationBuilder struct {
-	v *IpRangeAggregation
-}
+func (s *IpRangeAggregation) UnmarshalJSON(data []byte) error {
 
-// NewIpRangeAggregation provides a builder for the IpRangeAggregation struct.
-func NewIpRangeAggregationBuilder() *IpRangeAggregationBuilder {
-	r := IpRangeAggregationBuilder{
-		&IpRangeAggregation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "ranges":
+			if err := dec.Decode(&s.Ranges); err != nil {
+				return fmt.Errorf("%s | %w", "Ranges", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the IpRangeAggregation struct
-func (rb *IpRangeAggregationBuilder) Build() IpRangeAggregation {
-	return *rb.v
-}
+// NewIpRangeAggregation returns a IpRangeAggregation.
+func NewIpRangeAggregation() *IpRangeAggregation {
+	r := &IpRangeAggregation{}
 
-func (rb *IpRangeAggregationBuilder) Field(field Field) *IpRangeAggregationBuilder {
-	rb.v.Field = &field
-	return rb
-}
-
-func (rb *IpRangeAggregationBuilder) Meta(meta *MetadataBuilder) *IpRangeAggregationBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *IpRangeAggregationBuilder) Name(name string) *IpRangeAggregationBuilder {
-	rb.v.Name = &name
-	return rb
-}
-
-func (rb *IpRangeAggregationBuilder) Ranges(ranges []IpRangeAggregationRangeBuilder) *IpRangeAggregationBuilder {
-	tmp := make([]IpRangeAggregationRange, len(ranges))
-	for _, value := range ranges {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Ranges = tmp
-	return rb
+	return r
 }

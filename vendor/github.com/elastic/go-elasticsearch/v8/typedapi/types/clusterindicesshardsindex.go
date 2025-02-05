@@ -15,16 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // ClusterIndicesShardsIndex type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/stats/types.ts#L40-L47
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/stats/types.ts#L51-L58
 type ClusterIndicesShardsIndex struct {
 	// Primaries Contains statistics about the number of primary shards assigned to selected
 	// nodes.
@@ -36,47 +34,9 @@ type ClusterIndicesShardsIndex struct {
 	Shards ClusterShardMetrics `json:"shards"`
 }
 
-// ClusterIndicesShardsIndexBuilder holds ClusterIndicesShardsIndex struct and provides a builder API.
-type ClusterIndicesShardsIndexBuilder struct {
-	v *ClusterIndicesShardsIndex
-}
+// NewClusterIndicesShardsIndex returns a ClusterIndicesShardsIndex.
+func NewClusterIndicesShardsIndex() *ClusterIndicesShardsIndex {
+	r := &ClusterIndicesShardsIndex{}
 
-// NewClusterIndicesShardsIndex provides a builder for the ClusterIndicesShardsIndex struct.
-func NewClusterIndicesShardsIndexBuilder() *ClusterIndicesShardsIndexBuilder {
-	r := ClusterIndicesShardsIndexBuilder{
-		&ClusterIndicesShardsIndex{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the ClusterIndicesShardsIndex struct
-func (rb *ClusterIndicesShardsIndexBuilder) Build() ClusterIndicesShardsIndex {
-	return *rb.v
-}
-
-// Primaries Contains statistics about the number of primary shards assigned to selected
-// nodes.
-
-func (rb *ClusterIndicesShardsIndexBuilder) Primaries(primaries *ClusterShardMetricsBuilder) *ClusterIndicesShardsIndexBuilder {
-	v := primaries.Build()
-	rb.v.Primaries = v
-	return rb
-}
-
-// Replication Contains statistics about the number of replication shards assigned to
-// selected nodes.
-
-func (rb *ClusterIndicesShardsIndexBuilder) Replication(replication *ClusterShardMetricsBuilder) *ClusterIndicesShardsIndexBuilder {
-	v := replication.Build()
-	rb.v.Replication = v
-	return rb
-}
-
-// Shards Contains statistics about the number of shards assigned to selected nodes.
-
-func (rb *ClusterIndicesShardsIndexBuilder) Shards(shards *ClusterShardMetricsBuilder) *ClusterIndicesShardsIndexBuilder {
-	v := shards.Build()
-	rb.v.Shards = v
-	return rb
+	return r
 }

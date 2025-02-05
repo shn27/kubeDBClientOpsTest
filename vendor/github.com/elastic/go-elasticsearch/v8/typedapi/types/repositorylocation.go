@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // RepositoryLocation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/_types/RepositoryMeteringInformation.ts#L68-L74
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/_types/RepositoryMeteringInformation.ts#L68-L74
 type RepositoryLocation struct {
 	BasePath string `json:"base_path"`
 	// Bucket Bucket name (GCP, S3)
@@ -33,40 +40,65 @@ type RepositoryLocation struct {
 	Container *string `json:"container,omitempty"`
 }
 
-// RepositoryLocationBuilder holds RepositoryLocation struct and provides a builder API.
-type RepositoryLocationBuilder struct {
-	v *RepositoryLocation
-}
+func (s *RepositoryLocation) UnmarshalJSON(data []byte) error {
 
-// NewRepositoryLocation provides a builder for the RepositoryLocation struct.
-func NewRepositoryLocationBuilder() *RepositoryLocationBuilder {
-	r := RepositoryLocationBuilder{
-		&RepositoryLocation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "base_path":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "BasePath", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.BasePath = o
+
+		case "bucket":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Bucket", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Bucket = &o
+
+		case "container":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Container", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Container = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RepositoryLocation struct
-func (rb *RepositoryLocationBuilder) Build() RepositoryLocation {
-	return *rb.v
-}
+// NewRepositoryLocation returns a RepositoryLocation.
+func NewRepositoryLocation() *RepositoryLocation {
+	r := &RepositoryLocation{}
 
-func (rb *RepositoryLocationBuilder) BasePath(basepath string) *RepositoryLocationBuilder {
-	rb.v.BasePath = basepath
-	return rb
-}
-
-// Bucket Bucket name (GCP, S3)
-
-func (rb *RepositoryLocationBuilder) Bucket(bucket string) *RepositoryLocationBuilder {
-	rb.v.Bucket = &bucket
-	return rb
-}
-
-// Container Container name (Azure)
-
-func (rb *RepositoryLocationBuilder) Container(container string) *RepositoryLocationBuilder {
-	rb.v.Container = &container
-	return rb
+	return r
 }

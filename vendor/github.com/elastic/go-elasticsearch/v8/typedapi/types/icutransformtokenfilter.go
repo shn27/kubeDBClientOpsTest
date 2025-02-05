@@ -15,59 +15,97 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/icutransformdirection"
 )
 
 // IcuTransformTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/icu-plugin.ts#L24-L28
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/icu-plugin.ts#L24-L28
 type IcuTransformTokenFilter struct {
-	Dir     icutransformdirection.IcuTransformDirection `json:"dir"`
-	Id      string                                      `json:"id"`
-	Type    string                                      `json:"type,omitempty"`
-	Version *VersionString                              `json:"version,omitempty"`
+	Dir     *icutransformdirection.IcuTransformDirection `json:"dir,omitempty"`
+	Id      string                                       `json:"id"`
+	Type    string                                       `json:"type,omitempty"`
+	Version *string                                      `json:"version,omitempty"`
 }
 
-// IcuTransformTokenFilterBuilder holds IcuTransformTokenFilter struct and provides a builder API.
-type IcuTransformTokenFilterBuilder struct {
-	v *IcuTransformTokenFilter
+func (s *IcuTransformTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "dir":
+			if err := dec.Decode(&s.Dir); err != nil {
+				return fmt.Errorf("%s | %w", "Dir", err)
+			}
+
+		case "id":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Id = o
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewIcuTransformTokenFilter provides a builder for the IcuTransformTokenFilter struct.
-func NewIcuTransformTokenFilterBuilder() *IcuTransformTokenFilterBuilder {
-	r := IcuTransformTokenFilterBuilder{
-		&IcuTransformTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s IcuTransformTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerIcuTransformTokenFilter IcuTransformTokenFilter
+	tmp := innerIcuTransformTokenFilter{
+		Dir:     s.Dir,
+		Id:      s.Id,
+		Type:    s.Type,
+		Version: s.Version,
 	}
 
-	r.v.Type = "icu_transform"
+	tmp.Type = "icu_transform"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the IcuTransformTokenFilter struct
-func (rb *IcuTransformTokenFilterBuilder) Build() IcuTransformTokenFilter {
-	return *rb.v
-}
+// NewIcuTransformTokenFilter returns a IcuTransformTokenFilter.
+func NewIcuTransformTokenFilter() *IcuTransformTokenFilter {
+	r := &IcuTransformTokenFilter{}
 
-func (rb *IcuTransformTokenFilterBuilder) Dir(dir icutransformdirection.IcuTransformDirection) *IcuTransformTokenFilterBuilder {
-	rb.v.Dir = dir
-	return rb
-}
-
-func (rb *IcuTransformTokenFilterBuilder) Id(id string) *IcuTransformTokenFilterBuilder {
-	rb.v.Id = id
-	return rb
-}
-
-func (rb *IcuTransformTokenFilterBuilder) Version(version VersionString) *IcuTransformTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

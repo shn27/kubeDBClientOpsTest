@@ -15,16 +15,22 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // TranslogRetention type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/IndexSettings.ts#L373-L392
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/IndexSettings.ts#L382-L401
 type TranslogRetention struct {
 	// Age This controls the maximum duration for which translog files are kept by each
 	// shard. Keeping more
@@ -35,7 +41,7 @@ type TranslogRetention struct {
 	// is ignored, and should not be set, if soft deletes are enabled. Soft deletes
 	// are enabled by default in
 	// indices created in Elasticsearch versions 7.0.0 and later.
-	Age *Duration `json:"age,omitempty"`
+	Age Duration `json:"age,omitempty"`
 	// Size This controls the total size of translog files to keep for each shard.
 	// Keeping more translog files increases
 	// the chance of performing an operation based sync when recovering a replica.
@@ -45,56 +51,42 @@ type TranslogRetention struct {
 	// set, if soft deletes are enabled. Soft deletes are enabled by default in
 	// indices created in Elasticsearch
 	// versions 7.0.0 and later.
-	Size *ByteSize `json:"size,omitempty"`
+	Size ByteSize `json:"size,omitempty"`
 }
 
-// TranslogRetentionBuilder holds TranslogRetention struct and provides a builder API.
-type TranslogRetentionBuilder struct {
-	v *TranslogRetention
-}
+func (s *TranslogRetention) UnmarshalJSON(data []byte) error {
 
-// NewTranslogRetention provides a builder for the TranslogRetention struct.
-func NewTranslogRetentionBuilder() *TranslogRetentionBuilder {
-	r := TranslogRetentionBuilder{
-		&TranslogRetention{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "age":
+			if err := dec.Decode(&s.Age); err != nil {
+				return fmt.Errorf("%s | %w", "Age", err)
+			}
+
+		case "size":
+			if err := dec.Decode(&s.Size); err != nil {
+				return fmt.Errorf("%s | %w", "Size", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TranslogRetention struct
-func (rb *TranslogRetentionBuilder) Build() TranslogRetention {
-	return *rb.v
-}
+// NewTranslogRetention returns a TranslogRetention.
+func NewTranslogRetention() *TranslogRetention {
+	r := &TranslogRetention{}
 
-// Age This controls the maximum duration for which translog files are kept by each
-// shard. Keeping more
-// translog files increases the chance of performing an operation based sync
-// when recovering replicas. If
-// the translog files are not sufficient, replica recovery will fall back to a
-// file based sync. This setting
-// is ignored, and should not be set, if soft deletes are enabled. Soft deletes
-// are enabled by default in
-// indices created in Elasticsearch versions 7.0.0 and later.
-
-func (rb *TranslogRetentionBuilder) Age(age *DurationBuilder) *TranslogRetentionBuilder {
-	v := age.Build()
-	rb.v.Age = &v
-	return rb
-}
-
-// Size This controls the total size of translog files to keep for each shard.
-// Keeping more translog files increases
-// the chance of performing an operation based sync when recovering a replica.
-// If the translog files are not
-// sufficient, replica recovery will fall back to a file based sync. This
-// setting is ignored, and should not be
-// set, if soft deletes are enabled. Soft deletes are enabled by default in
-// indices created in Elasticsearch
-// versions 7.0.0 and later.
-
-func (rb *TranslogRetentionBuilder) Size(size *ByteSizeBuilder) *TranslogRetentionBuilder {
-	v := size.Build()
-	rb.v.Size = &v
-	return rb
+	return r
 }

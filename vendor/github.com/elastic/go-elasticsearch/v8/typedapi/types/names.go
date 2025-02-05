@@ -15,34 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // Names type alias.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/common.ts#L66-L66
-type Names []Name
-
-// NamesBuilder holds Names struct and provides a builder API.
-type NamesBuilder struct {
-	v Names
-}
-
-// NewNames provides a builder for the Names struct.
-func NewNamesBuilder() *NamesBuilder {
-	return &NamesBuilder{}
-}
-
-// Build finalize the chain and returns the Names struct
-func (b *NamesBuilder) Build() Names {
-	return b.v
-}
-
-func (b *NamesBuilder) Names(value Names) *NamesBuilder {
-	b.v = value
-	return b
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/common.ts#L81-L81
+type Names []string

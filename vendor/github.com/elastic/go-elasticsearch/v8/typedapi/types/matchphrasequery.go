@@ -15,74 +15,152 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/zerotermsquery"
 )
 
 // MatchPhraseQuery type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/fulltext.ts#L173-L180
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/fulltext.ts#L414-L438
 type MatchPhraseQuery struct {
-	Analyzer       *string                        `json:"analyzer,omitempty"`
-	Boost          *float32                       `json:"boost,omitempty"`
-	Query          string                         `json:"query"`
-	QueryName_     *string                        `json:"_name,omitempty"`
-	Slop           *int                           `json:"slop,omitempty"`
+	// Analyzer Analyzer used to convert the text in the query value into tokens.
+	Analyzer *string `json:"analyzer,omitempty"`
+	// Boost Floating point number used to decrease or increase the relevance scores of
+	// the query.
+	// Boost values are relative to the default value of 1.0.
+	// A boost value between 0 and 1.0 decreases the relevance score.
+	// A value greater than 1.0 increases the relevance score.
+	Boost *float32 `json:"boost,omitempty"`
+	// Query Query terms that are analyzed and turned into a phrase query.
+	Query      string  `json:"query"`
+	QueryName_ *string `json:"_name,omitempty"`
+	// Slop Maximum number of positions allowed between matching tokens.
+	Slop *int `json:"slop,omitempty"`
+	// ZeroTermsQuery Indicates whether no documents are returned if the `analyzer` removes all
+	// tokens, such as when using a `stop` filter.
 	ZeroTermsQuery *zerotermsquery.ZeroTermsQuery `json:"zero_terms_query,omitempty"`
 }
 
-// MatchPhraseQueryBuilder holds MatchPhraseQuery struct and provides a builder API.
-type MatchPhraseQueryBuilder struct {
-	v *MatchPhraseQuery
-}
+func (s *MatchPhraseQuery) UnmarshalJSON(data []byte) error {
 
-// NewMatchPhraseQuery provides a builder for the MatchPhraseQuery struct.
-func NewMatchPhraseQueryBuilder() *MatchPhraseQueryBuilder {
-	r := MatchPhraseQueryBuilder{
-		&MatchPhraseQuery{},
+	if !bytes.HasPrefix(data, []byte(`{`)) {
+		if !bytes.HasPrefix(data, []byte(`"`)) {
+			data = append([]byte{'"'}, data...)
+			data = append(data, []byte{'"'}...)
+		}
+		err := json.NewDecoder(bytes.NewReader(data)).Decode(&s.Query)
+		if err != nil {
+			return err
+		}
+		return nil
 	}
 
-	return &r
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "analyzer":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Analyzer", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Analyzer = &o
+
+		case "boost":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Boost", err)
+				}
+				f := float32(value)
+				s.Boost = &f
+			case float64:
+				f := float32(v)
+				s.Boost = &f
+			}
+
+		case "query":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Query", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Query = o
+
+		case "_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "QueryName_", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.QueryName_ = &o
+
+		case "slop":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Slop", err)
+				}
+				s.Slop = &value
+			case float64:
+				f := int(v)
+				s.Slop = &f
+			}
+
+		case "zero_terms_query":
+			if err := dec.Decode(&s.ZeroTermsQuery); err != nil {
+				return fmt.Errorf("%s | %w", "ZeroTermsQuery", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// Build finalize the chain and returns the MatchPhraseQuery struct
-func (rb *MatchPhraseQueryBuilder) Build() MatchPhraseQuery {
-	return *rb.v
-}
+// NewMatchPhraseQuery returns a MatchPhraseQuery.
+func NewMatchPhraseQuery() *MatchPhraseQuery {
+	r := &MatchPhraseQuery{}
 
-func (rb *MatchPhraseQueryBuilder) Analyzer(analyzer string) *MatchPhraseQueryBuilder {
-	rb.v.Analyzer = &analyzer
-	return rb
-}
-
-func (rb *MatchPhraseQueryBuilder) Boost(boost float32) *MatchPhraseQueryBuilder {
-	rb.v.Boost = &boost
-	return rb
-}
-
-func (rb *MatchPhraseQueryBuilder) Query(query string) *MatchPhraseQueryBuilder {
-	rb.v.Query = query
-	return rb
-}
-
-func (rb *MatchPhraseQueryBuilder) QueryName_(queryname_ string) *MatchPhraseQueryBuilder {
-	rb.v.QueryName_ = &queryname_
-	return rb
-}
-
-func (rb *MatchPhraseQueryBuilder) Slop(slop int) *MatchPhraseQueryBuilder {
-	rb.v.Slop = &slop
-	return rb
-}
-
-func (rb *MatchPhraseQueryBuilder) ZeroTermsQuery(zerotermsquery zerotermsquery.ZeroTermsQuery) *MatchPhraseQueryBuilder {
-	rb.v.ZeroTermsQuery = &zerotermsquery
-	return rb
+	return r
 }

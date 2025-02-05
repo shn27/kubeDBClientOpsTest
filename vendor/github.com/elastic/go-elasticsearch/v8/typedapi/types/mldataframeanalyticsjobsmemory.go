@@ -15,41 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // MlDataFrameAnalyticsJobsMemory type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/usage/types.ts#L181-L183
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/xpack/usage/types.ts#L188-L190
 type MlDataFrameAnalyticsJobsMemory struct {
 	PeakUsageBytes JobStatistics `json:"peak_usage_bytes"`
 }
 
-// MlDataFrameAnalyticsJobsMemoryBuilder holds MlDataFrameAnalyticsJobsMemory struct and provides a builder API.
-type MlDataFrameAnalyticsJobsMemoryBuilder struct {
-	v *MlDataFrameAnalyticsJobsMemory
-}
+// NewMlDataFrameAnalyticsJobsMemory returns a MlDataFrameAnalyticsJobsMemory.
+func NewMlDataFrameAnalyticsJobsMemory() *MlDataFrameAnalyticsJobsMemory {
+	r := &MlDataFrameAnalyticsJobsMemory{}
 
-// NewMlDataFrameAnalyticsJobsMemory provides a builder for the MlDataFrameAnalyticsJobsMemory struct.
-func NewMlDataFrameAnalyticsJobsMemoryBuilder() *MlDataFrameAnalyticsJobsMemoryBuilder {
-	r := MlDataFrameAnalyticsJobsMemoryBuilder{
-		&MlDataFrameAnalyticsJobsMemory{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the MlDataFrameAnalyticsJobsMemory struct
-func (rb *MlDataFrameAnalyticsJobsMemoryBuilder) Build() MlDataFrameAnalyticsJobsMemory {
-	return *rb.v
-}
-
-func (rb *MlDataFrameAnalyticsJobsMemoryBuilder) PeakUsageBytes(peakusagebytes *JobStatisticsBuilder) *MlDataFrameAnalyticsJobsMemoryBuilder {
-	v := peakusagebytes.Build()
-	rb.v.PeakUsageBytes = v
-	return rb
+	return r
 }

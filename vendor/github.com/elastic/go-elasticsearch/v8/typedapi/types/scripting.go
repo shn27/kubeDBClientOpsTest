@@ -15,62 +15,119 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // Scripting type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/_types/Stats.ts#L383-L388
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/_types/Stats.ts#L1048-L1066
 type Scripting struct {
-	CacheEvictions            *int64    `json:"cache_evictions,omitempty"`
-	CompilationLimitTriggered *int64    `json:"compilation_limit_triggered,omitempty"`
-	Compilations              *int64    `json:"compilations,omitempty"`
-	Contexts                  []Context `json:"contexts,omitempty"`
+	// CacheEvictions Total number of times the script cache has evicted old data.
+	CacheEvictions *int64 `json:"cache_evictions,omitempty"`
+	// CompilationLimitTriggered Total number of times the script compilation circuit breaker has limited
+	// inline script compilations.
+	CompilationLimitTriggered *int64 `json:"compilation_limit_triggered,omitempty"`
+	// Compilations Total number of inline script compilations performed by the node.
+	Compilations *int64 `json:"compilations,omitempty"`
+	// CompilationsHistory Contains this recent history of script compilations.
+	CompilationsHistory map[string]int64 `json:"compilations_history,omitempty"`
+	Contexts            []NodesContext   `json:"contexts,omitempty"`
 }
 
-// ScriptingBuilder holds Scripting struct and provides a builder API.
-type ScriptingBuilder struct {
-	v *Scripting
+func (s *Scripting) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "cache_evictions":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CacheEvictions", err)
+				}
+				s.CacheEvictions = &value
+			case float64:
+				f := int64(v)
+				s.CacheEvictions = &f
+			}
+
+		case "compilation_limit_triggered":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CompilationLimitTriggered", err)
+				}
+				s.CompilationLimitTriggered = &value
+			case float64:
+				f := int64(v)
+				s.CompilationLimitTriggered = &f
+			}
+
+		case "compilations":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Compilations", err)
+				}
+				s.Compilations = &value
+			case float64:
+				f := int64(v)
+				s.Compilations = &f
+			}
+
+		case "compilations_history":
+			if s.CompilationsHistory == nil {
+				s.CompilationsHistory = make(map[string]int64, 0)
+			}
+			if err := dec.Decode(&s.CompilationsHistory); err != nil {
+				return fmt.Errorf("%s | %w", "CompilationsHistory", err)
+			}
+
+		case "contexts":
+			if err := dec.Decode(&s.Contexts); err != nil {
+				return fmt.Errorf("%s | %w", "Contexts", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewScripting provides a builder for the Scripting struct.
-func NewScriptingBuilder() *ScriptingBuilder {
-	r := ScriptingBuilder{
-		&Scripting{},
+// NewScripting returns a Scripting.
+func NewScripting() *Scripting {
+	r := &Scripting{
+		CompilationsHistory: make(map[string]int64, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the Scripting struct
-func (rb *ScriptingBuilder) Build() Scripting {
-	return *rb.v
-}
-
-func (rb *ScriptingBuilder) CacheEvictions(cacheevictions int64) *ScriptingBuilder {
-	rb.v.CacheEvictions = &cacheevictions
-	return rb
-}
-
-func (rb *ScriptingBuilder) CompilationLimitTriggered(compilationlimittriggered int64) *ScriptingBuilder {
-	rb.v.CompilationLimitTriggered = &compilationlimittriggered
-	return rb
-}
-
-func (rb *ScriptingBuilder) Compilations(compilations int64) *ScriptingBuilder {
-	rb.v.Compilations = &compilations
-	return rb
-}
-
-func (rb *ScriptingBuilder) Contexts(contexts []ContextBuilder) *ScriptingBuilder {
-	tmp := make([]Context, len(contexts))
-	for _, value := range contexts {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Contexts = tmp
-	return rb
+	return r
 }

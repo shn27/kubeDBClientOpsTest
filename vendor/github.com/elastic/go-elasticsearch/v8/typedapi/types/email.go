@@ -15,112 +15,136 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/emailpriority"
 )
 
 // Email type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Actions.ts#L238-L250
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Actions.ts#L238-L250
 type Email struct {
 	Attachments map[string]EmailAttachmentContainer `json:"attachments,omitempty"`
 	Bcc         []string                            `json:"bcc,omitempty"`
 	Body        *EmailBody                          `json:"body,omitempty"`
 	Cc          []string                            `json:"cc,omitempty"`
 	From        *string                             `json:"from,omitempty"`
-	Id          *Id                                 `json:"id,omitempty"`
+	Id          *string                             `json:"id,omitempty"`
 	Priority    *emailpriority.EmailPriority        `json:"priority,omitempty"`
 	ReplyTo     []string                            `json:"reply_to,omitempty"`
-	SentDate    *DateTime                           `json:"sent_date,omitempty"`
+	SentDate    DateTime                            `json:"sent_date,omitempty"`
 	Subject     string                              `json:"subject"`
 	To          []string                            `json:"to"`
 }
 
-// EmailBuilder holds Email struct and provides a builder API.
-type EmailBuilder struct {
-	v *Email
+func (s *Email) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "attachments":
+			if s.Attachments == nil {
+				s.Attachments = make(map[string]EmailAttachmentContainer, 0)
+			}
+			if err := dec.Decode(&s.Attachments); err != nil {
+				return fmt.Errorf("%s | %w", "Attachments", err)
+			}
+
+		case "bcc":
+			if err := dec.Decode(&s.Bcc); err != nil {
+				return fmt.Errorf("%s | %w", "Bcc", err)
+			}
+
+		case "body":
+			if err := dec.Decode(&s.Body); err != nil {
+				return fmt.Errorf("%s | %w", "Body", err)
+			}
+
+		case "cc":
+			if err := dec.Decode(&s.Cc); err != nil {
+				return fmt.Errorf("%s | %w", "Cc", err)
+			}
+
+		case "from":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "From", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.From = &o
+
+		case "id":
+			if err := dec.Decode(&s.Id); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
+
+		case "priority":
+			if err := dec.Decode(&s.Priority); err != nil {
+				return fmt.Errorf("%s | %w", "Priority", err)
+			}
+
+		case "reply_to":
+			if err := dec.Decode(&s.ReplyTo); err != nil {
+				return fmt.Errorf("%s | %w", "ReplyTo", err)
+			}
+
+		case "sent_date":
+			if err := dec.Decode(&s.SentDate); err != nil {
+				return fmt.Errorf("%s | %w", "SentDate", err)
+			}
+
+		case "subject":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Subject", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Subject = o
+
+		case "to":
+			if err := dec.Decode(&s.To); err != nil {
+				return fmt.Errorf("%s | %w", "To", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewEmail provides a builder for the Email struct.
-func NewEmailBuilder() *EmailBuilder {
-	r := EmailBuilder{
-		&Email{
-			Attachments: make(map[string]EmailAttachmentContainer, 0),
-		},
+// NewEmail returns a Email.
+func NewEmail() *Email {
+	r := &Email{
+		Attachments: make(map[string]EmailAttachmentContainer, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the Email struct
-func (rb *EmailBuilder) Build() Email {
-	return *rb.v
-}
-
-func (rb *EmailBuilder) Attachments(values map[string]*EmailAttachmentContainerBuilder) *EmailBuilder {
-	tmp := make(map[string]EmailAttachmentContainer, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Attachments = tmp
-	return rb
-}
-
-func (rb *EmailBuilder) Bcc(bcc ...string) *EmailBuilder {
-	rb.v.Bcc = bcc
-	return rb
-}
-
-func (rb *EmailBuilder) Body(body *EmailBodyBuilder) *EmailBuilder {
-	v := body.Build()
-	rb.v.Body = &v
-	return rb
-}
-
-func (rb *EmailBuilder) Cc(cc ...string) *EmailBuilder {
-	rb.v.Cc = cc
-	return rb
-}
-
-func (rb *EmailBuilder) From(from string) *EmailBuilder {
-	rb.v.From = &from
-	return rb
-}
-
-func (rb *EmailBuilder) Id(id Id) *EmailBuilder {
-	rb.v.Id = &id
-	return rb
-}
-
-func (rb *EmailBuilder) Priority(priority emailpriority.EmailPriority) *EmailBuilder {
-	rb.v.Priority = &priority
-	return rb
-}
-
-func (rb *EmailBuilder) ReplyTo(reply_to ...string) *EmailBuilder {
-	rb.v.ReplyTo = reply_to
-	return rb
-}
-
-func (rb *EmailBuilder) SentDate(sentdate *DateTimeBuilder) *EmailBuilder {
-	v := sentdate.Build()
-	rb.v.SentDate = &v
-	return rb
-}
-
-func (rb *EmailBuilder) Subject(subject string) *EmailBuilder {
-	rb.v.Subject = subject
-	return rb
-}
-
-func (rb *EmailBuilder) To(to ...string) *EmailBuilder {
-	rb.v.To = to
-	return rb
+	return r
 }

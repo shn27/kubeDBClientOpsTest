@@ -15,22 +15,29 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DataframeAnalysisFeatureProcessorNGramEncoding type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/DataframeAnalytics.ts#L274-L286
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/DataframeAnalytics.ts#L274-L286
 type DataframeAnalysisFeatureProcessorNGramEncoding struct {
 	Custom *bool `json:"custom,omitempty"`
 	// FeaturePrefix The feature name prefix. Defaults to ngram_<start>_<length>.
 	FeaturePrefix *string `json:"feature_prefix,omitempty"`
 	// Field The name of the text field to encode.
-	Field Field `json:"field"`
+	Field string `json:"field"`
 	// Length Specifies the length of the n-gram substring. Defaults to 50. Must be greater
 	// than 0.
 	Length *int `json:"length,omitempty"`
@@ -42,64 +49,97 @@ type DataframeAnalysisFeatureProcessorNGramEncoding struct {
 	Start *int `json:"start,omitempty"`
 }
 
-// DataframeAnalysisFeatureProcessorNGramEncodingBuilder holds DataframeAnalysisFeatureProcessorNGramEncoding struct and provides a builder API.
-type DataframeAnalysisFeatureProcessorNGramEncodingBuilder struct {
-	v *DataframeAnalysisFeatureProcessorNGramEncoding
-}
+func (s *DataframeAnalysisFeatureProcessorNGramEncoding) UnmarshalJSON(data []byte) error {
 
-// NewDataframeAnalysisFeatureProcessorNGramEncoding provides a builder for the DataframeAnalysisFeatureProcessorNGramEncoding struct.
-func NewDataframeAnalysisFeatureProcessorNGramEncodingBuilder() *DataframeAnalysisFeatureProcessorNGramEncodingBuilder {
-	r := DataframeAnalysisFeatureProcessorNGramEncodingBuilder{
-		&DataframeAnalysisFeatureProcessorNGramEncoding{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "custom":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Custom", err)
+				}
+				s.Custom = &value
+			case bool:
+				s.Custom = &v
+			}
+
+		case "feature_prefix":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "FeaturePrefix", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.FeaturePrefix = &o
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "length":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Length", err)
+				}
+				s.Length = &value
+			case float64:
+				f := int(v)
+				s.Length = &f
+			}
+
+		case "n_grams":
+			if err := dec.Decode(&s.NGrams); err != nil {
+				return fmt.Errorf("%s | %w", "NGrams", err)
+			}
+
+		case "start":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Start", err)
+				}
+				s.Start = &value
+			case float64:
+				f := int(v)
+				s.Start = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DataframeAnalysisFeatureProcessorNGramEncoding struct
-func (rb *DataframeAnalysisFeatureProcessorNGramEncodingBuilder) Build() DataframeAnalysisFeatureProcessorNGramEncoding {
-	return *rb.v
-}
+// NewDataframeAnalysisFeatureProcessorNGramEncoding returns a DataframeAnalysisFeatureProcessorNGramEncoding.
+func NewDataframeAnalysisFeatureProcessorNGramEncoding() *DataframeAnalysisFeatureProcessorNGramEncoding {
+	r := &DataframeAnalysisFeatureProcessorNGramEncoding{}
 
-func (rb *DataframeAnalysisFeatureProcessorNGramEncodingBuilder) Custom(custom bool) *DataframeAnalysisFeatureProcessorNGramEncodingBuilder {
-	rb.v.Custom = &custom
-	return rb
-}
-
-// FeaturePrefix The feature name prefix. Defaults to ngram_<start>_<length>.
-
-func (rb *DataframeAnalysisFeatureProcessorNGramEncodingBuilder) FeaturePrefix(featureprefix string) *DataframeAnalysisFeatureProcessorNGramEncodingBuilder {
-	rb.v.FeaturePrefix = &featureprefix
-	return rb
-}
-
-// Field The name of the text field to encode.
-
-func (rb *DataframeAnalysisFeatureProcessorNGramEncodingBuilder) Field(field Field) *DataframeAnalysisFeatureProcessorNGramEncodingBuilder {
-	rb.v.Field = field
-	return rb
-}
-
-// Length Specifies the length of the n-gram substring. Defaults to 50. Must be greater
-// than 0.
-
-func (rb *DataframeAnalysisFeatureProcessorNGramEncodingBuilder) Length(length int) *DataframeAnalysisFeatureProcessorNGramEncodingBuilder {
-	rb.v.Length = &length
-	return rb
-}
-
-// NGrams Specifies which n-grams to gather. It’s an array of integer values where the
-// minimum value is 1, and a maximum value is 5.
-
-func (rb *DataframeAnalysisFeatureProcessorNGramEncodingBuilder) NGrams(n_grams ...int) *DataframeAnalysisFeatureProcessorNGramEncodingBuilder {
-	rb.v.NGrams = n_grams
-	return rb
-}
-
-// Start Specifies the zero-indexed start of the n-gram substring. Negative values are
-// allowed for encoding n-grams of string suffixes. Defaults to 0.
-
-func (rb *DataframeAnalysisFeatureProcessorNGramEncodingBuilder) Start(start int) *DataframeAnalysisFeatureProcessorNGramEncodingBuilder {
-	rb.v.Start = &start
-	return rb
+	return r
 }

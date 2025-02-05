@@ -15,50 +15,103 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // StandardAnalyzer type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/analyzers.ts#L95-L99
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/analyzers.ts#L341-L345
 type StandardAnalyzer struct {
-	MaxTokenLength *int       `json:"max_token_length,omitempty"`
-	Stopwords      *StopWords `json:"stopwords,omitempty"`
-	Type           string     `json:"type,omitempty"`
+	MaxTokenLength *int     `json:"max_token_length,omitempty"`
+	Stopwords      []string `json:"stopwords,omitempty"`
+	Type           string   `json:"type,omitempty"`
 }
 
-// StandardAnalyzerBuilder holds StandardAnalyzer struct and provides a builder API.
-type StandardAnalyzerBuilder struct {
-	v *StandardAnalyzer
+func (s *StandardAnalyzer) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "max_token_length":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxTokenLength", err)
+				}
+				s.MaxTokenLength = &value
+			case float64:
+				f := int(v)
+				s.MaxTokenLength = &f
+			}
+
+		case "stopwords":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Stopwords", err)
+				}
+
+				s.Stopwords = append(s.Stopwords, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Stopwords); err != nil {
+					return fmt.Errorf("%s | %w", "Stopwords", err)
+				}
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewStandardAnalyzer provides a builder for the StandardAnalyzer struct.
-func NewStandardAnalyzerBuilder() *StandardAnalyzerBuilder {
-	r := StandardAnalyzerBuilder{
-		&StandardAnalyzer{},
+// MarshalJSON override marshalling to include literal value
+func (s StandardAnalyzer) MarshalJSON() ([]byte, error) {
+	type innerStandardAnalyzer StandardAnalyzer
+	tmp := innerStandardAnalyzer{
+		MaxTokenLength: s.MaxTokenLength,
+		Stopwords:      s.Stopwords,
+		Type:           s.Type,
 	}
 
-	r.v.Type = "standard"
+	tmp.Type = "standard"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the StandardAnalyzer struct
-func (rb *StandardAnalyzerBuilder) Build() StandardAnalyzer {
-	return *rb.v
-}
+// NewStandardAnalyzer returns a StandardAnalyzer.
+func NewStandardAnalyzer() *StandardAnalyzer {
+	r := &StandardAnalyzer{}
 
-func (rb *StandardAnalyzerBuilder) MaxTokenLength(maxtokenlength int) *StandardAnalyzerBuilder {
-	rb.v.MaxTokenLength = &maxtokenlength
-	return rb
-}
-
-func (rb *StandardAnalyzerBuilder) Stopwords(stopwords *StopWordsBuilder) *StandardAnalyzerBuilder {
-	v := stopwords.Build()
-	rb.v.Stopwords = &v
-	return rb
+	return r
 }

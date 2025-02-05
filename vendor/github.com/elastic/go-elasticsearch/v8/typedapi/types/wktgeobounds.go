@@ -15,40 +15,62 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // WktGeoBounds type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Geo.ts#L131-L133
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Geo.ts#L150-L152
 type WktGeoBounds struct {
 	Wkt string `json:"wkt"`
 }
 
-// WktGeoBoundsBuilder holds WktGeoBounds struct and provides a builder API.
-type WktGeoBoundsBuilder struct {
-	v *WktGeoBounds
-}
+func (s *WktGeoBounds) UnmarshalJSON(data []byte) error {
 
-// NewWktGeoBounds provides a builder for the WktGeoBounds struct.
-func NewWktGeoBoundsBuilder() *WktGeoBoundsBuilder {
-	r := WktGeoBoundsBuilder{
-		&WktGeoBounds{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "wkt":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Wkt", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Wkt = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the WktGeoBounds struct
-func (rb *WktGeoBoundsBuilder) Build() WktGeoBounds {
-	return *rb.v
-}
+// NewWktGeoBounds returns a WktGeoBounds.
+func NewWktGeoBounds() *WktGeoBounds {
+	r := &WktGeoBounds{}
 
-func (rb *WktGeoBoundsBuilder) Wkt(wkt string) *WktGeoBoundsBuilder {
-	rb.v.Wkt = wkt
-	return rb
+	return r
 }

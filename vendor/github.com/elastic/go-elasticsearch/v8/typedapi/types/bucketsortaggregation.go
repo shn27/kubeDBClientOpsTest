@@ -15,76 +15,113 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/gappolicy"
 )
 
 // BucketSortAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/pipeline.ts#L142-L147
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/pipeline.ts#L180-L204
 type BucketSortAggregation struct {
-	From      *int                 `json:"from,omitempty"`
+	// From Buckets in positions prior to `from` will be truncated.
+	From *int `json:"from,omitempty"`
+	// GapPolicy The policy to apply when gaps are found in the data.
 	GapPolicy *gappolicy.GapPolicy `json:"gap_policy,omitempty"`
-	Meta      *Metadata            `json:"meta,omitempty"`
-	Name      *string              `json:"name,omitempty"`
-	Size      *int                 `json:"size,omitempty"`
-	Sort      *Sort                `json:"sort,omitempty"`
+	// Size The number of buckets to return.
+	// Defaults to all buckets of the parent aggregation.
+	Size *int `json:"size,omitempty"`
+	// Sort The list of fields to sort on.
+	Sort []SortCombinations `json:"sort,omitempty"`
 }
 
-// BucketSortAggregationBuilder holds BucketSortAggregation struct and provides a builder API.
-type BucketSortAggregationBuilder struct {
-	v *BucketSortAggregation
-}
+func (s *BucketSortAggregation) UnmarshalJSON(data []byte) error {
 
-// NewBucketSortAggregation provides a builder for the BucketSortAggregation struct.
-func NewBucketSortAggregationBuilder() *BucketSortAggregationBuilder {
-	r := BucketSortAggregationBuilder{
-		&BucketSortAggregation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "from":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "From", err)
+				}
+				s.From = &value
+			case float64:
+				f := int(v)
+				s.From = &f
+			}
+
+		case "gap_policy":
+			if err := dec.Decode(&s.GapPolicy); err != nil {
+				return fmt.Errorf("%s | %w", "GapPolicy", err)
+			}
+
+		case "size":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Size", err)
+				}
+				s.Size = &value
+			case float64:
+				f := int(v)
+				s.Size = &f
+			}
+
+		case "sort":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(SortCombinations)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Sort", err)
+				}
+
+				s.Sort = append(s.Sort, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Sort); err != nil {
+					return fmt.Errorf("%s | %w", "Sort", err)
+				}
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the BucketSortAggregation struct
-func (rb *BucketSortAggregationBuilder) Build() BucketSortAggregation {
-	return *rb.v
-}
+// NewBucketSortAggregation returns a BucketSortAggregation.
+func NewBucketSortAggregation() *BucketSortAggregation {
+	r := &BucketSortAggregation{}
 
-func (rb *BucketSortAggregationBuilder) From(from int) *BucketSortAggregationBuilder {
-	rb.v.From = &from
-	return rb
-}
-
-func (rb *BucketSortAggregationBuilder) GapPolicy(gappolicy gappolicy.GapPolicy) *BucketSortAggregationBuilder {
-	rb.v.GapPolicy = &gappolicy
-	return rb
-}
-
-func (rb *BucketSortAggregationBuilder) Meta(meta *MetadataBuilder) *BucketSortAggregationBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *BucketSortAggregationBuilder) Name(name string) *BucketSortAggregationBuilder {
-	rb.v.Name = &name
-	return rb
-}
-
-func (rb *BucketSortAggregationBuilder) Size(size int) *BucketSortAggregationBuilder {
-	rb.v.Size = &size
-	return rb
-}
-
-func (rb *BucketSortAggregationBuilder) Sort(sort *SortBuilder) *BucketSortAggregationBuilder {
-	v := sort.Build()
-	rb.v.Sort = &v
-	return rb
+	return r
 }

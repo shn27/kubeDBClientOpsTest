@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // SlowlogSettings type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/IndexSettings.ts#L471-L476
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/IndexSettings.ts#L490-L495
 type SlowlogSettings struct {
 	Level     *string           `json:"level,omitempty"`
 	Reformat  *bool             `json:"reformat,omitempty"`
@@ -32,42 +39,76 @@ type SlowlogSettings struct {
 	Threshold *SlowlogTresholds `json:"threshold,omitempty"`
 }
 
-// SlowlogSettingsBuilder holds SlowlogSettings struct and provides a builder API.
-type SlowlogSettingsBuilder struct {
-	v *SlowlogSettings
-}
+func (s *SlowlogSettings) UnmarshalJSON(data []byte) error {
 
-// NewSlowlogSettings provides a builder for the SlowlogSettings struct.
-func NewSlowlogSettingsBuilder() *SlowlogSettingsBuilder {
-	r := SlowlogSettingsBuilder{
-		&SlowlogSettings{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "level":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Level", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Level = &o
+
+		case "reformat":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Reformat", err)
+				}
+				s.Reformat = &value
+			case bool:
+				s.Reformat = &v
+			}
+
+		case "source":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Source", err)
+				}
+				s.Source = &value
+			case float64:
+				f := int(v)
+				s.Source = &f
+			}
+
+		case "threshold":
+			if err := dec.Decode(&s.Threshold); err != nil {
+				return fmt.Errorf("%s | %w", "Threshold", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SlowlogSettings struct
-func (rb *SlowlogSettingsBuilder) Build() SlowlogSettings {
-	return *rb.v
-}
+// NewSlowlogSettings returns a SlowlogSettings.
+func NewSlowlogSettings() *SlowlogSettings {
+	r := &SlowlogSettings{}
 
-func (rb *SlowlogSettingsBuilder) Level(level string) *SlowlogSettingsBuilder {
-	rb.v.Level = &level
-	return rb
-}
-
-func (rb *SlowlogSettingsBuilder) Reformat(reformat bool) *SlowlogSettingsBuilder {
-	rb.v.Reformat = &reformat
-	return rb
-}
-
-func (rb *SlowlogSettingsBuilder) Source(source int) *SlowlogSettingsBuilder {
-	rb.v.Source = &source
-	return rb
-}
-
-func (rb *SlowlogSettingsBuilder) Threshold(threshold *SlowlogTresholdsBuilder) *SlowlogSettingsBuilder {
-	v := threshold.Build()
-	rb.v.Threshold = &v
-	return rb
+	return r
 }

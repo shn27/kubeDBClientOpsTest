@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 //
-// Code generated from specification version 8.4.0: DO NOT EDIT
+// Code generated from specification version 8.17.0: DO NOT EDIT
 
 package esapi
 
@@ -35,6 +35,11 @@ func newAsyncSearchSubmitFunc(t Transport) AsyncSearchSubmit {
 		for _, f := range o {
 			f(&r)
 		}
+
+		if transport, ok := t.(Instrumented); ok {
+			r.instrument = transport.InstrumentationEnabled()
+		}
+
 		return r.Do(r.ctx, t)
 	}
 }
@@ -57,6 +62,7 @@ type AsyncSearchSubmitRequest struct {
 	Analyzer                   string
 	AnalyzeWildcard            *bool
 	BatchedReduceSize          *int
+	CcsMinimizeRoundtrips      *bool
 	DefaultOperator            string
 	Df                         string
 	DocvalueFields             []string
@@ -65,13 +71,13 @@ type AsyncSearchSubmitRequest struct {
 	From                       *int
 	IgnoreThrottled            *bool
 	IgnoreUnavailable          *bool
-	KeepAlive                  time.Duration
 	KeepOnCompletion           *bool
 	Lenient                    *bool
 	MaxConcurrentShardRequests *int
 	Preference                 string
 	Query                      string
 	RequestCache               *bool
+	RestTotalHitsAsInt         *bool
 	Routing                    []string
 	SearchType                 string
 	SeqNoPrimaryTerm           *bool
@@ -102,15 +108,26 @@ type AsyncSearchSubmitRequest struct {
 	Header http.Header
 
 	ctx context.Context
+
+	instrument Instrumentation
 }
 
 // Do executes the request and returns response or error.
-func (r AsyncSearchSubmitRequest) Do(ctx context.Context, transport Transport) (*Response, error) {
+func (r AsyncSearchSubmitRequest) Do(providedCtx context.Context, transport Transport) (*Response, error) {
 	var (
 		method string
 		path   strings.Builder
 		params map[string]string
+		ctx    context.Context
 	)
+
+	if instrument, ok := r.instrument.(Instrumentation); ok {
+		ctx = instrument.Start(providedCtx, "async_search.submit")
+		defer instrument.Close(ctx)
+	}
+	if ctx == nil {
+		ctx = providedCtx
+	}
 
 	method = "POST"
 
@@ -119,6 +136,9 @@ func (r AsyncSearchSubmitRequest) Do(ctx context.Context, transport Transport) (
 	if len(r.Index) > 0 {
 		path.WriteString("/")
 		path.WriteString(strings.Join(r.Index, ","))
+		if instrument, ok := r.instrument.(Instrumentation); ok {
+			instrument.RecordPathPart(ctx, "index", strings.Join(r.Index, ","))
+		}
 	}
 	path.WriteString("/")
 	path.WriteString("_async_search")
@@ -143,6 +163,10 @@ func (r AsyncSearchSubmitRequest) Do(ctx context.Context, transport Transport) (
 
 	if r.BatchedReduceSize != nil {
 		params["batched_reduce_size"] = strconv.FormatInt(int64(*r.BatchedReduceSize), 10)
+	}
+
+	if r.CcsMinimizeRoundtrips != nil {
+		params["ccs_minimize_roundtrips"] = strconv.FormatBool(*r.CcsMinimizeRoundtrips)
 	}
 
 	if r.DefaultOperator != "" {
@@ -177,10 +201,6 @@ func (r AsyncSearchSubmitRequest) Do(ctx context.Context, transport Transport) (
 		params["ignore_unavailable"] = strconv.FormatBool(*r.IgnoreUnavailable)
 	}
 
-	if r.KeepAlive != 0 {
-		params["keep_alive"] = formatDuration(r.KeepAlive)
-	}
-
 	if r.KeepOnCompletion != nil {
 		params["keep_on_completion"] = strconv.FormatBool(*r.KeepOnCompletion)
 	}
@@ -203,6 +223,10 @@ func (r AsyncSearchSubmitRequest) Do(ctx context.Context, transport Transport) (
 
 	if r.RequestCache != nil {
 		params["request_cache"] = strconv.FormatBool(*r.RequestCache)
+	}
+
+	if r.RestTotalHitsAsInt != nil {
+		params["rest_total_hits_as_int"] = strconv.FormatBool(*r.RestTotalHitsAsInt)
 	}
 
 	if len(r.Routing) > 0 {
@@ -307,6 +331,9 @@ func (r AsyncSearchSubmitRequest) Do(ctx context.Context, transport Transport) (
 
 	req, err := newRequest(method, path.String(), r.Body)
 	if err != nil {
+		if instrument, ok := r.instrument.(Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
 		return nil, err
 	}
 
@@ -316,10 +343,6 @@ func (r AsyncSearchSubmitRequest) Do(ctx context.Context, transport Transport) (
 			q.Set(k, v)
 		}
 		req.URL.RawQuery = q.Encode()
-	}
-
-	if r.Body != nil {
-		req.Header[headerContentType] = headerContentTypeJSON
 	}
 
 	if len(r.Header) > 0 {
@@ -334,12 +357,28 @@ func (r AsyncSearchSubmitRequest) Do(ctx context.Context, transport Transport) (
 		}
 	}
 
+	if r.Body != nil && req.Header.Get(headerContentType) == "" {
+		req.Header[headerContentType] = headerContentTypeJSON
+	}
+
 	if ctx != nil {
 		req = req.WithContext(ctx)
 	}
 
+	if instrument, ok := r.instrument.(Instrumentation); ok {
+		instrument.BeforeRequest(req, "async_search.submit")
+		if reader := instrument.RecordRequestBody(ctx, "async_search.submit", r.Body); reader != nil {
+			req.Body = reader
+		}
+	}
 	res, err := transport.Perform(req)
+	if instrument, ok := r.instrument.(Instrumentation); ok {
+		instrument.AfterRequest(req, "elasticsearch", "async_search.submit")
+	}
 	if err != nil {
+		if instrument, ok := r.instrument.(Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
 		return nil, err
 	}
 
@@ -408,6 +447,13 @@ func (f AsyncSearchSubmit) WithBatchedReduceSize(v int) func(*AsyncSearchSubmitR
 	}
 }
 
+// WithCcsMinimizeRoundtrips - when doing a cross-cluster search, setting it to true may improve overall search latency, particularly when searching clusters with a large number of shards. however, when set to true, the progress of searches on the remote clusters will not be received until the search finishes on all clusters..
+func (f AsyncSearchSubmit) WithCcsMinimizeRoundtrips(v bool) func(*AsyncSearchSubmitRequest) {
+	return func(r *AsyncSearchSubmitRequest) {
+		r.CcsMinimizeRoundtrips = &v
+	}
+}
+
 // WithDefaultOperator - the default operator for query string query (and or or).
 func (f AsyncSearchSubmit) WithDefaultOperator(v string) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
@@ -464,13 +510,6 @@ func (f AsyncSearchSubmit) WithIgnoreUnavailable(v bool) func(*AsyncSearchSubmit
 	}
 }
 
-// WithKeepAlive - update the time interval in which the results (partial or final) for this search will be available.
-func (f AsyncSearchSubmit) WithKeepAlive(v time.Duration) func(*AsyncSearchSubmitRequest) {
-	return func(r *AsyncSearchSubmitRequest) {
-		r.KeepAlive = v
-	}
-}
-
 // WithKeepOnCompletion - control whether the response should be stored in the cluster if it completed within the provided [wait_for_completion] time (default: false).
 func (f AsyncSearchSubmit) WithKeepOnCompletion(v bool) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
@@ -510,6 +549,13 @@ func (f AsyncSearchSubmit) WithQuery(v string) func(*AsyncSearchSubmitRequest) {
 func (f AsyncSearchSubmit) WithRequestCache(v bool) func(*AsyncSearchSubmitRequest) {
 	return func(r *AsyncSearchSubmitRequest) {
 		r.RequestCache = &v
+	}
+}
+
+// WithRestTotalHitsAsInt - indicates whether hits.total should be rendered as an integer or an object in the rest search response.
+func (f AsyncSearchSubmit) WithRestTotalHitsAsInt(v bool) func(*AsyncSearchSubmitRequest) {
+	return func(r *AsyncSearchSubmitRequest) {
+		r.RestTotalHitsAsInt = &v
 	}
 }
 

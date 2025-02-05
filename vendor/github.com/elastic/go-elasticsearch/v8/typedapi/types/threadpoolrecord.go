@@ -15,214 +15,324 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ThreadPoolRecord type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cat/thread_pool/types.ts#L22-L123
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cat/thread_pool/types.ts#L22-L124
 type ThreadPoolRecord struct {
-	// Active number of active threads
+	// Active The number of active threads in the current thread pool.
 	Active *string `json:"active,omitempty"`
-	// Completed number of completed tasks
+	// Completed The number of completed tasks.
 	Completed *string `json:"completed,omitempty"`
-	// Core core number of threads in a scaling thread pool
-	Core string `json:"core,omitempty"`
-	// EphemeralNodeId ephemeral node id
+	// Core The core number of active threads allowed in a scaling thread pool.
+	Core *string `json:"core,omitempty"`
+	// EphemeralNodeId The ephemeral node identifier.
 	EphemeralNodeId *string `json:"ephemeral_node_id,omitempty"`
-	// Host host name
+	// Host The host name for the current node.
 	Host *string `json:"host,omitempty"`
-	// Ip ip address
+	// Ip The IP address for the current node.
 	Ip *string `json:"ip,omitempty"`
-	// KeepAlive thread keep alive time
-	KeepAlive string `json:"keep_alive,omitempty"`
-	// Largest highest number of seen active threads
+	// KeepAlive The thread keep alive time.
+	KeepAlive *string `json:"keep_alive,omitempty"`
+	// Largest The highest number of active threads in the current thread pool.
 	Largest *string `json:"largest,omitempty"`
-	// Max maximum number of threads in a scaling thread pool
-	Max string `json:"max,omitempty"`
-	// Name thread pool name
+	// Max The maximum number of active threads allowed in a scaling thread pool.
+	Max *string `json:"max,omitempty"`
+	// Name The thread pool name.
 	Name *string `json:"name,omitempty"`
-	// NodeId persistent node id
-	NodeId *NodeId `json:"node_id,omitempty"`
-	// NodeName node name
+	// NodeId The persistent node identifier.
+	NodeId *string `json:"node_id,omitempty"`
+	// NodeName The node name.
 	NodeName *string `json:"node_name,omitempty"`
-	// Pid process id
+	// Pid The process identifier.
 	Pid *string `json:"pid,omitempty"`
-	// PoolSize number of threads
+	// PoolSize The number of threads in the current thread pool.
 	PoolSize *string `json:"pool_size,omitempty"`
-	// Port bound transport port
+	// Port The bound transport port for the current node.
 	Port *string `json:"port,omitempty"`
-	// Queue number of tasks currently in queue
+	// Queue The number of tasks currently in queue.
 	Queue *string `json:"queue,omitempty"`
-	// QueueSize maximum number of tasks permitted in queue
+	// QueueSize The maximum number of tasks permitted in the queue.
 	QueueSize *string `json:"queue_size,omitempty"`
-	// Rejected number of rejected tasks
+	// Rejected The number of rejected tasks.
 	Rejected *string `json:"rejected,omitempty"`
-	// Size number of threads in a fixed thread pool
-	Size string `json:"size,omitempty"`
-	// Type thread pool type
+	// Size The number of active threads allowed in a fixed thread pool.
+	Size *string `json:"size,omitempty"`
+	// Type The thread pool type.
+	// Returned values include `fixed`, `fixed_auto_queue_size`, `direct`, and
+	// `scaling`.
 	Type *string `json:"type,omitempty"`
 }
 
-// ThreadPoolRecordBuilder holds ThreadPoolRecord struct and provides a builder API.
-type ThreadPoolRecordBuilder struct {
-	v *ThreadPoolRecord
-}
+func (s *ThreadPoolRecord) UnmarshalJSON(data []byte) error {
 
-// NewThreadPoolRecord provides a builder for the ThreadPoolRecord struct.
-func NewThreadPoolRecordBuilder() *ThreadPoolRecordBuilder {
-	r := ThreadPoolRecordBuilder{
-		&ThreadPoolRecord{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "active", "a":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Active", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Active = &o
+
+		case "completed", "c":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Completed", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Completed = &o
+
+		case "core", "cr":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Core", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Core = &o
+
+		case "ephemeral_node_id", "eid":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "EphemeralNodeId", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.EphemeralNodeId = &o
+
+		case "host", "h":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Host", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Host = &o
+
+		case "ip", "i":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Ip", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Ip = &o
+
+		case "keep_alive", "ka":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "KeepAlive", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.KeepAlive = &o
+
+		case "largest", "l":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Largest", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Largest = &o
+
+		case "max", "mx":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Max", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Max = &o
+
+		case "name", "n":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Name = &o
+
+		case "node_id", "id":
+			if err := dec.Decode(&s.NodeId); err != nil {
+				return fmt.Errorf("%s | %w", "NodeId", err)
+			}
+
+		case "node_name", "nn":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "NodeName", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.NodeName = &o
+
+		case "pid", "p":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Pid", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Pid = &o
+
+		case "pool_size", "psz":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "PoolSize", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.PoolSize = &o
+
+		case "port", "po":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Port", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Port = &o
+
+		case "queue", "q":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Queue", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Queue = &o
+
+		case "queue_size", "qs":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "QueueSize", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.QueueSize = &o
+
+		case "rejected", "r":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Rejected", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Rejected = &o
+
+		case "size", "sz":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Size", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Size = &o
+
+		case "type", "t":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Type = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ThreadPoolRecord struct
-func (rb *ThreadPoolRecordBuilder) Build() ThreadPoolRecord {
-	return *rb.v
-}
+// NewThreadPoolRecord returns a ThreadPoolRecord.
+func NewThreadPoolRecord() *ThreadPoolRecord {
+	r := &ThreadPoolRecord{}
 
-// Active number of active threads
-
-func (rb *ThreadPoolRecordBuilder) Active(active string) *ThreadPoolRecordBuilder {
-	rb.v.Active = &active
-	return rb
-}
-
-// Completed number of completed tasks
-
-func (rb *ThreadPoolRecordBuilder) Completed(completed string) *ThreadPoolRecordBuilder {
-	rb.v.Completed = &completed
-	return rb
-}
-
-// Core core number of threads in a scaling thread pool
-
-func (rb *ThreadPoolRecordBuilder) Core(core string) *ThreadPoolRecordBuilder {
-	rb.v.Core = core
-	return rb
-}
-
-// EphemeralNodeId ephemeral node id
-
-func (rb *ThreadPoolRecordBuilder) EphemeralNodeId(ephemeralnodeid string) *ThreadPoolRecordBuilder {
-	rb.v.EphemeralNodeId = &ephemeralnodeid
-	return rb
-}
-
-// Host host name
-
-func (rb *ThreadPoolRecordBuilder) Host(host string) *ThreadPoolRecordBuilder {
-	rb.v.Host = &host
-	return rb
-}
-
-// Ip ip address
-
-func (rb *ThreadPoolRecordBuilder) Ip(ip string) *ThreadPoolRecordBuilder {
-	rb.v.Ip = &ip
-	return rb
-}
-
-// KeepAlive thread keep alive time
-
-func (rb *ThreadPoolRecordBuilder) KeepAlive(keepalive string) *ThreadPoolRecordBuilder {
-	rb.v.KeepAlive = keepalive
-	return rb
-}
-
-// Largest highest number of seen active threads
-
-func (rb *ThreadPoolRecordBuilder) Largest(largest string) *ThreadPoolRecordBuilder {
-	rb.v.Largest = &largest
-	return rb
-}
-
-// Max maximum number of threads in a scaling thread pool
-
-func (rb *ThreadPoolRecordBuilder) Max(max string) *ThreadPoolRecordBuilder {
-	rb.v.Max = max
-	return rb
-}
-
-// Name thread pool name
-
-func (rb *ThreadPoolRecordBuilder) Name(name string) *ThreadPoolRecordBuilder {
-	rb.v.Name = &name
-	return rb
-}
-
-// NodeId persistent node id
-
-func (rb *ThreadPoolRecordBuilder) NodeId(nodeid NodeId) *ThreadPoolRecordBuilder {
-	rb.v.NodeId = &nodeid
-	return rb
-}
-
-// NodeName node name
-
-func (rb *ThreadPoolRecordBuilder) NodeName(nodename string) *ThreadPoolRecordBuilder {
-	rb.v.NodeName = &nodename
-	return rb
-}
-
-// Pid process id
-
-func (rb *ThreadPoolRecordBuilder) Pid(pid string) *ThreadPoolRecordBuilder {
-	rb.v.Pid = &pid
-	return rb
-}
-
-// PoolSize number of threads
-
-func (rb *ThreadPoolRecordBuilder) PoolSize(poolsize string) *ThreadPoolRecordBuilder {
-	rb.v.PoolSize = &poolsize
-	return rb
-}
-
-// Port bound transport port
-
-func (rb *ThreadPoolRecordBuilder) Port(port string) *ThreadPoolRecordBuilder {
-	rb.v.Port = &port
-	return rb
-}
-
-// Queue number of tasks currently in queue
-
-func (rb *ThreadPoolRecordBuilder) Queue(queue string) *ThreadPoolRecordBuilder {
-	rb.v.Queue = &queue
-	return rb
-}
-
-// QueueSize maximum number of tasks permitted in queue
-
-func (rb *ThreadPoolRecordBuilder) QueueSize(queuesize string) *ThreadPoolRecordBuilder {
-	rb.v.QueueSize = &queuesize
-	return rb
-}
-
-// Rejected number of rejected tasks
-
-func (rb *ThreadPoolRecordBuilder) Rejected(rejected string) *ThreadPoolRecordBuilder {
-	rb.v.Rejected = &rejected
-	return rb
-}
-
-// Size number of threads in a fixed thread pool
-
-func (rb *ThreadPoolRecordBuilder) Size(size string) *ThreadPoolRecordBuilder {
-	rb.v.Size = size
-	return rb
-}
-
-// Type thread pool type
-
-func (rb *ThreadPoolRecordBuilder) Type_(type_ string) *ThreadPoolRecordBuilder {
-	rb.v.Type = &type_
-	return rb
+	return r
 }

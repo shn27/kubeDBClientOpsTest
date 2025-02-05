@@ -15,46 +15,83 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // HoltLinearModelSettings type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/pipeline.ts#L219-L222
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/pipeline.ts#L297-L300
 type HoltLinearModelSettings struct {
 	Alpha *float32 `json:"alpha,omitempty"`
 	Beta  *float32 `json:"beta,omitempty"`
 }
 
-// HoltLinearModelSettingsBuilder holds HoltLinearModelSettings struct and provides a builder API.
-type HoltLinearModelSettingsBuilder struct {
-	v *HoltLinearModelSettings
-}
+func (s *HoltLinearModelSettings) UnmarshalJSON(data []byte) error {
 
-// NewHoltLinearModelSettings provides a builder for the HoltLinearModelSettings struct.
-func NewHoltLinearModelSettingsBuilder() *HoltLinearModelSettingsBuilder {
-	r := HoltLinearModelSettingsBuilder{
-		&HoltLinearModelSettings{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "alpha":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Alpha", err)
+				}
+				f := float32(value)
+				s.Alpha = &f
+			case float64:
+				f := float32(v)
+				s.Alpha = &f
+			}
+
+		case "beta":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Beta", err)
+				}
+				f := float32(value)
+				s.Beta = &f
+			case float64:
+				f := float32(v)
+				s.Beta = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the HoltLinearModelSettings struct
-func (rb *HoltLinearModelSettingsBuilder) Build() HoltLinearModelSettings {
-	return *rb.v
-}
+// NewHoltLinearModelSettings returns a HoltLinearModelSettings.
+func NewHoltLinearModelSettings() *HoltLinearModelSettings {
+	r := &HoltLinearModelSettings{}
 
-func (rb *HoltLinearModelSettingsBuilder) Alpha(alpha float32) *HoltLinearModelSettingsBuilder {
-	rb.v.Alpha = &alpha
-	return rb
-}
-
-func (rb *HoltLinearModelSettingsBuilder) Beta(beta float32) *HoltLinearModelSettingsBuilder {
-	rb.v.Beta = &beta
-	return rb
+	return r
 }

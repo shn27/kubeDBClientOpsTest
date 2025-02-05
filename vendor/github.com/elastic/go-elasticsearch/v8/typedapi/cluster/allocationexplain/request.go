@@ -15,54 +15,45 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package allocationexplain
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
-
-	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
+	"io"
+	"strconv"
 )
 
 // Request holds the request body struct for the package allocationexplain
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/allocation_explain/ClusterAllocationExplainRequest.ts#L24-L61
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/allocation_explain/ClusterAllocationExplainRequest.ts#L24-L66
 type Request struct {
 
 	// CurrentNode Specifies the node ID or the name of the node to only explain a shard that is
 	// currently located on the specified node.
 	CurrentNode *string `json:"current_node,omitempty"`
-
 	// Index Specifies the name of the index that you would like an explanation for.
-	Index *types.IndexName `json:"index,omitempty"`
-
+	Index *string `json:"index,omitempty"`
 	// Primary If true, returns explanation for the primary shard for the given shard ID.
 	Primary *bool `json:"primary,omitempty"`
-
 	// Shard Specifies the ID of the shard that you would like an explanation for.
 	Shard *int `json:"shard,omitempty"`
 }
 
-// RequestBuilder is the builder API for the allocationexplain.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -73,27 +64,68 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) CurrentNode(currentnode string) *RequestBuilder {
-	rb.v.CurrentNode = &currentnode
-	return rb
-}
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
 
-func (rb *RequestBuilder) Index(index types.IndexName) *RequestBuilder {
-	rb.v.Index = &index
-	return rb
-}
+		switch t {
 
-func (rb *RequestBuilder) Primary(primary bool) *RequestBuilder {
-	rb.v.Primary = &primary
-	return rb
-}
+		case "current_node":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "CurrentNode", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.CurrentNode = &o
 
-func (rb *RequestBuilder) Shard(shard int) *RequestBuilder {
-	rb.v.Shard = &shard
-	return rb
+		case "index":
+			if err := dec.Decode(&s.Index); err != nil {
+				return fmt.Errorf("%s | %w", "Index", err)
+			}
+
+		case "primary":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Primary", err)
+				}
+				s.Primary = &value
+			case bool:
+				s.Primary = &v
+			}
+
+		case "shard":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Shard", err)
+				}
+				s.Shard = &value
+			case float64:
+				f := int(v)
+				s.Shard = &f
+			}
+
+		}
+	}
+	return nil
 }

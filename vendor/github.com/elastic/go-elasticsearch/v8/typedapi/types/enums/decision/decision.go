@@ -15,19 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package decision
 package decision
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/allocation_explain/types.ts#L86-L95
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/allocation_explain/types.ts#L92-L101
 type Decision struct {
-	name string
+	Name string
 }
 
 var (
@@ -53,7 +51,7 @@ func (d Decision) MarshalText() (text []byte, err error) {
 }
 
 func (d *Decision) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
 	case "yes":
 		*d = Yes
@@ -79,5 +77,5 @@ func (d *Decision) UnmarshalText(text []byte) error {
 }
 
 func (d Decision) String() string {
-	return d.name
+	return d.Name
 }

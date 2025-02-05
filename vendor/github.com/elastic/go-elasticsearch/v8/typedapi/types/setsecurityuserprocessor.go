@@ -15,74 +15,130 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // SetSecurityUserProcessor type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ingest/_types/Processors.ts#L325-L328
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ingest/_types/Processors.ts#L1462-L1471
 type SetSecurityUserProcessor struct {
-	Field         Field                `json:"field"`
-	If            *string              `json:"if,omitempty"`
-	IgnoreFailure *bool                `json:"ignore_failure,omitempty"`
-	OnFailure     []ProcessorContainer `json:"on_failure,omitempty"`
-	Properties    []string             `json:"properties,omitempty"`
-	Tag           *string              `json:"tag,omitempty"`
+	// Description Description of the processor.
+	// Useful for describing the purpose of the processor or its configuration.
+	Description *string `json:"description,omitempty"`
+	// Field The field to store the user information into.
+	Field string `json:"field"`
+	// If Conditionally execute the processor.
+	If *string `json:"if,omitempty"`
+	// IgnoreFailure Ignore failures for the processor.
+	IgnoreFailure *bool `json:"ignore_failure,omitempty"`
+	// OnFailure Handle failures for the processor.
+	OnFailure []ProcessorContainer `json:"on_failure,omitempty"`
+	// Properties Controls what user related properties are added to the field.
+	Properties []string `json:"properties,omitempty"`
+	// Tag Identifier for the processor.
+	// Useful for debugging and metrics.
+	Tag *string `json:"tag,omitempty"`
 }
 
-// SetSecurityUserProcessorBuilder holds SetSecurityUserProcessor struct and provides a builder API.
-type SetSecurityUserProcessorBuilder struct {
-	v *SetSecurityUserProcessor
-}
+func (s *SetSecurityUserProcessor) UnmarshalJSON(data []byte) error {
 
-// NewSetSecurityUserProcessor provides a builder for the SetSecurityUserProcessor struct.
-func NewSetSecurityUserProcessorBuilder() *SetSecurityUserProcessorBuilder {
-	r := SetSecurityUserProcessorBuilder{
-		&SetSecurityUserProcessor{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "description":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Description", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Description = &o
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "if":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "If", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.If = &o
+
+		case "ignore_failure":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IgnoreFailure", err)
+				}
+				s.IgnoreFailure = &value
+			case bool:
+				s.IgnoreFailure = &v
+			}
+
+		case "on_failure":
+			if err := dec.Decode(&s.OnFailure); err != nil {
+				return fmt.Errorf("%s | %w", "OnFailure", err)
+			}
+
+		case "properties":
+			if err := dec.Decode(&s.Properties); err != nil {
+				return fmt.Errorf("%s | %w", "Properties", err)
+			}
+
+		case "tag":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Tag", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Tag = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SetSecurityUserProcessor struct
-func (rb *SetSecurityUserProcessorBuilder) Build() SetSecurityUserProcessor {
-	return *rb.v
-}
+// NewSetSecurityUserProcessor returns a SetSecurityUserProcessor.
+func NewSetSecurityUserProcessor() *SetSecurityUserProcessor {
+	r := &SetSecurityUserProcessor{}
 
-func (rb *SetSecurityUserProcessorBuilder) Field(field Field) *SetSecurityUserProcessorBuilder {
-	rb.v.Field = field
-	return rb
-}
-
-func (rb *SetSecurityUserProcessorBuilder) If_(if_ string) *SetSecurityUserProcessorBuilder {
-	rb.v.If = &if_
-	return rb
-}
-
-func (rb *SetSecurityUserProcessorBuilder) IgnoreFailure(ignorefailure bool) *SetSecurityUserProcessorBuilder {
-	rb.v.IgnoreFailure = &ignorefailure
-	return rb
-}
-
-func (rb *SetSecurityUserProcessorBuilder) OnFailure(on_failure []ProcessorContainerBuilder) *SetSecurityUserProcessorBuilder {
-	tmp := make([]ProcessorContainer, len(on_failure))
-	for _, value := range on_failure {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.OnFailure = tmp
-	return rb
-}
-
-func (rb *SetSecurityUserProcessorBuilder) Properties(properties ...string) *SetSecurityUserProcessorBuilder {
-	rb.v.Properties = properties
-	return rb
-}
-
-func (rb *SetSecurityUserProcessorBuilder) Tag(tag string) *SetSecurityUserProcessorBuilder {
-	rb.v.Tag = &tag
-	return rb
+	return r
 }

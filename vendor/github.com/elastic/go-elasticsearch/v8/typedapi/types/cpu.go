@@ -15,90 +15,113 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // Cpu type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/_types/Stats.ts#L212-L221
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/_types/Stats.ts#L575-L584
 type Cpu struct {
-	LoadAverage   map[string]float64       `json:"load_average,omitempty"`
-	Percent       *int                     `json:"percent,omitempty"`
-	Sys           *Duration                `json:"sys,omitempty"`
-	SysInMillis   *DurationValueUnitMillis `json:"sys_in_millis,omitempty"`
-	Total         *Duration                `json:"total,omitempty"`
-	TotalInMillis *DurationValueUnitMillis `json:"total_in_millis,omitempty"`
-	User          *Duration                `json:"user,omitempty"`
-	UserInMillis  *DurationValueUnitMillis `json:"user_in_millis,omitempty"`
+	LoadAverage   map[string]Float64 `json:"load_average,omitempty"`
+	Percent       *int               `json:"percent,omitempty"`
+	Sys           Duration           `json:"sys,omitempty"`
+	SysInMillis   *int64             `json:"sys_in_millis,omitempty"`
+	Total         Duration           `json:"total,omitempty"`
+	TotalInMillis *int64             `json:"total_in_millis,omitempty"`
+	User          Duration           `json:"user,omitempty"`
+	UserInMillis  *int64             `json:"user_in_millis,omitempty"`
 }
 
-// CpuBuilder holds Cpu struct and provides a builder API.
-type CpuBuilder struct {
-	v *Cpu
+func (s *Cpu) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "load_average":
+			if s.LoadAverage == nil {
+				s.LoadAverage = make(map[string]Float64, 0)
+			}
+			if err := dec.Decode(&s.LoadAverage); err != nil {
+				return fmt.Errorf("%s | %w", "LoadAverage", err)
+			}
+
+		case "percent":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Percent", err)
+				}
+				s.Percent = &value
+			case float64:
+				f := int(v)
+				s.Percent = &f
+			}
+
+		case "sys":
+			if err := dec.Decode(&s.Sys); err != nil {
+				return fmt.Errorf("%s | %w", "Sys", err)
+			}
+
+		case "sys_in_millis":
+			if err := dec.Decode(&s.SysInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "SysInMillis", err)
+			}
+
+		case "total":
+			if err := dec.Decode(&s.Total); err != nil {
+				return fmt.Errorf("%s | %w", "Total", err)
+			}
+
+		case "total_in_millis":
+			if err := dec.Decode(&s.TotalInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "TotalInMillis", err)
+			}
+
+		case "user":
+			if err := dec.Decode(&s.User); err != nil {
+				return fmt.Errorf("%s | %w", "User", err)
+			}
+
+		case "user_in_millis":
+			if err := dec.Decode(&s.UserInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "UserInMillis", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewCpu provides a builder for the Cpu struct.
-func NewCpuBuilder() *CpuBuilder {
-	r := CpuBuilder{
-		&Cpu{
-			LoadAverage: make(map[string]float64, 0),
-		},
+// NewCpu returns a Cpu.
+func NewCpu() *Cpu {
+	r := &Cpu{
+		LoadAverage: make(map[string]Float64, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the Cpu struct
-func (rb *CpuBuilder) Build() Cpu {
-	return *rb.v
-}
-
-func (rb *CpuBuilder) LoadAverage(value map[string]float64) *CpuBuilder {
-	rb.v.LoadAverage = value
-	return rb
-}
-
-func (rb *CpuBuilder) Percent(percent int) *CpuBuilder {
-	rb.v.Percent = &percent
-	return rb
-}
-
-func (rb *CpuBuilder) Sys(sys *DurationBuilder) *CpuBuilder {
-	v := sys.Build()
-	rb.v.Sys = &v
-	return rb
-}
-
-func (rb *CpuBuilder) SysInMillis(sysinmillis *DurationValueUnitMillisBuilder) *CpuBuilder {
-	v := sysinmillis.Build()
-	rb.v.SysInMillis = &v
-	return rb
-}
-
-func (rb *CpuBuilder) Total(total *DurationBuilder) *CpuBuilder {
-	v := total.Build()
-	rb.v.Total = &v
-	return rb
-}
-
-func (rb *CpuBuilder) TotalInMillis(totalinmillis *DurationValueUnitMillisBuilder) *CpuBuilder {
-	v := totalinmillis.Build()
-	rb.v.TotalInMillis = &v
-	return rb
-}
-
-func (rb *CpuBuilder) User(user *DurationBuilder) *CpuBuilder {
-	v := user.Build()
-	rb.v.User = &v
-	return rb
-}
-
-func (rb *CpuBuilder) UserInMillis(userinmillis *DurationValueUnitMillisBuilder) *CpuBuilder {
-	v := userinmillis.Build()
-	rb.v.UserInMillis = &v
-	return rb
+	return r
 }

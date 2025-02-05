@@ -15,91 +15,135 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/gappolicy"
 )
 
 // MovingPercentilesAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/pipeline.ts#L244-L248
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/pipeline.ts#L334-L349
 type MovingPercentilesAggregation struct {
 	// BucketsPath Path to the buckets that contain one set of values to correlate.
-	BucketsPath *BucketsPath         `json:"buckets_path,omitempty"`
-	Format      *string              `json:"format,omitempty"`
-	GapPolicy   *gappolicy.GapPolicy `json:"gap_policy,omitempty"`
-	Keyed       *bool                `json:"keyed,omitempty"`
-	Meta        *Metadata            `json:"meta,omitempty"`
-	Name        *string              `json:"name,omitempty"`
-	Shift       *int                 `json:"shift,omitempty"`
-	Window      *int                 `json:"window,omitempty"`
+	BucketsPath BucketsPath `json:"buckets_path,omitempty"`
+	// Format `DecimalFormat` pattern for the output value.
+	// If specified, the formatted value is returned in the aggregation’s
+	// `value_as_string` property.
+	Format *string `json:"format,omitempty"`
+	// GapPolicy Policy to apply when gaps are found in the data.
+	GapPolicy *gappolicy.GapPolicy `json:"gap_policy,omitempty"`
+	Keyed     *bool                `json:"keyed,omitempty"`
+	// Shift By default, the window consists of the last n values excluding the current
+	// bucket.
+	// Increasing `shift` by 1, moves the starting window position by 1 to the
+	// right.
+	Shift *int `json:"shift,omitempty"`
+	// Window The size of window to "slide" across the histogram.
+	Window *int `json:"window,omitempty"`
 }
 
-// MovingPercentilesAggregationBuilder holds MovingPercentilesAggregation struct and provides a builder API.
-type MovingPercentilesAggregationBuilder struct {
-	v *MovingPercentilesAggregation
-}
+func (s *MovingPercentilesAggregation) UnmarshalJSON(data []byte) error {
 
-// NewMovingPercentilesAggregation provides a builder for the MovingPercentilesAggregation struct.
-func NewMovingPercentilesAggregationBuilder() *MovingPercentilesAggregationBuilder {
-	r := MovingPercentilesAggregationBuilder{
-		&MovingPercentilesAggregation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "buckets_path":
+			if err := dec.Decode(&s.BucketsPath); err != nil {
+				return fmt.Errorf("%s | %w", "BucketsPath", err)
+			}
+
+		case "format":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Format", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Format = &o
+
+		case "gap_policy":
+			if err := dec.Decode(&s.GapPolicy); err != nil {
+				return fmt.Errorf("%s | %w", "GapPolicy", err)
+			}
+
+		case "keyed":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Keyed", err)
+				}
+				s.Keyed = &value
+			case bool:
+				s.Keyed = &v
+			}
+
+		case "shift":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Shift", err)
+				}
+				s.Shift = &value
+			case float64:
+				f := int(v)
+				s.Shift = &f
+			}
+
+		case "window":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Window", err)
+				}
+				s.Window = &value
+			case float64:
+				f := int(v)
+				s.Window = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the MovingPercentilesAggregation struct
-func (rb *MovingPercentilesAggregationBuilder) Build() MovingPercentilesAggregation {
-	return *rb.v
-}
+// NewMovingPercentilesAggregation returns a MovingPercentilesAggregation.
+func NewMovingPercentilesAggregation() *MovingPercentilesAggregation {
+	r := &MovingPercentilesAggregation{}
 
-// BucketsPath Path to the buckets that contain one set of values to correlate.
-
-func (rb *MovingPercentilesAggregationBuilder) BucketsPath(bucketspath *BucketsPathBuilder) *MovingPercentilesAggregationBuilder {
-	v := bucketspath.Build()
-	rb.v.BucketsPath = &v
-	return rb
-}
-
-func (rb *MovingPercentilesAggregationBuilder) Format(format string) *MovingPercentilesAggregationBuilder {
-	rb.v.Format = &format
-	return rb
-}
-
-func (rb *MovingPercentilesAggregationBuilder) GapPolicy(gappolicy gappolicy.GapPolicy) *MovingPercentilesAggregationBuilder {
-	rb.v.GapPolicy = &gappolicy
-	return rb
-}
-
-func (rb *MovingPercentilesAggregationBuilder) Keyed(keyed bool) *MovingPercentilesAggregationBuilder {
-	rb.v.Keyed = &keyed
-	return rb
-}
-
-func (rb *MovingPercentilesAggregationBuilder) Meta(meta *MetadataBuilder) *MovingPercentilesAggregationBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *MovingPercentilesAggregationBuilder) Name(name string) *MovingPercentilesAggregationBuilder {
-	rb.v.Name = &name
-	return rb
-}
-
-func (rb *MovingPercentilesAggregationBuilder) Shift(shift int) *MovingPercentilesAggregationBuilder {
-	rb.v.Shift = &shift
-	return rb
-}
-
-func (rb *MovingPercentilesAggregationBuilder) Window(window int) *MovingPercentilesAggregationBuilder {
-	rb.v.Window = &window
-	return rb
+	return r
 }

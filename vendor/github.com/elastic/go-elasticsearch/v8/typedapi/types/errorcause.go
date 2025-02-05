@@ -15,25 +15,28 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
 )
 
 // ErrorCause type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Errors.ts#L25-L48
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Errors.ts#L25-L50
 type ErrorCause struct {
-	CausedBy *ErrorCause            `json:"caused_by,omitempty"`
-	Metadata map[string]interface{} `json:"-"`
+	CausedBy *ErrorCause                `json:"caused_by,omitempty"`
+	Metadata map[string]json.RawMessage `json:"-"`
 	// Reason A human-readable explanation of the error, in english
-	Reason    string       `json:"reason"`
+	Reason    *string      `json:"reason,omitempty"`
 	RootCause []ErrorCause `json:"root_cause,omitempty"`
 	// StackTrace The server stack trace. Present only if the `error_trace=true` parameter was
 	// sent with the request.
@@ -43,11 +46,101 @@ type ErrorCause struct {
 	Type string `json:"type"`
 }
 
+func (s *ErrorCause) UnmarshalJSON(data []byte) error {
+
+	if bytes.HasPrefix(data, []byte(`"`)) {
+		reason := string(data)
+		s.Reason = &reason
+		return nil
+	}
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "caused_by":
+			if err := dec.Decode(&s.CausedBy); err != nil {
+				return fmt.Errorf("%s | %w", "CausedBy", err)
+			}
+
+		case "reason":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Reason", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Reason = &o
+
+		case "root_cause":
+			if err := dec.Decode(&s.RootCause); err != nil {
+				return fmt.Errorf("%s | %w", "RootCause", err)
+			}
+
+		case "stack_trace":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "StackTrace", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.StackTrace = &o
+
+		case "suppressed":
+			if err := dec.Decode(&s.Suppressed); err != nil {
+				return fmt.Errorf("%s | %w", "Suppressed", err)
+			}
+
+		case "type":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Type = o
+
+		default:
+
+			if key, ok := t.(string); ok {
+				if s.Metadata == nil {
+					s.Metadata = make(map[string]json.RawMessage, 0)
+				}
+				raw := new(json.RawMessage)
+				if err := dec.Decode(&raw); err != nil {
+					return fmt.Errorf("%s | %w", "Metadata", err)
+				}
+				s.Metadata[key] = *raw
+			}
+
+		}
+	}
+	return nil
+}
+
 // MarhsalJSON overrides marshalling for types with additional properties
 func (s ErrorCause) MarshalJSON() ([]byte, error) {
 	type opt ErrorCause
 	// We transform the struct to a map without the embedded additional properties map
-	tmp := make(map[string]interface{}, 0)
+	tmp := make(map[string]any, 0)
 
 	data, err := json.Marshal(opt(s))
 	if err != nil {
@@ -60,8 +153,9 @@ func (s ErrorCause) MarshalJSON() ([]byte, error) {
 
 	// We inline the additional fields from the underlying map
 	for key, value := range s.Metadata {
-		tmp[string(key)] = value
+		tmp[fmt.Sprintf("%s", key)] = value
 	}
+	delete(tmp, "Metadata")
 
 	data, err = json.Marshal(tmp)
 	if err != nil {
@@ -71,74 +165,11 @@ func (s ErrorCause) MarshalJSON() ([]byte, error) {
 	return data, nil
 }
 
-// ErrorCauseBuilder holds ErrorCause struct and provides a builder API.
-type ErrorCauseBuilder struct {
-	v *ErrorCause
-}
-
-// NewErrorCause provides a builder for the ErrorCause struct.
-func NewErrorCauseBuilder() *ErrorCauseBuilder {
-	r := ErrorCauseBuilder{
-		&ErrorCause{
-			Metadata: make(map[string]interface{}, 0),
-		},
+// NewErrorCause returns a ErrorCause.
+func NewErrorCause() *ErrorCause {
+	r := &ErrorCause{
+		Metadata: make(map[string]json.RawMessage, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the ErrorCause struct
-func (rb *ErrorCauseBuilder) Build() ErrorCause {
-	return *rb.v
-}
-
-func (rb *ErrorCauseBuilder) CausedBy(causedby *ErrorCauseBuilder) *ErrorCauseBuilder {
-	v := causedby.Build()
-	rb.v.CausedBy = &v
-	return rb
-}
-
-func (rb *ErrorCauseBuilder) Metadata(value map[string]interface{}) *ErrorCauseBuilder {
-	rb.v.Metadata = value
-	return rb
-}
-
-// Reason A human-readable explanation of the error, in english
-
-func (rb *ErrorCauseBuilder) Reason(reason string) *ErrorCauseBuilder {
-	rb.v.Reason = reason
-	return rb
-}
-
-func (rb *ErrorCauseBuilder) RootCause(root_cause []ErrorCauseBuilder) *ErrorCauseBuilder {
-	tmp := make([]ErrorCause, len(root_cause))
-	for _, value := range root_cause {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.RootCause = tmp
-	return rb
-}
-
-// StackTrace The server stack trace. Present only if the `error_trace=true` parameter was
-// sent with the request.
-
-func (rb *ErrorCauseBuilder) StackTrace(stacktrace string) *ErrorCauseBuilder {
-	rb.v.StackTrace = &stacktrace
-	return rb
-}
-
-func (rb *ErrorCauseBuilder) Suppressed(suppressed []ErrorCauseBuilder) *ErrorCauseBuilder {
-	tmp := make([]ErrorCause, len(suppressed))
-	for _, value := range suppressed {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Suppressed = tmp
-	return rb
-}
-
-// Type The type of error
-
-func (rb *ErrorCauseBuilder) Type_(type_ string) *ErrorCauseBuilder {
-	rb.v.Type = type_
-	return rb
+	return r
 }

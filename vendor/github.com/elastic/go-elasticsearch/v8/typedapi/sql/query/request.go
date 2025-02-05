@@ -15,98 +15,84 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package query
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"strconv"
 
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 )
 
 // Request holds the request body struct for the package query
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/sql/query/QuerySqlRequest.ts#L28-L111
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/sql/query/QuerySqlRequest.ts#L28-L124
 type Request struct {
 
 	// Catalog Default catalog (cluster) for queries. If unspecified, the queries execute on
 	// the data in the local cluster only.
 	Catalog *string `json:"catalog,omitempty"`
-
+	// Columnar If true, the results in a columnar fashion: one row represents all the values
+	// of a certain column from the current page of results.
 	Columnar *bool `json:"columnar,omitempty"`
-
+	// Cursor Cursor used to retrieve a set of paginated results.
+	// If you specify a cursor, the API only uses the `columnar` and `time_zone`
+	// request body parameters.
+	// It ignores other request body parameters.
 	Cursor *string `json:"cursor,omitempty"`
-
 	// FetchSize The maximum number of rows (or entries) to return in one response
 	FetchSize *int `json:"fetch_size,omitempty"`
-
 	// FieldMultiValueLeniency Throw an exception when encountering multiple values for a field (default) or
 	// be lenient and return the first value from the list (without any guarantees
 	// of what that will be - typically the first in natural ascending order).
 	FieldMultiValueLeniency *bool `json:"field_multi_value_leniency,omitempty"`
-
-	// Filter Optional Elasticsearch query DSL for additional filtering.
-	Filter *types.QueryContainer `json:"filter,omitempty"`
-
+	// Filter Elasticsearch query DSL for additional filtering.
+	Filter *types.Query `json:"filter,omitempty"`
 	// IndexUsingFrozen If true, the search can run on frozen indices. Defaults to false.
 	IndexUsingFrozen *bool `json:"index_using_frozen,omitempty"`
-
 	// KeepAlive Retention period for an async or saved synchronous search.
-	KeepAlive *types.Duration `json:"keep_alive,omitempty"`
-
+	KeepAlive types.Duration `json:"keep_alive,omitempty"`
 	// KeepOnCompletion If true, Elasticsearch stores synchronous searches if you also specify the
 	// wait_for_completion_timeout parameter. If false, Elasticsearch only stores
 	// async searches that don’t finish before the wait_for_completion_timeout.
 	KeepOnCompletion *bool `json:"keep_on_completion,omitempty"`
-
 	// PageTimeout The timeout before a pagination request fails.
-	PageTimeout *types.Duration `json:"page_timeout,omitempty"`
-
+	PageTimeout types.Duration `json:"page_timeout,omitempty"`
 	// Params Values for parameters in the query.
-	Params map[string]interface{} `json:"params,omitempty"`
-
-	// Query SQL query to execute
+	Params map[string]json.RawMessage `json:"params,omitempty"`
+	// Query SQL query to run.
 	Query *string `json:"query,omitempty"`
-
 	// RequestTimeout The timeout before the request fails.
-	RequestTimeout *types.Duration `json:"request_timeout,omitempty"`
-
+	RequestTimeout types.Duration `json:"request_timeout,omitempty"`
 	// RuntimeMappings Defines one or more runtime fields in the search request. These fields take
 	// precedence over mapped fields with the same name.
-	RuntimeMappings *types.RuntimeFields `json:"runtime_mappings,omitempty"`
-
-	// TimeZone Time-zone in ISO 8601 used for executing the query on the server. More
-	// information available here.
-	TimeZone *types.TimeZone `json:"time_zone,omitempty"`
-
+	RuntimeMappings types.RuntimeFields `json:"runtime_mappings,omitempty"`
+	// TimeZone ISO-8601 time zone ID for the search.
+	TimeZone *string `json:"time_zone,omitempty"`
 	// WaitForCompletionTimeout Period to wait for complete results. Defaults to no timeout, meaning the
 	// request waits for complete search results. If the search doesn’t finish
 	// within this period, the search becomes async.
-	WaitForCompletionTimeout *types.Duration `json:"wait_for_completion_timeout,omitempty"`
+	WaitForCompletionTimeout types.Duration `json:"wait_for_completion_timeout,omitempty"`
 }
 
-// RequestBuilder is the builder API for the query.Request
-type RequestBuilder struct {
-	v *Request
-}
-
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{
-			Params: make(map[string]interface{}, 0),
-		},
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{
+		Params: make(map[string]json.RawMessage, 0),
 	}
-	return &r
+
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -117,93 +103,172 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) Catalog(catalog string) *RequestBuilder {
-	rb.v.Catalog = &catalog
-	return rb
-}
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
 
-func (rb *RequestBuilder) Columnar(columnar bool) *RequestBuilder {
-	rb.v.Columnar = &columnar
-	return rb
-}
+		switch t {
 
-func (rb *RequestBuilder) Cursor(cursor string) *RequestBuilder {
-	rb.v.Cursor = &cursor
-	return rb
-}
+		case "catalog":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Catalog", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Catalog = &o
 
-func (rb *RequestBuilder) FetchSize(fetchsize int) *RequestBuilder {
-	rb.v.FetchSize = &fetchsize
-	return rb
-}
+		case "columnar":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Columnar", err)
+				}
+				s.Columnar = &value
+			case bool:
+				s.Columnar = &v
+			}
 
-func (rb *RequestBuilder) FieldMultiValueLeniency(fieldmultivalueleniency bool) *RequestBuilder {
-	rb.v.FieldMultiValueLeniency = &fieldmultivalueleniency
-	return rb
-}
+		case "cursor":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Cursor", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Cursor = &o
 
-func (rb *RequestBuilder) Filter(filter *types.QueryContainerBuilder) *RequestBuilder {
-	v := filter.Build()
-	rb.v.Filter = &v
-	return rb
-}
+		case "fetch_size":
 
-func (rb *RequestBuilder) IndexUsingFrozen(indexusingfrozen bool) *RequestBuilder {
-	rb.v.IndexUsingFrozen = &indexusingfrozen
-	return rb
-}
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "FetchSize", err)
+				}
+				s.FetchSize = &value
+			case float64:
+				f := int(v)
+				s.FetchSize = &f
+			}
 
-func (rb *RequestBuilder) KeepAlive(keepalive *types.DurationBuilder) *RequestBuilder {
-	v := keepalive.Build()
-	rb.v.KeepAlive = &v
-	return rb
-}
+		case "field_multi_value_leniency":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "FieldMultiValueLeniency", err)
+				}
+				s.FieldMultiValueLeniency = &value
+			case bool:
+				s.FieldMultiValueLeniency = &v
+			}
 
-func (rb *RequestBuilder) KeepOnCompletion(keeponcompletion bool) *RequestBuilder {
-	rb.v.KeepOnCompletion = &keeponcompletion
-	return rb
-}
+		case "filter":
+			if err := dec.Decode(&s.Filter); err != nil {
+				return fmt.Errorf("%s | %w", "Filter", err)
+			}
 
-func (rb *RequestBuilder) PageTimeout(pagetimeout *types.DurationBuilder) *RequestBuilder {
-	v := pagetimeout.Build()
-	rb.v.PageTimeout = &v
-	return rb
-}
+		case "index_using_frozen":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IndexUsingFrozen", err)
+				}
+				s.IndexUsingFrozen = &value
+			case bool:
+				s.IndexUsingFrozen = &v
+			}
 
-func (rb *RequestBuilder) Params(value map[string]interface{}) *RequestBuilder {
-	rb.v.Params = value
-	return rb
-}
+		case "keep_alive":
+			if err := dec.Decode(&s.KeepAlive); err != nil {
+				return fmt.Errorf("%s | %w", "KeepAlive", err)
+			}
 
-func (rb *RequestBuilder) Query(query string) *RequestBuilder {
-	rb.v.Query = &query
-	return rb
-}
+		case "keep_on_completion":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "KeepOnCompletion", err)
+				}
+				s.KeepOnCompletion = &value
+			case bool:
+				s.KeepOnCompletion = &v
+			}
 
-func (rb *RequestBuilder) RequestTimeout(requesttimeout *types.DurationBuilder) *RequestBuilder {
-	v := requesttimeout.Build()
-	rb.v.RequestTimeout = &v
-	return rb
-}
+		case "page_timeout":
+			if err := dec.Decode(&s.PageTimeout); err != nil {
+				return fmt.Errorf("%s | %w", "PageTimeout", err)
+			}
 
-func (rb *RequestBuilder) RuntimeMappings(runtimemappings *types.RuntimeFieldsBuilder) *RequestBuilder {
-	v := runtimemappings.Build()
-	rb.v.RuntimeMappings = &v
-	return rb
-}
+		case "params":
+			if s.Params == nil {
+				s.Params = make(map[string]json.RawMessage, 0)
+			}
+			if err := dec.Decode(&s.Params); err != nil {
+				return fmt.Errorf("%s | %w", "Params", err)
+			}
 
-func (rb *RequestBuilder) TimeZone(timezone types.TimeZone) *RequestBuilder {
-	rb.v.TimeZone = &timezone
-	return rb
-}
+		case "query":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Query", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Query = &o
 
-func (rb *RequestBuilder) WaitForCompletionTimeout(waitforcompletiontimeout *types.DurationBuilder) *RequestBuilder {
-	v := waitforcompletiontimeout.Build()
-	rb.v.WaitForCompletionTimeout = &v
-	return rb
+		case "request_timeout":
+			if err := dec.Decode(&s.RequestTimeout); err != nil {
+				return fmt.Errorf("%s | %w", "RequestTimeout", err)
+			}
+
+		case "runtime_mappings":
+			if err := dec.Decode(&s.RuntimeMappings); err != nil {
+				return fmt.Errorf("%s | %w", "RuntimeMappings", err)
+			}
+
+		case "time_zone":
+			if err := dec.Decode(&s.TimeZone); err != nil {
+				return fmt.Errorf("%s | %w", "TimeZone", err)
+			}
+
+		case "wait_for_completion_timeout":
+			if err := dec.Decode(&s.WaitForCompletionTimeout); err != nil {
+				return fmt.Errorf("%s | %w", "WaitForCompletionTimeout", err)
+			}
+
+		}
+	}
+	return nil
 }

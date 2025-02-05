@@ -15,82 +15,163 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // JvmMemoryStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/_types/Stats.ts#L329-L337
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/_types/Stats.ts#L918-L947
 type JvmMemoryStats struct {
-	HeapCommittedInBytes    *int64          `json:"heap_committed_in_bytes,omitempty"`
-	HeapMaxInBytes          *int64          `json:"heap_max_in_bytes,omitempty"`
-	HeapUsedInBytes         *int64          `json:"heap_used_in_bytes,omitempty"`
-	HeapUsedPercent         *int64          `json:"heap_used_percent,omitempty"`
-	NonHeapCommittedInBytes *int64          `json:"non_heap_committed_in_bytes,omitempty"`
-	NonHeapUsedInBytes      *int64          `json:"non_heap_used_in_bytes,omitempty"`
-	Pools                   map[string]Pool `json:"pools,omitempty"`
+	// HeapCommittedInBytes Amount of memory, in bytes, available for use by the heap.
+	HeapCommittedInBytes *int64 `json:"heap_committed_in_bytes,omitempty"`
+	// HeapMaxInBytes Maximum amount of memory, in bytes, available for use by the heap.
+	HeapMaxInBytes *int64 `json:"heap_max_in_bytes,omitempty"`
+	// HeapUsedInBytes Memory, in bytes, currently in use by the heap.
+	HeapUsedInBytes *int64 `json:"heap_used_in_bytes,omitempty"`
+	// HeapUsedPercent Percentage of memory currently in use by the heap.
+	HeapUsedPercent *int64 `json:"heap_used_percent,omitempty"`
+	// NonHeapCommittedInBytes Amount of non-heap memory available, in bytes.
+	NonHeapCommittedInBytes *int64 `json:"non_heap_committed_in_bytes,omitempty"`
+	// NonHeapUsedInBytes Non-heap memory used, in bytes.
+	NonHeapUsedInBytes *int64 `json:"non_heap_used_in_bytes,omitempty"`
+	// Pools Contains statistics about heap memory usage for the node.
+	Pools map[string]Pool `json:"pools,omitempty"`
 }
 
-// JvmMemoryStatsBuilder holds JvmMemoryStats struct and provides a builder API.
-type JvmMemoryStatsBuilder struct {
-	v *JvmMemoryStats
+func (s *JvmMemoryStats) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "heap_committed_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "HeapCommittedInBytes", err)
+				}
+				s.HeapCommittedInBytes = &value
+			case float64:
+				f := int64(v)
+				s.HeapCommittedInBytes = &f
+			}
+
+		case "heap_max_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "HeapMaxInBytes", err)
+				}
+				s.HeapMaxInBytes = &value
+			case float64:
+				f := int64(v)
+				s.HeapMaxInBytes = &f
+			}
+
+		case "heap_used_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "HeapUsedInBytes", err)
+				}
+				s.HeapUsedInBytes = &value
+			case float64:
+				f := int64(v)
+				s.HeapUsedInBytes = &f
+			}
+
+		case "heap_used_percent":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "HeapUsedPercent", err)
+				}
+				s.HeapUsedPercent = &value
+			case float64:
+				f := int64(v)
+				s.HeapUsedPercent = &f
+			}
+
+		case "non_heap_committed_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NonHeapCommittedInBytes", err)
+				}
+				s.NonHeapCommittedInBytes = &value
+			case float64:
+				f := int64(v)
+				s.NonHeapCommittedInBytes = &f
+			}
+
+		case "non_heap_used_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NonHeapUsedInBytes", err)
+				}
+				s.NonHeapUsedInBytes = &value
+			case float64:
+				f := int64(v)
+				s.NonHeapUsedInBytes = &f
+			}
+
+		case "pools":
+			if s.Pools == nil {
+				s.Pools = make(map[string]Pool, 0)
+			}
+			if err := dec.Decode(&s.Pools); err != nil {
+				return fmt.Errorf("%s | %w", "Pools", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewJvmMemoryStats provides a builder for the JvmMemoryStats struct.
-func NewJvmMemoryStatsBuilder() *JvmMemoryStatsBuilder {
-	r := JvmMemoryStatsBuilder{
-		&JvmMemoryStats{
-			Pools: make(map[string]Pool, 0),
-		},
+// NewJvmMemoryStats returns a JvmMemoryStats.
+func NewJvmMemoryStats() *JvmMemoryStats {
+	r := &JvmMemoryStats{
+		Pools: make(map[string]Pool, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the JvmMemoryStats struct
-func (rb *JvmMemoryStatsBuilder) Build() JvmMemoryStats {
-	return *rb.v
-}
-
-func (rb *JvmMemoryStatsBuilder) HeapCommittedInBytes(heapcommittedinbytes int64) *JvmMemoryStatsBuilder {
-	rb.v.HeapCommittedInBytes = &heapcommittedinbytes
-	return rb
-}
-
-func (rb *JvmMemoryStatsBuilder) HeapMaxInBytes(heapmaxinbytes int64) *JvmMemoryStatsBuilder {
-	rb.v.HeapMaxInBytes = &heapmaxinbytes
-	return rb
-}
-
-func (rb *JvmMemoryStatsBuilder) HeapUsedInBytes(heapusedinbytes int64) *JvmMemoryStatsBuilder {
-	rb.v.HeapUsedInBytes = &heapusedinbytes
-	return rb
-}
-
-func (rb *JvmMemoryStatsBuilder) HeapUsedPercent(heapusedpercent int64) *JvmMemoryStatsBuilder {
-	rb.v.HeapUsedPercent = &heapusedpercent
-	return rb
-}
-
-func (rb *JvmMemoryStatsBuilder) NonHeapCommittedInBytes(nonheapcommittedinbytes int64) *JvmMemoryStatsBuilder {
-	rb.v.NonHeapCommittedInBytes = &nonheapcommittedinbytes
-	return rb
-}
-
-func (rb *JvmMemoryStatsBuilder) NonHeapUsedInBytes(nonheapusedinbytes int64) *JvmMemoryStatsBuilder {
-	rb.v.NonHeapUsedInBytes = &nonheapusedinbytes
-	return rb
-}
-
-func (rb *JvmMemoryStatsBuilder) Pools(values map[string]*PoolBuilder) *JvmMemoryStatsBuilder {
-	tmp := make(map[string]Pool, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Pools = tmp
-	return rb
+	return r
 }

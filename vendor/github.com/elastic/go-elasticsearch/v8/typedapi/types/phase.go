@@ -15,54 +15,60 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // Phase type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ilm/_types/Phase.ts#L25-L33
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ilm/_types/Phase.ts#L26-L32
 type Phase struct {
-	Actions        *Actions        `json:"actions,omitempty"`
-	Configurations *Configurations `json:"configurations,omitempty"`
-	MinAge         int64           `json:"min_age,omitempty"`
+	Actions *IlmActions `json:"actions,omitempty"`
+	MinAge  *Duration   `json:"min_age,omitempty"`
 }
 
-// PhaseBuilder holds Phase struct and provides a builder API.
-type PhaseBuilder struct {
-	v *Phase
-}
+func (s *Phase) UnmarshalJSON(data []byte) error {
 
-// NewPhase provides a builder for the Phase struct.
-func NewPhaseBuilder() *PhaseBuilder {
-	r := PhaseBuilder{
-		&Phase{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "actions":
+			if err := dec.Decode(&s.Actions); err != nil {
+				return fmt.Errorf("%s | %w", "Actions", err)
+			}
+
+		case "min_age":
+			if err := dec.Decode(&s.MinAge); err != nil {
+				return fmt.Errorf("%s | %w", "MinAge", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the Phase struct
-func (rb *PhaseBuilder) Build() Phase {
-	return *rb.v
-}
+// NewPhase returns a Phase.
+func NewPhase() *Phase {
+	r := &Phase{}
 
-func (rb *PhaseBuilder) Actions(actions *ActionsBuilder) *PhaseBuilder {
-	v := actions.Build()
-	rb.v.Actions = &v
-	return rb
-}
-
-func (rb *PhaseBuilder) Configurations(configurations *ConfigurationsBuilder) *PhaseBuilder {
-	v := configurations.Build()
-	rb.v.Configurations = &v
-	return rb
-}
-
-func (rb *PhaseBuilder) MinAge(arg int64) *PhaseBuilder {
-	rb.v.MinAge = arg
-	return rb
+	return r
 }

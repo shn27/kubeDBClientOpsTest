@@ -15,25 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package holtwinterstype
 package holtwinterstype
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/pipeline.ts#L231-L236
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/pipeline.ts#L309-L312
 type HoltWintersType struct {
-	name string
+	Name string
 }
 
 var (
-	Add = HoltWintersType{"add"}
+	Additive = HoltWintersType{"add"}
 
-	Mult = HoltWintersType{"mult"}
+	Multiplicative = HoltWintersType{"mult"}
 )
 
 func (h HoltWintersType) MarshalText() (text []byte, err error) {
@@ -41,12 +39,12 @@ func (h HoltWintersType) MarshalText() (text []byte, err error) {
 }
 
 func (h *HoltWintersType) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
 	case "add":
-		*h = Add
+		*h = Additive
 	case "mult":
-		*h = Mult
+		*h = Multiplicative
 	default:
 		*h = HoltWintersType{string(text)}
 	}
@@ -55,5 +53,5 @@ func (h *HoltWintersType) UnmarshalText(text []byte) error {
 }
 
 func (h HoltWintersType) String() string {
-	return h.name
+	return h.Name
 }

@@ -15,48 +15,24 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // InferenceConfig type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ingest/_types/Processors.ts#L244-L250
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ingest/_types/Processors.ts#L1048-L1060
 type InferenceConfig struct {
+	// Classification Classification configuration for inference.
 	Classification *InferenceConfigClassification `json:"classification,omitempty"`
-	Regression     *InferenceConfigRegression     `json:"regression,omitempty"`
+	// Regression Regression configuration for inference.
+	Regression *InferenceConfigRegression `json:"regression,omitempty"`
 }
 
-// InferenceConfigBuilder holds InferenceConfig struct and provides a builder API.
-type InferenceConfigBuilder struct {
-	v *InferenceConfig
-}
+// NewInferenceConfig returns a InferenceConfig.
+func NewInferenceConfig() *InferenceConfig {
+	r := &InferenceConfig{}
 
-// NewInferenceConfig provides a builder for the InferenceConfig struct.
-func NewInferenceConfigBuilder() *InferenceConfigBuilder {
-	r := InferenceConfigBuilder{
-		&InferenceConfig{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the InferenceConfig struct
-func (rb *InferenceConfigBuilder) Build() InferenceConfig {
-	return *rb.v
-}
-
-func (rb *InferenceConfigBuilder) Classification(classification *InferenceConfigClassificationBuilder) *InferenceConfigBuilder {
-	v := classification.Build()
-	rb.v.Classification = &v
-	return rb
-}
-
-func (rb *InferenceConfigBuilder) Regression(regression *InferenceConfigRegressionBuilder) *InferenceConfigBuilder {
-	v := regression.Build()
-	rb.v.Regression = &v
-	return rb
+	return r
 }

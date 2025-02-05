@@ -15,92 +15,157 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/functionboostmode"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/functionscoremode"
 )
 
 // FunctionScoreQuery type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/compound.ts#L52-L59
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/compound.ts#L105-L135
 type FunctionScoreQuery struct {
-	Boost      *float32                             `json:"boost,omitempty"`
-	BoostMode  *functionboostmode.FunctionBoostMode `json:"boost_mode,omitempty"`
-	Functions  []FunctionScoreContainer             `json:"functions,omitempty"`
-	MaxBoost   *float64                             `json:"max_boost,omitempty"`
-	MinScore   *float64                             `json:"min_score,omitempty"`
-	Query      *QueryContainer                      `json:"query,omitempty"`
-	QueryName_ *string                              `json:"_name,omitempty"`
-	ScoreMode  *functionscoremode.FunctionScoreMode `json:"score_mode,omitempty"`
+	// Boost Floating point number used to decrease or increase the relevance scores of
+	// the query.
+	// Boost values are relative to the default value of 1.0.
+	// A boost value between 0 and 1.0 decreases the relevance score.
+	// A value greater than 1.0 increases the relevance score.
+	Boost *float32 `json:"boost,omitempty"`
+	// BoostMode Defines how he newly computed score is combined with the score of the query
+	BoostMode *functionboostmode.FunctionBoostMode `json:"boost_mode,omitempty"`
+	// Functions One or more functions that compute a new score for each document returned by
+	// the query.
+	Functions []FunctionScore `json:"functions,omitempty"`
+	// MaxBoost Restricts the new score to not exceed the provided limit.
+	MaxBoost *Float64 `json:"max_boost,omitempty"`
+	// MinScore Excludes documents that do not meet the provided score threshold.
+	MinScore *Float64 `json:"min_score,omitempty"`
+	// Query A query that determines the documents for which a new score is computed.
+	Query      *Query  `json:"query,omitempty"`
+	QueryName_ *string `json:"_name,omitempty"`
+	// ScoreMode Specifies how the computed scores are combined
+	ScoreMode *functionscoremode.FunctionScoreMode `json:"score_mode,omitempty"`
 }
 
-// FunctionScoreQueryBuilder holds FunctionScoreQuery struct and provides a builder API.
-type FunctionScoreQueryBuilder struct {
-	v *FunctionScoreQuery
-}
+func (s *FunctionScoreQuery) UnmarshalJSON(data []byte) error {
 
-// NewFunctionScoreQuery provides a builder for the FunctionScoreQuery struct.
-func NewFunctionScoreQueryBuilder() *FunctionScoreQueryBuilder {
-	r := FunctionScoreQueryBuilder{
-		&FunctionScoreQuery{},
+	if !bytes.HasPrefix(data, []byte(`{`)) {
+		err := json.NewDecoder(bytes.NewReader(data)).Decode(&s.Functions)
+		return err
 	}
 
-	return &r
-}
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-// Build finalize the chain and returns the FunctionScoreQuery struct
-func (rb *FunctionScoreQueryBuilder) Build() FunctionScoreQuery {
-	return *rb.v
-}
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
 
-func (rb *FunctionScoreQueryBuilder) Boost(boost float32) *FunctionScoreQueryBuilder {
-	rb.v.Boost = &boost
-	return rb
-}
+		switch t {
 
-func (rb *FunctionScoreQueryBuilder) BoostMode(boostmode functionboostmode.FunctionBoostMode) *FunctionScoreQueryBuilder {
-	rb.v.BoostMode = &boostmode
-	return rb
-}
+		case "boost":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Boost", err)
+				}
+				f := float32(value)
+				s.Boost = &f
+			case float64:
+				f := float32(v)
+				s.Boost = &f
+			}
 
-func (rb *FunctionScoreQueryBuilder) Functions(functions []FunctionScoreContainerBuilder) *FunctionScoreQueryBuilder {
-	tmp := make([]FunctionScoreContainer, len(functions))
-	for _, value := range functions {
-		tmp = append(tmp, value.Build())
+		case "boost_mode":
+			if err := dec.Decode(&s.BoostMode); err != nil {
+				return fmt.Errorf("%s | %w", "BoostMode", err)
+			}
+
+		case "functions":
+			if err := dec.Decode(&s.Functions); err != nil {
+				return fmt.Errorf("%s | %w", "Functions", err)
+			}
+
+		case "max_boost":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxBoost", err)
+				}
+				f := Float64(value)
+				s.MaxBoost = &f
+			case float64:
+				f := Float64(v)
+				s.MaxBoost = &f
+			}
+
+		case "min_score":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MinScore", err)
+				}
+				f := Float64(value)
+				s.MinScore = &f
+			case float64:
+				f := Float64(v)
+				s.MinScore = &f
+			}
+
+		case "query":
+			if err := dec.Decode(&s.Query); err != nil {
+				return fmt.Errorf("%s | %w", "Query", err)
+			}
+
+		case "_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "QueryName_", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.QueryName_ = &o
+
+		case "score_mode":
+			if err := dec.Decode(&s.ScoreMode); err != nil {
+				return fmt.Errorf("%s | %w", "ScoreMode", err)
+			}
+
+		}
 	}
-	rb.v.Functions = tmp
-	return rb
+	return nil
 }
 
-func (rb *FunctionScoreQueryBuilder) MaxBoost(maxboost float64) *FunctionScoreQueryBuilder {
-	rb.v.MaxBoost = &maxboost
-	return rb
-}
+// NewFunctionScoreQuery returns a FunctionScoreQuery.
+func NewFunctionScoreQuery() *FunctionScoreQuery {
+	r := &FunctionScoreQuery{}
 
-func (rb *FunctionScoreQueryBuilder) MinScore(minscore float64) *FunctionScoreQueryBuilder {
-	rb.v.MinScore = &minscore
-	return rb
-}
-
-func (rb *FunctionScoreQueryBuilder) Query(query *QueryContainerBuilder) *FunctionScoreQueryBuilder {
-	v := query.Build()
-	rb.v.Query = &v
-	return rb
-}
-
-func (rb *FunctionScoreQueryBuilder) QueryName_(queryname_ string) *FunctionScoreQueryBuilder {
-	rb.v.QueryName_ = &queryname_
-	return rb
-}
-
-func (rb *FunctionScoreQueryBuilder) ScoreMode(scoremode functionscoremode.FunctionScoreMode) *FunctionScoreQueryBuilder {
-	rb.v.ScoreMode = &scoremode
-	return rb
+	return r
 }

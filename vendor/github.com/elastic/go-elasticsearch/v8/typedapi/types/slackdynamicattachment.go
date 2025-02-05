@@ -15,47 +15,68 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // SlackDynamicAttachment type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Actions.ts#L125-L128
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Actions.ts#L125-L128
 type SlackDynamicAttachment struct {
 	AttachmentTemplate SlackAttachment `json:"attachment_template"`
 	ListPath           string          `json:"list_path"`
 }
 
-// SlackDynamicAttachmentBuilder holds SlackDynamicAttachment struct and provides a builder API.
-type SlackDynamicAttachmentBuilder struct {
-	v *SlackDynamicAttachment
-}
+func (s *SlackDynamicAttachment) UnmarshalJSON(data []byte) error {
 
-// NewSlackDynamicAttachment provides a builder for the SlackDynamicAttachment struct.
-func NewSlackDynamicAttachmentBuilder() *SlackDynamicAttachmentBuilder {
-	r := SlackDynamicAttachmentBuilder{
-		&SlackDynamicAttachment{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "attachment_template":
+			if err := dec.Decode(&s.AttachmentTemplate); err != nil {
+				return fmt.Errorf("%s | %w", "AttachmentTemplate", err)
+			}
+
+		case "list_path":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ListPath", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ListPath = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SlackDynamicAttachment struct
-func (rb *SlackDynamicAttachmentBuilder) Build() SlackDynamicAttachment {
-	return *rb.v
-}
+// NewSlackDynamicAttachment returns a SlackDynamicAttachment.
+func NewSlackDynamicAttachment() *SlackDynamicAttachment {
+	r := &SlackDynamicAttachment{}
 
-func (rb *SlackDynamicAttachmentBuilder) AttachmentTemplate(attachmenttemplate *SlackAttachmentBuilder) *SlackDynamicAttachmentBuilder {
-	v := attachmenttemplate.Build()
-	rb.v.AttachmentTemplate = v
-	return rb
-}
-
-func (rb *SlackDynamicAttachmentBuilder) ListPath(listpath string) *SlackDynamicAttachmentBuilder {
-	rb.v.ListPath = listpath
-	return rb
+	return r
 }

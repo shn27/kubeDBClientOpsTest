@@ -15,79 +15,162 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ShingleTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L86-L94
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L86-L94
 type ShingleTokenFilter struct {
-	FillerToken                *string        `json:"filler_token,omitempty"`
-	MaxShingleSize             string         `json:"max_shingle_size,omitempty"`
-	MinShingleSize             string         `json:"min_shingle_size,omitempty"`
-	OutputUnigrams             *bool          `json:"output_unigrams,omitempty"`
-	OutputUnigramsIfNoShingles *bool          `json:"output_unigrams_if_no_shingles,omitempty"`
-	TokenSeparator             *string        `json:"token_separator,omitempty"`
-	Type                       string         `json:"type,omitempty"`
-	Version                    *VersionString `json:"version,omitempty"`
+	FillerToken                *string `json:"filler_token,omitempty"`
+	MaxShingleSize             string  `json:"max_shingle_size,omitempty"`
+	MinShingleSize             string  `json:"min_shingle_size,omitempty"`
+	OutputUnigrams             *bool   `json:"output_unigrams,omitempty"`
+	OutputUnigramsIfNoShingles *bool   `json:"output_unigrams_if_no_shingles,omitempty"`
+	TokenSeparator             *string `json:"token_separator,omitempty"`
+	Type                       string  `json:"type,omitempty"`
+	Version                    *string `json:"version,omitempty"`
 }
 
-// ShingleTokenFilterBuilder holds ShingleTokenFilter struct and provides a builder API.
-type ShingleTokenFilterBuilder struct {
-	v *ShingleTokenFilter
+func (s *ShingleTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "filler_token":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "FillerToken", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.FillerToken = &o
+
+		case "max_shingle_size":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "MaxShingleSize", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.MaxShingleSize = o
+
+		case "min_shingle_size":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "MinShingleSize", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.MinShingleSize = o
+
+		case "output_unigrams":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "OutputUnigrams", err)
+				}
+				s.OutputUnigrams = &value
+			case bool:
+				s.OutputUnigrams = &v
+			}
+
+		case "output_unigrams_if_no_shingles":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "OutputUnigramsIfNoShingles", err)
+				}
+				s.OutputUnigramsIfNoShingles = &value
+			case bool:
+				s.OutputUnigramsIfNoShingles = &v
+			}
+
+		case "token_separator":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "TokenSeparator", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.TokenSeparator = &o
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewShingleTokenFilter provides a builder for the ShingleTokenFilter struct.
-func NewShingleTokenFilterBuilder() *ShingleTokenFilterBuilder {
-	r := ShingleTokenFilterBuilder{
-		&ShingleTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s ShingleTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerShingleTokenFilter ShingleTokenFilter
+	tmp := innerShingleTokenFilter{
+		FillerToken:                s.FillerToken,
+		MaxShingleSize:             s.MaxShingleSize,
+		MinShingleSize:             s.MinShingleSize,
+		OutputUnigrams:             s.OutputUnigrams,
+		OutputUnigramsIfNoShingles: s.OutputUnigramsIfNoShingles,
+		TokenSeparator:             s.TokenSeparator,
+		Type:                       s.Type,
+		Version:                    s.Version,
 	}
 
-	r.v.Type = "shingle"
+	tmp.Type = "shingle"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the ShingleTokenFilter struct
-func (rb *ShingleTokenFilterBuilder) Build() ShingleTokenFilter {
-	return *rb.v
-}
+// NewShingleTokenFilter returns a ShingleTokenFilter.
+func NewShingleTokenFilter() *ShingleTokenFilter {
+	r := &ShingleTokenFilter{}
 
-func (rb *ShingleTokenFilterBuilder) FillerToken(fillertoken string) *ShingleTokenFilterBuilder {
-	rb.v.FillerToken = &fillertoken
-	return rb
-}
-
-func (rb *ShingleTokenFilterBuilder) MaxShingleSize(arg string) *ShingleTokenFilterBuilder {
-	rb.v.MaxShingleSize = arg
-	return rb
-}
-
-func (rb *ShingleTokenFilterBuilder) MinShingleSize(arg string) *ShingleTokenFilterBuilder {
-	rb.v.MinShingleSize = arg
-	return rb
-}
-
-func (rb *ShingleTokenFilterBuilder) OutputUnigrams(outputunigrams bool) *ShingleTokenFilterBuilder {
-	rb.v.OutputUnigrams = &outputunigrams
-	return rb
-}
-
-func (rb *ShingleTokenFilterBuilder) OutputUnigramsIfNoShingles(outputunigramsifnoshingles bool) *ShingleTokenFilterBuilder {
-	rb.v.OutputUnigramsIfNoShingles = &outputunigramsifnoshingles
-	return rb
-}
-
-func (rb *ShingleTokenFilterBuilder) TokenSeparator(tokenseparator string) *ShingleTokenFilterBuilder {
-	rb.v.TokenSeparator = &tokenseparator
-	return rb
-}
-
-func (rb *ShingleTokenFilterBuilder) Version(version VersionString) *ShingleTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

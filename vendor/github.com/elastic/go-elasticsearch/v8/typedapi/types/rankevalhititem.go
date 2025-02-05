@@ -15,47 +15,60 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // RankEvalHitItem type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/rank_eval/types.ts#L136-L139
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/rank_eval/types.ts#L139-L142
 type RankEvalHitItem struct {
 	Hit    RankEvalHit `json:"hit"`
-	Rating float64     `json:"rating,omitempty"`
+	Rating *Float64    `json:"rating,omitempty"`
 }
 
-// RankEvalHitItemBuilder holds RankEvalHitItem struct and provides a builder API.
-type RankEvalHitItemBuilder struct {
-	v *RankEvalHitItem
-}
+func (s *RankEvalHitItem) UnmarshalJSON(data []byte) error {
 
-// NewRankEvalHitItem provides a builder for the RankEvalHitItem struct.
-func NewRankEvalHitItemBuilder() *RankEvalHitItemBuilder {
-	r := RankEvalHitItemBuilder{
-		&RankEvalHitItem{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "hit":
+			if err := dec.Decode(&s.Hit); err != nil {
+				return fmt.Errorf("%s | %w", "Hit", err)
+			}
+
+		case "rating":
+			if err := dec.Decode(&s.Rating); err != nil {
+				return fmt.Errorf("%s | %w", "Rating", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RankEvalHitItem struct
-func (rb *RankEvalHitItemBuilder) Build() RankEvalHitItem {
-	return *rb.v
-}
+// NewRankEvalHitItem returns a RankEvalHitItem.
+func NewRankEvalHitItem() *RankEvalHitItem {
+	r := &RankEvalHitItem{}
 
-func (rb *RankEvalHitItemBuilder) Hit(hit *RankEvalHitBuilder) *RankEvalHitItemBuilder {
-	v := hit.Build()
-	rb.v.Hit = v
-	return rb
-}
-
-func (rb *RankEvalHitItemBuilder) Rating(rating float64) *RankEvalHitItemBuilder {
-	rb.v.Rating = rating
-	return rb
+	return r
 }

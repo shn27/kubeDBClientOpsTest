@@ -15,71 +15,107 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // User type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/_types/User.ts#L22-L29
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/_types/User.ts#L23-L31
 type User struct {
-	Email    string   `json:"email,omitempty"`
-	Enabled  bool     `json:"enabled"`
-	FullName Name     `json:"full_name,omitempty"`
-	Metadata Metadata `json:"metadata"`
-	Roles    []string `json:"roles"`
-	Username Username `json:"username"`
+	Email      *string  `json:"email,omitempty"`
+	Enabled    bool     `json:"enabled"`
+	FullName   *string  `json:"full_name,omitempty"`
+	Metadata   Metadata `json:"metadata"`
+	ProfileUid *string  `json:"profile_uid,omitempty"`
+	Roles      []string `json:"roles"`
+	Username   string   `json:"username"`
 }
 
-// UserBuilder holds User struct and provides a builder API.
-type UserBuilder struct {
-	v *User
-}
+func (s *User) UnmarshalJSON(data []byte) error {
 
-// NewUser provides a builder for the User struct.
-func NewUserBuilder() *UserBuilder {
-	r := UserBuilder{
-		&User{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "email":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Email", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Email = &o
+
+		case "enabled":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Enabled", err)
+				}
+				s.Enabled = value
+			case bool:
+				s.Enabled = v
+			}
+
+		case "full_name":
+			if err := dec.Decode(&s.FullName); err != nil {
+				return fmt.Errorf("%s | %w", "FullName", err)
+			}
+
+		case "metadata":
+			if err := dec.Decode(&s.Metadata); err != nil {
+				return fmt.Errorf("%s | %w", "Metadata", err)
+			}
+
+		case "profile_uid":
+			if err := dec.Decode(&s.ProfileUid); err != nil {
+				return fmt.Errorf("%s | %w", "ProfileUid", err)
+			}
+
+		case "roles":
+			if err := dec.Decode(&s.Roles); err != nil {
+				return fmt.Errorf("%s | %w", "Roles", err)
+			}
+
+		case "username":
+			if err := dec.Decode(&s.Username); err != nil {
+				return fmt.Errorf("%s | %w", "Username", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the User struct
-func (rb *UserBuilder) Build() User {
-	return *rb.v
-}
+// NewUser returns a User.
+func NewUser() *User {
+	r := &User{}
 
-func (rb *UserBuilder) Email(email string) *UserBuilder {
-	rb.v.Email = email
-	return rb
-}
-
-func (rb *UserBuilder) Enabled(enabled bool) *UserBuilder {
-	rb.v.Enabled = enabled
-	return rb
-}
-
-func (rb *UserBuilder) FullName(fullname Name) *UserBuilder {
-	rb.v.FullName = fullname
-	return rb
-}
-
-func (rb *UserBuilder) Metadata(metadata *MetadataBuilder) *UserBuilder {
-	v := metadata.Build()
-	rb.v.Metadata = v
-	return rb
-}
-
-func (rb *UserBuilder) Roles(roles ...string) *UserBuilder {
-	rb.v.Roles = roles
-	return rb
-}
-
-func (rb *UserBuilder) Username(username Username) *UserBuilder {
-	rb.v.Username = username
-	return rb
+	return r
 }

@@ -15,65 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // CharFilterDefinition holds the union for the following types:
 //
 //	HtmlStripCharFilter
-//	IcuNormalizationCharFilter
-//	KuromojiIterationMarkCharFilter
 //	MappingCharFilter
 //	PatternReplaceCharFilter
+//	IcuNormalizationCharFilter
+//	KuromojiIterationMarkCharFilter
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/char_filters.ts#L32-L41
-type CharFilterDefinition interface{}
-
-// CharFilterDefinitionBuilder holds CharFilterDefinition struct and provides a builder API.
-type CharFilterDefinitionBuilder struct {
-	v CharFilterDefinition
-}
-
-// NewCharFilterDefinition provides a builder for the CharFilterDefinition struct.
-func NewCharFilterDefinitionBuilder() *CharFilterDefinitionBuilder {
-	return &CharFilterDefinitionBuilder{}
-}
-
-// Build finalize the chain and returns the CharFilterDefinition struct
-func (u *CharFilterDefinitionBuilder) Build() CharFilterDefinition {
-	return u.v
-}
-
-func (u *CharFilterDefinitionBuilder) HtmlStripCharFilter(htmlstripcharfilter *HtmlStripCharFilterBuilder) *CharFilterDefinitionBuilder {
-	v := htmlstripcharfilter.Build()
-	u.v = &v
-	return u
-}
-
-func (u *CharFilterDefinitionBuilder) IcuNormalizationCharFilter(icunormalizationcharfilter *IcuNormalizationCharFilterBuilder) *CharFilterDefinitionBuilder {
-	v := icunormalizationcharfilter.Build()
-	u.v = &v
-	return u
-}
-
-func (u *CharFilterDefinitionBuilder) KuromojiIterationMarkCharFilter(kuromojiiterationmarkcharfilter *KuromojiIterationMarkCharFilterBuilder) *CharFilterDefinitionBuilder {
-	v := kuromojiiterationmarkcharfilter.Build()
-	u.v = &v
-	return u
-}
-
-func (u *CharFilterDefinitionBuilder) MappingCharFilter(mappingcharfilter *MappingCharFilterBuilder) *CharFilterDefinitionBuilder {
-	v := mappingcharfilter.Build()
-	u.v = &v
-	return u
-}
-
-func (u *CharFilterDefinitionBuilder) PatternReplaceCharFilter(patternreplacecharfilter *PatternReplaceCharFilterBuilder) *CharFilterDefinitionBuilder {
-	v := patternreplacecharfilter.Build()
-	u.v = &v
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/char_filters.ts#L35-L44
+type CharFilterDefinition any

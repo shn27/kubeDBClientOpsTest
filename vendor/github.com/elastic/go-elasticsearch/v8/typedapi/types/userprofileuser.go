@@ -15,70 +15,92 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // UserProfileUser type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/_types/UserProfile.ts#L34-L41
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/_types/UserProfile.ts#L32-L39
 type UserProfileUser struct {
-	Email       string   `json:"email,omitempty"`
-	FullName    Name     `json:"full_name,omitempty"`
-	RealmDomain *Name    `json:"realm_domain,omitempty"`
-	RealmName   Name     `json:"realm_name"`
+	Email       *string  `json:"email,omitempty"`
+	FullName    *string  `json:"full_name,omitempty"`
+	RealmDomain *string  `json:"realm_domain,omitempty"`
+	RealmName   string   `json:"realm_name"`
 	Roles       []string `json:"roles"`
-	Username    Username `json:"username"`
+	Username    string   `json:"username"`
 }
 
-// UserProfileUserBuilder holds UserProfileUser struct and provides a builder API.
-type UserProfileUserBuilder struct {
-	v *UserProfileUser
-}
+func (s *UserProfileUser) UnmarshalJSON(data []byte) error {
 
-// NewUserProfileUser provides a builder for the UserProfileUser struct.
-func NewUserProfileUserBuilder() *UserProfileUserBuilder {
-	r := UserProfileUserBuilder{
-		&UserProfileUser{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "email":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Email", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Email = &o
+
+		case "full_name":
+			if err := dec.Decode(&s.FullName); err != nil {
+				return fmt.Errorf("%s | %w", "FullName", err)
+			}
+
+		case "realm_domain":
+			if err := dec.Decode(&s.RealmDomain); err != nil {
+				return fmt.Errorf("%s | %w", "RealmDomain", err)
+			}
+
+		case "realm_name":
+			if err := dec.Decode(&s.RealmName); err != nil {
+				return fmt.Errorf("%s | %w", "RealmName", err)
+			}
+
+		case "roles":
+			if err := dec.Decode(&s.Roles); err != nil {
+				return fmt.Errorf("%s | %w", "Roles", err)
+			}
+
+		case "username":
+			if err := dec.Decode(&s.Username); err != nil {
+				return fmt.Errorf("%s | %w", "Username", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the UserProfileUser struct
-func (rb *UserProfileUserBuilder) Build() UserProfileUser {
-	return *rb.v
-}
+// NewUserProfileUser returns a UserProfileUser.
+func NewUserProfileUser() *UserProfileUser {
+	r := &UserProfileUser{}
 
-func (rb *UserProfileUserBuilder) Email(email string) *UserProfileUserBuilder {
-	rb.v.Email = email
-	return rb
-}
-
-func (rb *UserProfileUserBuilder) FullName(fullname Name) *UserProfileUserBuilder {
-	rb.v.FullName = fullname
-	return rb
-}
-
-func (rb *UserProfileUserBuilder) RealmDomain(realmdomain Name) *UserProfileUserBuilder {
-	rb.v.RealmDomain = &realmdomain
-	return rb
-}
-
-func (rb *UserProfileUserBuilder) RealmName(realmname Name) *UserProfileUserBuilder {
-	rb.v.RealmName = realmname
-	return rb
-}
-
-func (rb *UserProfileUserBuilder) Roles(roles ...string) *UserProfileUserBuilder {
-	rb.v.Roles = roles
-	return rb
-}
-
-func (rb *UserProfileUserBuilder) Username(username Username) *UserProfileUserBuilder {
-	rb.v.Username = username
-	return rb
+	return r
 }

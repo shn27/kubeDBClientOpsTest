@@ -15,73 +15,115 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // TranslogStatus type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/recovery/types.ts#L102-L109
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/recovery/types.ts#L102-L109
 type TranslogStatus struct {
-	Percent           Percentage              `json:"percent"`
-	Recovered         int64                   `json:"recovered"`
-	Total             int64                   `json:"total"`
-	TotalOnStart      int64                   `json:"total_on_start"`
-	TotalTime         *Duration               `json:"total_time,omitempty"`
-	TotalTimeInMillis DurationValueUnitMillis `json:"total_time_in_millis"`
+	Percent           Percentage `json:"percent"`
+	Recovered         int64      `json:"recovered"`
+	Total             int64      `json:"total"`
+	TotalOnStart      int64      `json:"total_on_start"`
+	TotalTime         Duration   `json:"total_time,omitempty"`
+	TotalTimeInMillis int64      `json:"total_time_in_millis"`
 }
 
-// TranslogStatusBuilder holds TranslogStatus struct and provides a builder API.
-type TranslogStatusBuilder struct {
-	v *TranslogStatus
-}
+func (s *TranslogStatus) UnmarshalJSON(data []byte) error {
 
-// NewTranslogStatus provides a builder for the TranslogStatus struct.
-func NewTranslogStatusBuilder() *TranslogStatusBuilder {
-	r := TranslogStatusBuilder{
-		&TranslogStatus{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "percent":
+			if err := dec.Decode(&s.Percent); err != nil {
+				return fmt.Errorf("%s | %w", "Percent", err)
+			}
+
+		case "recovered":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Recovered", err)
+				}
+				s.Recovered = value
+			case float64:
+				f := int64(v)
+				s.Recovered = f
+			}
+
+		case "total":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Total", err)
+				}
+				s.Total = value
+			case float64:
+				f := int64(v)
+				s.Total = f
+			}
+
+		case "total_on_start":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TotalOnStart", err)
+				}
+				s.TotalOnStart = value
+			case float64:
+				f := int64(v)
+				s.TotalOnStart = f
+			}
+
+		case "total_time":
+			if err := dec.Decode(&s.TotalTime); err != nil {
+				return fmt.Errorf("%s | %w", "TotalTime", err)
+			}
+
+		case "total_time_in_millis":
+			if err := dec.Decode(&s.TotalTimeInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "TotalTimeInMillis", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TranslogStatus struct
-func (rb *TranslogStatusBuilder) Build() TranslogStatus {
-	return *rb.v
-}
+// NewTranslogStatus returns a TranslogStatus.
+func NewTranslogStatus() *TranslogStatus {
+	r := &TranslogStatus{}
 
-func (rb *TranslogStatusBuilder) Percent(percent *PercentageBuilder) *TranslogStatusBuilder {
-	v := percent.Build()
-	rb.v.Percent = v
-	return rb
-}
-
-func (rb *TranslogStatusBuilder) Recovered(recovered int64) *TranslogStatusBuilder {
-	rb.v.Recovered = recovered
-	return rb
-}
-
-func (rb *TranslogStatusBuilder) Total(total int64) *TranslogStatusBuilder {
-	rb.v.Total = total
-	return rb
-}
-
-func (rb *TranslogStatusBuilder) TotalOnStart(totalonstart int64) *TranslogStatusBuilder {
-	rb.v.TotalOnStart = totalonstart
-	return rb
-}
-
-func (rb *TranslogStatusBuilder) TotalTime(totaltime *DurationBuilder) *TranslogStatusBuilder {
-	v := totaltime.Build()
-	rb.v.TotalTime = &v
-	return rb
-}
-
-func (rb *TranslogStatusBuilder) TotalTimeInMillis(totaltimeinmillis *DurationValueUnitMillisBuilder) *TranslogStatusBuilder {
-	v := totaltimeinmillis.Build()
-	rb.v.TotalTimeInMillis = v
-	return rb
+	return r
 }

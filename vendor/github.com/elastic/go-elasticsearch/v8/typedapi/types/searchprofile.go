@@ -15,60 +15,77 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // SearchProfile type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/profile.ts#L124-L128
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/profile.ts#L136-L140
 type SearchProfile struct {
 	Collector   []Collector    `json:"collector"`
 	Query       []QueryProfile `json:"query"`
 	RewriteTime int64          `json:"rewrite_time"`
 }
 
-// SearchProfileBuilder holds SearchProfile struct and provides a builder API.
-type SearchProfileBuilder struct {
-	v *SearchProfile
-}
+func (s *SearchProfile) UnmarshalJSON(data []byte) error {
 
-// NewSearchProfile provides a builder for the SearchProfile struct.
-func NewSearchProfileBuilder() *SearchProfileBuilder {
-	r := SearchProfileBuilder{
-		&SearchProfile{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "collector":
+			if err := dec.Decode(&s.Collector); err != nil {
+				return fmt.Errorf("%s | %w", "Collector", err)
+			}
+
+		case "query":
+			if err := dec.Decode(&s.Query); err != nil {
+				return fmt.Errorf("%s | %w", "Query", err)
+			}
+
+		case "rewrite_time":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "RewriteTime", err)
+				}
+				s.RewriteTime = value
+			case float64:
+				f := int64(v)
+				s.RewriteTime = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SearchProfile struct
-func (rb *SearchProfileBuilder) Build() SearchProfile {
-	return *rb.v
-}
+// NewSearchProfile returns a SearchProfile.
+func NewSearchProfile() *SearchProfile {
+	r := &SearchProfile{}
 
-func (rb *SearchProfileBuilder) Collector(collector []CollectorBuilder) *SearchProfileBuilder {
-	tmp := make([]Collector, len(collector))
-	for _, value := range collector {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Collector = tmp
-	return rb
-}
-
-func (rb *SearchProfileBuilder) Query(query []QueryProfileBuilder) *SearchProfileBuilder {
-	tmp := make([]QueryProfile, len(query))
-	for _, value := range query {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Query = tmp
-	return rb
-}
-
-func (rb *SearchProfileBuilder) RewriteTime(rewritetime int64) *SearchProfileBuilder {
-	rb.v.RewriteTime = rewritetime
-	return rb
+	return r
 }

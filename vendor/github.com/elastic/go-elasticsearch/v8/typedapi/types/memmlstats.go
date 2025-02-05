@@ -15,141 +15,180 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // MemMlStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/get_memory_stats/types.ts#L90-L111
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/get_memory_stats/types.ts#L90-L111
 type MemMlStats struct {
 	// AnomalyDetectors Amount of native memory set aside for anomaly detection jobs.
-	AnomalyDetectors *ByteSize `json:"anomaly_detectors,omitempty"`
+	AnomalyDetectors ByteSize `json:"anomaly_detectors,omitempty"`
 	// AnomalyDetectorsInBytes Amount of native memory, in bytes, set aside for anomaly detection jobs.
 	AnomalyDetectorsInBytes int `json:"anomaly_detectors_in_bytes"`
 	// DataFrameAnalytics Amount of native memory set aside for data frame analytics jobs.
-	DataFrameAnalytics *ByteSize `json:"data_frame_analytics,omitempty"`
+	DataFrameAnalytics ByteSize `json:"data_frame_analytics,omitempty"`
 	// DataFrameAnalyticsInBytes Amount of native memory, in bytes, set aside for data frame analytics jobs.
 	DataFrameAnalyticsInBytes int `json:"data_frame_analytics_in_bytes"`
 	// Max Maximum amount of native memory (separate to the JVM heap) that may be used
 	// by machine learning native processes.
-	Max *ByteSize `json:"max,omitempty"`
+	Max ByteSize `json:"max,omitempty"`
 	// MaxInBytes Maximum amount of native memory (separate to the JVM heap), in bytes, that
 	// may be used by machine learning native processes.
 	MaxInBytes int `json:"max_in_bytes"`
 	// NativeCodeOverhead Amount of native memory set aside for loading machine learning native code
 	// shared libraries.
-	NativeCodeOverhead *ByteSize `json:"native_code_overhead,omitempty"`
+	NativeCodeOverhead ByteSize `json:"native_code_overhead,omitempty"`
 	// NativeCodeOverheadInBytes Amount of native memory, in bytes, set aside for loading machine learning
 	// native code shared libraries.
 	NativeCodeOverheadInBytes int `json:"native_code_overhead_in_bytes"`
 	// NativeInference Amount of native memory set aside for trained models that have a PyTorch
 	// model_type.
-	NativeInference *ByteSize `json:"native_inference,omitempty"`
+	NativeInference ByteSize `json:"native_inference,omitempty"`
 	// NativeInferenceInBytes Amount of native memory, in bytes, set aside for trained models that have a
 	// PyTorch model_type.
 	NativeInferenceInBytes int `json:"native_inference_in_bytes"`
 }
 
-// MemMlStatsBuilder holds MemMlStats struct and provides a builder API.
-type MemMlStatsBuilder struct {
-	v *MemMlStats
-}
+func (s *MemMlStats) UnmarshalJSON(data []byte) error {
 
-// NewMemMlStats provides a builder for the MemMlStats struct.
-func NewMemMlStatsBuilder() *MemMlStatsBuilder {
-	r := MemMlStatsBuilder{
-		&MemMlStats{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "anomaly_detectors":
+			if err := dec.Decode(&s.AnomalyDetectors); err != nil {
+				return fmt.Errorf("%s | %w", "AnomalyDetectors", err)
+			}
+
+		case "anomaly_detectors_in_bytes":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "AnomalyDetectorsInBytes", err)
+				}
+				s.AnomalyDetectorsInBytes = value
+			case float64:
+				f := int(v)
+				s.AnomalyDetectorsInBytes = f
+			}
+
+		case "data_frame_analytics":
+			if err := dec.Decode(&s.DataFrameAnalytics); err != nil {
+				return fmt.Errorf("%s | %w", "DataFrameAnalytics", err)
+			}
+
+		case "data_frame_analytics_in_bytes":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DataFrameAnalyticsInBytes", err)
+				}
+				s.DataFrameAnalyticsInBytes = value
+			case float64:
+				f := int(v)
+				s.DataFrameAnalyticsInBytes = f
+			}
+
+		case "max":
+			if err := dec.Decode(&s.Max); err != nil {
+				return fmt.Errorf("%s | %w", "Max", err)
+			}
+
+		case "max_in_bytes":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxInBytes", err)
+				}
+				s.MaxInBytes = value
+			case float64:
+				f := int(v)
+				s.MaxInBytes = f
+			}
+
+		case "native_code_overhead":
+			if err := dec.Decode(&s.NativeCodeOverhead); err != nil {
+				return fmt.Errorf("%s | %w", "NativeCodeOverhead", err)
+			}
+
+		case "native_code_overhead_in_bytes":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NativeCodeOverheadInBytes", err)
+				}
+				s.NativeCodeOverheadInBytes = value
+			case float64:
+				f := int(v)
+				s.NativeCodeOverheadInBytes = f
+			}
+
+		case "native_inference":
+			if err := dec.Decode(&s.NativeInference); err != nil {
+				return fmt.Errorf("%s | %w", "NativeInference", err)
+			}
+
+		case "native_inference_in_bytes":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NativeInferenceInBytes", err)
+				}
+				s.NativeInferenceInBytes = value
+			case float64:
+				f := int(v)
+				s.NativeInferenceInBytes = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the MemMlStats struct
-func (rb *MemMlStatsBuilder) Build() MemMlStats {
-	return *rb.v
-}
+// NewMemMlStats returns a MemMlStats.
+func NewMemMlStats() *MemMlStats {
+	r := &MemMlStats{}
 
-// AnomalyDetectors Amount of native memory set aside for anomaly detection jobs.
-
-func (rb *MemMlStatsBuilder) AnomalyDetectors(anomalydetectors *ByteSizeBuilder) *MemMlStatsBuilder {
-	v := anomalydetectors.Build()
-	rb.v.AnomalyDetectors = &v
-	return rb
-}
-
-// AnomalyDetectorsInBytes Amount of native memory, in bytes, set aside for anomaly detection jobs.
-
-func (rb *MemMlStatsBuilder) AnomalyDetectorsInBytes(anomalydetectorsinbytes int) *MemMlStatsBuilder {
-	rb.v.AnomalyDetectorsInBytes = anomalydetectorsinbytes
-	return rb
-}
-
-// DataFrameAnalytics Amount of native memory set aside for data frame analytics jobs.
-
-func (rb *MemMlStatsBuilder) DataFrameAnalytics(dataframeanalytics *ByteSizeBuilder) *MemMlStatsBuilder {
-	v := dataframeanalytics.Build()
-	rb.v.DataFrameAnalytics = &v
-	return rb
-}
-
-// DataFrameAnalyticsInBytes Amount of native memory, in bytes, set aside for data frame analytics jobs.
-
-func (rb *MemMlStatsBuilder) DataFrameAnalyticsInBytes(dataframeanalyticsinbytes int) *MemMlStatsBuilder {
-	rb.v.DataFrameAnalyticsInBytes = dataframeanalyticsinbytes
-	return rb
-}
-
-// Max Maximum amount of native memory (separate to the JVM heap) that may be used
-// by machine learning native processes.
-
-func (rb *MemMlStatsBuilder) Max(max *ByteSizeBuilder) *MemMlStatsBuilder {
-	v := max.Build()
-	rb.v.Max = &v
-	return rb
-}
-
-// MaxInBytes Maximum amount of native memory (separate to the JVM heap), in bytes, that
-// may be used by machine learning native processes.
-
-func (rb *MemMlStatsBuilder) MaxInBytes(maxinbytes int) *MemMlStatsBuilder {
-	rb.v.MaxInBytes = maxinbytes
-	return rb
-}
-
-// NativeCodeOverhead Amount of native memory set aside for loading machine learning native code
-// shared libraries.
-
-func (rb *MemMlStatsBuilder) NativeCodeOverhead(nativecodeoverhead *ByteSizeBuilder) *MemMlStatsBuilder {
-	v := nativecodeoverhead.Build()
-	rb.v.NativeCodeOverhead = &v
-	return rb
-}
-
-// NativeCodeOverheadInBytes Amount of native memory, in bytes, set aside for loading machine learning
-// native code shared libraries.
-
-func (rb *MemMlStatsBuilder) NativeCodeOverheadInBytes(nativecodeoverheadinbytes int) *MemMlStatsBuilder {
-	rb.v.NativeCodeOverheadInBytes = nativecodeoverheadinbytes
-	return rb
-}
-
-// NativeInference Amount of native memory set aside for trained models that have a PyTorch
-// model_type.
-
-func (rb *MemMlStatsBuilder) NativeInference(nativeinference *ByteSizeBuilder) *MemMlStatsBuilder {
-	v := nativeinference.Build()
-	rb.v.NativeInference = &v
-	return rb
-}
-
-// NativeInferenceInBytes Amount of native memory, in bytes, set aside for trained models that have a
-// PyTorch model_type.
-
-func (rb *MemMlStatsBuilder) NativeInferenceInBytes(nativeinferenceinbytes int) *MemMlStatsBuilder {
-	rb.v.NativeInferenceInBytes = nativeinferenceinbytes
-	return rb
+	return r
 }

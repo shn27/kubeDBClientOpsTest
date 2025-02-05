@@ -15,50 +15,80 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // PredicateTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L295-L298
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L297-L300
 type PredicateTokenFilter struct {
-	Script  Script         `json:"script"`
-	Type    string         `json:"type,omitempty"`
-	Version *VersionString `json:"version,omitempty"`
+	Script  Script  `json:"script"`
+	Type    string  `json:"type,omitempty"`
+	Version *string `json:"version,omitempty"`
 }
 
-// PredicateTokenFilterBuilder holds PredicateTokenFilter struct and provides a builder API.
-type PredicateTokenFilterBuilder struct {
-	v *PredicateTokenFilter
+func (s *PredicateTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "script":
+			if err := dec.Decode(&s.Script); err != nil {
+				return fmt.Errorf("%s | %w", "Script", err)
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewPredicateTokenFilter provides a builder for the PredicateTokenFilter struct.
-func NewPredicateTokenFilterBuilder() *PredicateTokenFilterBuilder {
-	r := PredicateTokenFilterBuilder{
-		&PredicateTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s PredicateTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerPredicateTokenFilter PredicateTokenFilter
+	tmp := innerPredicateTokenFilter{
+		Script:  s.Script,
+		Type:    s.Type,
+		Version: s.Version,
 	}
 
-	r.v.Type = "predicate_token_filter"
+	tmp.Type = "predicate_token_filter"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the PredicateTokenFilter struct
-func (rb *PredicateTokenFilterBuilder) Build() PredicateTokenFilter {
-	return *rb.v
-}
+// NewPredicateTokenFilter returns a PredicateTokenFilter.
+func NewPredicateTokenFilter() *PredicateTokenFilter {
+	r := &PredicateTokenFilter{}
 
-func (rb *PredicateTokenFilterBuilder) Script(script *ScriptBuilder) *PredicateTokenFilterBuilder {
-	v := script.Build()
-	rb.v.Script = v
-	return rb
-}
-
-func (rb *PredicateTokenFilterBuilder) Version(version VersionString) *PredicateTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

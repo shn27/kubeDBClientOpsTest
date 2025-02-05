@@ -15,48 +15,76 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // FiltersAggregate type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L547-L548
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L639-L643
 type FiltersAggregate struct {
 	Buckets BucketsFiltersBucket `json:"buckets"`
-	Meta    *Metadata            `json:"meta,omitempty"`
+	Meta    Metadata             `json:"meta,omitempty"`
 }
 
-// FiltersAggregateBuilder holds FiltersAggregate struct and provides a builder API.
-type FiltersAggregateBuilder struct {
-	v *FiltersAggregate
-}
+func (s *FiltersAggregate) UnmarshalJSON(data []byte) error {
 
-// NewFiltersAggregate provides a builder for the FiltersAggregate struct.
-func NewFiltersAggregateBuilder() *FiltersAggregateBuilder {
-	r := FiltersAggregateBuilder{
-		&FiltersAggregate{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "buckets":
+
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			source := bytes.NewReader(rawMsg)
+			localDec := json.NewDecoder(source)
+			switch rawMsg[0] {
+			case '{':
+				o := make(map[string]FiltersBucket, 0)
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Buckets", err)
+				}
+				s.Buckets = o
+			case '[':
+				o := []FiltersBucket{}
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Buckets", err)
+				}
+				s.Buckets = o
+			}
+
+		case "meta":
+			if err := dec.Decode(&s.Meta); err != nil {
+				return fmt.Errorf("%s | %w", "Meta", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the FiltersAggregate struct
-func (rb *FiltersAggregateBuilder) Build() FiltersAggregate {
-	return *rb.v
-}
+// NewFiltersAggregate returns a FiltersAggregate.
+func NewFiltersAggregate() *FiltersAggregate {
+	r := &FiltersAggregate{}
 
-func (rb *FiltersAggregateBuilder) Buckets(buckets *BucketsFiltersBucketBuilder) *FiltersAggregateBuilder {
-	v := buckets.Build()
-	rb.v.Buckets = v
-	return rb
-}
-
-func (rb *FiltersAggregateBuilder) Meta(meta *MetadataBuilder) *FiltersAggregateBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
+	return r
 }

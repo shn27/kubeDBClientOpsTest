@@ -15,29 +15,33 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
-
-// Gets configuration and usage information about data frame analytics jobs.
+// Get data frame analytics jobs.
+// Returns configuration and usage information about data frame analytics jobs.
+//
+// CAT APIs are only intended for human consumption using the Kibana
+// console or command line. They are not intended for use by applications. For
+// application consumption, use the get data frame analytics jobs statistics
+// API.
 package mldataframeanalytics
 
 import (
-	gobytes "bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 
 	"github.com/elastic/elastic-transport-go/v8/elastictransport"
-
+	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/bytes"
+	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/catdfacolumn"
 )
 
 const (
@@ -54,11 +58,15 @@ type MlDataFrameAnalytics struct {
 	values  url.Values
 	path    url.URL
 
-	buf *gobytes.Buffer
+	raw io.Reader
 
 	paramSet int
 
 	id string
+
+	spanStarted bool
+
+	instrument elastictransport.Instrumentation
 }
 
 // NewMlDataFrameAnalytics type alias for index.
@@ -74,15 +82,26 @@ func NewMlDataFrameAnalyticsFunc(tp elastictransport.Interface) NewMlDataFrameAn
 	}
 }
 
-// Gets configuration and usage information about data frame analytics jobs.
+// Get data frame analytics jobs.
+// Returns configuration and usage information about data frame analytics jobs.
 //
-// https://www.elastic.co/guide/en/elasticsearch/reference/{branch}/cat-dfanalytics.html
+// CAT APIs are only intended for human consumption using the Kibana
+// console or command line. They are not intended for use by applications. For
+// application consumption, use the get data frame analytics jobs statistics
+// API.
+//
+// https://www.elastic.co/guide/en/elasticsearch/reference/current/cat-dfanalytics.html
 func New(tp elastictransport.Interface) *MlDataFrameAnalytics {
 	r := &MlDataFrameAnalytics{
 		transport: tp,
 		values:    make(url.Values),
 		headers:   make(http.Header),
-		buf:       gobytes.NewBuffer(nil),
+	}
+
+	if instrumented, ok := r.transport.(elastictransport.Instrumented); ok {
+		if instrument := instrumented.InstrumentationEnabled(); instrument != nil {
+			r.instrument = instrument
+		}
 	}
 
 	return r
@@ -121,7 +140,11 @@ func (r *MlDataFrameAnalytics) HttpRequest(ctx context.Context) (*http.Request, 
 		path.WriteString("/")
 		path.WriteString("analytics")
 		path.WriteString("/")
-		path.WriteString(url.PathEscape(r.id))
+
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordPathPart(ctx, "id", r.id)
+		}
+		path.WriteString(r.id)
 
 		method = http.MethodGet
 	}
@@ -134,12 +157,16 @@ func (r *MlDataFrameAnalytics) HttpRequest(ctx context.Context) (*http.Request, 
 	}
 
 	if ctx != nil {
-		req, err = http.NewRequestWithContext(ctx, method, r.path.String(), r.buf)
+		req, err = http.NewRequestWithContext(ctx, method, r.path.String(), r.raw)
 	} else {
-		req, err = http.NewRequest(method, r.path.String(), r.buf)
+		req, err = http.NewRequest(method, r.path.String(), r.raw)
 	}
 
-	req.Header.Set("accept", "application/vnd.elasticsearch+json;compatible-with=8")
+	req.Header = r.headers.Clone()
+
+	if req.Header.Get("Accept") == "" {
+		req.Header.Set("Accept", "application/vnd.elasticsearch+json;compatible-with=8")
+	}
 
 	if err != nil {
 		return req, fmt.Errorf("could not build http.Request: %w", err)
@@ -148,30 +175,121 @@ func (r *MlDataFrameAnalytics) HttpRequest(ctx context.Context) (*http.Request, 
 	return req, nil
 }
 
-// Do runs the http.Request through the provided transport.
-func (r MlDataFrameAnalytics) Do(ctx context.Context) (*http.Response, error) {
+// Perform runs the http.Request through the provided transport and returns an http.Response.
+func (r MlDataFrameAnalytics) Perform(providedCtx context.Context) (*http.Response, error) {
+	var ctx context.Context
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		if r.spanStarted == false {
+			ctx := instrument.Start(providedCtx, "cat.ml_data_frame_analytics")
+			defer instrument.Close(ctx)
+		}
+	}
+	if ctx == nil {
+		ctx = providedCtx
+	}
+
 	req, err := r.HttpRequest(ctx)
 	if err != nil {
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
 		return nil, err
 	}
 
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		instrument.BeforeRequest(req, "cat.ml_data_frame_analytics")
+		if reader := instrument.RecordRequestBody(ctx, "cat.ml_data_frame_analytics", r.raw); reader != nil {
+			req.Body = reader
+		}
+	}
 	res, err := r.transport.Perform(req)
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		instrument.AfterRequest(req, "elasticsearch", "cat.ml_data_frame_analytics")
+	}
 	if err != nil {
-		return nil, fmt.Errorf("an error happened during the MlDataFrameAnalytics query execution: %w", err)
+		localErr := fmt.Errorf("an error happened during the MlDataFrameAnalytics query execution: %w", err)
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, localErr)
+		}
+		return nil, localErr
 	}
 
 	return res, nil
 }
 
+// Do runs the request through the transport, handle the response and returns a mldataframeanalytics.Response
+func (r MlDataFrameAnalytics) Do(providedCtx context.Context) (Response, error) {
+	var ctx context.Context
+	r.spanStarted = true
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		ctx = instrument.Start(providedCtx, "cat.ml_data_frame_analytics")
+		defer instrument.Close(ctx)
+	}
+	if ctx == nil {
+		ctx = providedCtx
+	}
+
+	response := NewResponse()
+
+	res, err := r.Perform(ctx)
+	if err != nil {
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode < 299 {
+		err = json.NewDecoder(res.Body).Decode(&response)
+		if err != nil {
+			if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+				instrument.RecordError(ctx, err)
+			}
+			return nil, err
+		}
+
+		return response, nil
+	}
+
+	errorResponse := types.NewElasticsearchError()
+	err = json.NewDecoder(res.Body).Decode(errorResponse)
+	if err != nil {
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
+		return nil, err
+	}
+
+	if errorResponse.Status == 0 {
+		errorResponse.Status = res.StatusCode
+	}
+
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		instrument.RecordError(ctx, errorResponse)
+	}
+	return nil, errorResponse
+}
+
 // IsSuccess allows to run a query with a context and retrieve the result as a boolean.
 // This only exists for endpoints without a request payload and allows for quick control flow.
-func (r MlDataFrameAnalytics) IsSuccess(ctx context.Context) (bool, error) {
-	res, err := r.Do(ctx)
+func (r MlDataFrameAnalytics) IsSuccess(providedCtx context.Context) (bool, error) {
+	var ctx context.Context
+	r.spanStarted = true
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		ctx = instrument.Start(providedCtx, "cat.ml_data_frame_analytics")
+		defer instrument.Close(ctx)
+	}
+	if ctx == nil {
+		ctx = providedCtx
+	}
+
+	res, err := r.Perform(ctx)
 
 	if err != nil {
 		return false, err
 	}
-	io.Copy(ioutil.Discard, res.Body)
+	io.Copy(io.Discard, res.Body)
 	err = res.Body.Close()
 	if err != nil {
 		return false, err
@@ -179,6 +297,14 @@ func (r MlDataFrameAnalytics) IsSuccess(ctx context.Context) (bool, error) {
 
 	if res.StatusCode >= 200 && res.StatusCode < 300 {
 		return true, nil
+	}
+
+	if res.StatusCode != 404 {
+		err := fmt.Errorf("an error happened during the MlDataFrameAnalytics query execution, status code: %d", res.StatusCode)
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
+		return false, err
 	}
 
 	return false, nil
@@ -193,9 +319,9 @@ func (r *MlDataFrameAnalytics) Header(key, value string) *MlDataFrameAnalytics {
 
 // Id The ID of the data frame analytics to fetch
 // API Name: id
-func (r *MlDataFrameAnalytics) Id(v string) *MlDataFrameAnalytics {
+func (r *MlDataFrameAnalytics) Id(id string) *MlDataFrameAnalytics {
 	r.paramSet |= idMask
-	r.id = v
+	r.id = id
 
 	return r
 }
@@ -203,24 +329,28 @@ func (r *MlDataFrameAnalytics) Id(v string) *MlDataFrameAnalytics {
 // AllowNoMatch Whether to ignore if a wildcard expression matches no configs. (This includes
 // `_all` string or when no configs have been specified)
 // API name: allow_no_match
-func (r *MlDataFrameAnalytics) AllowNoMatch(b bool) *MlDataFrameAnalytics {
-	r.values.Set("allow_no_match", strconv.FormatBool(b))
+func (r *MlDataFrameAnalytics) AllowNoMatch(allownomatch bool) *MlDataFrameAnalytics {
+	r.values.Set("allow_no_match", strconv.FormatBool(allownomatch))
 
 	return r
 }
 
 // Bytes The unit in which to display byte values
 // API name: bytes
-func (r *MlDataFrameAnalytics) Bytes(enum bytes.Bytes) *MlDataFrameAnalytics {
-	r.values.Set("bytes", enum.String())
+func (r *MlDataFrameAnalytics) Bytes(bytes bytes.Bytes) *MlDataFrameAnalytics {
+	r.values.Set("bytes", bytes.String())
 
 	return r
 }
 
 // H Comma-separated list of column names to display.
 // API name: h
-func (r *MlDataFrameAnalytics) H(value string) *MlDataFrameAnalytics {
-	r.values.Set("h", value)
+func (r *MlDataFrameAnalytics) H(catdfacolumns ...catdfacolumn.CatDfaColumn) *MlDataFrameAnalytics {
+	tmp := []string{}
+	for _, item := range catdfacolumns {
+		tmp = append(tmp, item.String())
+	}
+	r.values.Set("expand_wildcards", strings.Join(tmp, ","))
 
 	return r
 }
@@ -228,16 +358,109 @@ func (r *MlDataFrameAnalytics) H(value string) *MlDataFrameAnalytics {
 // S Comma-separated list of column names or column aliases used to sort the
 // response.
 // API name: s
-func (r *MlDataFrameAnalytics) S(value string) *MlDataFrameAnalytics {
-	r.values.Set("s", value)
+func (r *MlDataFrameAnalytics) S(catdfacolumns ...catdfacolumn.CatDfaColumn) *MlDataFrameAnalytics {
+	tmp := []string{}
+	for _, item := range catdfacolumns {
+		tmp = append(tmp, item.String())
+	}
+	r.values.Set("expand_wildcards", strings.Join(tmp, ","))
 
 	return r
 }
 
 // Time Unit used to display time values.
 // API name: time
-func (r *MlDataFrameAnalytics) Time(value string) *MlDataFrameAnalytics {
-	r.values.Set("time", value)
+func (r *MlDataFrameAnalytics) Time(duration string) *MlDataFrameAnalytics {
+	r.values.Set("time", duration)
+
+	return r
+}
+
+// Format Specifies the format to return the columnar data in, can be set to
+// `text`, `json`, `cbor`, `yaml`, or `smile`.
+// API name: format
+func (r *MlDataFrameAnalytics) Format(format string) *MlDataFrameAnalytics {
+	r.values.Set("format", format)
+
+	return r
+}
+
+// Help When set to `true` will output available columns. This option
+// can't be combined with any other query string option.
+// API name: help
+func (r *MlDataFrameAnalytics) Help(help bool) *MlDataFrameAnalytics {
+	r.values.Set("help", strconv.FormatBool(help))
+
+	return r
+}
+
+// Local If `true`, the request computes the list of selected nodes from the
+// local cluster state. If `false` the list of selected nodes are computed
+// from the cluster state of the master node. In both cases the coordinating
+// node will send requests for further information to each selected node.
+// API name: local
+func (r *MlDataFrameAnalytics) Local(local bool) *MlDataFrameAnalytics {
+	r.values.Set("local", strconv.FormatBool(local))
+
+	return r
+}
+
+// MasterTimeout Period to wait for a connection to the master node.
+// API name: master_timeout
+func (r *MlDataFrameAnalytics) MasterTimeout(duration string) *MlDataFrameAnalytics {
+	r.values.Set("master_timeout", duration)
+
+	return r
+}
+
+// V When set to `true` will enable verbose output.
+// API name: v
+func (r *MlDataFrameAnalytics) V(v bool) *MlDataFrameAnalytics {
+	r.values.Set("v", strconv.FormatBool(v))
+
+	return r
+}
+
+// ErrorTrace When set to `true` Elasticsearch will include the full stack trace of errors
+// when they occur.
+// API name: error_trace
+func (r *MlDataFrameAnalytics) ErrorTrace(errortrace bool) *MlDataFrameAnalytics {
+	r.values.Set("error_trace", strconv.FormatBool(errortrace))
+
+	return r
+}
+
+// FilterPath Comma-separated list of filters in dot notation which reduce the response
+// returned by Elasticsearch.
+// API name: filter_path
+func (r *MlDataFrameAnalytics) FilterPath(filterpaths ...string) *MlDataFrameAnalytics {
+	tmp := []string{}
+	for _, item := range filterpaths {
+		tmp = append(tmp, fmt.Sprintf("%v", item))
+	}
+	r.values.Set("filter_path", strings.Join(tmp, ","))
+
+	return r
+}
+
+// Human When set to `true` will return statistics in a format suitable for humans.
+// For example `"exists_time": "1h"` for humans and
+// `"eixsts_time_in_millis": 3600000` for computers. When disabled the human
+// readable values will be omitted. This makes sense for responses being
+// consumed
+// only by machines.
+// API name: human
+func (r *MlDataFrameAnalytics) Human(human bool) *MlDataFrameAnalytics {
+	r.values.Set("human", strconv.FormatBool(human))
+
+	return r
+}
+
+// Pretty If set to `true` the returned JSON will be "pretty-formatted". Only use
+// this option for debugging only.
+// API name: pretty
+func (r *MlDataFrameAnalytics) Pretty(pretty bool) *MlDataFrameAnalytics {
+	r.values.Set("pretty", strconv.FormatBool(pretty))
 
 	return r
 }

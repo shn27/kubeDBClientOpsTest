@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // Page type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/Page.ts#L22-L33
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/Page.ts#L22-L33
 type Page struct {
 	// From Skips the specified number of items.
 	From *int `json:"from,omitempty"`
@@ -32,35 +39,61 @@ type Page struct {
 	Size *int `json:"size,omitempty"`
 }
 
-// PageBuilder holds Page struct and provides a builder API.
-type PageBuilder struct {
-	v *Page
-}
+func (s *Page) UnmarshalJSON(data []byte) error {
 
-// NewPage provides a builder for the Page struct.
-func NewPageBuilder() *PageBuilder {
-	r := PageBuilder{
-		&Page{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "from":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "From", err)
+				}
+				s.From = &value
+			case float64:
+				f := int(v)
+				s.From = &f
+			}
+
+		case "size":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Size", err)
+				}
+				s.Size = &value
+			case float64:
+				f := int(v)
+				s.Size = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the Page struct
-func (rb *PageBuilder) Build() Page {
-	return *rb.v
-}
+// NewPage returns a Page.
+func NewPage() *Page {
+	r := &Page{}
 
-// From Skips the specified number of items.
-
-func (rb *PageBuilder) From(from int) *PageBuilder {
-	rb.v.From = &from
-	return rb
-}
-
-// Size Specifies the maximum number of items to obtain.
-
-func (rb *PageBuilder) Size(size int) *PageBuilder {
-	rb.v.Size = &size
-	return rb
+	return r
 }

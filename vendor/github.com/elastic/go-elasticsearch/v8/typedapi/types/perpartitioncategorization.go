@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // PerPartitionCategorization type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/Analysis.ts#L93-L102
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/Analysis.ts#L150-L159
 type PerPartitionCategorization struct {
 	// Enabled To enable this setting, you must also set the `partition_field_name` property
 	// to the same value in every detector that uses the keyword `mlcategory`.
@@ -39,42 +46,57 @@ type PerPartitionCategorization struct {
 	StopOnWarn *bool `json:"stop_on_warn,omitempty"`
 }
 
-// PerPartitionCategorizationBuilder holds PerPartitionCategorization struct and provides a builder API.
-type PerPartitionCategorizationBuilder struct {
-	v *PerPartitionCategorization
-}
+func (s *PerPartitionCategorization) UnmarshalJSON(data []byte) error {
 
-// NewPerPartitionCategorization provides a builder for the PerPartitionCategorization struct.
-func NewPerPartitionCategorizationBuilder() *PerPartitionCategorizationBuilder {
-	r := PerPartitionCategorizationBuilder{
-		&PerPartitionCategorization{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "enabled":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Enabled", err)
+				}
+				s.Enabled = &value
+			case bool:
+				s.Enabled = &v
+			}
+
+		case "stop_on_warn":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "StopOnWarn", err)
+				}
+				s.StopOnWarn = &value
+			case bool:
+				s.StopOnWarn = &v
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the PerPartitionCategorization struct
-func (rb *PerPartitionCategorizationBuilder) Build() PerPartitionCategorization {
-	return *rb.v
-}
+// NewPerPartitionCategorization returns a PerPartitionCategorization.
+func NewPerPartitionCategorization() *PerPartitionCategorization {
+	r := &PerPartitionCategorization{}
 
-// Enabled To enable this setting, you must also set the `partition_field_name` property
-// to the same value in every detector that uses the keyword `mlcategory`.
-// Otherwise, job creation fails.
-
-func (rb *PerPartitionCategorizationBuilder) Enabled(enabled bool) *PerPartitionCategorizationBuilder {
-	rb.v.Enabled = &enabled
-	return rb
-}
-
-// StopOnWarn This setting can be set to true only if per-partition categorization is
-// enabled. If true, both categorization and subsequent anomaly detection stops
-// for partitions where the categorization status changes to warn. This setting
-// makes it viable to have a job where it is expected that categorization works
-// well for some partitions but not others; you do not pay the cost of bad
-// categorization forever in the partitions where it works badly.
-
-func (rb *PerPartitionCategorizationBuilder) StopOnWarn(stoponwarn bool) *PerPartitionCategorizationBuilder {
-	rb.v.StopOnWarn = &stoponwarn
-	return rb
+	return r
 }

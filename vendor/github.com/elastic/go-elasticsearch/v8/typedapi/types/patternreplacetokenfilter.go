@@ -15,67 +15,132 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // PatternReplaceTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L283-L289
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L285-L291
 type PatternReplaceTokenFilter struct {
-	All         *bool          `json:"all,omitempty"`
-	Flags       *string        `json:"flags,omitempty"`
-	Pattern     string         `json:"pattern"`
-	Replacement *string        `json:"replacement,omitempty"`
-	Type        string         `json:"type,omitempty"`
-	Version     *VersionString `json:"version,omitempty"`
+	All         *bool   `json:"all,omitempty"`
+	Flags       *string `json:"flags,omitempty"`
+	Pattern     string  `json:"pattern"`
+	Replacement *string `json:"replacement,omitempty"`
+	Type        string  `json:"type,omitempty"`
+	Version     *string `json:"version,omitempty"`
 }
 
-// PatternReplaceTokenFilterBuilder holds PatternReplaceTokenFilter struct and provides a builder API.
-type PatternReplaceTokenFilterBuilder struct {
-	v *PatternReplaceTokenFilter
+func (s *PatternReplaceTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "all":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "All", err)
+				}
+				s.All = &value
+			case bool:
+				s.All = &v
+			}
+
+		case "flags":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Flags", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Flags = &o
+
+		case "pattern":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Pattern", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Pattern = o
+
+		case "replacement":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Replacement", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Replacement = &o
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewPatternReplaceTokenFilter provides a builder for the PatternReplaceTokenFilter struct.
-func NewPatternReplaceTokenFilterBuilder() *PatternReplaceTokenFilterBuilder {
-	r := PatternReplaceTokenFilterBuilder{
-		&PatternReplaceTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s PatternReplaceTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerPatternReplaceTokenFilter PatternReplaceTokenFilter
+	tmp := innerPatternReplaceTokenFilter{
+		All:         s.All,
+		Flags:       s.Flags,
+		Pattern:     s.Pattern,
+		Replacement: s.Replacement,
+		Type:        s.Type,
+		Version:     s.Version,
 	}
 
-	r.v.Type = "pattern_replace"
+	tmp.Type = "pattern_replace"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the PatternReplaceTokenFilter struct
-func (rb *PatternReplaceTokenFilterBuilder) Build() PatternReplaceTokenFilter {
-	return *rb.v
-}
+// NewPatternReplaceTokenFilter returns a PatternReplaceTokenFilter.
+func NewPatternReplaceTokenFilter() *PatternReplaceTokenFilter {
+	r := &PatternReplaceTokenFilter{}
 
-func (rb *PatternReplaceTokenFilterBuilder) All(all bool) *PatternReplaceTokenFilterBuilder {
-	rb.v.All = &all
-	return rb
-}
-
-func (rb *PatternReplaceTokenFilterBuilder) Flags(flags string) *PatternReplaceTokenFilterBuilder {
-	rb.v.Flags = &flags
-	return rb
-}
-
-func (rb *PatternReplaceTokenFilterBuilder) Pattern(pattern string) *PatternReplaceTokenFilterBuilder {
-	rb.v.Pattern = pattern
-	return rb
-}
-
-func (rb *PatternReplaceTokenFilterBuilder) Replacement(replacement string) *PatternReplaceTokenFilterBuilder {
-	rb.v.Replacement = &replacement
-	return rb
-}
-
-func (rb *PatternReplaceTokenFilterBuilder) Version(version VersionString) *PatternReplaceTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

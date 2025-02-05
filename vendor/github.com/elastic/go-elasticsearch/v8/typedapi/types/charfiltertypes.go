@@ -15,114 +15,36 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // CharFilterTypes type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/stats/types.ts#L126-L135
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/stats/types.ts#L228-L261
 type CharFilterTypes struct {
-	AnalyzerTypes      []FieldTypes `json:"analyzer_types"`
-	BuiltInAnalyzers   []FieldTypes `json:"built_in_analyzers"`
+	// AnalyzerTypes Contains statistics about analyzer types used in selected nodes.
+	AnalyzerTypes []FieldTypes `json:"analyzer_types"`
+	// BuiltInAnalyzers Contains statistics about built-in analyzers used in selected nodes.
+	BuiltInAnalyzers []FieldTypes `json:"built_in_analyzers"`
+	// BuiltInCharFilters Contains statistics about built-in character filters used in selected nodes.
 	BuiltInCharFilters []FieldTypes `json:"built_in_char_filters"`
-	BuiltInFilters     []FieldTypes `json:"built_in_filters"`
-	BuiltInTokenizers  []FieldTypes `json:"built_in_tokenizers"`
-	CharFilterTypes    []FieldTypes `json:"char_filter_types"`
-	FilterTypes        []FieldTypes `json:"filter_types"`
-	TokenizerTypes     []FieldTypes `json:"tokenizer_types"`
+	// BuiltInFilters Contains statistics about built-in token filters used in selected nodes.
+	BuiltInFilters []FieldTypes `json:"built_in_filters"`
+	// BuiltInTokenizers Contains statistics about built-in tokenizers used in selected nodes.
+	BuiltInTokenizers []FieldTypes `json:"built_in_tokenizers"`
+	// CharFilterTypes Contains statistics about character filter types used in selected nodes.
+	CharFilterTypes []FieldTypes `json:"char_filter_types"`
+	// FilterTypes Contains statistics about token filter types used in selected nodes.
+	FilterTypes []FieldTypes `json:"filter_types"`
+	// TokenizerTypes Contains statistics about tokenizer types used in selected nodes.
+	TokenizerTypes []FieldTypes `json:"tokenizer_types"`
 }
 
-// CharFilterTypesBuilder holds CharFilterTypes struct and provides a builder API.
-type CharFilterTypesBuilder struct {
-	v *CharFilterTypes
-}
+// NewCharFilterTypes returns a CharFilterTypes.
+func NewCharFilterTypes() *CharFilterTypes {
+	r := &CharFilterTypes{}
 
-// NewCharFilterTypes provides a builder for the CharFilterTypes struct.
-func NewCharFilterTypesBuilder() *CharFilterTypesBuilder {
-	r := CharFilterTypesBuilder{
-		&CharFilterTypes{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the CharFilterTypes struct
-func (rb *CharFilterTypesBuilder) Build() CharFilterTypes {
-	return *rb.v
-}
-
-func (rb *CharFilterTypesBuilder) AnalyzerTypes(analyzer_types []FieldTypesBuilder) *CharFilterTypesBuilder {
-	tmp := make([]FieldTypes, len(analyzer_types))
-	for _, value := range analyzer_types {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.AnalyzerTypes = tmp
-	return rb
-}
-
-func (rb *CharFilterTypesBuilder) BuiltInAnalyzers(built_in_analyzers []FieldTypesBuilder) *CharFilterTypesBuilder {
-	tmp := make([]FieldTypes, len(built_in_analyzers))
-	for _, value := range built_in_analyzers {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.BuiltInAnalyzers = tmp
-	return rb
-}
-
-func (rb *CharFilterTypesBuilder) BuiltInCharFilters(built_in_char_filters []FieldTypesBuilder) *CharFilterTypesBuilder {
-	tmp := make([]FieldTypes, len(built_in_char_filters))
-	for _, value := range built_in_char_filters {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.BuiltInCharFilters = tmp
-	return rb
-}
-
-func (rb *CharFilterTypesBuilder) BuiltInFilters(built_in_filters []FieldTypesBuilder) *CharFilterTypesBuilder {
-	tmp := make([]FieldTypes, len(built_in_filters))
-	for _, value := range built_in_filters {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.BuiltInFilters = tmp
-	return rb
-}
-
-func (rb *CharFilterTypesBuilder) BuiltInTokenizers(built_in_tokenizers []FieldTypesBuilder) *CharFilterTypesBuilder {
-	tmp := make([]FieldTypes, len(built_in_tokenizers))
-	for _, value := range built_in_tokenizers {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.BuiltInTokenizers = tmp
-	return rb
-}
-
-func (rb *CharFilterTypesBuilder) CharFilterTypes(char_filter_types []FieldTypesBuilder) *CharFilterTypesBuilder {
-	tmp := make([]FieldTypes, len(char_filter_types))
-	for _, value := range char_filter_types {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.CharFilterTypes = tmp
-	return rb
-}
-
-func (rb *CharFilterTypesBuilder) FilterTypes(filter_types []FieldTypesBuilder) *CharFilterTypesBuilder {
-	tmp := make([]FieldTypes, len(filter_types))
-	for _, value := range filter_types {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.FilterTypes = tmp
-	return rb
-}
-
-func (rb *CharFilterTypesBuilder) TokenizerTypes(tokenizer_types []FieldTypesBuilder) *CharFilterTypesBuilder {
-	tmp := make([]FieldTypes, len(tokenizer_types))
-	for _, value := range tokenizer_types {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.TokenizerTypes = tmp
-	return rb
+	return r
 }

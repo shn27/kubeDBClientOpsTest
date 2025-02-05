@@ -15,60 +15,68 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // HitsMetadata type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/hits.ts#L62-L68
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/hits.ts#L68-L74
 type HitsMetadata struct {
-	Hits     []Hit   `json:"hits"`
-	MaxScore float64 `json:"max_score,omitempty"`
+	Hits     []Hit    `json:"hits"`
+	MaxScore *Float64 `json:"max_score,omitempty"`
 	// Total Total hit count information, present only if `track_total_hits` wasn't
 	// `false` in the search request.
-	Total int64 `json:"total,omitempty"`
+	Total *TotalHits `json:"total,omitempty"`
 }
 
-// HitsMetadataBuilder holds HitsMetadata struct and provides a builder API.
-type HitsMetadataBuilder struct {
-	v *HitsMetadata
-}
+func (s *HitsMetadata) UnmarshalJSON(data []byte) error {
 
-// NewHitsMetadata provides a builder for the HitsMetadata struct.
-func NewHitsMetadataBuilder() *HitsMetadataBuilder {
-	r := HitsMetadataBuilder{
-		&HitsMetadata{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "hits":
+			if err := dec.Decode(&s.Hits); err != nil {
+				return fmt.Errorf("%s | %w", "Hits", err)
+			}
+
+		case "max_score":
+			if err := dec.Decode(&s.MaxScore); err != nil {
+				return fmt.Errorf("%s | %w", "MaxScore", err)
+			}
+
+		case "total":
+			if err := dec.Decode(&s.Total); err != nil {
+				return fmt.Errorf("%s | %w", "Total", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the HitsMetadata struct
-func (rb *HitsMetadataBuilder) Build() HitsMetadata {
-	return *rb.v
-}
+// NewHitsMetadata returns a HitsMetadata.
+func NewHitsMetadata() *HitsMetadata {
+	r := &HitsMetadata{}
 
-func (rb *HitsMetadataBuilder) Hits(hits []HitBuilder) *HitsMetadataBuilder {
-	tmp := make([]Hit, len(hits))
-	for _, value := range hits {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Hits = tmp
-	return rb
-}
-
-func (rb *HitsMetadataBuilder) MaxScore(maxscore float64) *HitsMetadataBuilder {
-	rb.v.MaxScore = maxscore
-	return rb
-}
-
-// Total Total hit count information, present only if `track_total_hits` wasn't
-// `false` in the search request.
-func (rb *HitsMetadataBuilder) Total(arg int64) *HitsMetadataBuilder {
-	rb.v.Total = arg
-	return rb
+	return r
 }

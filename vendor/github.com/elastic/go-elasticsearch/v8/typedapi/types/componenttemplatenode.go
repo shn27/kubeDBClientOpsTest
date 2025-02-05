@@ -15,54 +15,66 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // ComponentTemplateNode type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/_types/ComponentTemplate.ts#L31-L36
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/_types/ComponentTemplate.ts#L32-L37
 type ComponentTemplateNode struct {
-	Meta_    *Metadata                `json:"_meta,omitempty"`
+	Meta_    Metadata                 `json:"_meta,omitempty"`
 	Template ComponentTemplateSummary `json:"template"`
-	Version  *VersionNumber           `json:"version,omitempty"`
+	Version  *int64                   `json:"version,omitempty"`
 }
 
-// ComponentTemplateNodeBuilder holds ComponentTemplateNode struct and provides a builder API.
-type ComponentTemplateNodeBuilder struct {
-	v *ComponentTemplateNode
-}
+func (s *ComponentTemplateNode) UnmarshalJSON(data []byte) error {
 
-// NewComponentTemplateNode provides a builder for the ComponentTemplateNode struct.
-func NewComponentTemplateNodeBuilder() *ComponentTemplateNodeBuilder {
-	r := ComponentTemplateNodeBuilder{
-		&ComponentTemplateNode{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "_meta":
+			if err := dec.Decode(&s.Meta_); err != nil {
+				return fmt.Errorf("%s | %w", "Meta_", err)
+			}
+
+		case "template":
+			if err := dec.Decode(&s.Template); err != nil {
+				return fmt.Errorf("%s | %w", "Template", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ComponentTemplateNode struct
-func (rb *ComponentTemplateNodeBuilder) Build() ComponentTemplateNode {
-	return *rb.v
-}
+// NewComponentTemplateNode returns a ComponentTemplateNode.
+func NewComponentTemplateNode() *ComponentTemplateNode {
+	r := &ComponentTemplateNode{}
 
-func (rb *ComponentTemplateNodeBuilder) Meta_(meta_ *MetadataBuilder) *ComponentTemplateNodeBuilder {
-	v := meta_.Build()
-	rb.v.Meta_ = &v
-	return rb
-}
-
-func (rb *ComponentTemplateNodeBuilder) Template(template *ComponentTemplateSummaryBuilder) *ComponentTemplateNodeBuilder {
-	v := template.Build()
-	rb.v.Template = v
-	return rb
-}
-
-func (rb *ComponentTemplateNodeBuilder) Version(version VersionNumber) *ComponentTemplateNodeBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

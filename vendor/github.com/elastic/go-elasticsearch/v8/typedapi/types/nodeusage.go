@@ -15,63 +15,81 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // NodeUsage type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/usage/types.ts#L25-L30
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/usage/types.ts#L25-L30
 type NodeUsage struct {
-	Aggregations map[string]interface{} `json:"aggregations"`
-	RestActions  map[string]int         `json:"rest_actions"`
-	Since        EpochTimeUnitMillis    `json:"since"`
-	Timestamp    EpochTimeUnitMillis    `json:"timestamp"`
+	Aggregations map[string]json.RawMessage `json:"aggregations"`
+	RestActions  map[string]int             `json:"rest_actions"`
+	Since        int64                      `json:"since"`
+	Timestamp    int64                      `json:"timestamp"`
 }
 
-// NodeUsageBuilder holds NodeUsage struct and provides a builder API.
-type NodeUsageBuilder struct {
-	v *NodeUsage
+func (s *NodeUsage) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "aggregations":
+			if s.Aggregations == nil {
+				s.Aggregations = make(map[string]json.RawMessage, 0)
+			}
+			if err := dec.Decode(&s.Aggregations); err != nil {
+				return fmt.Errorf("%s | %w", "Aggregations", err)
+			}
+
+		case "rest_actions":
+			if s.RestActions == nil {
+				s.RestActions = make(map[string]int, 0)
+			}
+			if err := dec.Decode(&s.RestActions); err != nil {
+				return fmt.Errorf("%s | %w", "RestActions", err)
+			}
+
+		case "since":
+			if err := dec.Decode(&s.Since); err != nil {
+				return fmt.Errorf("%s | %w", "Since", err)
+			}
+
+		case "timestamp":
+			if err := dec.Decode(&s.Timestamp); err != nil {
+				return fmt.Errorf("%s | %w", "Timestamp", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewNodeUsage provides a builder for the NodeUsage struct.
-func NewNodeUsageBuilder() *NodeUsageBuilder {
-	r := NodeUsageBuilder{
-		&NodeUsage{
-			Aggregations: make(map[string]interface{}, 0),
-			RestActions:  make(map[string]int, 0),
-		},
+// NewNodeUsage returns a NodeUsage.
+func NewNodeUsage() *NodeUsage {
+	r := &NodeUsage{
+		Aggregations: make(map[string]json.RawMessage, 0),
+		RestActions:  make(map[string]int, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the NodeUsage struct
-func (rb *NodeUsageBuilder) Build() NodeUsage {
-	return *rb.v
-}
-
-func (rb *NodeUsageBuilder) Aggregations(value map[string]interface{}) *NodeUsageBuilder {
-	rb.v.Aggregations = value
-	return rb
-}
-
-func (rb *NodeUsageBuilder) RestActions(value map[string]int) *NodeUsageBuilder {
-	rb.v.RestActions = value
-	return rb
-}
-
-func (rb *NodeUsageBuilder) Since(since *EpochTimeUnitMillisBuilder) *NodeUsageBuilder {
-	v := since.Build()
-	rb.v.Since = v
-	return rb
-}
-
-func (rb *NodeUsageBuilder) Timestamp(timestamp *EpochTimeUnitMillisBuilder) *NodeUsageBuilder {
-	v := timestamp.Build()
-	rb.v.Timestamp = v
-	return rb
+	return r
 }

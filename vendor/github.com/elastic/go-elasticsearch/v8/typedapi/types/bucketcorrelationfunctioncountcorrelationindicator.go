@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // BucketCorrelationFunctionCountCorrelationIndicator type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/pipeline.ts#L122-L140
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/pipeline.ts#L160-L178
 type BucketCorrelationFunctionCountCorrelationIndicator struct {
 	// DocCount The total number of documents that initially created the expectations. It’s
 	// required to be greater
@@ -36,62 +43,64 @@ type BucketCorrelationFunctionCountCorrelationIndicator struct {
 	// values.
 	// The length of this value must always equal the number of buckets returned by
 	// the `bucket_path`.
-	Expectations []float64 `json:"expectations"`
+	Expectations []Float64 `json:"expectations"`
 	// Fractions An array of fractions to use when averaging and calculating variance. This
 	// should be used if
 	// the pre-calculated data and the buckets_path have known gaps. The length of
 	// fractions, if provided,
 	// must equal expectations.
-	Fractions []float64 `json:"fractions,omitempty"`
+	Fractions []Float64 `json:"fractions,omitempty"`
 }
 
-// BucketCorrelationFunctionCountCorrelationIndicatorBuilder holds BucketCorrelationFunctionCountCorrelationIndicator struct and provides a builder API.
-type BucketCorrelationFunctionCountCorrelationIndicatorBuilder struct {
-	v *BucketCorrelationFunctionCountCorrelationIndicator
-}
+func (s *BucketCorrelationFunctionCountCorrelationIndicator) UnmarshalJSON(data []byte) error {
 
-// NewBucketCorrelationFunctionCountCorrelationIndicator provides a builder for the BucketCorrelationFunctionCountCorrelationIndicator struct.
-func NewBucketCorrelationFunctionCountCorrelationIndicatorBuilder() *BucketCorrelationFunctionCountCorrelationIndicatorBuilder {
-	r := BucketCorrelationFunctionCountCorrelationIndicatorBuilder{
-		&BucketCorrelationFunctionCountCorrelationIndicator{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "doc_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DocCount", err)
+				}
+				s.DocCount = value
+			case float64:
+				f := int(v)
+				s.DocCount = f
+			}
+
+		case "expectations":
+			if err := dec.Decode(&s.Expectations); err != nil {
+				return fmt.Errorf("%s | %w", "Expectations", err)
+			}
+
+		case "fractions":
+			if err := dec.Decode(&s.Fractions); err != nil {
+				return fmt.Errorf("%s | %w", "Fractions", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the BucketCorrelationFunctionCountCorrelationIndicator struct
-func (rb *BucketCorrelationFunctionCountCorrelationIndicatorBuilder) Build() BucketCorrelationFunctionCountCorrelationIndicator {
-	return *rb.v
-}
+// NewBucketCorrelationFunctionCountCorrelationIndicator returns a BucketCorrelationFunctionCountCorrelationIndicator.
+func NewBucketCorrelationFunctionCountCorrelationIndicator() *BucketCorrelationFunctionCountCorrelationIndicator {
+	r := &BucketCorrelationFunctionCountCorrelationIndicator{}
 
-// DocCount The total number of documents that initially created the expectations. It’s
-// required to be greater
-// than or equal to the sum of all values in the buckets_path as this is the
-// originating superset of data
-// to which the term values are correlated.
-
-func (rb *BucketCorrelationFunctionCountCorrelationIndicatorBuilder) DocCount(doccount int) *BucketCorrelationFunctionCountCorrelationIndicatorBuilder {
-	rb.v.DocCount = doccount
-	return rb
-}
-
-// Expectations An array of numbers with which to correlate the configured `bucket_path`
-// values.
-// The length of this value must always equal the number of buckets returned by
-// the `bucket_path`.
-
-func (rb *BucketCorrelationFunctionCountCorrelationIndicatorBuilder) Expectations(expectations ...float64) *BucketCorrelationFunctionCountCorrelationIndicatorBuilder {
-	rb.v.Expectations = expectations
-	return rb
-}
-
-// Fractions An array of fractions to use when averaging and calculating variance. This
-// should be used if
-// the pre-calculated data and the buckets_path have known gaps. The length of
-// fractions, if provided,
-// must equal expectations.
-
-func (rb *BucketCorrelationFunctionCountCorrelationIndicatorBuilder) Fractions(fractions ...float64) *BucketCorrelationFunctionCountCorrelationIndicatorBuilder {
-	rb.v.Fractions = fractions
-	return rb
+	return r
 }

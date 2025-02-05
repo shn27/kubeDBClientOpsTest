@@ -15,55 +15,119 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // SettingsSimilarityBm25 type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/IndexSettings.ts#L180-L185
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/IndexSettings.ts#L188-L193
 type SettingsSimilarityBm25 struct {
-	B                int     `json:"b"`
-	DiscountOverlaps bool    `json:"discount_overlaps"`
-	K1               float64 `json:"k1"`
-	Type             string  `json:"type,omitempty"`
+	B                *Float64 `json:"b,omitempty"`
+	DiscountOverlaps *bool    `json:"discount_overlaps,omitempty"`
+	K1               *Float64 `json:"k1,omitempty"`
+	Type             string   `json:"type,omitempty"`
 }
 
-// SettingsSimilarityBm25Builder holds SettingsSimilarityBm25 struct and provides a builder API.
-type SettingsSimilarityBm25Builder struct {
-	v *SettingsSimilarityBm25
+func (s *SettingsSimilarityBm25) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "b":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "B", err)
+				}
+				f := Float64(value)
+				s.B = &f
+			case float64:
+				f := Float64(v)
+				s.B = &f
+			}
+
+		case "discount_overlaps":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DiscountOverlaps", err)
+				}
+				s.DiscountOverlaps = &value
+			case bool:
+				s.DiscountOverlaps = &v
+			}
+
+		case "k1":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "K1", err)
+				}
+				f := Float64(value)
+				s.K1 = &f
+			case float64:
+				f := Float64(v)
+				s.K1 = &f
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewSettingsSimilarityBm25 provides a builder for the SettingsSimilarityBm25 struct.
-func NewSettingsSimilarityBm25Builder() *SettingsSimilarityBm25Builder {
-	r := SettingsSimilarityBm25Builder{
-		&SettingsSimilarityBm25{},
+// MarshalJSON override marshalling to include literal value
+func (s SettingsSimilarityBm25) MarshalJSON() ([]byte, error) {
+	type innerSettingsSimilarityBm25 SettingsSimilarityBm25
+	tmp := innerSettingsSimilarityBm25{
+		B:                s.B,
+		DiscountOverlaps: s.DiscountOverlaps,
+		K1:               s.K1,
+		Type:             s.Type,
 	}
 
-	r.v.Type = "BM25"
+	tmp.Type = "BM25"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the SettingsSimilarityBm25 struct
-func (rb *SettingsSimilarityBm25Builder) Build() SettingsSimilarityBm25 {
-	return *rb.v
-}
+// NewSettingsSimilarityBm25 returns a SettingsSimilarityBm25.
+func NewSettingsSimilarityBm25() *SettingsSimilarityBm25 {
+	r := &SettingsSimilarityBm25{}
 
-func (rb *SettingsSimilarityBm25Builder) B(b int) *SettingsSimilarityBm25Builder {
-	rb.v.B = b
-	return rb
-}
-
-func (rb *SettingsSimilarityBm25Builder) DiscountOverlaps(discountoverlaps bool) *SettingsSimilarityBm25Builder {
-	rb.v.DiscountOverlaps = discountoverlaps
-	return rb
-}
-
-func (rb *SettingsSimilarityBm25Builder) K1(k1 float64) *SettingsSimilarityBm25Builder {
-	rb.v.K1 = k1
-	return rb
+	return r
 }

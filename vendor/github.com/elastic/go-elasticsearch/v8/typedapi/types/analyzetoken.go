@@ -15,70 +15,139 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // AnalyzeToken type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/analyze/types.ts#L37-L44
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/analyze/types.ts#L37-L44
 type AnalyzeToken struct {
 	EndOffset      int64  `json:"end_offset"`
 	Position       int64  `json:"position"`
-	PositionLength *int64 `json:"position_length,omitempty"`
+	PositionLength *int64 `json:"positionLength,omitempty"`
 	StartOffset    int64  `json:"start_offset"`
 	Token          string `json:"token"`
 	Type           string `json:"type"`
 }
 
-// AnalyzeTokenBuilder holds AnalyzeToken struct and provides a builder API.
-type AnalyzeTokenBuilder struct {
-	v *AnalyzeToken
-}
+func (s *AnalyzeToken) UnmarshalJSON(data []byte) error {
 
-// NewAnalyzeToken provides a builder for the AnalyzeToken struct.
-func NewAnalyzeTokenBuilder() *AnalyzeTokenBuilder {
-	r := AnalyzeTokenBuilder{
-		&AnalyzeToken{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "end_offset":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "EndOffset", err)
+				}
+				s.EndOffset = value
+			case float64:
+				f := int64(v)
+				s.EndOffset = f
+			}
+
+		case "position":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Position", err)
+				}
+				s.Position = value
+			case float64:
+				f := int64(v)
+				s.Position = f
+			}
+
+		case "positionLength":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PositionLength", err)
+				}
+				s.PositionLength = &value
+			case float64:
+				f := int64(v)
+				s.PositionLength = &f
+			}
+
+		case "start_offset":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "StartOffset", err)
+				}
+				s.StartOffset = value
+			case float64:
+				f := int64(v)
+				s.StartOffset = f
+			}
+
+		case "token":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Token", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Token = o
+
+		case "type":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Type = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the AnalyzeToken struct
-func (rb *AnalyzeTokenBuilder) Build() AnalyzeToken {
-	return *rb.v
-}
+// NewAnalyzeToken returns a AnalyzeToken.
+func NewAnalyzeToken() *AnalyzeToken {
+	r := &AnalyzeToken{}
 
-func (rb *AnalyzeTokenBuilder) EndOffset(endoffset int64) *AnalyzeTokenBuilder {
-	rb.v.EndOffset = endoffset
-	return rb
-}
-
-func (rb *AnalyzeTokenBuilder) Position(position int64) *AnalyzeTokenBuilder {
-	rb.v.Position = position
-	return rb
-}
-
-func (rb *AnalyzeTokenBuilder) PositionLength(positionlength int64) *AnalyzeTokenBuilder {
-	rb.v.PositionLength = &positionlength
-	return rb
-}
-
-func (rb *AnalyzeTokenBuilder) StartOffset(startoffset int64) *AnalyzeTokenBuilder {
-	rb.v.StartOffset = startoffset
-	return rb
-}
-
-func (rb *AnalyzeTokenBuilder) Token(token string) *AnalyzeTokenBuilder {
-	rb.v.Token = token
-	return rb
-}
-
-func (rb *AnalyzeTokenBuilder) Type_(type_ string) *AnalyzeTokenBuilder {
-	rb.v.Type = type_
-	return rb
+	return r
 }

@@ -15,60 +15,91 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DecayPlacementDateMathDuration type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/compound.ts#L77-L82
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/compound.ts#L170-L189
 type DecayPlacementDateMathDuration struct {
-	Decay  *float64  `json:"decay,omitempty"`
-	Offset *Duration `json:"offset,omitempty"`
-	Origin *DateMath `json:"origin,omitempty"`
-	Scale  *Duration `json:"scale,omitempty"`
+	// Decay Defines how documents are scored at the distance given at scale.
+	Decay *Float64 `json:"decay,omitempty"`
+	// Offset If defined, the decay function will only compute the decay function for
+	// documents with a distance greater than the defined `offset`.
+	Offset Duration `json:"offset,omitempty"`
+	// Origin The point of origin used for calculating distance. Must be given as a number
+	// for numeric field, date for date fields and geo point for geo fields.
+	Origin *string `json:"origin,omitempty"`
+	// Scale Defines the distance from origin + offset at which the computed score will
+	// equal `decay` parameter.
+	Scale Duration `json:"scale,omitempty"`
 }
 
-// DecayPlacementDateMathDurationBuilder holds DecayPlacementDateMathDuration struct and provides a builder API.
-type DecayPlacementDateMathDurationBuilder struct {
-	v *DecayPlacementDateMathDuration
-}
+func (s *DecayPlacementDateMathDuration) UnmarshalJSON(data []byte) error {
 
-// NewDecayPlacementDateMathDuration provides a builder for the DecayPlacementDateMathDuration struct.
-func NewDecayPlacementDateMathDurationBuilder() *DecayPlacementDateMathDurationBuilder {
-	r := DecayPlacementDateMathDurationBuilder{
-		&DecayPlacementDateMathDuration{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "decay":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Decay", err)
+				}
+				f := Float64(value)
+				s.Decay = &f
+			case float64:
+				f := Float64(v)
+				s.Decay = &f
+			}
+
+		case "offset":
+			if err := dec.Decode(&s.Offset); err != nil {
+				return fmt.Errorf("%s | %w", "Offset", err)
+			}
+
+		case "origin":
+			if err := dec.Decode(&s.Origin); err != nil {
+				return fmt.Errorf("%s | %w", "Origin", err)
+			}
+
+		case "scale":
+			if err := dec.Decode(&s.Scale); err != nil {
+				return fmt.Errorf("%s | %w", "Scale", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DecayPlacementDateMathDuration struct
-func (rb *DecayPlacementDateMathDurationBuilder) Build() DecayPlacementDateMathDuration {
-	return *rb.v
-}
+// NewDecayPlacementDateMathDuration returns a DecayPlacementDateMathDuration.
+func NewDecayPlacementDateMathDuration() *DecayPlacementDateMathDuration {
+	r := &DecayPlacementDateMathDuration{}
 
-func (rb *DecayPlacementDateMathDurationBuilder) Decay(decay float64) *DecayPlacementDateMathDurationBuilder {
-	rb.v.Decay = &decay
-	return rb
-}
-
-func (rb *DecayPlacementDateMathDurationBuilder) Offset(offset *DurationBuilder) *DecayPlacementDateMathDurationBuilder {
-	v := offset.Build()
-	rb.v.Offset = &v
-	return rb
-}
-
-func (rb *DecayPlacementDateMathDurationBuilder) Origin(origin DateMath) *DecayPlacementDateMathDurationBuilder {
-	rb.v.Origin = &origin
-	return rb
-}
-
-func (rb *DecayPlacementDateMathDurationBuilder) Scale(scale *DurationBuilder) *DecayPlacementDateMathDurationBuilder {
-	v := scale.Build()
-	rb.v.Scale = &v
-	return rb
+	return r
 }

@@ -15,54 +15,77 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DateRangeExpression type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/bucket.ts#L146-L150
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/bucket.ts#L318-L331
 type DateRangeExpression struct {
-	From *FieldDateMath `json:"from,omitempty"`
-	Key  *string        `json:"key,omitempty"`
-	To   *FieldDateMath `json:"to,omitempty"`
+	// From Start of the range (inclusive).
+	From FieldDateMath `json:"from,omitempty"`
+	// Key Custom key to return the range with.
+	Key *string `json:"key,omitempty"`
+	// To End of the range (exclusive).
+	To FieldDateMath `json:"to,omitempty"`
 }
 
-// DateRangeExpressionBuilder holds DateRangeExpression struct and provides a builder API.
-type DateRangeExpressionBuilder struct {
-	v *DateRangeExpression
-}
+func (s *DateRangeExpression) UnmarshalJSON(data []byte) error {
 
-// NewDateRangeExpression provides a builder for the DateRangeExpression struct.
-func NewDateRangeExpressionBuilder() *DateRangeExpressionBuilder {
-	r := DateRangeExpressionBuilder{
-		&DateRangeExpression{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "from":
+			if err := dec.Decode(&s.From); err != nil {
+				return fmt.Errorf("%s | %w", "From", err)
+			}
+
+		case "key":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Key", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Key = &o
+
+		case "to":
+			if err := dec.Decode(&s.To); err != nil {
+				return fmt.Errorf("%s | %w", "To", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DateRangeExpression struct
-func (rb *DateRangeExpressionBuilder) Build() DateRangeExpression {
-	return *rb.v
-}
+// NewDateRangeExpression returns a DateRangeExpression.
+func NewDateRangeExpression() *DateRangeExpression {
+	r := &DateRangeExpression{}
 
-func (rb *DateRangeExpressionBuilder) From(from *FieldDateMathBuilder) *DateRangeExpressionBuilder {
-	v := from.Build()
-	rb.v.From = &v
-	return rb
-}
-
-func (rb *DateRangeExpressionBuilder) Key(key string) *DateRangeExpressionBuilder {
-	rb.v.Key = &key
-	return rb
-}
-
-func (rb *DateRangeExpressionBuilder) To(to *FieldDateMathBuilder) *DateRangeExpressionBuilder {
-	v := to.Build()
-	rb.v.To = &v
-	return rb
+	return r
 }

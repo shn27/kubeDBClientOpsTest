@@ -15,60 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // SnapshotIndexStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/snapshot/_types/SnapshotIndexStats.ts#L25-L29
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/snapshot/_types/SnapshotIndexStats.ts#L25-L29
 type SnapshotIndexStats struct {
 	Shards      map[string]SnapshotShardsStatus `json:"shards"`
-	ShardsStats ShardsStats                     `json:"shards_stats"`
+	ShardsStats SnapshotShardsStats             `json:"shards_stats"`
 	Stats       SnapshotStats                   `json:"stats"`
 }
 
-// SnapshotIndexStatsBuilder holds SnapshotIndexStats struct and provides a builder API.
-type SnapshotIndexStatsBuilder struct {
-	v *SnapshotIndexStats
-}
-
-// NewSnapshotIndexStats provides a builder for the SnapshotIndexStats struct.
-func NewSnapshotIndexStatsBuilder() *SnapshotIndexStatsBuilder {
-	r := SnapshotIndexStatsBuilder{
-		&SnapshotIndexStats{
-			Shards: make(map[string]SnapshotShardsStatus, 0),
-		},
+// NewSnapshotIndexStats returns a SnapshotIndexStats.
+func NewSnapshotIndexStats() *SnapshotIndexStats {
+	r := &SnapshotIndexStats{
+		Shards: make(map[string]SnapshotShardsStatus, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the SnapshotIndexStats struct
-func (rb *SnapshotIndexStatsBuilder) Build() SnapshotIndexStats {
-	return *rb.v
-}
-
-func (rb *SnapshotIndexStatsBuilder) Shards(values map[string]*SnapshotShardsStatusBuilder) *SnapshotIndexStatsBuilder {
-	tmp := make(map[string]SnapshotShardsStatus, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Shards = tmp
-	return rb
-}
-
-func (rb *SnapshotIndexStatsBuilder) ShardsStats(shardsstats *ShardsStatsBuilder) *SnapshotIndexStatsBuilder {
-	v := shardsstats.Build()
-	rb.v.ShardsStats = v
-	return rb
-}
-
-func (rb *SnapshotIndexStatsBuilder) Stats(stats *SnapshotStatsBuilder) *SnapshotIndexStatsBuilder {
-	v := stats.Build()
-	rb.v.Stats = v
-	return rb
+	return r
 }

@@ -15,46 +15,84 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ClusterJvmMemory type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/stats/types.ts#L156-L159
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/stats/types.ts#L294-L303
 type ClusterJvmMemory struct {
-	HeapMaxInBytes  int64 `json:"heap_max_in_bytes"`
+	// HeapMaxInBytes Maximum amount of memory, in bytes, available for use by the heap across all
+	// selected nodes.
+	HeapMaxInBytes int64 `json:"heap_max_in_bytes"`
+	// HeapUsedInBytes Memory, in bytes, currently in use by the heap across all selected nodes.
 	HeapUsedInBytes int64 `json:"heap_used_in_bytes"`
 }
 
-// ClusterJvmMemoryBuilder holds ClusterJvmMemory struct and provides a builder API.
-type ClusterJvmMemoryBuilder struct {
-	v *ClusterJvmMemory
-}
+func (s *ClusterJvmMemory) UnmarshalJSON(data []byte) error {
 
-// NewClusterJvmMemory provides a builder for the ClusterJvmMemory struct.
-func NewClusterJvmMemoryBuilder() *ClusterJvmMemoryBuilder {
-	r := ClusterJvmMemoryBuilder{
-		&ClusterJvmMemory{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "heap_max_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "HeapMaxInBytes", err)
+				}
+				s.HeapMaxInBytes = value
+			case float64:
+				f := int64(v)
+				s.HeapMaxInBytes = f
+			}
+
+		case "heap_used_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "HeapUsedInBytes", err)
+				}
+				s.HeapUsedInBytes = value
+			case float64:
+				f := int64(v)
+				s.HeapUsedInBytes = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ClusterJvmMemory struct
-func (rb *ClusterJvmMemoryBuilder) Build() ClusterJvmMemory {
-	return *rb.v
-}
+// NewClusterJvmMemory returns a ClusterJvmMemory.
+func NewClusterJvmMemory() *ClusterJvmMemory {
+	r := &ClusterJvmMemory{}
 
-func (rb *ClusterJvmMemoryBuilder) HeapMaxInBytes(heapmaxinbytes int64) *ClusterJvmMemoryBuilder {
-	rb.v.HeapMaxInBytes = heapmaxinbytes
-	return rb
-}
-
-func (rb *ClusterJvmMemoryBuilder) HeapUsedInBytes(heapusedinbytes int64) *ClusterJvmMemoryBuilder {
-	rb.v.HeapUsedInBytes = heapusedinbytes
-	return rb
+	return r
 }

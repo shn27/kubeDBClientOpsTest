@@ -15,58 +15,29 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"encoding/json"
+)
+
 // HitsSequence type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/eql/_types/EqlHits.ts#L51-L59
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/eql/_types/EqlHits.ts#L56-L64
 type HitsSequence struct {
 	// Events Contains events matching the query. Each object represents a matching event.
 	Events []HitsEvent `json:"events"`
 	// JoinKeys Shared field values used to constrain matches in the sequence. These are
 	// defined using the by keyword in the EQL query syntax.
-	JoinKeys []interface{} `json:"join_keys"`
+	JoinKeys []json.RawMessage `json:"join_keys,omitempty"`
 }
 
-// HitsSequenceBuilder holds HitsSequence struct and provides a builder API.
-type HitsSequenceBuilder struct {
-	v *HitsSequence
-}
+// NewHitsSequence returns a HitsSequence.
+func NewHitsSequence() *HitsSequence {
+	r := &HitsSequence{}
 
-// NewHitsSequence provides a builder for the HitsSequence struct.
-func NewHitsSequenceBuilder() *HitsSequenceBuilder {
-	r := HitsSequenceBuilder{
-		&HitsSequence{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the HitsSequence struct
-func (rb *HitsSequenceBuilder) Build() HitsSequence {
-	return *rb.v
-}
-
-// Events Contains events matching the query. Each object represents a matching event.
-
-func (rb *HitsSequenceBuilder) Events(events []HitsEventBuilder) *HitsSequenceBuilder {
-	tmp := make([]HitsEvent, len(events))
-	for _, value := range events {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Events = tmp
-	return rb
-}
-
-// JoinKeys Shared field values used to constrain matches in the sequence. These are
-// defined using the by keyword in the EQL query syntax.
-
-func (rb *HitsSequenceBuilder) JoinKeys(join_keys ...interface{}) *HitsSequenceBuilder {
-	rb.v.JoinKeys = join_keys
-	return rb
+	return r
 }

@@ -15,59 +15,86 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // CompletionStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Stats.ts#L53-L57
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Stats.ts#L80-L90
 type CompletionStats struct {
-	Fields      map[Field]FieldSizeUsage `json:"fields,omitempty"`
-	Size        *ByteSize                `json:"size,omitempty"`
-	SizeInBytes int64                    `json:"size_in_bytes"`
+	Fields map[string]FieldSizeUsage `json:"fields,omitempty"`
+	// Size Total amount of memory used for completion across all shards assigned to
+	// selected nodes.
+	Size ByteSize `json:"size,omitempty"`
+	// SizeInBytes Total amount, in bytes, of memory used for completion across all shards
+	// assigned to selected nodes.
+	SizeInBytes int64 `json:"size_in_bytes"`
 }
 
-// CompletionStatsBuilder holds CompletionStats struct and provides a builder API.
-type CompletionStatsBuilder struct {
-	v *CompletionStats
+func (s *CompletionStats) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "fields":
+			if s.Fields == nil {
+				s.Fields = make(map[string]FieldSizeUsage, 0)
+			}
+			if err := dec.Decode(&s.Fields); err != nil {
+				return fmt.Errorf("%s | %w", "Fields", err)
+			}
+
+		case "size":
+			if err := dec.Decode(&s.Size); err != nil {
+				return fmt.Errorf("%s | %w", "Size", err)
+			}
+
+		case "size_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "SizeInBytes", err)
+				}
+				s.SizeInBytes = value
+			case float64:
+				f := int64(v)
+				s.SizeInBytes = f
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewCompletionStats provides a builder for the CompletionStats struct.
-func NewCompletionStatsBuilder() *CompletionStatsBuilder {
-	r := CompletionStatsBuilder{
-		&CompletionStats{
-			Fields: make(map[Field]FieldSizeUsage, 0),
-		},
+// NewCompletionStats returns a CompletionStats.
+func NewCompletionStats() *CompletionStats {
+	r := &CompletionStats{
+		Fields: make(map[string]FieldSizeUsage, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the CompletionStats struct
-func (rb *CompletionStatsBuilder) Build() CompletionStats {
-	return *rb.v
-}
-
-func (rb *CompletionStatsBuilder) Fields(values map[Field]*FieldSizeUsageBuilder) *CompletionStatsBuilder {
-	tmp := make(map[Field]FieldSizeUsage, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Fields = tmp
-	return rb
-}
-
-func (rb *CompletionStatsBuilder) Size(size *ByteSizeBuilder) *CompletionStatsBuilder {
-	v := size.Build()
-	rb.v.Size = &v
-	return rb
-}
-
-func (rb *CompletionStatsBuilder) SizeInBytes(sizeinbytes int64) *CompletionStatsBuilder {
-	rb.v.SizeInBytes = sizeinbytes
-	return rb
+	return r
 }

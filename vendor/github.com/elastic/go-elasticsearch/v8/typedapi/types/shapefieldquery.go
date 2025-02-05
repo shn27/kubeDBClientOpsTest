@@ -15,58 +15,72 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/geoshaperelation"
 )
 
 // ShapeFieldQuery type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/specialized.ts#L183-L187
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/specialized.ts#L383-L396
 type ShapeFieldQuery struct {
-	IndexedShape *FieldLookup                       `json:"indexed_shape,omitempty"`
-	Relation     *geoshaperelation.GeoShapeRelation `json:"relation,omitempty"`
-	Shape        *GeoShape                          `json:"shape,omitempty"`
+	// IndexedShape Queries using a pre-indexed shape.
+	IndexedShape *FieldLookup `json:"indexed_shape,omitempty"`
+	// Relation Spatial relation between the query shape and the document shape.
+	Relation *geoshaperelation.GeoShapeRelation `json:"relation,omitempty"`
+	// Shape Queries using an inline shape definition in GeoJSON or Well Known Text (WKT)
+	// format.
+	Shape json.RawMessage `json:"shape,omitempty"`
 }
 
-// ShapeFieldQueryBuilder holds ShapeFieldQuery struct and provides a builder API.
-type ShapeFieldQueryBuilder struct {
-	v *ShapeFieldQuery
-}
+func (s *ShapeFieldQuery) UnmarshalJSON(data []byte) error {
 
-// NewShapeFieldQuery provides a builder for the ShapeFieldQuery struct.
-func NewShapeFieldQueryBuilder() *ShapeFieldQueryBuilder {
-	r := ShapeFieldQueryBuilder{
-		&ShapeFieldQuery{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "indexed_shape":
+			if err := dec.Decode(&s.IndexedShape); err != nil {
+				return fmt.Errorf("%s | %w", "IndexedShape", err)
+			}
+
+		case "relation":
+			if err := dec.Decode(&s.Relation); err != nil {
+				return fmt.Errorf("%s | %w", "Relation", err)
+			}
+
+		case "shape":
+			if err := dec.Decode(&s.Shape); err != nil {
+				return fmt.Errorf("%s | %w", "Shape", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ShapeFieldQuery struct
-func (rb *ShapeFieldQueryBuilder) Build() ShapeFieldQuery {
-	return *rb.v
-}
+// NewShapeFieldQuery returns a ShapeFieldQuery.
+func NewShapeFieldQuery() *ShapeFieldQuery {
+	r := &ShapeFieldQuery{}
 
-func (rb *ShapeFieldQueryBuilder) IndexedShape(indexedshape *FieldLookupBuilder) *ShapeFieldQueryBuilder {
-	v := indexedshape.Build()
-	rb.v.IndexedShape = &v
-	return rb
-}
-
-func (rb *ShapeFieldQueryBuilder) Relation(relation geoshaperelation.GeoShapeRelation) *ShapeFieldQueryBuilder {
-	rb.v.Relation = &relation
-	return rb
-}
-
-func (rb *ShapeFieldQueryBuilder) Shape(shape *GeoShapeBuilder) *ShapeFieldQueryBuilder {
-	v := shape.Build()
-	rb.v.Shape = &v
-	return rb
+	return r
 }

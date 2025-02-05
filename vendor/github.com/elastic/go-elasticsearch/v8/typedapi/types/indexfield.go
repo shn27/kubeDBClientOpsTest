@@ -15,40 +15,64 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // IndexField type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/mapping/meta-fields.ts#L46-L48
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/mapping/meta-fields.ts#L46-L48
 type IndexField struct {
 	Enabled bool `json:"enabled"`
 }
 
-// IndexFieldBuilder holds IndexField struct and provides a builder API.
-type IndexFieldBuilder struct {
-	v *IndexField
-}
+func (s *IndexField) UnmarshalJSON(data []byte) error {
 
-// NewIndexField provides a builder for the IndexField struct.
-func NewIndexFieldBuilder() *IndexFieldBuilder {
-	r := IndexFieldBuilder{
-		&IndexField{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "enabled":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Enabled", err)
+				}
+				s.Enabled = value
+			case bool:
+				s.Enabled = v
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the IndexField struct
-func (rb *IndexFieldBuilder) Build() IndexField {
-	return *rb.v
-}
+// NewIndexField returns a IndexField.
+func NewIndexField() *IndexField {
+	r := &IndexField{}
 
-func (rb *IndexFieldBuilder) Enabled(enabled bool) *IndexFieldBuilder {
-	rb.v.Enabled = enabled
-	return rb
+	return r
 }

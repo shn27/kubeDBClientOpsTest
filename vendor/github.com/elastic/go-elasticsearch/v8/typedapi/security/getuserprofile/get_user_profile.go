@@ -15,26 +15,27 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
-
-// Retrieves user profile for the given unique ID.
+// Get a user profile.
+//
+// Get a user's profile using the unique profile ID.
 package getuserprofile
 
 import (
-	gobytes "bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 
 	"github.com/elastic/elastic-transport-go/v8/elastictransport"
+	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 )
 
 const (
@@ -51,11 +52,15 @@ type GetUserProfile struct {
 	values  url.Values
 	path    url.URL
 
-	buf *gobytes.Buffer
+	raw io.Reader
 
 	paramSet int
 
 	uid string
+
+	spanStarted bool
+
+	instrument elastictransport.Instrumentation
 }
 
 // NewGetUserProfile type alias for index.
@@ -67,13 +72,15 @@ func NewGetUserProfileFunc(tp elastictransport.Interface) NewGetUserProfile {
 	return func(uid string) *GetUserProfile {
 		n := New(tp)
 
-		n.Uid(uid)
+		n._uid(uid)
 
 		return n
 	}
 }
 
-// Retrieves user profile for the given unique ID.
+// Get a user profile.
+//
+// Get a user's profile using the unique profile ID.
 //
 // https://www.elastic.co/guide/en/elasticsearch/reference/current/security-api-get-user-profile.html
 func New(tp elastictransport.Interface) *GetUserProfile {
@@ -81,7 +88,12 @@ func New(tp elastictransport.Interface) *GetUserProfile {
 		transport: tp,
 		values:    make(url.Values),
 		headers:   make(http.Header),
-		buf:       gobytes.NewBuffer(nil),
+	}
+
+	if instrumented, ok := r.transport.(elastictransport.Instrumented); ok {
+		if instrument := instrumented.InstrumentationEnabled(); instrument != nil {
+			r.instrument = instrument
+		}
 	}
 
 	return r
@@ -105,7 +117,11 @@ func (r *GetUserProfile) HttpRequest(ctx context.Context) (*http.Request, error)
 		path.WriteString("/")
 		path.WriteString("profile")
 		path.WriteString("/")
-		path.WriteString(url.PathEscape(r.uid))
+
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordPathPart(ctx, "uid", r.uid)
+		}
+		path.WriteString(r.uid)
 
 		method = http.MethodGet
 	}
@@ -118,12 +134,16 @@ func (r *GetUserProfile) HttpRequest(ctx context.Context) (*http.Request, error)
 	}
 
 	if ctx != nil {
-		req, err = http.NewRequestWithContext(ctx, method, r.path.String(), r.buf)
+		req, err = http.NewRequestWithContext(ctx, method, r.path.String(), r.raw)
 	} else {
-		req, err = http.NewRequest(method, r.path.String(), r.buf)
+		req, err = http.NewRequest(method, r.path.String(), r.raw)
 	}
 
-	req.Header.Set("accept", "application/vnd.elasticsearch+json;compatible-with=8")
+	req.Header = r.headers.Clone()
+
+	if req.Header.Get("Accept") == "" {
+		req.Header.Set("Accept", "application/vnd.elasticsearch+json;compatible-with=8")
+	}
 
 	if err != nil {
 		return req, fmt.Errorf("could not build http.Request: %w", err)
@@ -132,30 +152,121 @@ func (r *GetUserProfile) HttpRequest(ctx context.Context) (*http.Request, error)
 	return req, nil
 }
 
-// Do runs the http.Request through the provided transport.
-func (r GetUserProfile) Do(ctx context.Context) (*http.Response, error) {
+// Perform runs the http.Request through the provided transport and returns an http.Response.
+func (r GetUserProfile) Perform(providedCtx context.Context) (*http.Response, error) {
+	var ctx context.Context
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		if r.spanStarted == false {
+			ctx := instrument.Start(providedCtx, "security.get_user_profile")
+			defer instrument.Close(ctx)
+		}
+	}
+	if ctx == nil {
+		ctx = providedCtx
+	}
+
 	req, err := r.HttpRequest(ctx)
 	if err != nil {
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
 		return nil, err
 	}
 
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		instrument.BeforeRequest(req, "security.get_user_profile")
+		if reader := instrument.RecordRequestBody(ctx, "security.get_user_profile", r.raw); reader != nil {
+			req.Body = reader
+		}
+	}
 	res, err := r.transport.Perform(req)
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		instrument.AfterRequest(req, "elasticsearch", "security.get_user_profile")
+	}
 	if err != nil {
-		return nil, fmt.Errorf("an error happened during the GetUserProfile query execution: %w", err)
+		localErr := fmt.Errorf("an error happened during the GetUserProfile query execution: %w", err)
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, localErr)
+		}
+		return nil, localErr
 	}
 
 	return res, nil
 }
 
+// Do runs the request through the transport, handle the response and returns a getuserprofile.Response
+func (r GetUserProfile) Do(providedCtx context.Context) (*Response, error) {
+	var ctx context.Context
+	r.spanStarted = true
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		ctx = instrument.Start(providedCtx, "security.get_user_profile")
+		defer instrument.Close(ctx)
+	}
+	if ctx == nil {
+		ctx = providedCtx
+	}
+
+	response := NewResponse()
+
+	res, err := r.Perform(ctx)
+	if err != nil {
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode < 299 {
+		err = json.NewDecoder(res.Body).Decode(response)
+		if err != nil {
+			if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+				instrument.RecordError(ctx, err)
+			}
+			return nil, err
+		}
+
+		return response, nil
+	}
+
+	errorResponse := types.NewElasticsearchError()
+	err = json.NewDecoder(res.Body).Decode(errorResponse)
+	if err != nil {
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
+		return nil, err
+	}
+
+	if errorResponse.Status == 0 {
+		errorResponse.Status = res.StatusCode
+	}
+
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		instrument.RecordError(ctx, errorResponse)
+	}
+	return nil, errorResponse
+}
+
 // IsSuccess allows to run a query with a context and retrieve the result as a boolean.
 // This only exists for endpoints without a request payload and allows for quick control flow.
-func (r GetUserProfile) IsSuccess(ctx context.Context) (bool, error) {
-	res, err := r.Do(ctx)
+func (r GetUserProfile) IsSuccess(providedCtx context.Context) (bool, error) {
+	var ctx context.Context
+	r.spanStarted = true
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		ctx = instrument.Start(providedCtx, "security.get_user_profile")
+		defer instrument.Close(ctx)
+	}
+	if ctx == nil {
+		ctx = providedCtx
+	}
+
+	res, err := r.Perform(ctx)
 
 	if err != nil {
 		return false, err
 	}
-	io.Copy(ioutil.Discard, res.Body)
+	io.Copy(io.Discard, res.Body)
 	err = res.Body.Close()
 	if err != nil {
 		return false, err
@@ -163,6 +274,14 @@ func (r GetUserProfile) IsSuccess(ctx context.Context) (bool, error) {
 
 	if res.StatusCode >= 200 && res.StatusCode < 300 {
 		return true, nil
+	}
+
+	if res.StatusCode != 404 {
+		err := fmt.Errorf("an error happened during the GetUserProfile query execution, status code: %d", res.StatusCode)
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
+		return false, err
 	}
 
 	return false, nil
@@ -177,9 +296,9 @@ func (r *GetUserProfile) Header(key, value string) *GetUserProfile {
 
 // Uid A unique identifier for the user profile.
 // API Name: uid
-func (r *GetUserProfile) Uid(v string) *GetUserProfile {
+func (r *GetUserProfile) _uid(uids ...string) *GetUserProfile {
 	r.paramSet |= uidMask
-	r.uid = v
+	r.uid = strings.Join(uids, ",")
 
 	return r
 }
@@ -189,8 +308,56 @@ func (r *GetUserProfile) Uid(v string) *GetUserProfile {
 // use `data=<key>` to retrieve content nested under the specified `<key>`.
 // By default returns no `data` content.
 // API name: data
-func (r *GetUserProfile) Data(value string) *GetUserProfile {
-	r.values.Set("data", value)
+func (r *GetUserProfile) Data(data ...string) *GetUserProfile {
+	tmp := []string{}
+	for _, item := range data {
+		tmp = append(tmp, fmt.Sprintf("%v", item))
+	}
+	r.values.Set("data", strings.Join(tmp, ","))
+
+	return r
+}
+
+// ErrorTrace When set to `true` Elasticsearch will include the full stack trace of errors
+// when they occur.
+// API name: error_trace
+func (r *GetUserProfile) ErrorTrace(errortrace bool) *GetUserProfile {
+	r.values.Set("error_trace", strconv.FormatBool(errortrace))
+
+	return r
+}
+
+// FilterPath Comma-separated list of filters in dot notation which reduce the response
+// returned by Elasticsearch.
+// API name: filter_path
+func (r *GetUserProfile) FilterPath(filterpaths ...string) *GetUserProfile {
+	tmp := []string{}
+	for _, item := range filterpaths {
+		tmp = append(tmp, fmt.Sprintf("%v", item))
+	}
+	r.values.Set("filter_path", strings.Join(tmp, ","))
+
+	return r
+}
+
+// Human When set to `true` will return statistics in a format suitable for humans.
+// For example `"exists_time": "1h"` for humans and
+// `"eixsts_time_in_millis": 3600000` for computers. When disabled the human
+// readable values will be omitted. This makes sense for responses being
+// consumed
+// only by machines.
+// API name: human
+func (r *GetUserProfile) Human(human bool) *GetUserProfile {
+	r.values.Set("human", strconv.FormatBool(human))
+
+	return r
+}
+
+// Pretty If set to `true` the returned JSON will be "pretty-formatted". Only use
+// this option for debugging only.
+// API name: pretty
+func (r *GetUserProfile) Pretty(pretty bool) *GetUserProfile {
+	r.values.Set("pretty", strconv.FormatBool(pretty))
 
 	return r
 }

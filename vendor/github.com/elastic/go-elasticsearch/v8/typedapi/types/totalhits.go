@@ -15,50 +15,49 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
-// Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
-
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/totalhitsrelation"
 )
 
 // TotalHits type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/hits.ts#L90-L93
+// https://github.com/elastic/elasticsearch-specification/blob/18d160a8583deec1bbef274d2c0e563a0cd20e2f/specification/_global/search/_types/hits.ts#L94-L97
 type TotalHits struct {
 	Relation totalhitsrelation.TotalHitsRelation `json:"relation"`
 	Value    int64                               `json:"value"`
 }
 
-// TotalHitsBuilder holds TotalHits struct and provides a builder API.
-type TotalHitsBuilder struct {
-	v *TotalHits
-}
-
-// NewTotalHits provides a builder for the TotalHits struct.
-func NewTotalHitsBuilder() *TotalHitsBuilder {
-	r := TotalHitsBuilder{
-		&TotalHits{},
+// UnmarshalJSON implements Unmarshaler interface, it handles the shortcut for total hits.
+func (t *TotalHits) UnmarshalJSON(data []byte) error {
+	type stub TotalHits
+	tmp := stub{}
+	dec := json.NewDecoder(bytes.NewReader(data))
+	if _, err := strconv.Atoi(string(data)); err == nil {
+		err := dec.Decode(&t.Value)
+		if err != nil {
+			return err
+		}
+		t.Relation = totalhitsrelation.Eq
+	} else {
+		err := dec.Decode(&tmp)
+		if err != nil {
+			return err
+		}
+		*t = TotalHits(tmp)
 	}
 
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TotalHits struct
-func (rb *TotalHitsBuilder) Build() TotalHits {
-	return *rb.v
-}
+// NewTotalHits returns a TotalHits.
+func NewTotalHits() *TotalHits {
+	r := &TotalHits{}
 
-func (rb *TotalHitsBuilder) Relation(relation totalhitsrelation.TotalHitsRelation) *TotalHitsBuilder {
-	rb.v.Relation = relation
-	return rb
-}
-
-func (rb *TotalHitsBuilder) Value(value int64) *TotalHitsBuilder {
-	rb.v.Value = value
-	return rb
+	return r
 }

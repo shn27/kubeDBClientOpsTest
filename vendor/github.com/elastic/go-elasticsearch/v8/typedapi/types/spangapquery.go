@@ -15,34 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // SpanGapQuery type alias.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/span.ts#L40-L42
-type SpanGapQuery map[Field]int
-
-// SpanGapQueryBuilder holds SpanGapQuery struct and provides a builder API.
-type SpanGapQueryBuilder struct {
-	v SpanGapQuery
-}
-
-// NewSpanGapQuery provides a builder for the SpanGapQuery struct.
-func NewSpanGapQueryBuilder() *SpanGapQueryBuilder {
-	return &SpanGapQueryBuilder{}
-}
-
-// Build finalize the chain and returns the SpanGapQuery struct
-func (b *SpanGapQueryBuilder) Build() SpanGapQuery {
-	return b.v
-}
-
-func (b *SpanGapQueryBuilder) SpanGapQuery(value SpanGapQuery) *SpanGapQueryBuilder {
-	b.v = value
-	return b
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/span.ts#L63-L65
+type SpanGapQuery map[string]int

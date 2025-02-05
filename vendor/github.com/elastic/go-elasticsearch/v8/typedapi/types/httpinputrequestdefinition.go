@@ -15,124 +15,160 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/connectionscheme"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/httpinputmethod"
 )
 
 // HttpInputRequestDefinition type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Input.ts#L74-L88
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Input.ts#L72-L86
 type HttpInputRequestDefinition struct {
 	Auth              *HttpInputAuthentication           `json:"auth,omitempty"`
 	Body              *string                            `json:"body,omitempty"`
-	ConnectionTimeout *Duration                          `json:"connection_timeout,omitempty"`
+	ConnectionTimeout Duration                           `json:"connection_timeout,omitempty"`
 	Headers           map[string]string                  `json:"headers,omitempty"`
-	Host              *Host                              `json:"host,omitempty"`
+	Host              *string                            `json:"host,omitempty"`
 	Method            *httpinputmethod.HttpInputMethod   `json:"method,omitempty"`
 	Params            map[string]string                  `json:"params,omitempty"`
 	Path              *string                            `json:"path,omitempty"`
 	Port              *uint                              `json:"port,omitempty"`
 	Proxy             *HttpInputProxy                    `json:"proxy,omitempty"`
-	ReadTimeout       *Duration                          `json:"read_timeout,omitempty"`
+	ReadTimeout       Duration                           `json:"read_timeout,omitempty"`
 	Scheme            *connectionscheme.ConnectionScheme `json:"scheme,omitempty"`
 	Url               *string                            `json:"url,omitempty"`
 }
 
-// HttpInputRequestDefinitionBuilder holds HttpInputRequestDefinition struct and provides a builder API.
-type HttpInputRequestDefinitionBuilder struct {
-	v *HttpInputRequestDefinition
+func (s *HttpInputRequestDefinition) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "auth":
+			if err := dec.Decode(&s.Auth); err != nil {
+				return fmt.Errorf("%s | %w", "Auth", err)
+			}
+
+		case "body":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Body", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Body = &o
+
+		case "connection_timeout":
+			if err := dec.Decode(&s.ConnectionTimeout); err != nil {
+				return fmt.Errorf("%s | %w", "ConnectionTimeout", err)
+			}
+
+		case "headers":
+			if s.Headers == nil {
+				s.Headers = make(map[string]string, 0)
+			}
+			if err := dec.Decode(&s.Headers); err != nil {
+				return fmt.Errorf("%s | %w", "Headers", err)
+			}
+
+		case "host":
+			if err := dec.Decode(&s.Host); err != nil {
+				return fmt.Errorf("%s | %w", "Host", err)
+			}
+
+		case "method":
+			if err := dec.Decode(&s.Method); err != nil {
+				return fmt.Errorf("%s | %w", "Method", err)
+			}
+
+		case "params":
+			if s.Params == nil {
+				s.Params = make(map[string]string, 0)
+			}
+			if err := dec.Decode(&s.Params); err != nil {
+				return fmt.Errorf("%s | %w", "Params", err)
+			}
+
+		case "path":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Path", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Path = &o
+
+		case "port":
+			if err := dec.Decode(&s.Port); err != nil {
+				return fmt.Errorf("%s | %w", "Port", err)
+			}
+
+		case "proxy":
+			if err := dec.Decode(&s.Proxy); err != nil {
+				return fmt.Errorf("%s | %w", "Proxy", err)
+			}
+
+		case "read_timeout":
+			if err := dec.Decode(&s.ReadTimeout); err != nil {
+				return fmt.Errorf("%s | %w", "ReadTimeout", err)
+			}
+
+		case "scheme":
+			if err := dec.Decode(&s.Scheme); err != nil {
+				return fmt.Errorf("%s | %w", "Scheme", err)
+			}
+
+		case "url":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Url", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Url = &o
+
+		}
+	}
+	return nil
 }
 
-// NewHttpInputRequestDefinition provides a builder for the HttpInputRequestDefinition struct.
-func NewHttpInputRequestDefinitionBuilder() *HttpInputRequestDefinitionBuilder {
-	r := HttpInputRequestDefinitionBuilder{
-		&HttpInputRequestDefinition{
-			Headers: make(map[string]string, 0),
-			Params:  make(map[string]string, 0),
-		},
+// NewHttpInputRequestDefinition returns a HttpInputRequestDefinition.
+func NewHttpInputRequestDefinition() *HttpInputRequestDefinition {
+	r := &HttpInputRequestDefinition{
+		Headers: make(map[string]string, 0),
+		Params:  make(map[string]string, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the HttpInputRequestDefinition struct
-func (rb *HttpInputRequestDefinitionBuilder) Build() HttpInputRequestDefinition {
-	return *rb.v
-}
-
-func (rb *HttpInputRequestDefinitionBuilder) Auth(auth *HttpInputAuthenticationBuilder) *HttpInputRequestDefinitionBuilder {
-	v := auth.Build()
-	rb.v.Auth = &v
-	return rb
-}
-
-func (rb *HttpInputRequestDefinitionBuilder) Body(body string) *HttpInputRequestDefinitionBuilder {
-	rb.v.Body = &body
-	return rb
-}
-
-func (rb *HttpInputRequestDefinitionBuilder) ConnectionTimeout(connectiontimeout *DurationBuilder) *HttpInputRequestDefinitionBuilder {
-	v := connectiontimeout.Build()
-	rb.v.ConnectionTimeout = &v
-	return rb
-}
-
-func (rb *HttpInputRequestDefinitionBuilder) Headers(value map[string]string) *HttpInputRequestDefinitionBuilder {
-	rb.v.Headers = value
-	return rb
-}
-
-func (rb *HttpInputRequestDefinitionBuilder) Host(host Host) *HttpInputRequestDefinitionBuilder {
-	rb.v.Host = &host
-	return rb
-}
-
-func (rb *HttpInputRequestDefinitionBuilder) Method(method httpinputmethod.HttpInputMethod) *HttpInputRequestDefinitionBuilder {
-	rb.v.Method = &method
-	return rb
-}
-
-func (rb *HttpInputRequestDefinitionBuilder) Params(value map[string]string) *HttpInputRequestDefinitionBuilder {
-	rb.v.Params = value
-	return rb
-}
-
-func (rb *HttpInputRequestDefinitionBuilder) Path(path string) *HttpInputRequestDefinitionBuilder {
-	rb.v.Path = &path
-	return rb
-}
-
-func (rb *HttpInputRequestDefinitionBuilder) Port(port uint) *HttpInputRequestDefinitionBuilder {
-	rb.v.Port = &port
-	return rb
-}
-
-func (rb *HttpInputRequestDefinitionBuilder) Proxy(proxy *HttpInputProxyBuilder) *HttpInputRequestDefinitionBuilder {
-	v := proxy.Build()
-	rb.v.Proxy = &v
-	return rb
-}
-
-func (rb *HttpInputRequestDefinitionBuilder) ReadTimeout(readtimeout *DurationBuilder) *HttpInputRequestDefinitionBuilder {
-	v := readtimeout.Build()
-	rb.v.ReadTimeout = &v
-	return rb
-}
-
-func (rb *HttpInputRequestDefinitionBuilder) Scheme(scheme connectionscheme.ConnectionScheme) *HttpInputRequestDefinitionBuilder {
-	rb.v.Scheme = &scheme
-	return rb
-}
-
-func (rb *HttpInputRequestDefinitionBuilder) Url(url string) *HttpInputRequestDefinitionBuilder {
-	rb.v.Url = &url
-	return rb
+	return r
 }

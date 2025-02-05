@@ -15,19 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package apikeygranttype
 package apikeygranttype
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/grant_api_key/types.ts#L31-L34
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/grant_api_key/types.ts#L48-L51
 type ApiKeyGrantType struct {
-	name string
+	Name string
 }
 
 var (
@@ -41,7 +39,7 @@ func (a ApiKeyGrantType) MarshalText() (text []byte, err error) {
 }
 
 func (a *ApiKeyGrantType) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
 	case "access_token":
 		*a = Accesstoken
@@ -55,5 +53,5 @@ func (a *ApiKeyGrantType) UnmarshalText(text []byte) error {
 }
 
 func (a ApiKeyGrantType) String() string {
-	return a.name
+	return a.Name
 }

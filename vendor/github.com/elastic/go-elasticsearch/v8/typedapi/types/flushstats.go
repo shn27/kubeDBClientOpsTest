@@ -15,60 +15,93 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // FlushStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Stats.ts#L81-L86
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Stats.ts#L123-L128
 type FlushStats struct {
-	Periodic          int64                   `json:"periodic"`
-	Total             int64                   `json:"total"`
-	TotalTime         *Duration               `json:"total_time,omitempty"`
-	TotalTimeInMillis DurationValueUnitMillis `json:"total_time_in_millis"`
+	Periodic          int64    `json:"periodic"`
+	Total             int64    `json:"total"`
+	TotalTime         Duration `json:"total_time,omitempty"`
+	TotalTimeInMillis int64    `json:"total_time_in_millis"`
 }
 
-// FlushStatsBuilder holds FlushStats struct and provides a builder API.
-type FlushStatsBuilder struct {
-	v *FlushStats
-}
+func (s *FlushStats) UnmarshalJSON(data []byte) error {
 
-// NewFlushStats provides a builder for the FlushStats struct.
-func NewFlushStatsBuilder() *FlushStatsBuilder {
-	r := FlushStatsBuilder{
-		&FlushStats{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "periodic":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Periodic", err)
+				}
+				s.Periodic = value
+			case float64:
+				f := int64(v)
+				s.Periodic = f
+			}
+
+		case "total":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Total", err)
+				}
+				s.Total = value
+			case float64:
+				f := int64(v)
+				s.Total = f
+			}
+
+		case "total_time":
+			if err := dec.Decode(&s.TotalTime); err != nil {
+				return fmt.Errorf("%s | %w", "TotalTime", err)
+			}
+
+		case "total_time_in_millis":
+			if err := dec.Decode(&s.TotalTimeInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "TotalTimeInMillis", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the FlushStats struct
-func (rb *FlushStatsBuilder) Build() FlushStats {
-	return *rb.v
-}
+// NewFlushStats returns a FlushStats.
+func NewFlushStats() *FlushStats {
+	r := &FlushStats{}
 
-func (rb *FlushStatsBuilder) Periodic(periodic int64) *FlushStatsBuilder {
-	rb.v.Periodic = periodic
-	return rb
-}
-
-func (rb *FlushStatsBuilder) Total(total int64) *FlushStatsBuilder {
-	rb.v.Total = total
-	return rb
-}
-
-func (rb *FlushStatsBuilder) TotalTime(totaltime *DurationBuilder) *FlushStatsBuilder {
-	v := totaltime.Build()
-	rb.v.TotalTime = &v
-	return rb
-}
-
-func (rb *FlushStatsBuilder) TotalTimeInMillis(totaltimeinmillis *DurationValueUnitMillisBuilder) *FlushStatsBuilder {
-	v := totaltimeinmillis.Build()
-	rb.v.TotalTimeInMillis = v
-	return rb
+	return r
 }

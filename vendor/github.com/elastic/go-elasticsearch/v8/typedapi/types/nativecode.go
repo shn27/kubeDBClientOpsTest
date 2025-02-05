@@ -15,46 +15,68 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // NativeCode type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/info/types.ts#L29-L32
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/info/types.ts#L29-L32
 type NativeCode struct {
-	BuildHash string        `json:"build_hash"`
-	Version   VersionString `json:"version"`
+	BuildHash string `json:"build_hash"`
+	Version   string `json:"version"`
 }
 
-// NativeCodeBuilder holds NativeCode struct and provides a builder API.
-type NativeCodeBuilder struct {
-	v *NativeCode
-}
+func (s *NativeCode) UnmarshalJSON(data []byte) error {
 
-// NewNativeCode provides a builder for the NativeCode struct.
-func NewNativeCodeBuilder() *NativeCodeBuilder {
-	r := NativeCodeBuilder{
-		&NativeCode{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "build_hash":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "BuildHash", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.BuildHash = o
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the NativeCode struct
-func (rb *NativeCodeBuilder) Build() NativeCode {
-	return *rb.v
-}
+// NewNativeCode returns a NativeCode.
+func NewNativeCode() *NativeCode {
+	r := &NativeCode{}
 
-func (rb *NativeCodeBuilder) BuildHash(buildhash string) *NativeCodeBuilder {
-	rb.v.BuildHash = buildhash
-	return rb
-}
-
-func (rb *NativeCodeBuilder) Version(version VersionString) *NativeCodeBuilder {
-	rb.v.Version = version
-	return rb
+	return r
 }

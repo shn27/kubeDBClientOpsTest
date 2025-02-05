@@ -15,73 +15,115 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // Checkpointing type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/transform/get_transform_stats/types.ts#L77-L84
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/transform/get_transform_stats/types.ts#L85-L92
 type Checkpointing struct {
 	ChangesLastDetectedAt         *int64           `json:"changes_last_detected_at,omitempty"`
-	ChangesLastDetectedAtDateTime *DateTime        `json:"changes_last_detected_at_date_time,omitempty"`
+	ChangesLastDetectedAtDateTime DateTime         `json:"changes_last_detected_at_date_time,omitempty"`
 	Last                          CheckpointStats  `json:"last"`
 	LastSearchTime                *int64           `json:"last_search_time,omitempty"`
 	Next                          *CheckpointStats `json:"next,omitempty"`
 	OperationsBehind              *int64           `json:"operations_behind,omitempty"`
 }
 
-// CheckpointingBuilder holds Checkpointing struct and provides a builder API.
-type CheckpointingBuilder struct {
-	v *Checkpointing
-}
+func (s *Checkpointing) UnmarshalJSON(data []byte) error {
 
-// NewCheckpointing provides a builder for the Checkpointing struct.
-func NewCheckpointingBuilder() *CheckpointingBuilder {
-	r := CheckpointingBuilder{
-		&Checkpointing{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "changes_last_detected_at":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ChangesLastDetectedAt", err)
+				}
+				s.ChangesLastDetectedAt = &value
+			case float64:
+				f := int64(v)
+				s.ChangesLastDetectedAt = &f
+			}
+
+		case "changes_last_detected_at_date_time":
+			if err := dec.Decode(&s.ChangesLastDetectedAtDateTime); err != nil {
+				return fmt.Errorf("%s | %w", "ChangesLastDetectedAtDateTime", err)
+			}
+
+		case "last":
+			if err := dec.Decode(&s.Last); err != nil {
+				return fmt.Errorf("%s | %w", "Last", err)
+			}
+
+		case "last_search_time":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "LastSearchTime", err)
+				}
+				s.LastSearchTime = &value
+			case float64:
+				f := int64(v)
+				s.LastSearchTime = &f
+			}
+
+		case "next":
+			if err := dec.Decode(&s.Next); err != nil {
+				return fmt.Errorf("%s | %w", "Next", err)
+			}
+
+		case "operations_behind":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "OperationsBehind", err)
+				}
+				s.OperationsBehind = &value
+			case float64:
+				f := int64(v)
+				s.OperationsBehind = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the Checkpointing struct
-func (rb *CheckpointingBuilder) Build() Checkpointing {
-	return *rb.v
-}
+// NewCheckpointing returns a Checkpointing.
+func NewCheckpointing() *Checkpointing {
+	r := &Checkpointing{}
 
-func (rb *CheckpointingBuilder) ChangesLastDetectedAt(changeslastdetectedat int64) *CheckpointingBuilder {
-	rb.v.ChangesLastDetectedAt = &changeslastdetectedat
-	return rb
-}
-
-func (rb *CheckpointingBuilder) ChangesLastDetectedAtDateTime(changeslastdetectedatdatetime *DateTimeBuilder) *CheckpointingBuilder {
-	v := changeslastdetectedatdatetime.Build()
-	rb.v.ChangesLastDetectedAtDateTime = &v
-	return rb
-}
-
-func (rb *CheckpointingBuilder) Last(last *CheckpointStatsBuilder) *CheckpointingBuilder {
-	v := last.Build()
-	rb.v.Last = v
-	return rb
-}
-
-func (rb *CheckpointingBuilder) LastSearchTime(lastsearchtime int64) *CheckpointingBuilder {
-	rb.v.LastSearchTime = &lastsearchtime
-	return rb
-}
-
-func (rb *CheckpointingBuilder) Next(next *CheckpointStatsBuilder) *CheckpointingBuilder {
-	v := next.Build()
-	rb.v.Next = &v
-	return rb
-}
-
-func (rb *CheckpointingBuilder) OperationsBehind(operationsbehind int64) *CheckpointingBuilder {
-	rb.v.OperationsBehind = &operationsbehind
-	return rb
+	return r
 }

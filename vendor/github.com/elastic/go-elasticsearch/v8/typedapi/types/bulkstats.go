@@ -15,94 +15,133 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // BulkStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Stats.ts#L41-L51
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Stats.ts#L68-L78
 type BulkStats struct {
-	AvgSize           *ByteSize               `json:"avg_size,omitempty"`
-	AvgSizeInBytes    int64                   `json:"avg_size_in_bytes"`
-	AvgTime           *Duration               `json:"avg_time,omitempty"`
-	AvgTimeInMillis   DurationValueUnitMillis `json:"avg_time_in_millis"`
-	TotalOperations   int64                   `json:"total_operations"`
-	TotalSize         *ByteSize               `json:"total_size,omitempty"`
-	TotalSizeInBytes  int64                   `json:"total_size_in_bytes"`
-	TotalTime         *Duration               `json:"total_time,omitempty"`
-	TotalTimeInMillis DurationValueUnitMillis `json:"total_time_in_millis"`
+	AvgSize           ByteSize `json:"avg_size,omitempty"`
+	AvgSizeInBytes    int64    `json:"avg_size_in_bytes"`
+	AvgTime           Duration `json:"avg_time,omitempty"`
+	AvgTimeInMillis   int64    `json:"avg_time_in_millis"`
+	TotalOperations   int64    `json:"total_operations"`
+	TotalSize         ByteSize `json:"total_size,omitempty"`
+	TotalSizeInBytes  int64    `json:"total_size_in_bytes"`
+	TotalTime         Duration `json:"total_time,omitempty"`
+	TotalTimeInMillis int64    `json:"total_time_in_millis"`
 }
 
-// BulkStatsBuilder holds BulkStats struct and provides a builder API.
-type BulkStatsBuilder struct {
-	v *BulkStats
-}
+func (s *BulkStats) UnmarshalJSON(data []byte) error {
 
-// NewBulkStats provides a builder for the BulkStats struct.
-func NewBulkStatsBuilder() *BulkStatsBuilder {
-	r := BulkStatsBuilder{
-		&BulkStats{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "avg_size":
+			if err := dec.Decode(&s.AvgSize); err != nil {
+				return fmt.Errorf("%s | %w", "AvgSize", err)
+			}
+
+		case "avg_size_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "AvgSizeInBytes", err)
+				}
+				s.AvgSizeInBytes = value
+			case float64:
+				f := int64(v)
+				s.AvgSizeInBytes = f
+			}
+
+		case "avg_time":
+			if err := dec.Decode(&s.AvgTime); err != nil {
+				return fmt.Errorf("%s | %w", "AvgTime", err)
+			}
+
+		case "avg_time_in_millis":
+			if err := dec.Decode(&s.AvgTimeInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "AvgTimeInMillis", err)
+			}
+
+		case "total_operations":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TotalOperations", err)
+				}
+				s.TotalOperations = value
+			case float64:
+				f := int64(v)
+				s.TotalOperations = f
+			}
+
+		case "total_size":
+			if err := dec.Decode(&s.TotalSize); err != nil {
+				return fmt.Errorf("%s | %w", "TotalSize", err)
+			}
+
+		case "total_size_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TotalSizeInBytes", err)
+				}
+				s.TotalSizeInBytes = value
+			case float64:
+				f := int64(v)
+				s.TotalSizeInBytes = f
+			}
+
+		case "total_time":
+			if err := dec.Decode(&s.TotalTime); err != nil {
+				return fmt.Errorf("%s | %w", "TotalTime", err)
+			}
+
+		case "total_time_in_millis":
+			if err := dec.Decode(&s.TotalTimeInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "TotalTimeInMillis", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the BulkStats struct
-func (rb *BulkStatsBuilder) Build() BulkStats {
-	return *rb.v
-}
+// NewBulkStats returns a BulkStats.
+func NewBulkStats() *BulkStats {
+	r := &BulkStats{}
 
-func (rb *BulkStatsBuilder) AvgSize(avgsize *ByteSizeBuilder) *BulkStatsBuilder {
-	v := avgsize.Build()
-	rb.v.AvgSize = &v
-	return rb
-}
-
-func (rb *BulkStatsBuilder) AvgSizeInBytes(avgsizeinbytes int64) *BulkStatsBuilder {
-	rb.v.AvgSizeInBytes = avgsizeinbytes
-	return rb
-}
-
-func (rb *BulkStatsBuilder) AvgTime(avgtime *DurationBuilder) *BulkStatsBuilder {
-	v := avgtime.Build()
-	rb.v.AvgTime = &v
-	return rb
-}
-
-func (rb *BulkStatsBuilder) AvgTimeInMillis(avgtimeinmillis *DurationValueUnitMillisBuilder) *BulkStatsBuilder {
-	v := avgtimeinmillis.Build()
-	rb.v.AvgTimeInMillis = v
-	return rb
-}
-
-func (rb *BulkStatsBuilder) TotalOperations(totaloperations int64) *BulkStatsBuilder {
-	rb.v.TotalOperations = totaloperations
-	return rb
-}
-
-func (rb *BulkStatsBuilder) TotalSize(totalsize *ByteSizeBuilder) *BulkStatsBuilder {
-	v := totalsize.Build()
-	rb.v.TotalSize = &v
-	return rb
-}
-
-func (rb *BulkStatsBuilder) TotalSizeInBytes(totalsizeinbytes int64) *BulkStatsBuilder {
-	rb.v.TotalSizeInBytes = totalsizeinbytes
-	return rb
-}
-
-func (rb *BulkStatsBuilder) TotalTime(totaltime *DurationBuilder) *BulkStatsBuilder {
-	v := totaltime.Build()
-	rb.v.TotalTime = &v
-	return rb
-}
-
-func (rb *BulkStatsBuilder) TotalTimeInMillis(totaltimeinmillis *DurationValueUnitMillisBuilder) *BulkStatsBuilder {
-	v := totaltimeinmillis.Build()
-	rb.v.TotalTimeInMillis = v
-	return rb
+	return r
 }

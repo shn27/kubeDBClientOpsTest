@@ -15,40 +15,66 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // SettingsHighlight type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/IndexSettings.ts#L221-L224
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/IndexSettings.ts#L230-L233
 type SettingsHighlight struct {
 	MaxAnalyzedOffset *int `json:"max_analyzed_offset,omitempty"`
 }
 
-// SettingsHighlightBuilder holds SettingsHighlight struct and provides a builder API.
-type SettingsHighlightBuilder struct {
-	v *SettingsHighlight
-}
+func (s *SettingsHighlight) UnmarshalJSON(data []byte) error {
 
-// NewSettingsHighlight provides a builder for the SettingsHighlight struct.
-func NewSettingsHighlightBuilder() *SettingsHighlightBuilder {
-	r := SettingsHighlightBuilder{
-		&SettingsHighlight{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "max_analyzed_offset":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxAnalyzedOffset", err)
+				}
+				s.MaxAnalyzedOffset = &value
+			case float64:
+				f := int(v)
+				s.MaxAnalyzedOffset = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SettingsHighlight struct
-func (rb *SettingsHighlightBuilder) Build() SettingsHighlight {
-	return *rb.v
-}
+// NewSettingsHighlight returns a SettingsHighlight.
+func NewSettingsHighlight() *SettingsHighlight {
+	r := &SettingsHighlight{}
 
-func (rb *SettingsHighlightBuilder) MaxAnalyzedOffset(maxanalyzedoffset int) *SettingsHighlightBuilder {
-	rb.v.MaxAnalyzedOffset = &maxanalyzedoffset
-	return rb
+	return r
 }

@@ -15,43 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // CharFilter holds the union for the following types:
 //
-//	CharFilterDefinition
 //	string
+//	CharFilterDefinition
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/char_filters.ts#L28-L30
-type CharFilter interface{}
-
-// CharFilterBuilder holds CharFilter struct and provides a builder API.
-type CharFilterBuilder struct {
-	v CharFilter
-}
-
-// NewCharFilter provides a builder for the CharFilter struct.
-func NewCharFilterBuilder() *CharFilterBuilder {
-	return &CharFilterBuilder{}
-}
-
-// Build finalize the chain and returns the CharFilter struct
-func (u *CharFilterBuilder) Build() CharFilter {
-	return u.v
-}
-
-func (u *CharFilterBuilder) CharFilterDefinition(charfilterdefinition *CharFilterDefinitionBuilder) *CharFilterBuilder {
-	v := charfilterdefinition.Build()
-	u.v = &v
-	return u
-}
-
-func (u *CharFilterBuilder) String(string string) *CharFilterBuilder {
-	u.v = &string
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/char_filters.ts#L28-L33
+type CharFilter any

@@ -15,100 +15,163 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // PercolateQuery type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/specialized.ts#L110-L120
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/specialized.ts#L205-L245
 type PercolateQuery struct {
-	Boost      *float32       `json:"boost,omitempty"`
-	Document   interface{}    `json:"document,omitempty"`
-	Documents  []interface{}  `json:"documents,omitempty"`
-	Field      Field          `json:"field"`
-	Id         *Id            `json:"id,omitempty"`
-	Index      *IndexName     `json:"index,omitempty"`
-	Name       *string        `json:"name,omitempty"`
-	Preference *string        `json:"preference,omitempty"`
-	QueryName_ *string        `json:"_name,omitempty"`
-	Routing    *Routing       `json:"routing,omitempty"`
-	Version    *VersionNumber `json:"version,omitempty"`
+	// Boost Floating point number used to decrease or increase the relevance scores of
+	// the query.
+	// Boost values are relative to the default value of 1.0.
+	// A boost value between 0 and 1.0 decreases the relevance score.
+	// A value greater than 1.0 increases the relevance score.
+	Boost *float32 `json:"boost,omitempty"`
+	// Document The source of the document being percolated.
+	Document json.RawMessage `json:"document,omitempty"`
+	// Documents An array of sources of the documents being percolated.
+	Documents []json.RawMessage `json:"documents,omitempty"`
+	// Field Field that holds the indexed queries. The field must use the `percolator`
+	// mapping type.
+	Field string `json:"field"`
+	// Id The ID of a stored document to percolate.
+	Id *string `json:"id,omitempty"`
+	// Index The index of a stored document to percolate.
+	Index *string `json:"index,omitempty"`
+	// Name The suffix used for the `_percolator_document_slot` field when multiple
+	// `percolate` queries are specified.
+	Name *string `json:"name,omitempty"`
+	// Preference Preference used to fetch document to percolate.
+	Preference *string `json:"preference,omitempty"`
+	QueryName_ *string `json:"_name,omitempty"`
+	// Routing Routing used to fetch document to percolate.
+	Routing *string `json:"routing,omitempty"`
+	// Version The expected version of a stored document to percolate.
+	Version *int64 `json:"version,omitempty"`
 }
 
-// PercolateQueryBuilder holds PercolateQuery struct and provides a builder API.
-type PercolateQueryBuilder struct {
-	v *PercolateQuery
-}
+func (s *PercolateQuery) UnmarshalJSON(data []byte) error {
 
-// NewPercolateQuery provides a builder for the PercolateQuery struct.
-func NewPercolateQueryBuilder() *PercolateQueryBuilder {
-	r := PercolateQueryBuilder{
-		&PercolateQuery{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "boost":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 32)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Boost", err)
+				}
+				f := float32(value)
+				s.Boost = &f
+			case float64:
+				f := float32(v)
+				s.Boost = &f
+			}
+
+		case "document":
+			if err := dec.Decode(&s.Document); err != nil {
+				return fmt.Errorf("%s | %w", "Document", err)
+			}
+
+		case "documents":
+			if err := dec.Decode(&s.Documents); err != nil {
+				return fmt.Errorf("%s | %w", "Documents", err)
+			}
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "id":
+			if err := dec.Decode(&s.Id); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
+
+		case "index":
+			if err := dec.Decode(&s.Index); err != nil {
+				return fmt.Errorf("%s | %w", "Index", err)
+			}
+
+		case "name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Name = &o
+
+		case "preference":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Preference", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Preference = &o
+
+		case "_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "QueryName_", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.QueryName_ = &o
+
+		case "routing":
+			if err := dec.Decode(&s.Routing); err != nil {
+				return fmt.Errorf("%s | %w", "Routing", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the PercolateQuery struct
-func (rb *PercolateQueryBuilder) Build() PercolateQuery {
-	return *rb.v
-}
+// NewPercolateQuery returns a PercolateQuery.
+func NewPercolateQuery() *PercolateQuery {
+	r := &PercolateQuery{}
 
-func (rb *PercolateQueryBuilder) Boost(boost float32) *PercolateQueryBuilder {
-	rb.v.Boost = &boost
-	return rb
-}
-
-func (rb *PercolateQueryBuilder) Document(document interface{}) *PercolateQueryBuilder {
-	rb.v.Document = document
-	return rb
-}
-
-func (rb *PercolateQueryBuilder) Documents(documents ...interface{}) *PercolateQueryBuilder {
-	rb.v.Documents = documents
-	return rb
-}
-
-func (rb *PercolateQueryBuilder) Field(field Field) *PercolateQueryBuilder {
-	rb.v.Field = field
-	return rb
-}
-
-func (rb *PercolateQueryBuilder) Id(id Id) *PercolateQueryBuilder {
-	rb.v.Id = &id
-	return rb
-}
-
-func (rb *PercolateQueryBuilder) Index(index IndexName) *PercolateQueryBuilder {
-	rb.v.Index = &index
-	return rb
-}
-
-func (rb *PercolateQueryBuilder) Name(name string) *PercolateQueryBuilder {
-	rb.v.Name = &name
-	return rb
-}
-
-func (rb *PercolateQueryBuilder) Preference(preference string) *PercolateQueryBuilder {
-	rb.v.Preference = &preference
-	return rb
-}
-
-func (rb *PercolateQueryBuilder) QueryName_(queryname_ string) *PercolateQueryBuilder {
-	rb.v.QueryName_ = &queryname_
-	return rb
-}
-
-func (rb *PercolateQueryBuilder) Routing(routing Routing) *PercolateQueryBuilder {
-	rb.v.Routing = &routing
-	return rb
-}
-
-func (rb *PercolateQueryBuilder) Version(version VersionNumber) *PercolateQueryBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

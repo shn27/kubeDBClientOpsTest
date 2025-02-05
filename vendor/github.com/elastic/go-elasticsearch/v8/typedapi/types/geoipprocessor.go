@@ -15,98 +15,208 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // GeoIpProcessor type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ingest/_types/Processors.ts#L105-L112
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ingest/_types/Processors.ts#L442-L476
 type GeoIpProcessor struct {
-	DatabaseFile  string               `json:"database_file"`
-	Field         Field                `json:"field"`
-	FirstOnly     bool                 `json:"first_only"`
-	If            *string              `json:"if,omitempty"`
-	IgnoreFailure *bool                `json:"ignore_failure,omitempty"`
-	IgnoreMissing bool                 `json:"ignore_missing"`
-	OnFailure     []ProcessorContainer `json:"on_failure,omitempty"`
-	Properties    []string             `json:"properties"`
-	Tag           *string              `json:"tag,omitempty"`
-	TargetField   Field                `json:"target_field"`
+	// DatabaseFile The database filename referring to a database the module ships with
+	// (GeoLite2-City.mmdb, GeoLite2-Country.mmdb, or GeoLite2-ASN.mmdb) or a custom
+	// database in the ingest-geoip config directory.
+	DatabaseFile *string `json:"database_file,omitempty"`
+	// Description Description of the processor.
+	// Useful for describing the purpose of the processor or its configuration.
+	Description *string `json:"description,omitempty"`
+	// DownloadDatabaseOnPipelineCreation If `true` (and if `ingest.geoip.downloader.eager.download` is `false`), the
+	// missing database is downloaded when the pipeline is created.
+	// Else, the download is triggered by when the pipeline is used as the
+	// `default_pipeline` or `final_pipeline` in an index.
+	DownloadDatabaseOnPipelineCreation *bool `json:"download_database_on_pipeline_creation,omitempty"`
+	// Field The field to get the ip address from for the geographical lookup.
+	Field string `json:"field"`
+	// FirstOnly If `true`, only the first found geoip data will be returned, even if the
+	// field contains an array.
+	FirstOnly *bool `json:"first_only,omitempty"`
+	// If Conditionally execute the processor.
+	If *string `json:"if,omitempty"`
+	// IgnoreFailure Ignore failures for the processor.
+	IgnoreFailure *bool `json:"ignore_failure,omitempty"`
+	// IgnoreMissing If `true` and `field` does not exist, the processor quietly exits without
+	// modifying the document.
+	IgnoreMissing *bool `json:"ignore_missing,omitempty"`
+	// OnFailure Handle failures for the processor.
+	OnFailure []ProcessorContainer `json:"on_failure,omitempty"`
+	// Properties Controls what properties are added to the `target_field` based on the geoip
+	// lookup.
+	Properties []string `json:"properties,omitempty"`
+	// Tag Identifier for the processor.
+	// Useful for debugging and metrics.
+	Tag *string `json:"tag,omitempty"`
+	// TargetField The field that will hold the geographical information looked up from the
+	// MaxMind database.
+	TargetField *string `json:"target_field,omitempty"`
 }
 
-// GeoIpProcessorBuilder holds GeoIpProcessor struct and provides a builder API.
-type GeoIpProcessorBuilder struct {
-	v *GeoIpProcessor
-}
+func (s *GeoIpProcessor) UnmarshalJSON(data []byte) error {
 
-// NewGeoIpProcessor provides a builder for the GeoIpProcessor struct.
-func NewGeoIpProcessorBuilder() *GeoIpProcessorBuilder {
-	r := GeoIpProcessorBuilder{
-		&GeoIpProcessor{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "database_file":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "DatabaseFile", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.DatabaseFile = &o
+
+		case "description":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Description", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Description = &o
+
+		case "download_database_on_pipeline_creation":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DownloadDatabaseOnPipelineCreation", err)
+				}
+				s.DownloadDatabaseOnPipelineCreation = &value
+			case bool:
+				s.DownloadDatabaseOnPipelineCreation = &v
+			}
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "first_only":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "FirstOnly", err)
+				}
+				s.FirstOnly = &value
+			case bool:
+				s.FirstOnly = &v
+			}
+
+		case "if":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "If", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.If = &o
+
+		case "ignore_failure":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IgnoreFailure", err)
+				}
+				s.IgnoreFailure = &value
+			case bool:
+				s.IgnoreFailure = &v
+			}
+
+		case "ignore_missing":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IgnoreMissing", err)
+				}
+				s.IgnoreMissing = &value
+			case bool:
+				s.IgnoreMissing = &v
+			}
+
+		case "on_failure":
+			if err := dec.Decode(&s.OnFailure); err != nil {
+				return fmt.Errorf("%s | %w", "OnFailure", err)
+			}
+
+		case "properties":
+			if err := dec.Decode(&s.Properties); err != nil {
+				return fmt.Errorf("%s | %w", "Properties", err)
+			}
+
+		case "tag":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Tag", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Tag = &o
+
+		case "target_field":
+			if err := dec.Decode(&s.TargetField); err != nil {
+				return fmt.Errorf("%s | %w", "TargetField", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the GeoIpProcessor struct
-func (rb *GeoIpProcessorBuilder) Build() GeoIpProcessor {
-	return *rb.v
-}
+// NewGeoIpProcessor returns a GeoIpProcessor.
+func NewGeoIpProcessor() *GeoIpProcessor {
+	r := &GeoIpProcessor{}
 
-func (rb *GeoIpProcessorBuilder) DatabaseFile(databasefile string) *GeoIpProcessorBuilder {
-	rb.v.DatabaseFile = databasefile
-	return rb
-}
-
-func (rb *GeoIpProcessorBuilder) Field(field Field) *GeoIpProcessorBuilder {
-	rb.v.Field = field
-	return rb
-}
-
-func (rb *GeoIpProcessorBuilder) FirstOnly(firstonly bool) *GeoIpProcessorBuilder {
-	rb.v.FirstOnly = firstonly
-	return rb
-}
-
-func (rb *GeoIpProcessorBuilder) If_(if_ string) *GeoIpProcessorBuilder {
-	rb.v.If = &if_
-	return rb
-}
-
-func (rb *GeoIpProcessorBuilder) IgnoreFailure(ignorefailure bool) *GeoIpProcessorBuilder {
-	rb.v.IgnoreFailure = &ignorefailure
-	return rb
-}
-
-func (rb *GeoIpProcessorBuilder) IgnoreMissing(ignoremissing bool) *GeoIpProcessorBuilder {
-	rb.v.IgnoreMissing = ignoremissing
-	return rb
-}
-
-func (rb *GeoIpProcessorBuilder) OnFailure(on_failure []ProcessorContainerBuilder) *GeoIpProcessorBuilder {
-	tmp := make([]ProcessorContainer, len(on_failure))
-	for _, value := range on_failure {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.OnFailure = tmp
-	return rb
-}
-
-func (rb *GeoIpProcessorBuilder) Properties(properties ...string) *GeoIpProcessorBuilder {
-	rb.v.Properties = properties
-	return rb
-}
-
-func (rb *GeoIpProcessorBuilder) Tag(tag string) *GeoIpProcessorBuilder {
-	rb.v.Tag = &tag
-	return rb
-}
-
-func (rb *GeoIpProcessorBuilder) TargetField(targetfield Field) *GeoIpProcessorBuilder {
-	rb.v.TargetField = targetfield
-	return rb
+	return r
 }

@@ -15,178 +15,225 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DataFrameAnalyticsRecord type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cat/ml_data_frame_analytics/types.ts#L22-L102
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cat/ml_data_frame_analytics/types.ts#L22-L102
 type DataFrameAnalyticsRecord struct {
-	// AssignmentExplanation why the job is or is not assigned to a node
+	// AssignmentExplanation Messages related to the selection of a node.
 	AssignmentExplanation *string `json:"assignment_explanation,omitempty"`
-	// CreateTime job creation time
+	// CreateTime The time when the job was created.
 	CreateTime *string `json:"create_time,omitempty"`
-	// Description description
+	// Description A description of the job.
 	Description *string `json:"description,omitempty"`
-	// DestIndex destination index
-	DestIndex *IndexName `json:"dest_index,omitempty"`
-	// FailureReason failure reason
+	// DestIndex The name of the destination index.
+	DestIndex *string `json:"dest_index,omitempty"`
+	// FailureReason Messages about the reason why the job failed.
 	FailureReason *string `json:"failure_reason,omitempty"`
-	// Id the id
-	Id *Id `json:"id,omitempty"`
-	// ModelMemoryLimit model memory limit
+	// Id The identifier for the job.
+	Id *string `json:"id,omitempty"`
+	// ModelMemoryLimit The approximate maximum amount of memory resources that are permitted for the
+	// job.
 	ModelMemoryLimit *string `json:"model_memory_limit,omitempty"`
-	// NodeAddress network address of the assigned node
+	// NodeAddress The network address of the assigned node.
 	NodeAddress *string `json:"node.address,omitempty"`
-	// NodeEphemeralId ephemeral id of the assigned node
-	NodeEphemeralId *Id `json:"node.ephemeral_id,omitempty"`
-	// NodeId id of the assigned node
-	NodeId *Id `json:"node.id,omitempty"`
-	// NodeName name of the assigned node
-	NodeName *Name `json:"node.name,omitempty"`
-	// Progress progress
+	// NodeEphemeralId The ephemeral identifier of the assigned node.
+	NodeEphemeralId *string `json:"node.ephemeral_id,omitempty"`
+	// NodeId The unique identifier of the assigned node.
+	NodeId *string `json:"node.id,omitempty"`
+	// NodeName The name of the assigned node.
+	NodeName *string `json:"node.name,omitempty"`
+	// Progress The progress report for the job by phase.
 	Progress *string `json:"progress,omitempty"`
-	// SourceIndex source index
-	SourceIndex *IndexName `json:"source_index,omitempty"`
-	// State job state
+	// SourceIndex The name of the source index.
+	SourceIndex *string `json:"source_index,omitempty"`
+	// State The current status of the job.
 	State *string `json:"state,omitempty"`
-	// Type analysis type
+	// Type The type of analysis that the job performs.
 	Type *string `json:"type,omitempty"`
-	// Version the version of Elasticsearch when the analytics was created
-	Version *VersionString `json:"version,omitempty"`
+	// Version The version of Elasticsearch when the job was created.
+	Version *string `json:"version,omitempty"`
 }
 
-// DataFrameAnalyticsRecordBuilder holds DataFrameAnalyticsRecord struct and provides a builder API.
-type DataFrameAnalyticsRecordBuilder struct {
-	v *DataFrameAnalyticsRecord
-}
+func (s *DataFrameAnalyticsRecord) UnmarshalJSON(data []byte) error {
 
-// NewDataFrameAnalyticsRecord provides a builder for the DataFrameAnalyticsRecord struct.
-func NewDataFrameAnalyticsRecordBuilder() *DataFrameAnalyticsRecordBuilder {
-	r := DataFrameAnalyticsRecordBuilder{
-		&DataFrameAnalyticsRecord{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "assignment_explanation", "ae", "assignmentExplanation":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "AssignmentExplanation", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.AssignmentExplanation = &o
+
+		case "create_time", "ct", "createTime":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "CreateTime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.CreateTime = &o
+
+		case "description", "d":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Description", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Description = &o
+
+		case "dest_index", "di", "destIndex":
+			if err := dec.Decode(&s.DestIndex); err != nil {
+				return fmt.Errorf("%s | %w", "DestIndex", err)
+			}
+
+		case "failure_reason", "fr", "failureReason":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "FailureReason", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.FailureReason = &o
+
+		case "id":
+			if err := dec.Decode(&s.Id); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
+
+		case "model_memory_limit", "mml", "modelMemoryLimit":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ModelMemoryLimit", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ModelMemoryLimit = &o
+
+		case "node.address", "na", "nodeAddress":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "NodeAddress", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.NodeAddress = &o
+
+		case "node.ephemeral_id", "ne", "nodeEphemeralId":
+			if err := dec.Decode(&s.NodeEphemeralId); err != nil {
+				return fmt.Errorf("%s | %w", "NodeEphemeralId", err)
+			}
+
+		case "node.id", "ni", "nodeId":
+			if err := dec.Decode(&s.NodeId); err != nil {
+				return fmt.Errorf("%s | %w", "NodeId", err)
+			}
+
+		case "node.name", "nn", "nodeName":
+			if err := dec.Decode(&s.NodeName); err != nil {
+				return fmt.Errorf("%s | %w", "NodeName", err)
+			}
+
+		case "progress", "p":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Progress", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Progress = &o
+
+		case "source_index", "si", "sourceIndex":
+			if err := dec.Decode(&s.SourceIndex); err != nil {
+				return fmt.Errorf("%s | %w", "SourceIndex", err)
+			}
+
+		case "state", "s":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "State", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.State = &o
+
+		case "type", "t":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Type = &o
+
+		case "version", "v":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DataFrameAnalyticsRecord struct
-func (rb *DataFrameAnalyticsRecordBuilder) Build() DataFrameAnalyticsRecord {
-	return *rb.v
-}
+// NewDataFrameAnalyticsRecord returns a DataFrameAnalyticsRecord.
+func NewDataFrameAnalyticsRecord() *DataFrameAnalyticsRecord {
+	r := &DataFrameAnalyticsRecord{}
 
-// AssignmentExplanation why the job is or is not assigned to a node
-
-func (rb *DataFrameAnalyticsRecordBuilder) AssignmentExplanation(assignmentexplanation string) *DataFrameAnalyticsRecordBuilder {
-	rb.v.AssignmentExplanation = &assignmentexplanation
-	return rb
-}
-
-// CreateTime job creation time
-
-func (rb *DataFrameAnalyticsRecordBuilder) CreateTime(createtime string) *DataFrameAnalyticsRecordBuilder {
-	rb.v.CreateTime = &createtime
-	return rb
-}
-
-// Description description
-
-func (rb *DataFrameAnalyticsRecordBuilder) Description(description string) *DataFrameAnalyticsRecordBuilder {
-	rb.v.Description = &description
-	return rb
-}
-
-// DestIndex destination index
-
-func (rb *DataFrameAnalyticsRecordBuilder) DestIndex(destindex IndexName) *DataFrameAnalyticsRecordBuilder {
-	rb.v.DestIndex = &destindex
-	return rb
-}
-
-// FailureReason failure reason
-
-func (rb *DataFrameAnalyticsRecordBuilder) FailureReason(failurereason string) *DataFrameAnalyticsRecordBuilder {
-	rb.v.FailureReason = &failurereason
-	return rb
-}
-
-// Id the id
-
-func (rb *DataFrameAnalyticsRecordBuilder) Id(id Id) *DataFrameAnalyticsRecordBuilder {
-	rb.v.Id = &id
-	return rb
-}
-
-// ModelMemoryLimit model memory limit
-
-func (rb *DataFrameAnalyticsRecordBuilder) ModelMemoryLimit(modelmemorylimit string) *DataFrameAnalyticsRecordBuilder {
-	rb.v.ModelMemoryLimit = &modelmemorylimit
-	return rb
-}
-
-// NodeAddress network address of the assigned node
-
-func (rb *DataFrameAnalyticsRecordBuilder) NodeAddress(nodeaddress string) *DataFrameAnalyticsRecordBuilder {
-	rb.v.NodeAddress = &nodeaddress
-	return rb
-}
-
-// NodeEphemeralId ephemeral id of the assigned node
-
-func (rb *DataFrameAnalyticsRecordBuilder) NodeEphemeralId(nodeephemeralid Id) *DataFrameAnalyticsRecordBuilder {
-	rb.v.NodeEphemeralId = &nodeephemeralid
-	return rb
-}
-
-// NodeId id of the assigned node
-
-func (rb *DataFrameAnalyticsRecordBuilder) NodeId(nodeid Id) *DataFrameAnalyticsRecordBuilder {
-	rb.v.NodeId = &nodeid
-	return rb
-}
-
-// NodeName name of the assigned node
-
-func (rb *DataFrameAnalyticsRecordBuilder) NodeName(nodename Name) *DataFrameAnalyticsRecordBuilder {
-	rb.v.NodeName = &nodename
-	return rb
-}
-
-// Progress progress
-
-func (rb *DataFrameAnalyticsRecordBuilder) Progress(progress string) *DataFrameAnalyticsRecordBuilder {
-	rb.v.Progress = &progress
-	return rb
-}
-
-// SourceIndex source index
-
-func (rb *DataFrameAnalyticsRecordBuilder) SourceIndex(sourceindex IndexName) *DataFrameAnalyticsRecordBuilder {
-	rb.v.SourceIndex = &sourceindex
-	return rb
-}
-
-// State job state
-
-func (rb *DataFrameAnalyticsRecordBuilder) State(state string) *DataFrameAnalyticsRecordBuilder {
-	rb.v.State = &state
-	return rb
-}
-
-// Type analysis type
-
-func (rb *DataFrameAnalyticsRecordBuilder) Type_(type_ string) *DataFrameAnalyticsRecordBuilder {
-	rb.v.Type = &type_
-	return rb
-}
-
-// Version the version of Elasticsearch when the analytics was created
-
-func (rb *DataFrameAnalyticsRecordBuilder) Version(version VersionString) *DataFrameAnalyticsRecordBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

@@ -15,83 +15,213 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
+	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/apikeytype"
+)
+
 // ApiKey type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/_types/ApiKey.ts#L23-L33
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/_types/ApiKey.ts#L27-L113
 type ApiKey struct {
-	Creation    *int64    `json:"creation,omitempty"`
-	Expiration  *int64    `json:"expiration,omitempty"`
-	Id          Id        `json:"id"`
-	Invalidated *bool     `json:"invalidated,omitempty"`
-	Metadata    *Metadata `json:"metadata,omitempty"`
-	Name        Name      `json:"name"`
-	Realm       *string   `json:"realm,omitempty"`
-	Username    *Username `json:"username,omitempty"`
+	// Access The access granted to cross-cluster API keys.
+	// The access is composed of permissions for cross cluster search and cross
+	// cluster replication.
+	// At least one of them must be specified.
+	// When specified, the new access assignment fully replaces the previously
+	// assigned access.
+	Access *Access `json:"access,omitempty"`
+	// Creation Creation time for the API key in milliseconds.
+	Creation int64 `json:"creation"`
+	// Expiration Expiration time for the API key in milliseconds.
+	Expiration *int64 `json:"expiration,omitempty"`
+	// Id Id for the API key
+	Id string `json:"id"`
+	// Invalidated Invalidation status for the API key.
+	// If the key has been invalidated, it has a value of `true`. Otherwise, it is
+	// `false`.
+	Invalidated bool `json:"invalidated"`
+	// Invalidation If the key has been invalidated, invalidation time in milliseconds.
+	Invalidation *int64 `json:"invalidation,omitempty"`
+	// LimitedBy The owner user’s permissions associated with the API key.
+	// It is a point-in-time snapshot captured at creation and subsequent updates.
+	// An API key’s effective permissions are an intersection of its assigned
+	// privileges and the owner user’s permissions.
+	LimitedBy []map[string]RoleDescriptor `json:"limited_by,omitempty"`
+	// Metadata Metadata of the API key
+	Metadata Metadata `json:"metadata"`
+	// Name Name of the API key.
+	Name string `json:"name"`
+	// ProfileUid The profile uid for the API key owner principal, if requested and if it
+	// exists
+	ProfileUid *string `json:"profile_uid,omitempty"`
+	// Realm Realm name of the principal for which this API key was created.
+	Realm string `json:"realm"`
+	// RealmType Realm type of the principal for which this API key was created
+	RealmType *string `json:"realm_type,omitempty"`
+	// RoleDescriptors The role descriptors assigned to this API key when it was created or last
+	// updated.
+	// An empty role descriptor means the API key inherits the owner user’s
+	// permissions.
+	RoleDescriptors map[string]RoleDescriptor `json:"role_descriptors,omitempty"`
+	// Sort_ Sorting values when using the `sort` parameter with the
+	// `security.query_api_keys` API.
+	Sort_ []FieldValue `json:"_sort,omitempty"`
+	// Type The type of the API key (e.g. `rest` or `cross_cluster`).
+	Type apikeytype.ApiKeyType `json:"type"`
+	// Username Principal for which this API key was created
+	Username string `json:"username"`
 }
 
-// ApiKeyBuilder holds ApiKey struct and provides a builder API.
-type ApiKeyBuilder struct {
-	v *ApiKey
+func (s *ApiKey) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "access":
+			if err := dec.Decode(&s.Access); err != nil {
+				return fmt.Errorf("%s | %w", "Access", err)
+			}
+
+		case "creation":
+			if err := dec.Decode(&s.Creation); err != nil {
+				return fmt.Errorf("%s | %w", "Creation", err)
+			}
+
+		case "expiration":
+			if err := dec.Decode(&s.Expiration); err != nil {
+				return fmt.Errorf("%s | %w", "Expiration", err)
+			}
+
+		case "id":
+			if err := dec.Decode(&s.Id); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
+
+		case "invalidated":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Invalidated", err)
+				}
+				s.Invalidated = value
+			case bool:
+				s.Invalidated = v
+			}
+
+		case "invalidation":
+			if err := dec.Decode(&s.Invalidation); err != nil {
+				return fmt.Errorf("%s | %w", "Invalidation", err)
+			}
+
+		case "limited_by":
+			if err := dec.Decode(&s.LimitedBy); err != nil {
+				return fmt.Errorf("%s | %w", "LimitedBy", err)
+			}
+
+		case "metadata":
+			if err := dec.Decode(&s.Metadata); err != nil {
+				return fmt.Errorf("%s | %w", "Metadata", err)
+			}
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		case "profile_uid":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ProfileUid", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ProfileUid = &o
+
+		case "realm":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Realm", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Realm = o
+
+		case "realm_type":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "RealmType", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.RealmType = &o
+
+		case "role_descriptors":
+			if s.RoleDescriptors == nil {
+				s.RoleDescriptors = make(map[string]RoleDescriptor, 0)
+			}
+			if err := dec.Decode(&s.RoleDescriptors); err != nil {
+				return fmt.Errorf("%s | %w", "RoleDescriptors", err)
+			}
+
+		case "_sort":
+			if err := dec.Decode(&s.Sort_); err != nil {
+				return fmt.Errorf("%s | %w", "Sort_", err)
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "username":
+			if err := dec.Decode(&s.Username); err != nil {
+				return fmt.Errorf("%s | %w", "Username", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewApiKey provides a builder for the ApiKey struct.
-func NewApiKeyBuilder() *ApiKeyBuilder {
-	r := ApiKeyBuilder{
-		&ApiKey{},
+// NewApiKey returns a ApiKey.
+func NewApiKey() *ApiKey {
+	r := &ApiKey{
+		RoleDescriptors: make(map[string]RoleDescriptor, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the ApiKey struct
-func (rb *ApiKeyBuilder) Build() ApiKey {
-	return *rb.v
-}
-
-func (rb *ApiKeyBuilder) Creation(creation int64) *ApiKeyBuilder {
-	rb.v.Creation = &creation
-	return rb
-}
-
-func (rb *ApiKeyBuilder) Expiration(expiration int64) *ApiKeyBuilder {
-	rb.v.Expiration = &expiration
-	return rb
-}
-
-func (rb *ApiKeyBuilder) Id(id Id) *ApiKeyBuilder {
-	rb.v.Id = id
-	return rb
-}
-
-func (rb *ApiKeyBuilder) Invalidated(invalidated bool) *ApiKeyBuilder {
-	rb.v.Invalidated = &invalidated
-	return rb
-}
-
-func (rb *ApiKeyBuilder) Metadata(metadata *MetadataBuilder) *ApiKeyBuilder {
-	v := metadata.Build()
-	rb.v.Metadata = &v
-	return rb
-}
-
-func (rb *ApiKeyBuilder) Name(name Name) *ApiKeyBuilder {
-	rb.v.Name = name
-	return rb
-}
-
-func (rb *ApiKeyBuilder) Realm(realm string) *ApiKeyBuilder {
-	rb.v.Realm = &realm
-	return rb
-}
-
-func (rb *ApiKeyBuilder) Username(username Username) *ApiKeyBuilder {
-	rb.v.Username = &username
-	return rb
+	return r
 }

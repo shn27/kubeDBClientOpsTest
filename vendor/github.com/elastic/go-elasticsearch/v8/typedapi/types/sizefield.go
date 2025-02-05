@@ -15,40 +15,64 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // SizeField type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/mapping/meta-fields.ts#L54-L56
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/mapping/meta-fields.ts#L54-L56
 type SizeField struct {
 	Enabled bool `json:"enabled"`
 }
 
-// SizeFieldBuilder holds SizeField struct and provides a builder API.
-type SizeFieldBuilder struct {
-	v *SizeField
-}
+func (s *SizeField) UnmarshalJSON(data []byte) error {
 
-// NewSizeField provides a builder for the SizeField struct.
-func NewSizeFieldBuilder() *SizeFieldBuilder {
-	r := SizeFieldBuilder{
-		&SizeField{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "enabled":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Enabled", err)
+				}
+				s.Enabled = value
+			case bool:
+				s.Enabled = v
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SizeField struct
-func (rb *SizeFieldBuilder) Build() SizeField {
-	return *rb.v
-}
+// NewSizeField returns a SizeField.
+func NewSizeField() *SizeField {
+	r := &SizeField{}
 
-func (rb *SizeFieldBuilder) Enabled(enabled bool) *SizeFieldBuilder {
-	rb.v.Enabled = enabled
-	return rb
+	return r
 }

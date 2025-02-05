@@ -15,64 +15,87 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ClusterJvm type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/stats/types.ts#L149-L154
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/stats/types.ts#L275-L292
 type ClusterJvm struct {
-	MaxUptimeInMillis DurationValueUnitMillis `json:"max_uptime_in_millis"`
-	Mem               ClusterJvmMemory        `json:"mem"`
-	Threads           int64                   `json:"threads"`
-	Versions          []ClusterJvmVersion     `json:"versions"`
+	// MaxUptimeInMillis Uptime duration, in milliseconds, since JVM last started.
+	MaxUptimeInMillis int64 `json:"max_uptime_in_millis"`
+	// Mem Contains statistics about memory used by selected nodes.
+	Mem ClusterJvmMemory `json:"mem"`
+	// Threads Number of active threads in use by JVM across all selected nodes.
+	Threads int64 `json:"threads"`
+	// Versions Contains statistics about the JVM versions used by selected nodes.
+	Versions []ClusterJvmVersion `json:"versions"`
 }
 
-// ClusterJvmBuilder holds ClusterJvm struct and provides a builder API.
-type ClusterJvmBuilder struct {
-	v *ClusterJvm
-}
+func (s *ClusterJvm) UnmarshalJSON(data []byte) error {
 
-// NewClusterJvm provides a builder for the ClusterJvm struct.
-func NewClusterJvmBuilder() *ClusterJvmBuilder {
-	r := ClusterJvmBuilder{
-		&ClusterJvm{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "max_uptime_in_millis":
+			if err := dec.Decode(&s.MaxUptimeInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "MaxUptimeInMillis", err)
+			}
+
+		case "mem":
+			if err := dec.Decode(&s.Mem); err != nil {
+				return fmt.Errorf("%s | %w", "Mem", err)
+			}
+
+		case "threads":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Threads", err)
+				}
+				s.Threads = value
+			case float64:
+				f := int64(v)
+				s.Threads = f
+			}
+
+		case "versions":
+			if err := dec.Decode(&s.Versions); err != nil {
+				return fmt.Errorf("%s | %w", "Versions", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ClusterJvm struct
-func (rb *ClusterJvmBuilder) Build() ClusterJvm {
-	return *rb.v
-}
+// NewClusterJvm returns a ClusterJvm.
+func NewClusterJvm() *ClusterJvm {
+	r := &ClusterJvm{}
 
-func (rb *ClusterJvmBuilder) MaxUptimeInMillis(maxuptimeinmillis *DurationValueUnitMillisBuilder) *ClusterJvmBuilder {
-	v := maxuptimeinmillis.Build()
-	rb.v.MaxUptimeInMillis = v
-	return rb
-}
-
-func (rb *ClusterJvmBuilder) Mem(mem *ClusterJvmMemoryBuilder) *ClusterJvmBuilder {
-	v := mem.Build()
-	rb.v.Mem = v
-	return rb
-}
-
-func (rb *ClusterJvmBuilder) Threads(threads int64) *ClusterJvmBuilder {
-	rb.v.Threads = threads
-	return rb
-}
-
-func (rb *ClusterJvmBuilder) Versions(versions []ClusterJvmVersionBuilder) *ClusterJvmBuilder {
-	tmp := make([]ClusterJvmVersion, len(versions))
-	for _, value := range versions {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Versions = tmp
-	return rb
+	return r
 }

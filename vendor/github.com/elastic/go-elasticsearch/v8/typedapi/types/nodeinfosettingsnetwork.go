@@ -15,40 +15,65 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // NodeInfoSettingsNetwork type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/info/types.ts#L212-L214
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/info/types.ts#L223-L225
 type NodeInfoSettingsNetwork struct {
-	Host Host `json:"host"`
+	Host []string `json:"host,omitempty"`
 }
 
-// NodeInfoSettingsNetworkBuilder holds NodeInfoSettingsNetwork struct and provides a builder API.
-type NodeInfoSettingsNetworkBuilder struct {
-	v *NodeInfoSettingsNetwork
-}
+func (s *NodeInfoSettingsNetwork) UnmarshalJSON(data []byte) error {
 
-// NewNodeInfoSettingsNetwork provides a builder for the NodeInfoSettingsNetwork struct.
-func NewNodeInfoSettingsNetworkBuilder() *NodeInfoSettingsNetworkBuilder {
-	r := NodeInfoSettingsNetworkBuilder{
-		&NodeInfoSettingsNetwork{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "host":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Host", err)
+				}
+
+				s.Host = append(s.Host, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Host); err != nil {
+					return fmt.Errorf("%s | %w", "Host", err)
+				}
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the NodeInfoSettingsNetwork struct
-func (rb *NodeInfoSettingsNetworkBuilder) Build() NodeInfoSettingsNetwork {
-	return *rb.v
-}
+// NewNodeInfoSettingsNetwork returns a NodeInfoSettingsNetwork.
+func NewNodeInfoSettingsNetwork() *NodeInfoSettingsNetwork {
+	r := &NodeInfoSettingsNetwork{}
 
-func (rb *NodeInfoSettingsNetworkBuilder) Host(host Host) *NodeInfoSettingsNetworkBuilder {
-	rb.v.Host = host
-	return rb
+	return r
 }

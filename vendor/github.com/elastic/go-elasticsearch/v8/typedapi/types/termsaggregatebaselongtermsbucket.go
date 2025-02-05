@@ -15,60 +15,109 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // TermsAggregateBaseLongTermsBucket type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L364-L369
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L417-L422
 type TermsAggregateBaseLongTermsBucket struct {
 	Buckets                 BucketsLongTermsBucket `json:"buckets"`
 	DocCountErrorUpperBound *int64                 `json:"doc_count_error_upper_bound,omitempty"`
-	Meta                    *Metadata              `json:"meta,omitempty"`
-	SumOtherDocCount        int64                  `json:"sum_other_doc_count"`
+	Meta                    Metadata               `json:"meta,omitempty"`
+	SumOtherDocCount        *int64                 `json:"sum_other_doc_count,omitempty"`
 }
 
-// TermsAggregateBaseLongTermsBucketBuilder holds TermsAggregateBaseLongTermsBucket struct and provides a builder API.
-type TermsAggregateBaseLongTermsBucketBuilder struct {
-	v *TermsAggregateBaseLongTermsBucket
-}
+func (s *TermsAggregateBaseLongTermsBucket) UnmarshalJSON(data []byte) error {
 
-// NewTermsAggregateBaseLongTermsBucket provides a builder for the TermsAggregateBaseLongTermsBucket struct.
-func NewTermsAggregateBaseLongTermsBucketBuilder() *TermsAggregateBaseLongTermsBucketBuilder {
-	r := TermsAggregateBaseLongTermsBucketBuilder{
-		&TermsAggregateBaseLongTermsBucket{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "buckets":
+
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			source := bytes.NewReader(rawMsg)
+			localDec := json.NewDecoder(source)
+			switch rawMsg[0] {
+			case '{':
+				o := make(map[string]LongTermsBucket, 0)
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Buckets", err)
+				}
+				s.Buckets = o
+			case '[':
+				o := []LongTermsBucket{}
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Buckets", err)
+				}
+				s.Buckets = o
+			}
+
+		case "doc_count_error_upper_bound":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DocCountErrorUpperBound", err)
+				}
+				s.DocCountErrorUpperBound = &value
+			case float64:
+				f := int64(v)
+				s.DocCountErrorUpperBound = &f
+			}
+
+		case "meta":
+			if err := dec.Decode(&s.Meta); err != nil {
+				return fmt.Errorf("%s | %w", "Meta", err)
+			}
+
+		case "sum_other_doc_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "SumOtherDocCount", err)
+				}
+				s.SumOtherDocCount = &value
+			case float64:
+				f := int64(v)
+				s.SumOtherDocCount = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TermsAggregateBaseLongTermsBucket struct
-func (rb *TermsAggregateBaseLongTermsBucketBuilder) Build() TermsAggregateBaseLongTermsBucket {
-	return *rb.v
-}
+// NewTermsAggregateBaseLongTermsBucket returns a TermsAggregateBaseLongTermsBucket.
+func NewTermsAggregateBaseLongTermsBucket() *TermsAggregateBaseLongTermsBucket {
+	r := &TermsAggregateBaseLongTermsBucket{}
 
-func (rb *TermsAggregateBaseLongTermsBucketBuilder) Buckets(buckets *BucketsLongTermsBucketBuilder) *TermsAggregateBaseLongTermsBucketBuilder {
-	v := buckets.Build()
-	rb.v.Buckets = v
-	return rb
-}
-
-func (rb *TermsAggregateBaseLongTermsBucketBuilder) DocCountErrorUpperBound(doccounterrorupperbound int64) *TermsAggregateBaseLongTermsBucketBuilder {
-	rb.v.DocCountErrorUpperBound = &doccounterrorupperbound
-	return rb
-}
-
-func (rb *TermsAggregateBaseLongTermsBucketBuilder) Meta(meta *MetadataBuilder) *TermsAggregateBaseLongTermsBucketBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *TermsAggregateBaseLongTermsBucketBuilder) SumOtherDocCount(sumotherdoccount int64) *TermsAggregateBaseLongTermsBucketBuilder {
-	rb.v.SumOtherDocCount = sumotherdoccount
-	return rb
+	return r
 }

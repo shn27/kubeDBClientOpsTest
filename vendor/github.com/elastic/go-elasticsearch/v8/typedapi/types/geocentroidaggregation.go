@@ -15,67 +15,132 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // GeoCentroidAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/metric.ts#L76-L79
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/metric.ts#L119-L122
 type GeoCentroidAggregation struct {
-	Count    *int64       `json:"count,omitempty"`
-	Field    *Field       `json:"field,omitempty"`
-	Location *GeoLocation `json:"location,omitempty"`
-	Missing  *Missing     `json:"missing,omitempty"`
-	Script   *Script      `json:"script,omitempty"`
+	Count *int64 `json:"count,omitempty"`
+	// Field The field on which to run the aggregation.
+	Field    *string     `json:"field,omitempty"`
+	Location GeoLocation `json:"location,omitempty"`
+	// Missing The value to apply to documents that do not have a value.
+	// By default, documents without a value are ignored.
+	Missing Missing `json:"missing,omitempty"`
+	Script  *Script `json:"script,omitempty"`
 }
 
-// GeoCentroidAggregationBuilder holds GeoCentroidAggregation struct and provides a builder API.
-type GeoCentroidAggregationBuilder struct {
-	v *GeoCentroidAggregation
-}
+func (s *GeoCentroidAggregation) UnmarshalJSON(data []byte) error {
 
-// NewGeoCentroidAggregation provides a builder for the GeoCentroidAggregation struct.
-func NewGeoCentroidAggregationBuilder() *GeoCentroidAggregationBuilder {
-	r := GeoCentroidAggregationBuilder{
-		&GeoCentroidAggregation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Count", err)
+				}
+				s.Count = &value
+			case float64:
+				f := int64(v)
+				s.Count = &f
+			}
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "location":
+			message := json.RawMessage{}
+			if err := dec.Decode(&message); err != nil {
+				return fmt.Errorf("%s | %w", "Location", err)
+			}
+			keyDec := json.NewDecoder(bytes.NewReader(message))
+		location_field:
+			for {
+				t, err := keyDec.Token()
+				if err != nil {
+					if errors.Is(err, io.EOF) {
+						break
+					}
+					return fmt.Errorf("%s | %w", "Location", err)
+				}
+
+				switch t {
+
+				case "lat", "lon":
+					o := NewLatLonGeoLocation()
+					localDec := json.NewDecoder(bytes.NewReader(message))
+					if err := localDec.Decode(&o); err != nil {
+						return fmt.Errorf("%s | %w", "Location", err)
+					}
+					s.Location = o
+					break location_field
+
+				case "geohash":
+					o := NewGeoHashLocation()
+					localDec := json.NewDecoder(bytes.NewReader(message))
+					if err := localDec.Decode(&o); err != nil {
+						return fmt.Errorf("%s | %w", "Location", err)
+					}
+					s.Location = o
+					break location_field
+
+				}
+			}
+			if s.Location == nil {
+				localDec := json.NewDecoder(bytes.NewReader(message))
+				if err := localDec.Decode(&s.Location); err != nil {
+					return fmt.Errorf("%s | %w", "Location", err)
+				}
+			}
+
+		case "missing":
+			if err := dec.Decode(&s.Missing); err != nil {
+				return fmt.Errorf("%s | %w", "Missing", err)
+			}
+
+		case "script":
+			if err := dec.Decode(&s.Script); err != nil {
+				return fmt.Errorf("%s | %w", "Script", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the GeoCentroidAggregation struct
-func (rb *GeoCentroidAggregationBuilder) Build() GeoCentroidAggregation {
-	return *rb.v
-}
+// NewGeoCentroidAggregation returns a GeoCentroidAggregation.
+func NewGeoCentroidAggregation() *GeoCentroidAggregation {
+	r := &GeoCentroidAggregation{}
 
-func (rb *GeoCentroidAggregationBuilder) Count(count int64) *GeoCentroidAggregationBuilder {
-	rb.v.Count = &count
-	return rb
-}
-
-func (rb *GeoCentroidAggregationBuilder) Field(field Field) *GeoCentroidAggregationBuilder {
-	rb.v.Field = &field
-	return rb
-}
-
-func (rb *GeoCentroidAggregationBuilder) Location(location *GeoLocationBuilder) *GeoCentroidAggregationBuilder {
-	v := location.Build()
-	rb.v.Location = &v
-	return rb
-}
-
-func (rb *GeoCentroidAggregationBuilder) Missing(missing *MissingBuilder) *GeoCentroidAggregationBuilder {
-	v := missing.Build()
-	rb.v.Missing = &v
-	return rb
-}
-
-func (rb *GeoCentroidAggregationBuilder) Script(script *ScriptBuilder) *GeoCentroidAggregationBuilder {
-	v := script.Build()
-	rb.v.Script = &v
-	return rb
+	return r
 }

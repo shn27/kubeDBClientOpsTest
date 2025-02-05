@@ -15,55 +15,87 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // MultiplexerTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L259-L263
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L261-L265
 type MultiplexerTokenFilter struct {
-	Filters          []string       `json:"filters"`
-	PreserveOriginal *bool          `json:"preserve_original,omitempty"`
-	Type             string         `json:"type,omitempty"`
-	Version          *VersionString `json:"version,omitempty"`
+	Filters          []string           `json:"filters"`
+	PreserveOriginal Stringifiedboolean `json:"preserve_original,omitempty"`
+	Type             string             `json:"type,omitempty"`
+	Version          *string            `json:"version,omitempty"`
 }
 
-// MultiplexerTokenFilterBuilder holds MultiplexerTokenFilter struct and provides a builder API.
-type MultiplexerTokenFilterBuilder struct {
-	v *MultiplexerTokenFilter
+func (s *MultiplexerTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "filters":
+			if err := dec.Decode(&s.Filters); err != nil {
+				return fmt.Errorf("%s | %w", "Filters", err)
+			}
+
+		case "preserve_original":
+			if err := dec.Decode(&s.PreserveOriginal); err != nil {
+				return fmt.Errorf("%s | %w", "PreserveOriginal", err)
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewMultiplexerTokenFilter provides a builder for the MultiplexerTokenFilter struct.
-func NewMultiplexerTokenFilterBuilder() *MultiplexerTokenFilterBuilder {
-	r := MultiplexerTokenFilterBuilder{
-		&MultiplexerTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s MultiplexerTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerMultiplexerTokenFilter MultiplexerTokenFilter
+	tmp := innerMultiplexerTokenFilter{
+		Filters:          s.Filters,
+		PreserveOriginal: s.PreserveOriginal,
+		Type:             s.Type,
+		Version:          s.Version,
 	}
 
-	r.v.Type = "multiplexer"
+	tmp.Type = "multiplexer"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the MultiplexerTokenFilter struct
-func (rb *MultiplexerTokenFilterBuilder) Build() MultiplexerTokenFilter {
-	return *rb.v
-}
+// NewMultiplexerTokenFilter returns a MultiplexerTokenFilter.
+func NewMultiplexerTokenFilter() *MultiplexerTokenFilter {
+	r := &MultiplexerTokenFilter{}
 
-func (rb *MultiplexerTokenFilterBuilder) Filters(filters ...string) *MultiplexerTokenFilterBuilder {
-	rb.v.Filters = filters
-	return rb
-}
-
-func (rb *MultiplexerTokenFilterBuilder) PreserveOriginal(preserveoriginal bool) *MultiplexerTokenFilterBuilder {
-	rb.v.PreserveOriginal = &preserveoriginal
-	return rb
-}
-
-func (rb *MultiplexerTokenFilterBuilder) Version(version VersionString) *MultiplexerTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

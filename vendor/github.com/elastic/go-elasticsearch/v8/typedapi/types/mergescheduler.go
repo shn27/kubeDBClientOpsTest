@@ -15,46 +15,60 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // MergeScheduler type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/IndexSettings.ts#L327-L330
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/IndexSettings.ts#L336-L339
 type MergeScheduler struct {
-	MaxMergeCount  *int `json:"max_merge_count,omitempty"`
-	MaxThreadCount *int `json:"max_thread_count,omitempty"`
+	MaxMergeCount  Stringifiedinteger `json:"max_merge_count,omitempty"`
+	MaxThreadCount Stringifiedinteger `json:"max_thread_count,omitempty"`
 }
 
-// MergeSchedulerBuilder holds MergeScheduler struct and provides a builder API.
-type MergeSchedulerBuilder struct {
-	v *MergeScheduler
-}
+func (s *MergeScheduler) UnmarshalJSON(data []byte) error {
 
-// NewMergeScheduler provides a builder for the MergeScheduler struct.
-func NewMergeSchedulerBuilder() *MergeSchedulerBuilder {
-	r := MergeSchedulerBuilder{
-		&MergeScheduler{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "max_merge_count":
+			if err := dec.Decode(&s.MaxMergeCount); err != nil {
+				return fmt.Errorf("%s | %w", "MaxMergeCount", err)
+			}
+
+		case "max_thread_count":
+			if err := dec.Decode(&s.MaxThreadCount); err != nil {
+				return fmt.Errorf("%s | %w", "MaxThreadCount", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the MergeScheduler struct
-func (rb *MergeSchedulerBuilder) Build() MergeScheduler {
-	return *rb.v
-}
+// NewMergeScheduler returns a MergeScheduler.
+func NewMergeScheduler() *MergeScheduler {
+	r := &MergeScheduler{}
 
-func (rb *MergeSchedulerBuilder) MaxMergeCount(maxmergecount int) *MergeSchedulerBuilder {
-	rb.v.MaxMergeCount = &maxmergecount
-	return rb
-}
-
-func (rb *MergeSchedulerBuilder) MaxThreadCount(maxthreadcount int) *MergeSchedulerBuilder {
-	rb.v.MaxThreadCount = &maxthreadcount
-	return rb
+	return r
 }

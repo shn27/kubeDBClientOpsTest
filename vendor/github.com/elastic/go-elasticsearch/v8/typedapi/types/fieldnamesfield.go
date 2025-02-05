@@ -15,40 +15,64 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // FieldNamesField type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/mapping/meta-fields.ts#L42-L44
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/mapping/meta-fields.ts#L42-L44
 type FieldNamesField struct {
 	Enabled bool `json:"enabled"`
 }
 
-// FieldNamesFieldBuilder holds FieldNamesField struct and provides a builder API.
-type FieldNamesFieldBuilder struct {
-	v *FieldNamesField
-}
+func (s *FieldNamesField) UnmarshalJSON(data []byte) error {
 
-// NewFieldNamesField provides a builder for the FieldNamesField struct.
-func NewFieldNamesFieldBuilder() *FieldNamesFieldBuilder {
-	r := FieldNamesFieldBuilder{
-		&FieldNamesField{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "enabled":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Enabled", err)
+				}
+				s.Enabled = value
+			case bool:
+				s.Enabled = v
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the FieldNamesField struct
-func (rb *FieldNamesFieldBuilder) Build() FieldNamesField {
-	return *rb.v
-}
+// NewFieldNamesField returns a FieldNamesField.
+func NewFieldNamesField() *FieldNamesField {
+	r := &FieldNamesField{}
 
-func (rb *FieldNamesFieldBuilder) Enabled(enabled bool) *FieldNamesFieldBuilder {
-	rb.v.Enabled = enabled
-	return rb
+	return r
 }

@@ -15,76 +15,109 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/routingstate"
 )
 
 // TrainedModelAssignmentRoutingTable type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/TrainedModel.ts#L350-L368
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/TrainedModel.ts#L418-L436
 type TrainedModelAssignmentRoutingTable struct {
 	// CurrentAllocations Current number of allocations.
 	CurrentAllocations int `json:"current_allocations"`
 	// Reason The reason for the current state. It is usually populated only when the
 	// `routing_state` is `failed`.
-	Reason string `json:"reason"`
+	Reason *string `json:"reason,omitempty"`
 	// RoutingState The current routing state.
 	RoutingState routingstate.RoutingState `json:"routing_state"`
 	// TargetAllocations Target number of allocations.
 	TargetAllocations int `json:"target_allocations"`
 }
 
-// TrainedModelAssignmentRoutingTableBuilder holds TrainedModelAssignmentRoutingTable struct and provides a builder API.
-type TrainedModelAssignmentRoutingTableBuilder struct {
-	v *TrainedModelAssignmentRoutingTable
-}
+func (s *TrainedModelAssignmentRoutingTable) UnmarshalJSON(data []byte) error {
 
-// NewTrainedModelAssignmentRoutingTable provides a builder for the TrainedModelAssignmentRoutingTable struct.
-func NewTrainedModelAssignmentRoutingTableBuilder() *TrainedModelAssignmentRoutingTableBuilder {
-	r := TrainedModelAssignmentRoutingTableBuilder{
-		&TrainedModelAssignmentRoutingTable{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "current_allocations":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CurrentAllocations", err)
+				}
+				s.CurrentAllocations = value
+			case float64:
+				f := int(v)
+				s.CurrentAllocations = f
+			}
+
+		case "reason":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Reason", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Reason = &o
+
+		case "routing_state":
+			if err := dec.Decode(&s.RoutingState); err != nil {
+				return fmt.Errorf("%s | %w", "RoutingState", err)
+			}
+
+		case "target_allocations":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TargetAllocations", err)
+				}
+				s.TargetAllocations = value
+			case float64:
+				f := int(v)
+				s.TargetAllocations = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TrainedModelAssignmentRoutingTable struct
-func (rb *TrainedModelAssignmentRoutingTableBuilder) Build() TrainedModelAssignmentRoutingTable {
-	return *rb.v
-}
+// NewTrainedModelAssignmentRoutingTable returns a TrainedModelAssignmentRoutingTable.
+func NewTrainedModelAssignmentRoutingTable() *TrainedModelAssignmentRoutingTable {
+	r := &TrainedModelAssignmentRoutingTable{}
 
-// CurrentAllocations Current number of allocations.
-
-func (rb *TrainedModelAssignmentRoutingTableBuilder) CurrentAllocations(currentallocations int) *TrainedModelAssignmentRoutingTableBuilder {
-	rb.v.CurrentAllocations = currentallocations
-	return rb
-}
-
-// Reason The reason for the current state. It is usually populated only when the
-// `routing_state` is `failed`.
-
-func (rb *TrainedModelAssignmentRoutingTableBuilder) Reason(reason string) *TrainedModelAssignmentRoutingTableBuilder {
-	rb.v.Reason = reason
-	return rb
-}
-
-// RoutingState The current routing state.
-
-func (rb *TrainedModelAssignmentRoutingTableBuilder) RoutingState(routingstate routingstate.RoutingState) *TrainedModelAssignmentRoutingTableBuilder {
-	rb.v.RoutingState = routingstate
-	return rb
-}
-
-// TargetAllocations Target number of allocations.
-
-func (rb *TrainedModelAssignmentRoutingTableBuilder) TargetAllocations(targetallocations int) *TrainedModelAssignmentRoutingTableBuilder {
-	rb.v.TargetAllocations = targetallocations
-	return rb
+	return r
 }

@@ -15,50 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // BucketsHistogramBucket holds the union for the following types:
 //
-//	[]HistogramBucket
 //	map[string]HistogramBucket
+//	[]HistogramBucket
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L303-L312
-type BucketsHistogramBucket interface{}
-
-// BucketsHistogramBucketBuilder holds BucketsHistogramBucket struct and provides a builder API.
-type BucketsHistogramBucketBuilder struct {
-	v BucketsHistogramBucket
-}
-
-// NewBucketsHistogramBucket provides a builder for the BucketsHistogramBucket struct.
-func NewBucketsHistogramBucketBuilder() *BucketsHistogramBucketBuilder {
-	return &BucketsHistogramBucketBuilder{}
-}
-
-// Build finalize the chain and returns the BucketsHistogramBucket struct
-func (u *BucketsHistogramBucketBuilder) Build() BucketsHistogramBucket {
-	return u.v
-}
-
-func (u *BucketsHistogramBucketBuilder) HistogramBuckets(histogrambuckets []HistogramBucketBuilder) *BucketsHistogramBucketBuilder {
-	tmp := make([]HistogramBucket, len(histogrambuckets))
-	for _, value := range histogrambuckets {
-		tmp = append(tmp, value.Build())
-	}
-	u.v = tmp
-	return u
-}
-
-func (u *BucketsHistogramBucketBuilder) Map(values map[string]*HistogramBucketBuilder) *BucketsHistogramBucketBuilder {
-	tmp := make(map[string]HistogramBucket, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	u.v = tmp
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L346-L355
+type BucketsHistogramBucket any

@@ -15,82 +15,108 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/sampleraggregationexecutionhint"
 )
 
 // DiversifiedSamplerAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/bucket.ts#L152-L158
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/bucket.ts#L333-L357
 type DiversifiedSamplerAggregation struct {
-	ExecutionHint   *sampleraggregationexecutionhint.SamplerAggregationExecutionHint `json:"execution_hint,omitempty"`
-	Field           *Field                                                           `json:"field,omitempty"`
-	MaxDocsPerValue *int                                                             `json:"max_docs_per_value,omitempty"`
-	Meta            *Metadata                                                        `json:"meta,omitempty"`
-	Name            *string                                                          `json:"name,omitempty"`
-	Script          *Script                                                          `json:"script,omitempty"`
-	ShardSize       *int                                                             `json:"shard_size,omitempty"`
+	// ExecutionHint The type of value used for de-duplication.
+	ExecutionHint *sampleraggregationexecutionhint.SamplerAggregationExecutionHint `json:"execution_hint,omitempty"`
+	// Field The field used to provide values used for de-duplication.
+	Field *string `json:"field,omitempty"`
+	// MaxDocsPerValue Limits how many documents are permitted per choice of de-duplicating value.
+	MaxDocsPerValue *int    `json:"max_docs_per_value,omitempty"`
+	Script          *Script `json:"script,omitempty"`
+	// ShardSize Limits how many top-scoring documents are collected in the sample processed
+	// on each shard.
+	ShardSize *int `json:"shard_size,omitempty"`
 }
 
-// DiversifiedSamplerAggregationBuilder holds DiversifiedSamplerAggregation struct and provides a builder API.
-type DiversifiedSamplerAggregationBuilder struct {
-	v *DiversifiedSamplerAggregation
-}
+func (s *DiversifiedSamplerAggregation) UnmarshalJSON(data []byte) error {
 
-// NewDiversifiedSamplerAggregation provides a builder for the DiversifiedSamplerAggregation struct.
-func NewDiversifiedSamplerAggregationBuilder() *DiversifiedSamplerAggregationBuilder {
-	r := DiversifiedSamplerAggregationBuilder{
-		&DiversifiedSamplerAggregation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "execution_hint":
+			if err := dec.Decode(&s.ExecutionHint); err != nil {
+				return fmt.Errorf("%s | %w", "ExecutionHint", err)
+			}
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "max_docs_per_value":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxDocsPerValue", err)
+				}
+				s.MaxDocsPerValue = &value
+			case float64:
+				f := int(v)
+				s.MaxDocsPerValue = &f
+			}
+
+		case "script":
+			if err := dec.Decode(&s.Script); err != nil {
+				return fmt.Errorf("%s | %w", "Script", err)
+			}
+
+		case "shard_size":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ShardSize", err)
+				}
+				s.ShardSize = &value
+			case float64:
+				f := int(v)
+				s.ShardSize = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DiversifiedSamplerAggregation struct
-func (rb *DiversifiedSamplerAggregationBuilder) Build() DiversifiedSamplerAggregation {
-	return *rb.v
-}
+// NewDiversifiedSamplerAggregation returns a DiversifiedSamplerAggregation.
+func NewDiversifiedSamplerAggregation() *DiversifiedSamplerAggregation {
+	r := &DiversifiedSamplerAggregation{}
 
-func (rb *DiversifiedSamplerAggregationBuilder) ExecutionHint(executionhint sampleraggregationexecutionhint.SamplerAggregationExecutionHint) *DiversifiedSamplerAggregationBuilder {
-	rb.v.ExecutionHint = &executionhint
-	return rb
-}
-
-func (rb *DiversifiedSamplerAggregationBuilder) Field(field Field) *DiversifiedSamplerAggregationBuilder {
-	rb.v.Field = &field
-	return rb
-}
-
-func (rb *DiversifiedSamplerAggregationBuilder) MaxDocsPerValue(maxdocspervalue int) *DiversifiedSamplerAggregationBuilder {
-	rb.v.MaxDocsPerValue = &maxdocspervalue
-	return rb
-}
-
-func (rb *DiversifiedSamplerAggregationBuilder) Meta(meta *MetadataBuilder) *DiversifiedSamplerAggregationBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *DiversifiedSamplerAggregationBuilder) Name(name string) *DiversifiedSamplerAggregationBuilder {
-	rb.v.Name = &name
-	return rb
-}
-
-func (rb *DiversifiedSamplerAggregationBuilder) Script(script *ScriptBuilder) *DiversifiedSamplerAggregationBuilder {
-	v := script.Build()
-	rb.v.Script = &v
-	return rb
-}
-
-func (rb *DiversifiedSamplerAggregationBuilder) ShardSize(shardsize int) *DiversifiedSamplerAggregationBuilder {
-	rb.v.ShardSize = &shardsize
-	return rb
+	return r
 }

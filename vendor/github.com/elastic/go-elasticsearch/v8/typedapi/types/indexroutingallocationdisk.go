@@ -15,40 +15,62 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // IndexRoutingAllocationDisk type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/IndexRouting.ts#L62-L64
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/IndexRouting.ts#L62-L64
 type IndexRoutingAllocationDisk struct {
 	ThresholdEnabled string `json:"threshold_enabled,omitempty"`
 }
 
-// IndexRoutingAllocationDiskBuilder holds IndexRoutingAllocationDisk struct and provides a builder API.
-type IndexRoutingAllocationDiskBuilder struct {
-	v *IndexRoutingAllocationDisk
-}
+func (s *IndexRoutingAllocationDisk) UnmarshalJSON(data []byte) error {
 
-// NewIndexRoutingAllocationDisk provides a builder for the IndexRoutingAllocationDisk struct.
-func NewIndexRoutingAllocationDiskBuilder() *IndexRoutingAllocationDiskBuilder {
-	r := IndexRoutingAllocationDiskBuilder{
-		&IndexRoutingAllocationDisk{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "threshold_enabled":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ThresholdEnabled", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ThresholdEnabled = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the IndexRoutingAllocationDisk struct
-func (rb *IndexRoutingAllocationDiskBuilder) Build() IndexRoutingAllocationDisk {
-	return *rb.v
-}
+// NewIndexRoutingAllocationDisk returns a IndexRoutingAllocationDisk.
+func NewIndexRoutingAllocationDisk() *IndexRoutingAllocationDisk {
+	r := &IndexRoutingAllocationDisk{}
 
-func (rb *IndexRoutingAllocationDiskBuilder) ThresholdEnabled(arg string) *IndexRoutingAllocationDiskBuilder {
-	rb.v.ThresholdEnabled = arg
-	return rb
+	return r
 }

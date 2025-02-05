@@ -15,74 +15,157 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/healthstatus"
 )
 
 // ShardHealthStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/health/types.ts#L36-L43
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/health/types.ts#L37-L45
 type ShardHealthStats struct {
-	ActiveShards       int                       `json:"active_shards"`
-	InitializingShards int                       `json:"initializing_shards"`
-	PrimaryActive      bool                      `json:"primary_active"`
-	RelocatingShards   int                       `json:"relocating_shards"`
-	Status             healthstatus.HealthStatus `json:"status"`
-	UnassignedShards   int                       `json:"unassigned_shards"`
+	ActiveShards            int                       `json:"active_shards"`
+	InitializingShards      int                       `json:"initializing_shards"`
+	PrimaryActive           bool                      `json:"primary_active"`
+	RelocatingShards        int                       `json:"relocating_shards"`
+	Status                  healthstatus.HealthStatus `json:"status"`
+	UnassignedPrimaryShards int                       `json:"unassigned_primary_shards"`
+	UnassignedShards        int                       `json:"unassigned_shards"`
 }
 
-// ShardHealthStatsBuilder holds ShardHealthStats struct and provides a builder API.
-type ShardHealthStatsBuilder struct {
-	v *ShardHealthStats
-}
+func (s *ShardHealthStats) UnmarshalJSON(data []byte) error {
 
-// NewShardHealthStats provides a builder for the ShardHealthStats struct.
-func NewShardHealthStatsBuilder() *ShardHealthStatsBuilder {
-	r := ShardHealthStatsBuilder{
-		&ShardHealthStats{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "active_shards":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ActiveShards", err)
+				}
+				s.ActiveShards = value
+			case float64:
+				f := int(v)
+				s.ActiveShards = f
+			}
+
+		case "initializing_shards":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "InitializingShards", err)
+				}
+				s.InitializingShards = value
+			case float64:
+				f := int(v)
+				s.InitializingShards = f
+			}
+
+		case "primary_active":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PrimaryActive", err)
+				}
+				s.PrimaryActive = value
+			case bool:
+				s.PrimaryActive = v
+			}
+
+		case "relocating_shards":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "RelocatingShards", err)
+				}
+				s.RelocatingShards = value
+			case float64:
+				f := int(v)
+				s.RelocatingShards = f
+			}
+
+		case "status":
+			if err := dec.Decode(&s.Status); err != nil {
+				return fmt.Errorf("%s | %w", "Status", err)
+			}
+
+		case "unassigned_primary_shards":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "UnassignedPrimaryShards", err)
+				}
+				s.UnassignedPrimaryShards = value
+			case float64:
+				f := int(v)
+				s.UnassignedPrimaryShards = f
+			}
+
+		case "unassigned_shards":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "UnassignedShards", err)
+				}
+				s.UnassignedShards = value
+			case float64:
+				f := int(v)
+				s.UnassignedShards = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ShardHealthStats struct
-func (rb *ShardHealthStatsBuilder) Build() ShardHealthStats {
-	return *rb.v
-}
+// NewShardHealthStats returns a ShardHealthStats.
+func NewShardHealthStats() *ShardHealthStats {
+	r := &ShardHealthStats{}
 
-func (rb *ShardHealthStatsBuilder) ActiveShards(activeshards int) *ShardHealthStatsBuilder {
-	rb.v.ActiveShards = activeshards
-	return rb
-}
-
-func (rb *ShardHealthStatsBuilder) InitializingShards(initializingshards int) *ShardHealthStatsBuilder {
-	rb.v.InitializingShards = initializingshards
-	return rb
-}
-
-func (rb *ShardHealthStatsBuilder) PrimaryActive(primaryactive bool) *ShardHealthStatsBuilder {
-	rb.v.PrimaryActive = primaryactive
-	return rb
-}
-
-func (rb *ShardHealthStatsBuilder) RelocatingShards(relocatingshards int) *ShardHealthStatsBuilder {
-	rb.v.RelocatingShards = relocatingshards
-	return rb
-}
-
-func (rb *ShardHealthStatsBuilder) Status(status healthstatus.HealthStatus) *ShardHealthStatsBuilder {
-	rb.v.Status = status
-	return rb
-}
-
-func (rb *ShardHealthStatsBuilder) UnassignedShards(unassignedshards int) *ShardHealthStatsBuilder {
-	rb.v.UnassignedShards = unassignedshards
-	return rb
+	return r
 }

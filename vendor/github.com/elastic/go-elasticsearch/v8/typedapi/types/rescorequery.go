@@ -15,63 +15,103 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/scoremode"
 )
 
 // RescoreQuery type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/rescoring.ts#L28-L34
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/rescoring.ts#L40-L62
 type RescoreQuery struct {
-	Query              QueryContainer       `json:"rescore_query"`
-	QueryWeight        *float64             `json:"query_weight,omitempty"`
-	RescoreQueryWeight *float64             `json:"rescore_query_weight,omitempty"`
-	ScoreMode          *scoremode.ScoreMode `json:"score_mode,omitempty"`
+	// Query The query to use for rescoring.
+	// This query is only run on the Top-K results returned by the `query` and
+	// `post_filter` phases.
+	Query Query `json:"rescore_query"`
+	// QueryWeight Relative importance of the original query versus the rescore query.
+	QueryWeight *Float64 `json:"query_weight,omitempty"`
+	// RescoreQueryWeight Relative importance of the rescore query versus the original query.
+	RescoreQueryWeight *Float64 `json:"rescore_query_weight,omitempty"`
+	// ScoreMode Determines how scores are combined.
+	ScoreMode *scoremode.ScoreMode `json:"score_mode,omitempty"`
 }
 
-// RescoreQueryBuilder holds RescoreQuery struct and provides a builder API.
-type RescoreQueryBuilder struct {
-	v *RescoreQuery
-}
+func (s *RescoreQuery) UnmarshalJSON(data []byte) error {
 
-// NewRescoreQuery provides a builder for the RescoreQuery struct.
-func NewRescoreQueryBuilder() *RescoreQueryBuilder {
-	r := RescoreQueryBuilder{
-		&RescoreQuery{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "rescore_query":
+			if err := dec.Decode(&s.Query); err != nil {
+				return fmt.Errorf("%s | %w", "Query", err)
+			}
+
+		case "query_weight":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "QueryWeight", err)
+				}
+				f := Float64(value)
+				s.QueryWeight = &f
+			case float64:
+				f := Float64(v)
+				s.QueryWeight = &f
+			}
+
+		case "rescore_query_weight":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "RescoreQueryWeight", err)
+				}
+				f := Float64(value)
+				s.RescoreQueryWeight = &f
+			case float64:
+				f := Float64(v)
+				s.RescoreQueryWeight = &f
+			}
+
+		case "score_mode":
+			if err := dec.Decode(&s.ScoreMode); err != nil {
+				return fmt.Errorf("%s | %w", "ScoreMode", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RescoreQuery struct
-func (rb *RescoreQueryBuilder) Build() RescoreQuery {
-	return *rb.v
-}
+// NewRescoreQuery returns a RescoreQuery.
+func NewRescoreQuery() *RescoreQuery {
+	r := &RescoreQuery{}
 
-func (rb *RescoreQueryBuilder) Query(query *QueryContainerBuilder) *RescoreQueryBuilder {
-	v := query.Build()
-	rb.v.Query = v
-	return rb
-}
-
-func (rb *RescoreQueryBuilder) QueryWeight(queryweight float64) *RescoreQueryBuilder {
-	rb.v.QueryWeight = &queryweight
-	return rb
-}
-
-func (rb *RescoreQueryBuilder) RescoreQueryWeight(rescorequeryweight float64) *RescoreQueryBuilder {
-	rb.v.RescoreQueryWeight = &rescorequeryweight
-	return rb
-}
-
-func (rb *RescoreQueryBuilder) ScoreMode(scoremode scoremode.ScoreMode) *RescoreQueryBuilder {
-	rb.v.ScoreMode = &scoremode
-	return rb
+	return r
 }

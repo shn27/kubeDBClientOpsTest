@@ -15,58 +15,46 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package validate
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"strconv"
 
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 )
 
 // Request holds the request body struct for the package validate
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/validate/MlValidateJobRequest.ts#L27-L45
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/validate/MlValidateJobRequest.ts#L27-L44
 type Request struct {
-	AnalysisConfig *types.AnalysisConfig `json:"analysis_config,omitempty"`
-
-	AnalysisLimits *types.AnalysisLimits `json:"analysis_limits,omitempty"`
-
-	DataDescription *types.DataDescription `json:"data_description,omitempty"`
-
-	Description *string `json:"description,omitempty"`
-
-	JobId *types.Id `json:"job_id,omitempty"`
-
-	ModelPlot *types.ModelPlotConfig `json:"model_plot,omitempty"`
-
-	ModelSnapshotId *types.Id `json:"model_snapshot_id,omitempty"`
-
-	ModelSnapshotRetentionDays *int64 `json:"model_snapshot_retention_days,omitempty"`
-
-	ResultsIndexName *types.IndexName `json:"results_index_name,omitempty"`
+	AnalysisConfig             *types.AnalysisConfig  `json:"analysis_config,omitempty"`
+	AnalysisLimits             *types.AnalysisLimits  `json:"analysis_limits,omitempty"`
+	DataDescription            *types.DataDescription `json:"data_description,omitempty"`
+	Description                *string                `json:"description,omitempty"`
+	JobId                      *string                `json:"job_id,omitempty"`
+	ModelPlot                  *types.ModelPlotConfig `json:"model_plot,omitempty"`
+	ModelSnapshotId            *string                `json:"model_snapshot_id,omitempty"`
+	ModelSnapshotRetentionDays *int64                 `json:"model_snapshot_retention_days,omitempty"`
+	ResultsIndexName           *string                `json:"results_index_name,omitempty"`
 }
 
-// RequestBuilder is the builder API for the validate.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -77,56 +65,83 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) AnalysisConfig(analysisconfig *types.AnalysisConfigBuilder) *RequestBuilder {
-	v := analysisconfig.Build()
-	rb.v.AnalysisConfig = &v
-	return rb
-}
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
 
-func (rb *RequestBuilder) AnalysisLimits(analysislimits *types.AnalysisLimitsBuilder) *RequestBuilder {
-	v := analysislimits.Build()
-	rb.v.AnalysisLimits = &v
-	return rb
-}
+		switch t {
 
-func (rb *RequestBuilder) DataDescription(datadescription *types.DataDescriptionBuilder) *RequestBuilder {
-	v := datadescription.Build()
-	rb.v.DataDescription = &v
-	return rb
-}
+		case "analysis_config":
+			if err := dec.Decode(&s.AnalysisConfig); err != nil {
+				return fmt.Errorf("%s | %w", "AnalysisConfig", err)
+			}
 
-func (rb *RequestBuilder) Description(description string) *RequestBuilder {
-	rb.v.Description = &description
-	return rb
-}
+		case "analysis_limits":
+			if err := dec.Decode(&s.AnalysisLimits); err != nil {
+				return fmt.Errorf("%s | %w", "AnalysisLimits", err)
+			}
 
-func (rb *RequestBuilder) JobId(jobid types.Id) *RequestBuilder {
-	rb.v.JobId = &jobid
-	return rb
-}
+		case "data_description":
+			if err := dec.Decode(&s.DataDescription); err != nil {
+				return fmt.Errorf("%s | %w", "DataDescription", err)
+			}
 
-func (rb *RequestBuilder) ModelPlot(modelplot *types.ModelPlotConfigBuilder) *RequestBuilder {
-	v := modelplot.Build()
-	rb.v.ModelPlot = &v
-	return rb
-}
+		case "description":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Description", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Description = &o
 
-func (rb *RequestBuilder) ModelSnapshotId(modelsnapshotid types.Id) *RequestBuilder {
-	rb.v.ModelSnapshotId = &modelsnapshotid
-	return rb
-}
+		case "job_id":
+			if err := dec.Decode(&s.JobId); err != nil {
+				return fmt.Errorf("%s | %w", "JobId", err)
+			}
 
-func (rb *RequestBuilder) ModelSnapshotRetentionDays(modelsnapshotretentiondays int64) *RequestBuilder {
-	rb.v.ModelSnapshotRetentionDays = &modelsnapshotretentiondays
-	return rb
-}
+		case "model_plot":
+			if err := dec.Decode(&s.ModelPlot); err != nil {
+				return fmt.Errorf("%s | %w", "ModelPlot", err)
+			}
 
-func (rb *RequestBuilder) ResultsIndexName(resultsindexname types.IndexName) *RequestBuilder {
-	rb.v.ResultsIndexName = &resultsindexname
-	return rb
+		case "model_snapshot_id":
+			if err := dec.Decode(&s.ModelSnapshotId); err != nil {
+				return fmt.Errorf("%s | %w", "ModelSnapshotId", err)
+			}
+
+		case "model_snapshot_retention_days":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ModelSnapshotRetentionDays", err)
+				}
+				s.ModelSnapshotRetentionDays = &value
+			case float64:
+				f := int64(v)
+				s.ModelSnapshotRetentionDays = &f
+			}
+
+		case "results_index_name":
+			if err := dec.Decode(&s.ResultsIndexName); err != nil {
+				return fmt.Errorf("%s | %w", "ResultsIndexName", err)
+			}
+
+		}
+	}
+	return nil
 }

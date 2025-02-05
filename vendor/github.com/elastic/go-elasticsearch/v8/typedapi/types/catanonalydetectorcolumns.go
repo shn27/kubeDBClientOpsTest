@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
@@ -28,25 +26,5 @@ import (
 
 // CatAnonalyDetectorColumns type alias.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cat/_types/CatBase.ts#L402-L404
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cat/_types/CatBase.ts#L402-L404
 type CatAnonalyDetectorColumns []catanomalydetectorcolumn.CatAnomalyDetectorColumn
-
-// CatAnonalyDetectorColumnsBuilder holds CatAnonalyDetectorColumns struct and provides a builder API.
-type CatAnonalyDetectorColumnsBuilder struct {
-	v CatAnonalyDetectorColumns
-}
-
-// NewCatAnonalyDetectorColumns provides a builder for the CatAnonalyDetectorColumns struct.
-func NewCatAnonalyDetectorColumnsBuilder() *CatAnonalyDetectorColumnsBuilder {
-	return &CatAnonalyDetectorColumnsBuilder{}
-}
-
-// Build finalize the chain and returns the CatAnonalyDetectorColumns struct
-func (b *CatAnonalyDetectorColumnsBuilder) Build() CatAnonalyDetectorColumns {
-	return b.v
-}
-
-func (b *CatAnonalyDetectorColumnsBuilder) CatAnonalyDetectorColumns(value CatAnonalyDetectorColumns) *CatAnonalyDetectorColumnsBuilder {
-	b.v = value
-	return b
-}

@@ -15,16 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // MlInferenceTrainedModels type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/usage/types.ts#L203-L210
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/xpack/usage/types.ts#L213-L223
 type MlInferenceTrainedModels struct {
 	All_                          MlCounter                      `json:"_all"`
 	Count                         *MlInferenceTrainedModelsCount `json:"count,omitempty"`
@@ -33,51 +31,9 @@ type MlInferenceTrainedModels struct {
 	ModelSizeBytes                *JobStatistics                 `json:"model_size_bytes,omitempty"`
 }
 
-// MlInferenceTrainedModelsBuilder holds MlInferenceTrainedModels struct and provides a builder API.
-type MlInferenceTrainedModelsBuilder struct {
-	v *MlInferenceTrainedModels
-}
+// NewMlInferenceTrainedModels returns a MlInferenceTrainedModels.
+func NewMlInferenceTrainedModels() *MlInferenceTrainedModels {
+	r := &MlInferenceTrainedModels{}
 
-// NewMlInferenceTrainedModels provides a builder for the MlInferenceTrainedModels struct.
-func NewMlInferenceTrainedModelsBuilder() *MlInferenceTrainedModelsBuilder {
-	r := MlInferenceTrainedModelsBuilder{
-		&MlInferenceTrainedModels{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the MlInferenceTrainedModels struct
-func (rb *MlInferenceTrainedModelsBuilder) Build() MlInferenceTrainedModels {
-	return *rb.v
-}
-
-func (rb *MlInferenceTrainedModelsBuilder) All_(all_ *MlCounterBuilder) *MlInferenceTrainedModelsBuilder {
-	v := all_.Build()
-	rb.v.All_ = v
-	return rb
-}
-
-func (rb *MlInferenceTrainedModelsBuilder) Count(count *MlInferenceTrainedModelsCountBuilder) *MlInferenceTrainedModelsBuilder {
-	v := count.Build()
-	rb.v.Count = &v
-	return rb
-}
-
-func (rb *MlInferenceTrainedModelsBuilder) EstimatedHeapMemoryUsageBytes(estimatedheapmemoryusagebytes *JobStatisticsBuilder) *MlInferenceTrainedModelsBuilder {
-	v := estimatedheapmemoryusagebytes.Build()
-	rb.v.EstimatedHeapMemoryUsageBytes = &v
-	return rb
-}
-
-func (rb *MlInferenceTrainedModelsBuilder) EstimatedOperations(estimatedoperations *JobStatisticsBuilder) *MlInferenceTrainedModelsBuilder {
-	v := estimatedoperations.Build()
-	rb.v.EstimatedOperations = &v
-	return rb
-}
-
-func (rb *MlInferenceTrainedModelsBuilder) ModelSizeBytes(modelsizebytes *JobStatisticsBuilder) *MlInferenceTrainedModelsBuilder {
-	v := modelsizebytes.Build()
-	rb.v.ModelSizeBytes = &v
-	return rb
+	return r
 }

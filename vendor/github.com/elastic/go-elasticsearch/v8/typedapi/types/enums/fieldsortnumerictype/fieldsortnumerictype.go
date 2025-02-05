@@ -15,19 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package fieldsortnumerictype
 package fieldsortnumerictype
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/sort.ts#L36-L41
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/sort.ts#L36-L41
 type FieldSortNumericType struct {
-	name string
+	Name string
 }
 
 var (
@@ -45,7 +43,7 @@ func (f FieldSortNumericType) MarshalText() (text []byte, err error) {
 }
 
 func (f *FieldSortNumericType) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
 	case "long":
 		*f = Long
@@ -63,5 +61,5 @@ func (f *FieldSortNumericType) UnmarshalText(text []byte) error {
 }
 
 func (f FieldSortNumericType) String() string {
-	return f.name
+	return f.Name
 }

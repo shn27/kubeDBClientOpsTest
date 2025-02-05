@@ -15,53 +15,80 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // WeightedAverageValue type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/metric.ts#L218-L222
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/metric.ts#L465-L475
 type WeightedAverageValue struct {
-	Field   *Field   `json:"field,omitempty"`
-	Missing *float64 `json:"missing,omitempty"`
+	// Field The field from which to extract the values or weights.
+	Field *string `json:"field,omitempty"`
+	// Missing A value or weight to use if the field is missing.
+	Missing *Float64 `json:"missing,omitempty"`
 	Script  *Script  `json:"script,omitempty"`
 }
 
-// WeightedAverageValueBuilder holds WeightedAverageValue struct and provides a builder API.
-type WeightedAverageValueBuilder struct {
-	v *WeightedAverageValue
-}
+func (s *WeightedAverageValue) UnmarshalJSON(data []byte) error {
 
-// NewWeightedAverageValue provides a builder for the WeightedAverageValue struct.
-func NewWeightedAverageValueBuilder() *WeightedAverageValueBuilder {
-	r := WeightedAverageValueBuilder{
-		&WeightedAverageValue{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "missing":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Missing", err)
+				}
+				f := Float64(value)
+				s.Missing = &f
+			case float64:
+				f := Float64(v)
+				s.Missing = &f
+			}
+
+		case "script":
+			if err := dec.Decode(&s.Script); err != nil {
+				return fmt.Errorf("%s | %w", "Script", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the WeightedAverageValue struct
-func (rb *WeightedAverageValueBuilder) Build() WeightedAverageValue {
-	return *rb.v
-}
+// NewWeightedAverageValue returns a WeightedAverageValue.
+func NewWeightedAverageValue() *WeightedAverageValue {
+	r := &WeightedAverageValue{}
 
-func (rb *WeightedAverageValueBuilder) Field(field Field) *WeightedAverageValueBuilder {
-	rb.v.Field = &field
-	return rb
-}
-
-func (rb *WeightedAverageValueBuilder) Missing(missing float64) *WeightedAverageValueBuilder {
-	rb.v.Missing = &missing
-	return rb
-}
-
-func (rb *WeightedAverageValueBuilder) Script(script *ScriptBuilder) *WeightedAverageValueBuilder {
-	v := script.Build()
-	rb.v.Script = &v
-	return rb
+	return r
 }

@@ -15,52 +15,77 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ClusterIngest type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/stats/types.ts#L144-L147
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/stats/types.ts#L270-L273
 type ClusterIngest struct {
 	NumberOfPipelines int                         `json:"number_of_pipelines"`
 	ProcessorStats    map[string]ClusterProcessor `json:"processor_stats"`
 }
 
-// ClusterIngestBuilder holds ClusterIngest struct and provides a builder API.
-type ClusterIngestBuilder struct {
-	v *ClusterIngest
+func (s *ClusterIngest) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "number_of_pipelines":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NumberOfPipelines", err)
+				}
+				s.NumberOfPipelines = value
+			case float64:
+				f := int(v)
+				s.NumberOfPipelines = f
+			}
+
+		case "processor_stats":
+			if s.ProcessorStats == nil {
+				s.ProcessorStats = make(map[string]ClusterProcessor, 0)
+			}
+			if err := dec.Decode(&s.ProcessorStats); err != nil {
+				return fmt.Errorf("%s | %w", "ProcessorStats", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewClusterIngest provides a builder for the ClusterIngest struct.
-func NewClusterIngestBuilder() *ClusterIngestBuilder {
-	r := ClusterIngestBuilder{
-		&ClusterIngest{
-			ProcessorStats: make(map[string]ClusterProcessor, 0),
-		},
+// NewClusterIngest returns a ClusterIngest.
+func NewClusterIngest() *ClusterIngest {
+	r := &ClusterIngest{
+		ProcessorStats: make(map[string]ClusterProcessor, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the ClusterIngest struct
-func (rb *ClusterIngestBuilder) Build() ClusterIngest {
-	return *rb.v
-}
-
-func (rb *ClusterIngestBuilder) NumberOfPipelines(numberofpipelines int) *ClusterIngestBuilder {
-	rb.v.NumberOfPipelines = numberofpipelines
-	return rb
-}
-
-func (rb *ClusterIngestBuilder) ProcessorStats(values map[string]*ClusterProcessorBuilder) *ClusterIngestBuilder {
-	tmp := make(map[string]ClusterProcessor, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.ProcessorStats = tmp
-	return rb
+	return r
 }

@@ -15,16 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // Definition type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/put_trained_model/types.ts#L24-L29
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/put_trained_model/types.ts#L24-L29
 type Definition struct {
 	// Preprocessors Collection of preprocessors
 	Preprocessors []Preprocessor `json:"preprocessors,omitempty"`
@@ -32,40 +30,9 @@ type Definition struct {
 	TrainedModel TrainedModel `json:"trained_model"`
 }
 
-// DefinitionBuilder holds Definition struct and provides a builder API.
-type DefinitionBuilder struct {
-	v *Definition
-}
+// NewDefinition returns a Definition.
+func NewDefinition() *Definition {
+	r := &Definition{}
 
-// NewDefinition provides a builder for the Definition struct.
-func NewDefinitionBuilder() *DefinitionBuilder {
-	r := DefinitionBuilder{
-		&Definition{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the Definition struct
-func (rb *DefinitionBuilder) Build() Definition {
-	return *rb.v
-}
-
-// Preprocessors Collection of preprocessors
-
-func (rb *DefinitionBuilder) Preprocessors(preprocessors []PreprocessorBuilder) *DefinitionBuilder {
-	tmp := make([]Preprocessor, len(preprocessors))
-	for _, value := range preprocessors {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Preprocessors = tmp
-	return rb
-}
-
-// TrainedModel The definition of the trained model.
-
-func (rb *DefinitionBuilder) TrainedModel(trainedmodel *TrainedModelBuilder) *DefinitionBuilder {
-	v := trainedmodel.Build()
-	rb.v.TrainedModel = v
-	return rb
+	return r
 }

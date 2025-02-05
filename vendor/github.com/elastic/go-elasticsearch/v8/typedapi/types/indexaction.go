@@ -15,76 +15,87 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/optype"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/refresh"
 )
 
 // IndexAction type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Actions.ts#L256-L265
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Actions.ts#L256-L265
 type IndexAction struct {
-	DocId              *Id              `json:"doc_id,omitempty"`
-	ExecutionTimeField *Field           `json:"execution_time_field,omitempty"`
-	Index              IndexName        `json:"index"`
+	DocId              *string          `json:"doc_id,omitempty"`
+	ExecutionTimeField *string          `json:"execution_time_field,omitempty"`
+	Index              string           `json:"index"`
 	OpType             *optype.OpType   `json:"op_type,omitempty"`
 	Refresh            *refresh.Refresh `json:"refresh,omitempty"`
-	Timeout            *Duration        `json:"timeout,omitempty"`
+	Timeout            Duration         `json:"timeout,omitempty"`
 }
 
-// IndexActionBuilder holds IndexAction struct and provides a builder API.
-type IndexActionBuilder struct {
-	v *IndexAction
-}
+func (s *IndexAction) UnmarshalJSON(data []byte) error {
 
-// NewIndexAction provides a builder for the IndexAction struct.
-func NewIndexActionBuilder() *IndexActionBuilder {
-	r := IndexActionBuilder{
-		&IndexAction{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "doc_id":
+			if err := dec.Decode(&s.DocId); err != nil {
+				return fmt.Errorf("%s | %w", "DocId", err)
+			}
+
+		case "execution_time_field":
+			if err := dec.Decode(&s.ExecutionTimeField); err != nil {
+				return fmt.Errorf("%s | %w", "ExecutionTimeField", err)
+			}
+
+		case "index":
+			if err := dec.Decode(&s.Index); err != nil {
+				return fmt.Errorf("%s | %w", "Index", err)
+			}
+
+		case "op_type":
+			if err := dec.Decode(&s.OpType); err != nil {
+				return fmt.Errorf("%s | %w", "OpType", err)
+			}
+
+		case "refresh":
+			if err := dec.Decode(&s.Refresh); err != nil {
+				return fmt.Errorf("%s | %w", "Refresh", err)
+			}
+
+		case "timeout":
+			if err := dec.Decode(&s.Timeout); err != nil {
+				return fmt.Errorf("%s | %w", "Timeout", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the IndexAction struct
-func (rb *IndexActionBuilder) Build() IndexAction {
-	return *rb.v
-}
+// NewIndexAction returns a IndexAction.
+func NewIndexAction() *IndexAction {
+	r := &IndexAction{}
 
-func (rb *IndexActionBuilder) DocId(docid Id) *IndexActionBuilder {
-	rb.v.DocId = &docid
-	return rb
-}
-
-func (rb *IndexActionBuilder) ExecutionTimeField(executiontimefield Field) *IndexActionBuilder {
-	rb.v.ExecutionTimeField = &executiontimefield
-	return rb
-}
-
-func (rb *IndexActionBuilder) Index(index IndexName) *IndexActionBuilder {
-	rb.v.Index = index
-	return rb
-}
-
-func (rb *IndexActionBuilder) OpType(optype optype.OpType) *IndexActionBuilder {
-	rb.v.OpType = &optype
-	return rb
-}
-
-func (rb *IndexActionBuilder) Refresh(refresh refresh.Refresh) *IndexActionBuilder {
-	rb.v.Refresh = &refresh
-	return rb
-}
-
-func (rb *IndexActionBuilder) Timeout(timeout *DurationBuilder) *IndexActionBuilder {
-	v := timeout.Build()
-	rb.v.Timeout = &v
-	return rb
+	return r
 }

@@ -15,58 +15,164 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // FieldTypes type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/stats/types.ts#L101-L107
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/stats/types.ts#L136-L167
 type FieldTypes struct {
-	Count       int  `json:"count"`
-	IndexCount  int  `json:"index_count"`
-	Name        Name `json:"name"`
+	// Count The number of occurrences of the field type in selected nodes.
+	Count int `json:"count"`
+	// IndexCount The number of indices containing the field type in selected nodes.
+	IndexCount int `json:"index_count"`
+	// IndexedVectorCount For dense_vector field types, number of indexed vector types in selected
+	// nodes.
+	IndexedVectorCount *int64 `json:"indexed_vector_count,omitempty"`
+	// IndexedVectorDimMax For dense_vector field types, the maximum dimension of all indexed vector
+	// types in selected nodes.
+	IndexedVectorDimMax *int64 `json:"indexed_vector_dim_max,omitempty"`
+	// IndexedVectorDimMin For dense_vector field types, the minimum dimension of all indexed vector
+	// types in selected nodes.
+	IndexedVectorDimMin *int64 `json:"indexed_vector_dim_min,omitempty"`
+	// Name The name for the field type in selected nodes.
+	Name string `json:"name"`
+	// ScriptCount The number of fields that declare a script.
 	ScriptCount *int `json:"script_count,omitempty"`
 }
 
-// FieldTypesBuilder holds FieldTypes struct and provides a builder API.
-type FieldTypesBuilder struct {
-	v *FieldTypes
-}
+func (s *FieldTypes) UnmarshalJSON(data []byte) error {
 
-// NewFieldTypes provides a builder for the FieldTypes struct.
-func NewFieldTypesBuilder() *FieldTypesBuilder {
-	r := FieldTypesBuilder{
-		&FieldTypes{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Count", err)
+				}
+				s.Count = value
+			case float64:
+				f := int(v)
+				s.Count = f
+			}
+
+		case "index_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IndexCount", err)
+				}
+				s.IndexCount = value
+			case float64:
+				f := int(v)
+				s.IndexCount = f
+			}
+
+		case "indexed_vector_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IndexedVectorCount", err)
+				}
+				s.IndexedVectorCount = &value
+			case float64:
+				f := int64(v)
+				s.IndexedVectorCount = &f
+			}
+
+		case "indexed_vector_dim_max":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IndexedVectorDimMax", err)
+				}
+				s.IndexedVectorDimMax = &value
+			case float64:
+				f := int64(v)
+				s.IndexedVectorDimMax = &f
+			}
+
+		case "indexed_vector_dim_min":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IndexedVectorDimMin", err)
+				}
+				s.IndexedVectorDimMin = &value
+			case float64:
+				f := int64(v)
+				s.IndexedVectorDimMin = &f
+			}
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		case "script_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ScriptCount", err)
+				}
+				s.ScriptCount = &value
+			case float64:
+				f := int(v)
+				s.ScriptCount = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the FieldTypes struct
-func (rb *FieldTypesBuilder) Build() FieldTypes {
-	return *rb.v
-}
+// NewFieldTypes returns a FieldTypes.
+func NewFieldTypes() *FieldTypes {
+	r := &FieldTypes{}
 
-func (rb *FieldTypesBuilder) Count(count int) *FieldTypesBuilder {
-	rb.v.Count = count
-	return rb
-}
-
-func (rb *FieldTypesBuilder) IndexCount(indexcount int) *FieldTypesBuilder {
-	rb.v.IndexCount = indexcount
-	return rb
-}
-
-func (rb *FieldTypesBuilder) Name(name Name) *FieldTypesBuilder {
-	rb.v.Name = name
-	return rb
-}
-
-func (rb *FieldTypesBuilder) ScriptCount(scriptcount int) *FieldTypesBuilder {
-	rb.v.ScriptCount = &scriptcount
-	return rb
+	return r
 }

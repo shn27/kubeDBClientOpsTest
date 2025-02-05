@@ -7,4 +7,5 @@ func Test_GetESClient(t *testing.T) {
 	if err != nil {
 		return
 	}
+	
 }

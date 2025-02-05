@@ -15,85 +15,131 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // MachineLearning type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/usage/types.ts#L360-L368
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/xpack/usage/types.ts#L370-L377
 type MachineLearning struct {
 	Available              bool                     `json:"available"`
 	DataFrameAnalyticsJobs MlDataFrameAnalyticsJobs `json:"data_frame_analytics_jobs"`
-	Datafeeds              map[string]Datafeed      `json:"datafeeds"`
+	Datafeeds              map[string]XpackDatafeed `json:"datafeeds"`
 	Enabled                bool                     `json:"enabled"`
 	Inference              MlInference              `json:"inference"`
-	Jobs                   Jobs                     `json:"jobs"`
-	NodeCount              int                      `json:"node_count"`
+	// Jobs Job usage statistics. The `_all` entry is always present and gathers
+	// statistics for all jobs.
+	Jobs      map[string]JobUsage `json:"jobs"`
+	NodeCount int                 `json:"node_count"`
 }
 
-// MachineLearningBuilder holds MachineLearning struct and provides a builder API.
-type MachineLearningBuilder struct {
-	v *MachineLearning
+func (s *MachineLearning) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "available":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Available", err)
+				}
+				s.Available = value
+			case bool:
+				s.Available = v
+			}
+
+		case "data_frame_analytics_jobs":
+			if err := dec.Decode(&s.DataFrameAnalyticsJobs); err != nil {
+				return fmt.Errorf("%s | %w", "DataFrameAnalyticsJobs", err)
+			}
+
+		case "datafeeds":
+			if s.Datafeeds == nil {
+				s.Datafeeds = make(map[string]XpackDatafeed, 0)
+			}
+			if err := dec.Decode(&s.Datafeeds); err != nil {
+				return fmt.Errorf("%s | %w", "Datafeeds", err)
+			}
+
+		case "enabled":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Enabled", err)
+				}
+				s.Enabled = value
+			case bool:
+				s.Enabled = v
+			}
+
+		case "inference":
+			if err := dec.Decode(&s.Inference); err != nil {
+				return fmt.Errorf("%s | %w", "Inference", err)
+			}
+
+		case "jobs":
+			if s.Jobs == nil {
+				s.Jobs = make(map[string]JobUsage, 0)
+			}
+			if err := dec.Decode(&s.Jobs); err != nil {
+				return fmt.Errorf("%s | %w", "Jobs", err)
+			}
+
+		case "node_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NodeCount", err)
+				}
+				s.NodeCount = value
+			case float64:
+				f := int(v)
+				s.NodeCount = f
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewMachineLearning provides a builder for the MachineLearning struct.
-func NewMachineLearningBuilder() *MachineLearningBuilder {
-	r := MachineLearningBuilder{
-		&MachineLearning{
-			Datafeeds: make(map[string]Datafeed, 0),
-		},
+// NewMachineLearning returns a MachineLearning.
+func NewMachineLearning() *MachineLearning {
+	r := &MachineLearning{
+		Datafeeds: make(map[string]XpackDatafeed, 0),
+		Jobs:      make(map[string]JobUsage, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the MachineLearning struct
-func (rb *MachineLearningBuilder) Build() MachineLearning {
-	return *rb.v
-}
-
-func (rb *MachineLearningBuilder) Available(available bool) *MachineLearningBuilder {
-	rb.v.Available = available
-	return rb
-}
-
-func (rb *MachineLearningBuilder) DataFrameAnalyticsJobs(dataframeanalyticsjobs *MlDataFrameAnalyticsJobsBuilder) *MachineLearningBuilder {
-	v := dataframeanalyticsjobs.Build()
-	rb.v.DataFrameAnalyticsJobs = v
-	return rb
-}
-
-func (rb *MachineLearningBuilder) Datafeeds(values map[string]*DatafeedBuilder) *MachineLearningBuilder {
-	tmp := make(map[string]Datafeed, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Datafeeds = tmp
-	return rb
-}
-
-func (rb *MachineLearningBuilder) Enabled(enabled bool) *MachineLearningBuilder {
-	rb.v.Enabled = enabled
-	return rb
-}
-
-func (rb *MachineLearningBuilder) Inference(inference *MlInferenceBuilder) *MachineLearningBuilder {
-	v := inference.Build()
-	rb.v.Inference = v
-	return rb
-}
-
-func (rb *MachineLearningBuilder) Jobs(jobs *JobsBuilder) *MachineLearningBuilder {
-	v := jobs.Build()
-	rb.v.Jobs = v
-	return rb
-}
-
-func (rb *MachineLearningBuilder) NodeCount(nodecount int) *MachineLearningBuilder {
-	rb.v.NodeCount = nodecount
-	return rb
+	return r
 }

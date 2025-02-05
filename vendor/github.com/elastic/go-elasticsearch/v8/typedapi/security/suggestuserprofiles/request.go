@@ -15,23 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package suggestuserprofiles
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"strconv"
 
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 )
 
 // Request holds the request body struct for the package suggestuserprofiles
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/suggest_user_profiles/Request.ts#L24-L66
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/suggest_user_profiles/Request.ts#L24-L68
 type Request struct {
 
 	// Data List of filters for the `data` field of the profile document.
@@ -39,36 +41,27 @@ type Request struct {
 	// use `data=<key>` to retrieve content nested under the specified `<key>`.
 	// By default returns no `data` content.
 	Data []string `json:"data,omitempty"`
-
 	// Hint Extra search criteria to improve relevance of the suggestion result.
 	// Profiles matching the spcified hint are ranked higher in the response.
 	// Profiles not matching the hint don't exclude the profile from the response
 	// as long as the profile matches the `name` field query.
 	Hint *types.Hint `json:"hint,omitempty"`
-
 	// Name Query string used to match name-related fields in user profile documents.
 	// Name-related fields are the user's `username`, `full_name`, and `email`.
 	Name *string `json:"name,omitempty"`
-
 	// Size Number of profiles to return.
 	Size *int64 `json:"size,omitempty"`
 }
 
-// RequestBuilder is the builder API for the suggestuserprofiles.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -79,28 +72,69 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) Data(arg []string) *RequestBuilder {
-	rb.v.Data = arg
-	return rb
-}
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
 
-func (rb *RequestBuilder) Hint(hint *types.HintBuilder) *RequestBuilder {
-	v := hint.Build()
-	rb.v.Hint = &v
-	return rb
-}
+		switch t {
 
-func (rb *RequestBuilder) Name(name string) *RequestBuilder {
-	rb.v.Name = &name
-	return rb
-}
+		case "data":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Data", err)
+				}
 
-func (rb *RequestBuilder) Size(size int64) *RequestBuilder {
-	rb.v.Size = &size
-	return rb
+				s.Data = append(s.Data, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Data); err != nil {
+					return fmt.Errorf("%s | %w", "Data", err)
+				}
+			}
+
+		case "hint":
+			if err := dec.Decode(&s.Hint); err != nil {
+				return fmt.Errorf("%s | %w", "Hint", err)
+			}
+
+		case "name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Name = &o
+
+		case "size":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Size", err)
+				}
+				s.Size = &value
+			case float64:
+				f := int64(v)
+				s.Size = &f
+			}
+
+		}
+	}
+	return nil
 }

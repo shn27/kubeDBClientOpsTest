@@ -15,94 +15,97 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // DataframeAnalyticsSource type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/DataframeAnalytics.ts#L39-L53
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/DataframeAnalytics.ts#L39-L53
 type DataframeAnalyticsSource struct {
 	// Index Index or indices on which to perform the analysis. It can be a single index
 	// or index pattern as well as an array of indices or patterns. NOTE: If your
 	// source indices contain documents with the same IDs, only the document that is
 	// indexed last appears in the destination index.
-	Index Indices `json:"index"`
+	Index []string `json:"index"`
 	// Query The Elasticsearch query domain-specific language (DSL). This value
 	// corresponds to the query object in an Elasticsearch search POST body. All the
 	// options that are supported by Elasticsearch can be used, as this object is
 	// passed verbatim to Elasticsearch. By default, this property has the following
 	// value: {"match_all": {}}.
-	Query *QueryContainer `json:"query,omitempty"`
+	Query *Query `json:"query,omitempty"`
 	// RuntimeMappings Definitions of runtime fields that will become part of the mapping of the
 	// destination index.
-	RuntimeMappings *RuntimeFields `json:"runtime_mappings,omitempty"`
+	RuntimeMappings RuntimeFields `json:"runtime_mappings,omitempty"`
 	// Source_ Specify `includes` and/or `excludes patterns to select which fields will be
 	// present in the destination. Fields that are excluded cannot be included in
 	// the analysis.
 	Source_ *DataframeAnalysisAnalyzedFields `json:"_source,omitempty"`
 }
 
-// DataframeAnalyticsSourceBuilder holds DataframeAnalyticsSource struct and provides a builder API.
-type DataframeAnalyticsSourceBuilder struct {
-	v *DataframeAnalyticsSource
-}
+func (s *DataframeAnalyticsSource) UnmarshalJSON(data []byte) error {
 
-// NewDataframeAnalyticsSource provides a builder for the DataframeAnalyticsSource struct.
-func NewDataframeAnalyticsSourceBuilder() *DataframeAnalyticsSourceBuilder {
-	r := DataframeAnalyticsSourceBuilder{
-		&DataframeAnalyticsSource{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "index":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Index", err)
+				}
+
+				s.Index = append(s.Index, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Index); err != nil {
+					return fmt.Errorf("%s | %w", "Index", err)
+				}
+			}
+
+		case "query":
+			if err := dec.Decode(&s.Query); err != nil {
+				return fmt.Errorf("%s | %w", "Query", err)
+			}
+
+		case "runtime_mappings":
+			if err := dec.Decode(&s.RuntimeMappings); err != nil {
+				return fmt.Errorf("%s | %w", "RuntimeMappings", err)
+			}
+
+		case "_source":
+			if err := dec.Decode(&s.Source_); err != nil {
+				return fmt.Errorf("%s | %w", "Source_", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DataframeAnalyticsSource struct
-func (rb *DataframeAnalyticsSourceBuilder) Build() DataframeAnalyticsSource {
-	return *rb.v
-}
+// NewDataframeAnalyticsSource returns a DataframeAnalyticsSource.
+func NewDataframeAnalyticsSource() *DataframeAnalyticsSource {
+	r := &DataframeAnalyticsSource{}
 
-// Index Index or indices on which to perform the analysis. It can be a single index
-// or index pattern as well as an array of indices or patterns. NOTE: If your
-// source indices contain documents with the same IDs, only the document that is
-// indexed last appears in the destination index.
-
-func (rb *DataframeAnalyticsSourceBuilder) Index(index *IndicesBuilder) *DataframeAnalyticsSourceBuilder {
-	v := index.Build()
-	rb.v.Index = v
-	return rb
-}
-
-// Query The Elasticsearch query domain-specific language (DSL). This value
-// corresponds to the query object in an Elasticsearch search POST body. All the
-// options that are supported by Elasticsearch can be used, as this object is
-// passed verbatim to Elasticsearch. By default, this property has the following
-// value: {"match_all": {}}.
-
-func (rb *DataframeAnalyticsSourceBuilder) Query(query *QueryContainerBuilder) *DataframeAnalyticsSourceBuilder {
-	v := query.Build()
-	rb.v.Query = &v
-	return rb
-}
-
-// RuntimeMappings Definitions of runtime fields that will become part of the mapping of the
-// destination index.
-
-func (rb *DataframeAnalyticsSourceBuilder) RuntimeMappings(runtimemappings *RuntimeFieldsBuilder) *DataframeAnalyticsSourceBuilder {
-	v := runtimemappings.Build()
-	rb.v.RuntimeMappings = &v
-	return rb
-}
-
-// Source_ Specify `includes` and/or `excludes patterns to select which fields will be
-// present in the destination. Fields that are excluded cannot be included in
-// the analysis.
-
-func (rb *DataframeAnalyticsSourceBuilder) Source_(source_ *DataframeAnalysisAnalyzedFieldsBuilder) *DataframeAnalyticsSourceBuilder {
-	v := source_.Build()
-	rb.v.Source_ = &v
-	return rb
+	return r
 }

@@ -3,6 +3,7 @@ package work
 import (
 	"context"
 	"fmt"
+	catalogapi "kubedb.dev/apimachinery/apis/catalog/v1alpha1"
 	"log"
 	"os"
 	"path/filepath"
@@ -45,6 +46,7 @@ func NewRuntimeClient(config *restclient.Config) (client.Client, error) {
 
 	utilruntime.Must(api.AddToScheme(scheme))
 	utilruntime.Must(corev1.AddToScheme(scheme))
+	utilruntime.Must(catalogapi.AddToScheme(scheme))
 
 	hc, err := restclient.HTTPClientFor(config)
 	if err != nil {

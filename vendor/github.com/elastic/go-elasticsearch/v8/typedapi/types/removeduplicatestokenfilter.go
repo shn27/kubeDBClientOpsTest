@@ -15,43 +15,73 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // RemoveDuplicatesTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L300-L302
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L302-L304
 type RemoveDuplicatesTokenFilter struct {
-	Type    string         `json:"type,omitempty"`
-	Version *VersionString `json:"version,omitempty"`
+	Type    string  `json:"type,omitempty"`
+	Version *string `json:"version,omitempty"`
 }
 
-// RemoveDuplicatesTokenFilterBuilder holds RemoveDuplicatesTokenFilter struct and provides a builder API.
-type RemoveDuplicatesTokenFilterBuilder struct {
-	v *RemoveDuplicatesTokenFilter
+func (s *RemoveDuplicatesTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewRemoveDuplicatesTokenFilter provides a builder for the RemoveDuplicatesTokenFilter struct.
-func NewRemoveDuplicatesTokenFilterBuilder() *RemoveDuplicatesTokenFilterBuilder {
-	r := RemoveDuplicatesTokenFilterBuilder{
-		&RemoveDuplicatesTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s RemoveDuplicatesTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerRemoveDuplicatesTokenFilter RemoveDuplicatesTokenFilter
+	tmp := innerRemoveDuplicatesTokenFilter{
+		Type:    s.Type,
+		Version: s.Version,
 	}
 
-	r.v.Type = "remove_duplicates"
+	tmp.Type = "remove_duplicates"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the RemoveDuplicatesTokenFilter struct
-func (rb *RemoveDuplicatesTokenFilterBuilder) Build() RemoveDuplicatesTokenFilter {
-	return *rb.v
-}
+// NewRemoveDuplicatesTokenFilter returns a RemoveDuplicatesTokenFilter.
+func NewRemoveDuplicatesTokenFilter() *RemoveDuplicatesTokenFilter {
+	r := &RemoveDuplicatesTokenFilter{}
 
-func (rb *RemoveDuplicatesTokenFilterBuilder) Version(version VersionString) *RemoveDuplicatesTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

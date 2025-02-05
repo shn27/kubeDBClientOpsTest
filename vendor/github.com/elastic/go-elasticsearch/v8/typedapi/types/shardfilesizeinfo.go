@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ShardFileSizeInfo type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/stats/types.ts#L112-L119
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/stats/types.ts#L124-L131
 type ShardFileSizeInfo struct {
 	AverageSizeInBytes *int64 `json:"average_size_in_bytes,omitempty"`
 	Count              *int64 `json:"count,omitempty"`
@@ -34,51 +41,116 @@ type ShardFileSizeInfo struct {
 	SizeInBytes        int64  `json:"size_in_bytes"`
 }
 
-// ShardFileSizeInfoBuilder holds ShardFileSizeInfo struct and provides a builder API.
-type ShardFileSizeInfoBuilder struct {
-	v *ShardFileSizeInfo
-}
+func (s *ShardFileSizeInfo) UnmarshalJSON(data []byte) error {
 
-// NewShardFileSizeInfo provides a builder for the ShardFileSizeInfo struct.
-func NewShardFileSizeInfoBuilder() *ShardFileSizeInfoBuilder {
-	r := ShardFileSizeInfoBuilder{
-		&ShardFileSizeInfo{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "average_size_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "AverageSizeInBytes", err)
+				}
+				s.AverageSizeInBytes = &value
+			case float64:
+				f := int64(v)
+				s.AverageSizeInBytes = &f
+			}
+
+		case "count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Count", err)
+				}
+				s.Count = &value
+			case float64:
+				f := int64(v)
+				s.Count = &f
+			}
+
+		case "description":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Description", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Description = o
+
+		case "max_size_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxSizeInBytes", err)
+				}
+				s.MaxSizeInBytes = &value
+			case float64:
+				f := int64(v)
+				s.MaxSizeInBytes = &f
+			}
+
+		case "min_size_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MinSizeInBytes", err)
+				}
+				s.MinSizeInBytes = &value
+			case float64:
+				f := int64(v)
+				s.MinSizeInBytes = &f
+			}
+
+		case "size_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "SizeInBytes", err)
+				}
+				s.SizeInBytes = value
+			case float64:
+				f := int64(v)
+				s.SizeInBytes = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ShardFileSizeInfo struct
-func (rb *ShardFileSizeInfoBuilder) Build() ShardFileSizeInfo {
-	return *rb.v
-}
+// NewShardFileSizeInfo returns a ShardFileSizeInfo.
+func NewShardFileSizeInfo() *ShardFileSizeInfo {
+	r := &ShardFileSizeInfo{}
 
-func (rb *ShardFileSizeInfoBuilder) AverageSizeInBytes(averagesizeinbytes int64) *ShardFileSizeInfoBuilder {
-	rb.v.AverageSizeInBytes = &averagesizeinbytes
-	return rb
-}
-
-func (rb *ShardFileSizeInfoBuilder) Count(count int64) *ShardFileSizeInfoBuilder {
-	rb.v.Count = &count
-	return rb
-}
-
-func (rb *ShardFileSizeInfoBuilder) Description(description string) *ShardFileSizeInfoBuilder {
-	rb.v.Description = description
-	return rb
-}
-
-func (rb *ShardFileSizeInfoBuilder) MaxSizeInBytes(maxsizeinbytes int64) *ShardFileSizeInfoBuilder {
-	rb.v.MaxSizeInBytes = &maxsizeinbytes
-	return rb
-}
-
-func (rb *ShardFileSizeInfoBuilder) MinSizeInBytes(minsizeinbytes int64) *ShardFileSizeInfoBuilder {
-	rb.v.MinSizeInBytes = &minsizeinbytes
-	return rb
-}
-
-func (rb *ShardFileSizeInfoBuilder) SizeInBytes(sizeinbytes int64) *ShardFileSizeInfoBuilder {
-	rb.v.SizeInBytes = sizeinbytes
-	return rb
+	return r
 }

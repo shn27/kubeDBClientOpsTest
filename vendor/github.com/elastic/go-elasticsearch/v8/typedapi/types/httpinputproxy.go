@@ -15,46 +15,60 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // HttpInputProxy type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Input.ts#L69-L72
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Input.ts#L67-L70
 type HttpInputProxy struct {
-	Host Host `json:"host"`
-	Port uint `json:"port"`
+	Host string `json:"host"`
+	Port uint   `json:"port"`
 }
 
-// HttpInputProxyBuilder holds HttpInputProxy struct and provides a builder API.
-type HttpInputProxyBuilder struct {
-	v *HttpInputProxy
-}
+func (s *HttpInputProxy) UnmarshalJSON(data []byte) error {
 
-// NewHttpInputProxy provides a builder for the HttpInputProxy struct.
-func NewHttpInputProxyBuilder() *HttpInputProxyBuilder {
-	r := HttpInputProxyBuilder{
-		&HttpInputProxy{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "host":
+			if err := dec.Decode(&s.Host); err != nil {
+				return fmt.Errorf("%s | %w", "Host", err)
+			}
+
+		case "port":
+			if err := dec.Decode(&s.Port); err != nil {
+				return fmt.Errorf("%s | %w", "Port", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the HttpInputProxy struct
-func (rb *HttpInputProxyBuilder) Build() HttpInputProxy {
-	return *rb.v
-}
+// NewHttpInputProxy returns a HttpInputProxy.
+func NewHttpInputProxy() *HttpInputProxy {
+	r := &HttpInputProxy{}
 
-func (rb *HttpInputProxyBuilder) Host(host Host) *HttpInputProxyBuilder {
-	rb.v.Host = host
-	return rb
-}
-
-func (rb *HttpInputProxyBuilder) Port(port uint) *HttpInputProxyBuilder {
-	rb.v.Port = port
-	return rb
+	return r
 }

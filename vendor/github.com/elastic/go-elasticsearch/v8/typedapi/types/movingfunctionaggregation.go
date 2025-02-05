@@ -15,91 +15,134 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/gappolicy"
 )
 
 // MovingFunctionAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/pipeline.ts#L238-L242
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/pipeline.ts#L314-L332
 type MovingFunctionAggregation struct {
 	// BucketsPath Path to the buckets that contain one set of values to correlate.
-	BucketsPath *BucketsPath         `json:"buckets_path,omitempty"`
-	Format      *string              `json:"format,omitempty"`
-	GapPolicy   *gappolicy.GapPolicy `json:"gap_policy,omitempty"`
-	Meta        *Metadata            `json:"meta,omitempty"`
-	Name        *string              `json:"name,omitempty"`
-	Script      *string              `json:"script,omitempty"`
-	Shift       *int                 `json:"shift,omitempty"`
-	Window      *int                 `json:"window,omitempty"`
+	BucketsPath BucketsPath `json:"buckets_path,omitempty"`
+	// Format `DecimalFormat` pattern for the output value.
+	// If specified, the formatted value is returned in the aggregation’s
+	// `value_as_string` property.
+	Format *string `json:"format,omitempty"`
+	// GapPolicy Policy to apply when gaps are found in the data.
+	GapPolicy *gappolicy.GapPolicy `json:"gap_policy,omitempty"`
+	// Script The script that should be executed on each window of data.
+	Script *string `json:"script,omitempty"`
+	// Shift By default, the window consists of the last n values excluding the current
+	// bucket.
+	// Increasing `shift` by 1, moves the starting window position by 1 to the
+	// right.
+	Shift *int `json:"shift,omitempty"`
+	// Window The size of window to "slide" across the histogram.
+	Window *int `json:"window,omitempty"`
 }
 
-// MovingFunctionAggregationBuilder holds MovingFunctionAggregation struct and provides a builder API.
-type MovingFunctionAggregationBuilder struct {
-	v *MovingFunctionAggregation
-}
+func (s *MovingFunctionAggregation) UnmarshalJSON(data []byte) error {
 
-// NewMovingFunctionAggregation provides a builder for the MovingFunctionAggregation struct.
-func NewMovingFunctionAggregationBuilder() *MovingFunctionAggregationBuilder {
-	r := MovingFunctionAggregationBuilder{
-		&MovingFunctionAggregation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "buckets_path":
+			if err := dec.Decode(&s.BucketsPath); err != nil {
+				return fmt.Errorf("%s | %w", "BucketsPath", err)
+			}
+
+		case "format":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Format", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Format = &o
+
+		case "gap_policy":
+			if err := dec.Decode(&s.GapPolicy); err != nil {
+				return fmt.Errorf("%s | %w", "GapPolicy", err)
+			}
+
+		case "script":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Script", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Script = &o
+
+		case "shift":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Shift", err)
+				}
+				s.Shift = &value
+			case float64:
+				f := int(v)
+				s.Shift = &f
+			}
+
+		case "window":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Window", err)
+				}
+				s.Window = &value
+			case float64:
+				f := int(v)
+				s.Window = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the MovingFunctionAggregation struct
-func (rb *MovingFunctionAggregationBuilder) Build() MovingFunctionAggregation {
-	return *rb.v
-}
+// NewMovingFunctionAggregation returns a MovingFunctionAggregation.
+func NewMovingFunctionAggregation() *MovingFunctionAggregation {
+	r := &MovingFunctionAggregation{}
 
-// BucketsPath Path to the buckets that contain one set of values to correlate.
-
-func (rb *MovingFunctionAggregationBuilder) BucketsPath(bucketspath *BucketsPathBuilder) *MovingFunctionAggregationBuilder {
-	v := bucketspath.Build()
-	rb.v.BucketsPath = &v
-	return rb
-}
-
-func (rb *MovingFunctionAggregationBuilder) Format(format string) *MovingFunctionAggregationBuilder {
-	rb.v.Format = &format
-	return rb
-}
-
-func (rb *MovingFunctionAggregationBuilder) GapPolicy(gappolicy gappolicy.GapPolicy) *MovingFunctionAggregationBuilder {
-	rb.v.GapPolicy = &gappolicy
-	return rb
-}
-
-func (rb *MovingFunctionAggregationBuilder) Meta(meta *MetadataBuilder) *MovingFunctionAggregationBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *MovingFunctionAggregationBuilder) Name(name string) *MovingFunctionAggregationBuilder {
-	rb.v.Name = &name
-	return rb
-}
-
-func (rb *MovingFunctionAggregationBuilder) Script(script string) *MovingFunctionAggregationBuilder {
-	rb.v.Script = &script
-	return rb
-}
-
-func (rb *MovingFunctionAggregationBuilder) Shift(shift int) *MovingFunctionAggregationBuilder {
-	rb.v.Shift = &shift
-	return rb
-}
-
-func (rb *MovingFunctionAggregationBuilder) Window(window int) *MovingFunctionAggregationBuilder {
-	rb.v.Window = &window
-	return rb
+	return r
 }

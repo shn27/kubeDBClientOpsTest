@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // TrainedModelStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/TrainedModel.ts#L42-L60
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/TrainedModel.ts#L42-L60
 type TrainedModelStats struct {
 	// DeploymentStats A collection of deployment stats, which is present when the models are
 	// deployed.
@@ -34,80 +41,84 @@ type TrainedModelStats struct {
 	// Ingest A collection of ingest stats for the model across all nodes.
 	// The values are summations of the individual node statistics.
 	// The format matches the ingest section in the nodes stats API.
-	Ingest map[string]interface{} `json:"ingest,omitempty"`
+	Ingest map[string]json.RawMessage `json:"ingest,omitempty"`
 	// ModelId The unique identifier of the trained model.
-	ModelId Id `json:"model_id"`
+	ModelId string `json:"model_id"`
 	// ModelSizeStats A collection of model size stats.
 	ModelSizeStats TrainedModelSizeStats `json:"model_size_stats"`
 	// PipelineCount The number of ingest pipelines that currently refer to the model.
 	PipelineCount int `json:"pipeline_count"`
 }
 
-// TrainedModelStatsBuilder holds TrainedModelStats struct and provides a builder API.
-type TrainedModelStatsBuilder struct {
-	v *TrainedModelStats
+func (s *TrainedModelStats) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "deployment_stats":
+			if err := dec.Decode(&s.DeploymentStats); err != nil {
+				return fmt.Errorf("%s | %w", "DeploymentStats", err)
+			}
+
+		case "inference_stats":
+			if err := dec.Decode(&s.InferenceStats); err != nil {
+				return fmt.Errorf("%s | %w", "InferenceStats", err)
+			}
+
+		case "ingest":
+			if s.Ingest == nil {
+				s.Ingest = make(map[string]json.RawMessage, 0)
+			}
+			if err := dec.Decode(&s.Ingest); err != nil {
+				return fmt.Errorf("%s | %w", "Ingest", err)
+			}
+
+		case "model_id":
+			if err := dec.Decode(&s.ModelId); err != nil {
+				return fmt.Errorf("%s | %w", "ModelId", err)
+			}
+
+		case "model_size_stats":
+			if err := dec.Decode(&s.ModelSizeStats); err != nil {
+				return fmt.Errorf("%s | %w", "ModelSizeStats", err)
+			}
+
+		case "pipeline_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PipelineCount", err)
+				}
+				s.PipelineCount = value
+			case float64:
+				f := int(v)
+				s.PipelineCount = f
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewTrainedModelStats provides a builder for the TrainedModelStats struct.
-func NewTrainedModelStatsBuilder() *TrainedModelStatsBuilder {
-	r := TrainedModelStatsBuilder{
-		&TrainedModelStats{
-			Ingest: make(map[string]interface{}, 0),
-		},
+// NewTrainedModelStats returns a TrainedModelStats.
+func NewTrainedModelStats() *TrainedModelStats {
+	r := &TrainedModelStats{
+		Ingest: make(map[string]json.RawMessage, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the TrainedModelStats struct
-func (rb *TrainedModelStatsBuilder) Build() TrainedModelStats {
-	return *rb.v
-}
-
-// DeploymentStats A collection of deployment stats, which is present when the models are
-// deployed.
-
-func (rb *TrainedModelStatsBuilder) DeploymentStats(deploymentstats *TrainedModelDeploymentStatsBuilder) *TrainedModelStatsBuilder {
-	v := deploymentstats.Build()
-	rb.v.DeploymentStats = &v
-	return rb
-}
-
-// InferenceStats A collection of inference stats fields.
-
-func (rb *TrainedModelStatsBuilder) InferenceStats(inferencestats *TrainedModelInferenceStatsBuilder) *TrainedModelStatsBuilder {
-	v := inferencestats.Build()
-	rb.v.InferenceStats = &v
-	return rb
-}
-
-// Ingest A collection of ingest stats for the model across all nodes.
-// The values are summations of the individual node statistics.
-// The format matches the ingest section in the nodes stats API.
-
-func (rb *TrainedModelStatsBuilder) Ingest(value map[string]interface{}) *TrainedModelStatsBuilder {
-	rb.v.Ingest = value
-	return rb
-}
-
-// ModelId The unique identifier of the trained model.
-
-func (rb *TrainedModelStatsBuilder) ModelId(modelid Id) *TrainedModelStatsBuilder {
-	rb.v.ModelId = modelid
-	return rb
-}
-
-// ModelSizeStats A collection of model size stats.
-
-func (rb *TrainedModelStatsBuilder) ModelSizeStats(modelsizestats *TrainedModelSizeStatsBuilder) *TrainedModelStatsBuilder {
-	v := modelsizestats.Build()
-	rb.v.ModelSizeStats = v
-	return rb
-}
-
-// PipelineCount The number of ingest pipelines that currently refer to the model.
-
-func (rb *TrainedModelStatsBuilder) PipelineCount(pipelinecount int) *TrainedModelStatsBuilder {
-	rb.v.PipelineCount = pipelinecount
-	return rb
+	return r
 }

@@ -15,70 +15,177 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // MlInferenceTrainedModelsCount type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/usage/types.ts#L229-L236
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/xpack/usage/types.ts#L242-L251
 type MlInferenceTrainedModelsCount struct {
 	Classification *int64 `json:"classification,omitempty"`
 	Ner            *int64 `json:"ner,omitempty"`
 	Other          int64  `json:"other"`
+	PassThrough    *int64 `json:"pass_through,omitempty"`
 	Prepackaged    int64  `json:"prepackaged"`
 	Regression     *int64 `json:"regression,omitempty"`
+	TextEmbedding  *int64 `json:"text_embedding,omitempty"`
 	Total          int64  `json:"total"`
 }
 
-// MlInferenceTrainedModelsCountBuilder holds MlInferenceTrainedModelsCount struct and provides a builder API.
-type MlInferenceTrainedModelsCountBuilder struct {
-	v *MlInferenceTrainedModelsCount
-}
+func (s *MlInferenceTrainedModelsCount) UnmarshalJSON(data []byte) error {
 
-// NewMlInferenceTrainedModelsCount provides a builder for the MlInferenceTrainedModelsCount struct.
-func NewMlInferenceTrainedModelsCountBuilder() *MlInferenceTrainedModelsCountBuilder {
-	r := MlInferenceTrainedModelsCountBuilder{
-		&MlInferenceTrainedModelsCount{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "classification":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Classification", err)
+				}
+				s.Classification = &value
+			case float64:
+				f := int64(v)
+				s.Classification = &f
+			}
+
+		case "ner":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Ner", err)
+				}
+				s.Ner = &value
+			case float64:
+				f := int64(v)
+				s.Ner = &f
+			}
+
+		case "other":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Other", err)
+				}
+				s.Other = value
+			case float64:
+				f := int64(v)
+				s.Other = f
+			}
+
+		case "pass_through":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PassThrough", err)
+				}
+				s.PassThrough = &value
+			case float64:
+				f := int64(v)
+				s.PassThrough = &f
+			}
+
+		case "prepackaged":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Prepackaged", err)
+				}
+				s.Prepackaged = value
+			case float64:
+				f := int64(v)
+				s.Prepackaged = f
+			}
+
+		case "regression":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Regression", err)
+				}
+				s.Regression = &value
+			case float64:
+				f := int64(v)
+				s.Regression = &f
+			}
+
+		case "text_embedding":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TextEmbedding", err)
+				}
+				s.TextEmbedding = &value
+			case float64:
+				f := int64(v)
+				s.TextEmbedding = &f
+			}
+
+		case "total":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Total", err)
+				}
+				s.Total = value
+			case float64:
+				f := int64(v)
+				s.Total = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the MlInferenceTrainedModelsCount struct
-func (rb *MlInferenceTrainedModelsCountBuilder) Build() MlInferenceTrainedModelsCount {
-	return *rb.v
-}
+// NewMlInferenceTrainedModelsCount returns a MlInferenceTrainedModelsCount.
+func NewMlInferenceTrainedModelsCount() *MlInferenceTrainedModelsCount {
+	r := &MlInferenceTrainedModelsCount{}
 
-func (rb *MlInferenceTrainedModelsCountBuilder) Classification(classification int64) *MlInferenceTrainedModelsCountBuilder {
-	rb.v.Classification = &classification
-	return rb
-}
-
-func (rb *MlInferenceTrainedModelsCountBuilder) Ner(ner int64) *MlInferenceTrainedModelsCountBuilder {
-	rb.v.Ner = &ner
-	return rb
-}
-
-func (rb *MlInferenceTrainedModelsCountBuilder) Other(other int64) *MlInferenceTrainedModelsCountBuilder {
-	rb.v.Other = other
-	return rb
-}
-
-func (rb *MlInferenceTrainedModelsCountBuilder) Prepackaged(prepackaged int64) *MlInferenceTrainedModelsCountBuilder {
-	rb.v.Prepackaged = prepackaged
-	return rb
-}
-
-func (rb *MlInferenceTrainedModelsCountBuilder) Regression(regression int64) *MlInferenceTrainedModelsCountBuilder {
-	rb.v.Regression = &regression
-	return rb
-}
-
-func (rb *MlInferenceTrainedModelsCountBuilder) Total(total int64) *MlInferenceTrainedModelsCountBuilder {
-	rb.v.Total = total
-	return rb
+	return r
 }

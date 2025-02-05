@@ -15,64 +15,99 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // SnapshotShardFailure type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/snapshot/_types/SnapshotShardFailure.ts#L22-L28
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/snapshot/_types/SnapshotShardFailure.ts#L22-L29
 type SnapshotShardFailure struct {
-	Index   IndexName `json:"index"`
-	NodeId  Id        `json:"node_id"`
-	Reason  string    `json:"reason"`
-	ShardId Id        `json:"shard_id"`
-	Status  string    `json:"status"`
+	Index     string  `json:"index"`
+	IndexUuid string  `json:"index_uuid"`
+	NodeId    *string `json:"node_id,omitempty"`
+	Reason    string  `json:"reason"`
+	ShardId   string  `json:"shard_id"`
+	Status    string  `json:"status"`
 }
 
-// SnapshotShardFailureBuilder holds SnapshotShardFailure struct and provides a builder API.
-type SnapshotShardFailureBuilder struct {
-	v *SnapshotShardFailure
-}
+func (s *SnapshotShardFailure) UnmarshalJSON(data []byte) error {
 
-// NewSnapshotShardFailure provides a builder for the SnapshotShardFailure struct.
-func NewSnapshotShardFailureBuilder() *SnapshotShardFailureBuilder {
-	r := SnapshotShardFailureBuilder{
-		&SnapshotShardFailure{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "index":
+			if err := dec.Decode(&s.Index); err != nil {
+				return fmt.Errorf("%s | %w", "Index", err)
+			}
+
+		case "index_uuid":
+			if err := dec.Decode(&s.IndexUuid); err != nil {
+				return fmt.Errorf("%s | %w", "IndexUuid", err)
+			}
+
+		case "node_id":
+			if err := dec.Decode(&s.NodeId); err != nil {
+				return fmt.Errorf("%s | %w", "NodeId", err)
+			}
+
+		case "reason":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Reason", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Reason = o
+
+		case "shard_id":
+			if err := dec.Decode(&s.ShardId); err != nil {
+				return fmt.Errorf("%s | %w", "ShardId", err)
+			}
+
+		case "status":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Status", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Status = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SnapshotShardFailure struct
-func (rb *SnapshotShardFailureBuilder) Build() SnapshotShardFailure {
-	return *rb.v
-}
+// NewSnapshotShardFailure returns a SnapshotShardFailure.
+func NewSnapshotShardFailure() *SnapshotShardFailure {
+	r := &SnapshotShardFailure{}
 
-func (rb *SnapshotShardFailureBuilder) Index(index IndexName) *SnapshotShardFailureBuilder {
-	rb.v.Index = index
-	return rb
-}
-
-func (rb *SnapshotShardFailureBuilder) NodeId(nodeid Id) *SnapshotShardFailureBuilder {
-	rb.v.NodeId = nodeid
-	return rb
-}
-
-func (rb *SnapshotShardFailureBuilder) Reason(reason string) *SnapshotShardFailureBuilder {
-	rb.v.Reason = reason
-	return rb
-}
-
-func (rb *SnapshotShardFailureBuilder) ShardId(shardid Id) *SnapshotShardFailureBuilder {
-	rb.v.ShardId = shardid
-	return rb
-}
-
-func (rb *SnapshotShardFailureBuilder) Status(status string) *SnapshotShardFailureBuilder {
-	rb.v.Status = status
-	return rb
+	return r
 }

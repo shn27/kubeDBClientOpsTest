@@ -15,58 +15,90 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ShardLease type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/stats/types.ts#L121-L126
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/stats/types.ts#L133-L138
 type ShardLease struct {
-	Id             Id             `json:"id"`
-	RetainingSeqNo SequenceNumber `json:"retaining_seq_no"`
-	Source         string         `json:"source"`
-	Timestamp      int64          `json:"timestamp"`
+	Id             string `json:"id"`
+	RetainingSeqNo int64  `json:"retaining_seq_no"`
+	Source         string `json:"source"`
+	Timestamp      int64  `json:"timestamp"`
 }
 
-// ShardLeaseBuilder holds ShardLease struct and provides a builder API.
-type ShardLeaseBuilder struct {
-	v *ShardLease
-}
+func (s *ShardLease) UnmarshalJSON(data []byte) error {
 
-// NewShardLease provides a builder for the ShardLease struct.
-func NewShardLeaseBuilder() *ShardLeaseBuilder {
-	r := ShardLeaseBuilder{
-		&ShardLease{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "id":
+			if err := dec.Decode(&s.Id); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
+
+		case "retaining_seq_no":
+			if err := dec.Decode(&s.RetainingSeqNo); err != nil {
+				return fmt.Errorf("%s | %w", "RetainingSeqNo", err)
+			}
+
+		case "source":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Source", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Source = o
+
+		case "timestamp":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Timestamp", err)
+				}
+				s.Timestamp = value
+			case float64:
+				f := int64(v)
+				s.Timestamp = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ShardLease struct
-func (rb *ShardLeaseBuilder) Build() ShardLease {
-	return *rb.v
-}
+// NewShardLease returns a ShardLease.
+func NewShardLease() *ShardLease {
+	r := &ShardLease{}
 
-func (rb *ShardLeaseBuilder) Id(id Id) *ShardLeaseBuilder {
-	rb.v.Id = id
-	return rb
-}
-
-func (rb *ShardLeaseBuilder) RetainingSeqNo(retainingseqno SequenceNumber) *ShardLeaseBuilder {
-	rb.v.RetainingSeqNo = retainingseqno
-	return rb
-}
-
-func (rb *ShardLeaseBuilder) Source(source string) *ShardLeaseBuilder {
-	rb.v.Source = source
-	return rb
-}
-
-func (rb *ShardLeaseBuilder) Timestamp(timestamp int64) *ShardLeaseBuilder {
-	rb.v.Timestamp = timestamp
-	return rb
+	return r
 }

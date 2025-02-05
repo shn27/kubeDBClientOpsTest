@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 //
-// Code generated from specification version 8.4.0: DO NOT EDIT
+// Code generated from specification version 8.17.0: DO NOT EDIT
 
 package esapi
 
@@ -33,6 +33,11 @@ func newMLStartTrainedModelDeploymentFunc(t Transport) MLStartTrainedModelDeploy
 		for _, f := range o {
 			f(&r)
 		}
+
+		if transport, ok := t.(Instrumented); ok {
+			r.instrument = transport.InstrumentationEnabled()
+		}
+
 		return r.Do(r.ctx, t)
 	}
 }
@@ -40,8 +45,6 @@ func newMLStartTrainedModelDeploymentFunc(t Transport) MLStartTrainedModelDeploy
 // ----- API Definition -------------------------------------------------------
 
 // MLStartTrainedModelDeployment - Start a trained model deployment.
-//
-// This API is experimental.
 //
 // See full documentation at https://www.elastic.co/guide/en/elasticsearch/reference/master/start-trained-model-deployment.html.
 type MLStartTrainedModelDeployment func(model_id string, o ...func(*MLStartTrainedModelDeploymentRequest)) (*Response, error)
@@ -51,7 +54,9 @@ type MLStartTrainedModelDeploymentRequest struct {
 	ModelID string
 
 	CacheSize            string
+	DeploymentID         string
 	NumberOfAllocations  *int
+	Priority             string
 	QueueCapacity        *int
 	ThreadsPerAllocation *int
 	Timeout              time.Duration
@@ -65,15 +70,26 @@ type MLStartTrainedModelDeploymentRequest struct {
 	Header http.Header
 
 	ctx context.Context
+
+	instrument Instrumentation
 }
 
 // Do executes the request and returns response or error.
-func (r MLStartTrainedModelDeploymentRequest) Do(ctx context.Context, transport Transport) (*Response, error) {
+func (r MLStartTrainedModelDeploymentRequest) Do(providedCtx context.Context, transport Transport) (*Response, error) {
 	var (
 		method string
 		path   strings.Builder
 		params map[string]string
+		ctx    context.Context
 	)
+
+	if instrument, ok := r.instrument.(Instrumentation); ok {
+		ctx = instrument.Start(providedCtx, "ml.start_trained_model_deployment")
+		defer instrument.Close(ctx)
+	}
+	if ctx == nil {
+		ctx = providedCtx
+	}
 
 	method = "POST"
 
@@ -85,6 +101,9 @@ func (r MLStartTrainedModelDeploymentRequest) Do(ctx context.Context, transport 
 	path.WriteString("trained_models")
 	path.WriteString("/")
 	path.WriteString(r.ModelID)
+	if instrument, ok := r.instrument.(Instrumentation); ok {
+		instrument.RecordPathPart(ctx, "model_id", r.ModelID)
+	}
 	path.WriteString("/")
 	path.WriteString("deployment")
 	path.WriteString("/")
@@ -96,8 +115,16 @@ func (r MLStartTrainedModelDeploymentRequest) Do(ctx context.Context, transport 
 		params["cache_size"] = r.CacheSize
 	}
 
+	if r.DeploymentID != "" {
+		params["deployment_id"] = r.DeploymentID
+	}
+
 	if r.NumberOfAllocations != nil {
 		params["number_of_allocations"] = strconv.FormatInt(int64(*r.NumberOfAllocations), 10)
+	}
+
+	if r.Priority != "" {
+		params["priority"] = r.Priority
 	}
 
 	if r.QueueCapacity != nil {
@@ -134,6 +161,9 @@ func (r MLStartTrainedModelDeploymentRequest) Do(ctx context.Context, transport 
 
 	req, err := newRequest(method, path.String(), nil)
 	if err != nil {
+		if instrument, ok := r.instrument.(Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
 		return nil, err
 	}
 
@@ -161,8 +191,17 @@ func (r MLStartTrainedModelDeploymentRequest) Do(ctx context.Context, transport 
 		req = req.WithContext(ctx)
 	}
 
+	if instrument, ok := r.instrument.(Instrumentation); ok {
+		instrument.BeforeRequest(req, "ml.start_trained_model_deployment")
+	}
 	res, err := transport.Perform(req)
+	if instrument, ok := r.instrument.(Instrumentation); ok {
+		instrument.AfterRequest(req, "elasticsearch", "ml.start_trained_model_deployment")
+	}
 	if err != nil {
+		if instrument, ok := r.instrument.(Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
 		return nil, err
 	}
 
@@ -189,10 +228,24 @@ func (f MLStartTrainedModelDeployment) WithCacheSize(v string) func(*MLStartTrai
 	}
 }
 
-// WithNumberOfAllocations - the number of model allocations on each node where the model is deployed..
+// WithDeploymentID - the ID of the new deployment. defaults to the model_id if not set..
+func (f MLStartTrainedModelDeployment) WithDeploymentID(v string) func(*MLStartTrainedModelDeploymentRequest) {
+	return func(r *MLStartTrainedModelDeploymentRequest) {
+		r.DeploymentID = v
+	}
+}
+
+// WithNumberOfAllocations - the total number of allocations this model is assigned across machine learning nodes..
 func (f MLStartTrainedModelDeployment) WithNumberOfAllocations(v int) func(*MLStartTrainedModelDeploymentRequest) {
 	return func(r *MLStartTrainedModelDeploymentRequest) {
 		r.NumberOfAllocations = &v
+	}
+}
+
+// WithPriority - the deployment priority..
+func (f MLStartTrainedModelDeployment) WithPriority(v string) func(*MLStartTrainedModelDeploymentRequest) {
+	return func(r *MLStartTrainedModelDeploymentRequest) {
+		r.Priority = v
 	}
 }
 

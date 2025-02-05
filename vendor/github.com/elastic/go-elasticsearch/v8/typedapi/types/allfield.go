@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // AllField type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/mapping/meta-fields.ts#L29-L40
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/mapping/meta-fields.ts#L29-L40
 type AllField struct {
 	Analyzer                 string `json:"analyzer"`
 	Enabled                  bool   `json:"enabled"`
@@ -38,71 +45,163 @@ type AllField struct {
 	StoreTermVectors         bool   `json:"store_term_vectors"`
 }
 
-// AllFieldBuilder holds AllField struct and provides a builder API.
-type AllFieldBuilder struct {
-	v *AllField
-}
+func (s *AllField) UnmarshalJSON(data []byte) error {
 
-// NewAllField provides a builder for the AllField struct.
-func NewAllFieldBuilder() *AllFieldBuilder {
-	r := AllFieldBuilder{
-		&AllField{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "analyzer":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Analyzer", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Analyzer = o
+
+		case "enabled":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Enabled", err)
+				}
+				s.Enabled = value
+			case bool:
+				s.Enabled = v
+			}
+
+		case "omit_norms":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "OmitNorms", err)
+				}
+				s.OmitNorms = value
+			case bool:
+				s.OmitNorms = v
+			}
+
+		case "search_analyzer":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SearchAnalyzer", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SearchAnalyzer = o
+
+		case "similarity":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Similarity", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Similarity = o
+
+		case "store":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Store", err)
+				}
+				s.Store = value
+			case bool:
+				s.Store = v
+			}
+
+		case "store_term_vector_offsets":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "StoreTermVectorOffsets", err)
+				}
+				s.StoreTermVectorOffsets = value
+			case bool:
+				s.StoreTermVectorOffsets = v
+			}
+
+		case "store_term_vector_payloads":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "StoreTermVectorPayloads", err)
+				}
+				s.StoreTermVectorPayloads = value
+			case bool:
+				s.StoreTermVectorPayloads = v
+			}
+
+		case "store_term_vector_positions":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "StoreTermVectorPositions", err)
+				}
+				s.StoreTermVectorPositions = value
+			case bool:
+				s.StoreTermVectorPositions = v
+			}
+
+		case "store_term_vectors":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "StoreTermVectors", err)
+				}
+				s.StoreTermVectors = value
+			case bool:
+				s.StoreTermVectors = v
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the AllField struct
-func (rb *AllFieldBuilder) Build() AllField {
-	return *rb.v
-}
+// NewAllField returns a AllField.
+func NewAllField() *AllField {
+	r := &AllField{}
 
-func (rb *AllFieldBuilder) Analyzer(analyzer string) *AllFieldBuilder {
-	rb.v.Analyzer = analyzer
-	return rb
-}
-
-func (rb *AllFieldBuilder) Enabled(enabled bool) *AllFieldBuilder {
-	rb.v.Enabled = enabled
-	return rb
-}
-
-func (rb *AllFieldBuilder) OmitNorms(omitnorms bool) *AllFieldBuilder {
-	rb.v.OmitNorms = omitnorms
-	return rb
-}
-
-func (rb *AllFieldBuilder) SearchAnalyzer(searchanalyzer string) *AllFieldBuilder {
-	rb.v.SearchAnalyzer = searchanalyzer
-	return rb
-}
-
-func (rb *AllFieldBuilder) Similarity(similarity string) *AllFieldBuilder {
-	rb.v.Similarity = similarity
-	return rb
-}
-
-func (rb *AllFieldBuilder) Store(store bool) *AllFieldBuilder {
-	rb.v.Store = store
-	return rb
-}
-
-func (rb *AllFieldBuilder) StoreTermVectorOffsets(storetermvectoroffsets bool) *AllFieldBuilder {
-	rb.v.StoreTermVectorOffsets = storetermvectoroffsets
-	return rb
-}
-
-func (rb *AllFieldBuilder) StoreTermVectorPayloads(storetermvectorpayloads bool) *AllFieldBuilder {
-	rb.v.StoreTermVectorPayloads = storetermvectorpayloads
-	return rb
-}
-
-func (rb *AllFieldBuilder) StoreTermVectorPositions(storetermvectorpositions bool) *AllFieldBuilder {
-	rb.v.StoreTermVectorPositions = storetermvectorpositions
-	return rb
-}
-
-func (rb *AllFieldBuilder) StoreTermVectors(storetermvectors bool) *AllFieldBuilder {
-	rb.v.StoreTermVectors = storetermvectors
-	return rb
+	return r
 }

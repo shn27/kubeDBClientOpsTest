@@ -15,69 +15,88 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/snapshotupgradestate"
 )
 
 // ModelSnapshotUpgrade type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/Model.ts#L48-L54
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/Model.ts#L48-L57
 type ModelSnapshotUpgrade struct {
 	AssignmentExplanation string                                    `json:"assignment_explanation"`
-	JobId                 Id                                        `json:"job_id"`
+	JobId                 string                                    `json:"job_id"`
 	Node                  DiscoveryNode                             `json:"node"`
-	SnapshotId            Id                                        `json:"snapshot_id"`
+	SnapshotId            string                                    `json:"snapshot_id"`
 	State                 snapshotupgradestate.SnapshotUpgradeState `json:"state"`
 }
 
-// ModelSnapshotUpgradeBuilder holds ModelSnapshotUpgrade struct and provides a builder API.
-type ModelSnapshotUpgradeBuilder struct {
-	v *ModelSnapshotUpgrade
-}
+func (s *ModelSnapshotUpgrade) UnmarshalJSON(data []byte) error {
 
-// NewModelSnapshotUpgrade provides a builder for the ModelSnapshotUpgrade struct.
-func NewModelSnapshotUpgradeBuilder() *ModelSnapshotUpgradeBuilder {
-	r := ModelSnapshotUpgradeBuilder{
-		&ModelSnapshotUpgrade{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "assignment_explanation":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "AssignmentExplanation", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.AssignmentExplanation = o
+
+		case "job_id":
+			if err := dec.Decode(&s.JobId); err != nil {
+				return fmt.Errorf("%s | %w", "JobId", err)
+			}
+
+		case "node":
+			if err := dec.Decode(&s.Node); err != nil {
+				return fmt.Errorf("%s | %w", "Node", err)
+			}
+
+		case "snapshot_id":
+			if err := dec.Decode(&s.SnapshotId); err != nil {
+				return fmt.Errorf("%s | %w", "SnapshotId", err)
+			}
+
+		case "state":
+			if err := dec.Decode(&s.State); err != nil {
+				return fmt.Errorf("%s | %w", "State", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ModelSnapshotUpgrade struct
-func (rb *ModelSnapshotUpgradeBuilder) Build() ModelSnapshotUpgrade {
-	return *rb.v
-}
+// NewModelSnapshotUpgrade returns a ModelSnapshotUpgrade.
+func NewModelSnapshotUpgrade() *ModelSnapshotUpgrade {
+	r := &ModelSnapshotUpgrade{}
 
-func (rb *ModelSnapshotUpgradeBuilder) AssignmentExplanation(assignmentexplanation string) *ModelSnapshotUpgradeBuilder {
-	rb.v.AssignmentExplanation = assignmentexplanation
-	return rb
-}
-
-func (rb *ModelSnapshotUpgradeBuilder) JobId(jobid Id) *ModelSnapshotUpgradeBuilder {
-	rb.v.JobId = jobid
-	return rb
-}
-
-func (rb *ModelSnapshotUpgradeBuilder) Node(node *DiscoveryNodeBuilder) *ModelSnapshotUpgradeBuilder {
-	v := node.Build()
-	rb.v.Node = v
-	return rb
-}
-
-func (rb *ModelSnapshotUpgradeBuilder) SnapshotId(snapshotid Id) *ModelSnapshotUpgradeBuilder {
-	rb.v.SnapshotId = snapshotid
-	return rb
-}
-
-func (rb *ModelSnapshotUpgradeBuilder) State(state snapshotupgradestate.SnapshotUpgradeState) *ModelSnapshotUpgradeBuilder {
-	rb.v.State = state
-	return rb
+	return r
 }

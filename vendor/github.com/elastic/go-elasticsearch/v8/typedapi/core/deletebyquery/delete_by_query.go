@@ -15,12 +15,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
-
-// Deletes documents matching the provided query.
+// Delete documents.
+// Deletes documents that match the specified query.
 package deletebyquery
 
 import (
@@ -29,14 +28,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 
 	"github.com/elastic/elastic-transport-go/v8/elastictransport"
-
+	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/conflicts"
+	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/expandwildcard"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/operator"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/searchtype"
 )
@@ -55,14 +56,19 @@ type DeleteByQuery struct {
 	values  url.Values
 	path    url.URL
 
-	buf *gobytes.Buffer
+	raw io.Reader
 
-	req *Request
-	raw json.RawMessage
+	req      *Request
+	deferred []func(request *Request) error
+	buf      *gobytes.Buffer
 
 	paramSet int
 
 	index string
+
+	spanStarted bool
+
+	instrument elastictransport.Instrumentation
 }
 
 // NewDeleteByQuery type alias for index.
@@ -74,21 +80,31 @@ func NewDeleteByQueryFunc(tp elastictransport.Interface) NewDeleteByQuery {
 	return func(index string) *DeleteByQuery {
 		n := New(tp)
 
-		n.Index(index)
+		n._index(index)
 
 		return n
 	}
 }
 
-// Deletes documents matching the provided query.
+// Delete documents.
+// Deletes documents that match the specified query.
 //
-// https://www.elastic.co/guide/en/elasticsearch/reference/master/docs-delete-by-query.html
+// https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-delete-by-query.html
 func New(tp elastictransport.Interface) *DeleteByQuery {
 	r := &DeleteByQuery{
 		transport: tp,
 		values:    make(url.Values),
 		headers:   make(http.Header),
-		buf:       gobytes.NewBuffer(nil),
+
+		buf: gobytes.NewBuffer(nil),
+
+		req: NewRequest(),
+	}
+
+	if instrumented, ok := r.transport.(elastictransport.Instrumented); ok {
+		if instrument := instrumented.InstrumentationEnabled(); instrument != nil {
+			r.instrument = instrument
+		}
 	}
 
 	return r
@@ -96,7 +112,7 @@ func New(tp elastictransport.Interface) *DeleteByQuery {
 
 // Raw takes a json payload as input which is then passed to the http.Request
 // If specified Raw takes precedence on Request method.
-func (r *DeleteByQuery) Raw(raw json.RawMessage) *DeleteByQuery {
+func (r *DeleteByQuery) Raw(raw io.Reader) *DeleteByQuery {
 	r.raw = raw
 
 	return r
@@ -118,9 +134,17 @@ func (r *DeleteByQuery) HttpRequest(ctx context.Context) (*http.Request, error) 
 
 	var err error
 
-	if r.raw != nil {
-		r.buf.Write(r.raw)
-	} else if r.req != nil {
+	if len(r.deferred) > 0 {
+		for _, f := range r.deferred {
+			deferredErr := f(r.req)
+			if deferredErr != nil {
+				return nil, deferredErr
+			}
+		}
+	}
+
+	if r.raw == nil && r.req != nil {
+
 		data, err := json.Marshal(r.req)
 
 		if err != nil {
@@ -128,6 +152,11 @@ func (r *DeleteByQuery) HttpRequest(ctx context.Context) (*http.Request, error) 
 		}
 
 		r.buf.Write(data)
+
+	}
+
+	if r.buf.Len() > 0 {
+		r.raw = r.buf
 	}
 
 	r.path.Scheme = "http"
@@ -135,7 +164,11 @@ func (r *DeleteByQuery) HttpRequest(ctx context.Context) (*http.Request, error) 
 	switch {
 	case r.paramSet == indexMask:
 		path.WriteString("/")
-		path.WriteString(url.PathEscape(r.index))
+
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordPathPart(ctx, "index", r.index)
+		}
+		path.WriteString(r.index)
 		path.WriteString("/")
 		path.WriteString("_delete_by_query")
 
@@ -150,16 +183,22 @@ func (r *DeleteByQuery) HttpRequest(ctx context.Context) (*http.Request, error) 
 	}
 
 	if ctx != nil {
-		req, err = http.NewRequestWithContext(ctx, method, r.path.String(), r.buf)
+		req, err = http.NewRequestWithContext(ctx, method, r.path.String(), r.raw)
 	} else {
-		req, err = http.NewRequest(method, r.path.String(), r.buf)
+		req, err = http.NewRequest(method, r.path.String(), r.raw)
 	}
 
-	if r.buf.Len() > 0 {
-		req.Header.Set("content-type", "application/vnd.elasticsearch+json;compatible-with=8")
+	req.Header = r.headers.Clone()
+
+	if req.Header.Get("Content-Type") == "" {
+		if r.raw != nil {
+			req.Header.Set("Content-Type", "application/vnd.elasticsearch+json;compatible-with=8")
+		}
 	}
 
-	req.Header.Set("accept", "application/vnd.elasticsearch+json;compatible-with=8")
+	if req.Header.Get("Accept") == "" {
+		req.Header.Set("Accept", "application/vnd.elasticsearch+json;compatible-with=8")
+	}
 
 	if err != nil {
 		return req, fmt.Errorf("could not build http.Request: %w", err)
@@ -168,19 +207,100 @@ func (r *DeleteByQuery) HttpRequest(ctx context.Context) (*http.Request, error) 
 	return req, nil
 }
 
-// Do runs the http.Request through the provided transport.
-func (r DeleteByQuery) Do(ctx context.Context) (*http.Response, error) {
+// Perform runs the http.Request through the provided transport and returns an http.Response.
+func (r DeleteByQuery) Perform(providedCtx context.Context) (*http.Response, error) {
+	var ctx context.Context
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		if r.spanStarted == false {
+			ctx := instrument.Start(providedCtx, "delete_by_query")
+			defer instrument.Close(ctx)
+		}
+	}
+	if ctx == nil {
+		ctx = providedCtx
+	}
+
 	req, err := r.HttpRequest(ctx)
 	if err != nil {
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
 		return nil, err
 	}
 
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		instrument.BeforeRequest(req, "delete_by_query")
+		if reader := instrument.RecordRequestBody(ctx, "delete_by_query", r.raw); reader != nil {
+			req.Body = reader
+		}
+	}
 	res, err := r.transport.Perform(req)
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		instrument.AfterRequest(req, "elasticsearch", "delete_by_query")
+	}
 	if err != nil {
-		return nil, fmt.Errorf("an error happened during the DeleteByQuery query execution: %w", err)
+		localErr := fmt.Errorf("an error happened during the DeleteByQuery query execution: %w", err)
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, localErr)
+		}
+		return nil, localErr
 	}
 
 	return res, nil
+}
+
+// Do runs the request through the transport, handle the response and returns a deletebyquery.Response
+func (r DeleteByQuery) Do(providedCtx context.Context) (*Response, error) {
+	var ctx context.Context
+	r.spanStarted = true
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		ctx = instrument.Start(providedCtx, "delete_by_query")
+		defer instrument.Close(ctx)
+	}
+	if ctx == nil {
+		ctx = providedCtx
+	}
+
+	response := NewResponse()
+
+	res, err := r.Perform(ctx)
+	if err != nil {
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode < 299 {
+		err = json.NewDecoder(res.Body).Decode(response)
+		if err != nil {
+			if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+				instrument.RecordError(ctx, err)
+			}
+			return nil, err
+		}
+
+		return response, nil
+	}
+
+	errorResponse := types.NewElasticsearchError()
+	err = json.NewDecoder(res.Body).Decode(errorResponse)
+	if err != nil {
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
+		return nil, err
+	}
+
+	if errorResponse.Status == 0 {
+		errorResponse.Status = res.StatusCode
+	}
+
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		instrument.RecordError(ctx, errorResponse)
+	}
+	return nil, errorResponse
 }
 
 // Header set a key, value pair in the DeleteByQuery headers map.
@@ -190,261 +310,347 @@ func (r *DeleteByQuery) Header(key, value string) *DeleteByQuery {
 	return r
 }
 
-// Index A comma-separated list of index names to search; use `_all` or empty string
-// to perform the operation on all indices
+// Index Comma-separated list of data streams, indices, and aliases to search.
+// Supports wildcards (`*`).
+// To search all data streams or indices, omit this parameter or use `*` or
+// `_all`.
 // API Name: index
-func (r *DeleteByQuery) Index(v string) *DeleteByQuery {
+func (r *DeleteByQuery) _index(index string) *DeleteByQuery {
 	r.paramSet |= indexMask
-	r.index = v
+	r.index = index
 
 	return r
 }
 
-// AllowNoIndices Whether to ignore if a wildcard indices expression resolves into no concrete
-// indices. (This includes `_all` string or when no indices have been specified)
+// AllowNoIndices If `false`, the request returns an error if any wildcard expression, index
+// alias, or `_all` value targets only missing or closed indices.
+// This behavior applies even if the request targets other open indices.
+// For example, a request targeting `foo*,bar*` returns an error if an index
+// starts with `foo` but no index starts with `bar`.
 // API name: allow_no_indices
-func (r *DeleteByQuery) AllowNoIndices(b bool) *DeleteByQuery {
-	r.values.Set("allow_no_indices", strconv.FormatBool(b))
+func (r *DeleteByQuery) AllowNoIndices(allownoindices bool) *DeleteByQuery {
+	r.values.Set("allow_no_indices", strconv.FormatBool(allownoindices))
 
 	return r
 }
 
-// Analyzer The analyzer to use for the query string
+// Analyzer Analyzer to use for the query string.
 // API name: analyzer
-func (r *DeleteByQuery) Analyzer(value string) *DeleteByQuery {
-	r.values.Set("analyzer", value)
+func (r *DeleteByQuery) Analyzer(analyzer string) *DeleteByQuery {
+	r.values.Set("analyzer", analyzer)
 
 	return r
 }
 
-// AnalyzeWildcard Specify whether wildcard and prefix queries should be analyzed (default:
-// false)
+// AnalyzeWildcard If `true`, wildcard and prefix queries are analyzed.
 // API name: analyze_wildcard
-func (r *DeleteByQuery) AnalyzeWildcard(b bool) *DeleteByQuery {
-	r.values.Set("analyze_wildcard", strconv.FormatBool(b))
+func (r *DeleteByQuery) AnalyzeWildcard(analyzewildcard bool) *DeleteByQuery {
+	r.values.Set("analyze_wildcard", strconv.FormatBool(analyzewildcard))
 
 	return r
 }
 
-// Conflicts What to do when the delete by query hits version conflicts?
+// Conflicts What to do if delete by query hits version conflicts: `abort` or `proceed`.
 // API name: conflicts
-func (r *DeleteByQuery) Conflicts(enum conflicts.Conflicts) *DeleteByQuery {
-	r.values.Set("conflicts", enum.String())
+func (r *DeleteByQuery) Conflicts(conflicts conflicts.Conflicts) *DeleteByQuery {
+	r.values.Set("conflicts", conflicts.String())
 
 	return r
 }
 
-// DefaultOperator The default operator for query string query (AND or OR)
+// DefaultOperator The default operator for query string query: `AND` or `OR`.
 // API name: default_operator
-func (r *DeleteByQuery) DefaultOperator(enum operator.Operator) *DeleteByQuery {
-	r.values.Set("default_operator", enum.String())
+func (r *DeleteByQuery) DefaultOperator(defaultoperator operator.Operator) *DeleteByQuery {
+	r.values.Set("default_operator", defaultoperator.String())
 
 	return r
 }
 
-// Df The field to use as default where no field prefix is given in the query
-// string
+// Df Field to use as default where no field prefix is given in the query string.
 // API name: df
-func (r *DeleteByQuery) Df(value string) *DeleteByQuery {
-	r.values.Set("df", value)
+func (r *DeleteByQuery) Df(df string) *DeleteByQuery {
+	r.values.Set("df", df)
 
 	return r
 }
 
-// ExpandWildcards Whether to expand wildcard expression to concrete indices that are open,
-// closed or both.
+// ExpandWildcards Type of index that wildcard patterns can match.
+// If the request can target data streams, this argument determines whether
+// wildcard expressions match hidden data streams.
+// Supports comma-separated values, such as `open,hidden`. Valid values are:
+// `all`, `open`, `closed`, `hidden`, `none`.
 // API name: expand_wildcards
-func (r *DeleteByQuery) ExpandWildcards(value string) *DeleteByQuery {
-	r.values.Set("expand_wildcards", value)
+func (r *DeleteByQuery) ExpandWildcards(expandwildcards ...expandwildcard.ExpandWildcard) *DeleteByQuery {
+	tmp := []string{}
+	for _, item := range expandwildcards {
+		tmp = append(tmp, item.String())
+	}
+	r.values.Set("expand_wildcards", strings.Join(tmp, ","))
 
 	return r
 }
 
 // From Starting offset (default: 0)
 // API name: from
-func (r *DeleteByQuery) From(value string) *DeleteByQuery {
-	r.values.Set("from", value)
+func (r *DeleteByQuery) From(from string) *DeleteByQuery {
+	r.values.Set("from", from)
 
 	return r
 }
 
-// IgnoreUnavailable Whether specified concrete indices should be ignored when unavailable
-// (missing or closed)
+// IgnoreUnavailable If `false`, the request returns an error if it targets a missing or closed
+// index.
 // API name: ignore_unavailable
-func (r *DeleteByQuery) IgnoreUnavailable(b bool) *DeleteByQuery {
-	r.values.Set("ignore_unavailable", strconv.FormatBool(b))
+func (r *DeleteByQuery) IgnoreUnavailable(ignoreunavailable bool) *DeleteByQuery {
+	r.values.Set("ignore_unavailable", strconv.FormatBool(ignoreunavailable))
 
 	return r
 }
 
-// Lenient Specify whether format-based query failures (such as providing text to a
-// numeric field) should be ignored
+// Lenient If `true`, format-based query failures (such as providing text to a numeric
+// field) in the query string will be ignored.
 // API name: lenient
-func (r *DeleteByQuery) Lenient(b bool) *DeleteByQuery {
-	r.values.Set("lenient", strconv.FormatBool(b))
+func (r *DeleteByQuery) Lenient(lenient bool) *DeleteByQuery {
+	r.values.Set("lenient", strconv.FormatBool(lenient))
 
 	return r
 }
 
-// MaxDocs Maximum number of documents to process (default: all documents)
-// API name: max_docs
-func (r *DeleteByQuery) MaxDocs(value string) *DeleteByQuery {
-	r.values.Set("max_docs", value)
-
-	return r
-}
-
-// Preference Specify the node or shard the operation should be performed on (default:
-// random)
+// Preference Specifies the node or shard the operation should be performed on.
+// Random by default.
 // API name: preference
-func (r *DeleteByQuery) Preference(value string) *DeleteByQuery {
-	r.values.Set("preference", value)
+func (r *DeleteByQuery) Preference(preference string) *DeleteByQuery {
+	r.values.Set("preference", preference)
 
 	return r
 }
 
-// Refresh Should the affected indexes be refreshed?
+// Refresh If `true`, Elasticsearch refreshes all shards involved in the delete by query
+// after the request completes.
 // API name: refresh
-func (r *DeleteByQuery) Refresh(b bool) *DeleteByQuery {
-	r.values.Set("refresh", strconv.FormatBool(b))
+func (r *DeleteByQuery) Refresh(refresh bool) *DeleteByQuery {
+	r.values.Set("refresh", strconv.FormatBool(refresh))
 
 	return r
 }
 
-// RequestCache Specify if request cache should be used for this request or not, defaults to
-// index level setting
+// RequestCache If `true`, the request cache is used for this request.
+// Defaults to the index-level setting.
 // API name: request_cache
-func (r *DeleteByQuery) RequestCache(b bool) *DeleteByQuery {
-	r.values.Set("request_cache", strconv.FormatBool(b))
+func (r *DeleteByQuery) RequestCache(requestcache bool) *DeleteByQuery {
+	r.values.Set("request_cache", strconv.FormatBool(requestcache))
 
 	return r
 }
 
-// RequestsPerSecond The throttle for this request in sub-requests per second. -1 means no
-// throttle.
+// RequestsPerSecond The throttle for this request in sub-requests per second.
 // API name: requests_per_second
-func (r *DeleteByQuery) RequestsPerSecond(value string) *DeleteByQuery {
-	r.values.Set("requests_per_second", value)
+func (r *DeleteByQuery) RequestsPerSecond(requestspersecond string) *DeleteByQuery {
+	r.values.Set("requests_per_second", requestspersecond)
 
 	return r
 }
 
-// Routing A comma-separated list of specific routing values
+// Routing Custom value used to route operations to a specific shard.
 // API name: routing
-func (r *DeleteByQuery) Routing(value string) *DeleteByQuery {
-	r.values.Set("routing", value)
+func (r *DeleteByQuery) Routing(routing string) *DeleteByQuery {
+	r.values.Set("routing", routing)
 
 	return r
 }
 
-// Q Query in the Lucene query string syntax
+// Q Query in the Lucene query string syntax.
 // API name: q
-func (r *DeleteByQuery) Q(value string) *DeleteByQuery {
-	r.values.Set("q", value)
+func (r *DeleteByQuery) Q(q string) *DeleteByQuery {
+	r.values.Set("q", q)
 
 	return r
 }
 
-// Scroll Specify how long a consistent view of the index should be maintained for
-// scrolled search
+// Scroll Period to retain the search context for scrolling.
 // API name: scroll
-func (r *DeleteByQuery) Scroll(value string) *DeleteByQuery {
-	r.values.Set("scroll", value)
+func (r *DeleteByQuery) Scroll(duration string) *DeleteByQuery {
+	r.values.Set("scroll", duration)
 
 	return r
 }
 
-// ScrollSize Size on the scroll request powering the delete by query
+// ScrollSize Size of the scroll request that powers the operation.
 // API name: scroll_size
-func (r *DeleteByQuery) ScrollSize(value string) *DeleteByQuery {
-	r.values.Set("scroll_size", value)
+func (r *DeleteByQuery) ScrollSize(scrollsize string) *DeleteByQuery {
+	r.values.Set("scroll_size", scrollsize)
 
 	return r
 }
 
-// SearchTimeout Explicit timeout for each search request. Defaults to no timeout.
+// SearchTimeout Explicit timeout for each search request.
+// Defaults to no timeout.
 // API name: search_timeout
-func (r *DeleteByQuery) SearchTimeout(value string) *DeleteByQuery {
-	r.values.Set("search_timeout", value)
+func (r *DeleteByQuery) SearchTimeout(duration string) *DeleteByQuery {
+	r.values.Set("search_timeout", duration)
 
 	return r
 }
 
-// SearchType Search operation type
+// SearchType The type of the search operation.
+// Available options: `query_then_fetch`, `dfs_query_then_fetch`.
 // API name: search_type
-func (r *DeleteByQuery) SearchType(enum searchtype.SearchType) *DeleteByQuery {
-	r.values.Set("search_type", enum.String())
+func (r *DeleteByQuery) SearchType(searchtype searchtype.SearchType) *DeleteByQuery {
+	r.values.Set("search_type", searchtype.String())
 
 	return r
 }
 
-// Slices The number of slices this task should be divided into. Defaults to 1, meaning
-// the task isn't sliced into subtasks. Can be set to `auto`.
+// Slices The number of slices this task should be divided into.
 // API name: slices
-func (r *DeleteByQuery) Slices(value string) *DeleteByQuery {
-	r.values.Set("slices", value)
+func (r *DeleteByQuery) Slices(slices string) *DeleteByQuery {
+	r.values.Set("slices", slices)
 
 	return r
 }
 
-// Sort A comma-separated list of <field>:<direction> pairs
+// Sort A comma-separated list of <field>:<direction> pairs.
 // API name: sort
-func (r *DeleteByQuery) Sort(value string) *DeleteByQuery {
-	r.values.Set("sort", value)
+func (r *DeleteByQuery) Sort(sorts ...string) *DeleteByQuery {
+	tmp := []string{}
+	for _, item := range sorts {
+		tmp = append(tmp, fmt.Sprintf("%v", item))
+	}
+	r.values.Set("sort", strings.Join(tmp, ","))
 
 	return r
 }
 
-// Stats Specific 'tag' of the request for logging and statistical purposes
+// Stats Specific `tag` of the request for logging and statistical purposes.
 // API name: stats
-func (r *DeleteByQuery) Stats(value string) *DeleteByQuery {
-	r.values.Set("stats", value)
+func (r *DeleteByQuery) Stats(stats ...string) *DeleteByQuery {
+	tmp := []string{}
+	for _, item := range stats {
+		tmp = append(tmp, fmt.Sprintf("%v", item))
+	}
+	r.values.Set("stats", strings.Join(tmp, ","))
 
 	return r
 }
 
-// TerminateAfter The maximum number of documents to collect for each shard, upon reaching
-// which the query execution will terminate early.
+// TerminateAfter Maximum number of documents to collect for each shard.
+// If a query reaches this limit, Elasticsearch terminates the query early.
+// Elasticsearch collects documents before sorting.
+// Use with caution.
+// Elasticsearch applies this parameter to each shard handling the request.
+// When possible, let Elasticsearch perform early termination automatically.
+// Avoid specifying this parameter for requests that target data streams with
+// backing indices across multiple data tiers.
 // API name: terminate_after
-func (r *DeleteByQuery) TerminateAfter(value string) *DeleteByQuery {
-	r.values.Set("terminate_after", value)
+func (r *DeleteByQuery) TerminateAfter(terminateafter string) *DeleteByQuery {
+	r.values.Set("terminate_after", terminateafter)
 
 	return r
 }
 
-// Timeout Time each individual bulk request should wait for shards that are
-// unavailable.
+// Timeout Period each deletion request waits for active shards.
 // API name: timeout
-func (r *DeleteByQuery) Timeout(value string) *DeleteByQuery {
-	r.values.Set("timeout", value)
+func (r *DeleteByQuery) Timeout(duration string) *DeleteByQuery {
+	r.values.Set("timeout", duration)
 
 	return r
 }
 
-// Version Specify whether to return document version as part of a hit
+// Version If `true`, returns the document version as part of a hit.
 // API name: version
-func (r *DeleteByQuery) Version(b bool) *DeleteByQuery {
-	r.values.Set("version", strconv.FormatBool(b))
+func (r *DeleteByQuery) Version(version bool) *DeleteByQuery {
+	r.values.Set("version", strconv.FormatBool(version))
 
 	return r
 }
 
-// WaitForActiveShards Sets the number of shard copies that must be active before proceeding with
-// the delete by query operation. Defaults to 1, meaning the primary shard only.
-// Set to `all` for all shard copies, otherwise set to any non-negative value
-// less than or equal to the total number of copies for the shard (number of
-// replicas + 1)
+// WaitForActiveShards The number of shard copies that must be active before proceeding with the
+// operation.
+// Set to all or any positive integer up to the total number of shards in the
+// index (`number_of_replicas+1`).
 // API name: wait_for_active_shards
-func (r *DeleteByQuery) WaitForActiveShards(value string) *DeleteByQuery {
-	r.values.Set("wait_for_active_shards", value)
+func (r *DeleteByQuery) WaitForActiveShards(waitforactiveshards string) *DeleteByQuery {
+	r.values.Set("wait_for_active_shards", waitforactiveshards)
 
 	return r
 }
 
-// WaitForCompletion Should the request should block until the delete by query is complete.
+// WaitForCompletion If `true`, the request blocks until the operation is complete.
 // API name: wait_for_completion
-func (r *DeleteByQuery) WaitForCompletion(b bool) *DeleteByQuery {
-	r.values.Set("wait_for_completion", strconv.FormatBool(b))
+func (r *DeleteByQuery) WaitForCompletion(waitforcompletion bool) *DeleteByQuery {
+	r.values.Set("wait_for_completion", strconv.FormatBool(waitforcompletion))
+
+	return r
+}
+
+// ErrorTrace When set to `true` Elasticsearch will include the full stack trace of errors
+// when they occur.
+// API name: error_trace
+func (r *DeleteByQuery) ErrorTrace(errortrace bool) *DeleteByQuery {
+	r.values.Set("error_trace", strconv.FormatBool(errortrace))
+
+	return r
+}
+
+// FilterPath Comma-separated list of filters in dot notation which reduce the response
+// returned by Elasticsearch.
+// API name: filter_path
+func (r *DeleteByQuery) FilterPath(filterpaths ...string) *DeleteByQuery {
+	tmp := []string{}
+	for _, item := range filterpaths {
+		tmp = append(tmp, fmt.Sprintf("%v", item))
+	}
+	r.values.Set("filter_path", strings.Join(tmp, ","))
+
+	return r
+}
+
+// Human When set to `true` will return statistics in a format suitable for humans.
+// For example `"exists_time": "1h"` for humans and
+// `"eixsts_time_in_millis": 3600000` for computers. When disabled the human
+// readable values will be omitted. This makes sense for responses being
+// consumed
+// only by machines.
+// API name: human
+func (r *DeleteByQuery) Human(human bool) *DeleteByQuery {
+	r.values.Set("human", strconv.FormatBool(human))
+
+	return r
+}
+
+// Pretty If set to `true` the returned JSON will be "pretty-formatted". Only use
+// this option for debugging only.
+// API name: pretty
+func (r *DeleteByQuery) Pretty(pretty bool) *DeleteByQuery {
+	r.values.Set("pretty", strconv.FormatBool(pretty))
+
+	return r
+}
+
+// MaxDocs The maximum number of documents to delete.
+// API name: max_docs
+func (r *DeleteByQuery) MaxDocs(maxdocs int64) *DeleteByQuery {
+
+	r.req.MaxDocs = &maxdocs
+
+	return r
+}
+
+// Query Specifies the documents to delete using the Query DSL.
+// API name: query
+func (r *DeleteByQuery) Query(query *types.Query) *DeleteByQuery {
+
+	r.req.Query = query
+
+	return r
+}
+
+// Slice Slice the request manually using the provided slice ID and total number of
+// slices.
+// API name: slice
+func (r *DeleteByQuery) Slice(slice *types.SlicedScroll) *DeleteByQuery {
+
+	r.req.Slice = slice
 
 	return r
 }

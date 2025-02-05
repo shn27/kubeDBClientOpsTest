@@ -15,109 +15,147 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/minimuminterval"
 )
 
 // AutoDateHistogramAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/bucket.ts#L52-L62
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/bucket.ts#L72-L110
 type AutoDateHistogramAggregation struct {
-	Buckets         *int                             `json:"buckets,omitempty"`
-	Field           *Field                           `json:"field,omitempty"`
-	Format          *string                          `json:"format,omitempty"`
-	Meta            *Metadata                        `json:"meta,omitempty"`
+	// Buckets The target number of buckets.
+	Buckets *int `json:"buckets,omitempty"`
+	// Field The field on which to run the aggregation.
+	Field *string `json:"field,omitempty"`
+	// Format The date format used to format `key_as_string` in the response.
+	// If no `format` is specified, the first date format specified in the field
+	// mapping is used.
+	Format *string `json:"format,omitempty"`
+	// MinimumInterval The minimum rounding interval.
+	// This can make the collection process more efficient, as the aggregation will
+	// not attempt to round at any interval lower than `minimum_interval`.
 	MinimumInterval *minimuminterval.MinimumInterval `json:"minimum_interval,omitempty"`
-	Missing         *DateTime                        `json:"missing,omitempty"`
-	Name            *string                          `json:"name,omitempty"`
-	Offset          *string                          `json:"offset,omitempty"`
-	Params          map[string]interface{}           `json:"params,omitempty"`
-	Script          *Script                          `json:"script,omitempty"`
-	TimeZone        *TimeZone                        `json:"time_zone,omitempty"`
+	// Missing The value to apply to documents that do not have a value.
+	// By default, documents without a value are ignored.
+	Missing DateTime `json:"missing,omitempty"`
+	// Offset Time zone specified as a ISO 8601 UTC offset.
+	Offset *string                    `json:"offset,omitempty"`
+	Params map[string]json.RawMessage `json:"params,omitempty"`
+	Script *Script                    `json:"script,omitempty"`
+	// TimeZone Time zone ID.
+	TimeZone *string `json:"time_zone,omitempty"`
 }
 
-// AutoDateHistogramAggregationBuilder holds AutoDateHistogramAggregation struct and provides a builder API.
-type AutoDateHistogramAggregationBuilder struct {
-	v *AutoDateHistogramAggregation
+func (s *AutoDateHistogramAggregation) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "buckets":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Buckets", err)
+				}
+				s.Buckets = &value
+			case float64:
+				f := int(v)
+				s.Buckets = &f
+			}
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "format":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Format", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Format = &o
+
+		case "minimum_interval":
+			if err := dec.Decode(&s.MinimumInterval); err != nil {
+				return fmt.Errorf("%s | %w", "MinimumInterval", err)
+			}
+
+		case "missing":
+			if err := dec.Decode(&s.Missing); err != nil {
+				return fmt.Errorf("%s | %w", "Missing", err)
+			}
+
+		case "offset":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Offset", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Offset = &o
+
+		case "params":
+			if s.Params == nil {
+				s.Params = make(map[string]json.RawMessage, 0)
+			}
+			if err := dec.Decode(&s.Params); err != nil {
+				return fmt.Errorf("%s | %w", "Params", err)
+			}
+
+		case "script":
+			if err := dec.Decode(&s.Script); err != nil {
+				return fmt.Errorf("%s | %w", "Script", err)
+			}
+
+		case "time_zone":
+			if err := dec.Decode(&s.TimeZone); err != nil {
+				return fmt.Errorf("%s | %w", "TimeZone", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewAutoDateHistogramAggregation provides a builder for the AutoDateHistogramAggregation struct.
-func NewAutoDateHistogramAggregationBuilder() *AutoDateHistogramAggregationBuilder {
-	r := AutoDateHistogramAggregationBuilder{
-		&AutoDateHistogramAggregation{
-			Params: make(map[string]interface{}, 0),
-		},
+// NewAutoDateHistogramAggregation returns a AutoDateHistogramAggregation.
+func NewAutoDateHistogramAggregation() *AutoDateHistogramAggregation {
+	r := &AutoDateHistogramAggregation{
+		Params: make(map[string]json.RawMessage, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the AutoDateHistogramAggregation struct
-func (rb *AutoDateHistogramAggregationBuilder) Build() AutoDateHistogramAggregation {
-	return *rb.v
-}
-
-func (rb *AutoDateHistogramAggregationBuilder) Buckets(buckets int) *AutoDateHistogramAggregationBuilder {
-	rb.v.Buckets = &buckets
-	return rb
-}
-
-func (rb *AutoDateHistogramAggregationBuilder) Field(field Field) *AutoDateHistogramAggregationBuilder {
-	rb.v.Field = &field
-	return rb
-}
-
-func (rb *AutoDateHistogramAggregationBuilder) Format(format string) *AutoDateHistogramAggregationBuilder {
-	rb.v.Format = &format
-	return rb
-}
-
-func (rb *AutoDateHistogramAggregationBuilder) Meta(meta *MetadataBuilder) *AutoDateHistogramAggregationBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *AutoDateHistogramAggregationBuilder) MinimumInterval(minimuminterval minimuminterval.MinimumInterval) *AutoDateHistogramAggregationBuilder {
-	rb.v.MinimumInterval = &minimuminterval
-	return rb
-}
-
-func (rb *AutoDateHistogramAggregationBuilder) Missing(missing *DateTimeBuilder) *AutoDateHistogramAggregationBuilder {
-	v := missing.Build()
-	rb.v.Missing = &v
-	return rb
-}
-
-func (rb *AutoDateHistogramAggregationBuilder) Name(name string) *AutoDateHistogramAggregationBuilder {
-	rb.v.Name = &name
-	return rb
-}
-
-func (rb *AutoDateHistogramAggregationBuilder) Offset(offset string) *AutoDateHistogramAggregationBuilder {
-	rb.v.Offset = &offset
-	return rb
-}
-
-func (rb *AutoDateHistogramAggregationBuilder) Params(value map[string]interface{}) *AutoDateHistogramAggregationBuilder {
-	rb.v.Params = value
-	return rb
-}
-
-func (rb *AutoDateHistogramAggregationBuilder) Script(script *ScriptBuilder) *AutoDateHistogramAggregationBuilder {
-	v := script.Build()
-	rb.v.Script = &v
-	return rb
-}
-
-func (rb *AutoDateHistogramAggregationBuilder) TimeZone(timezone TimeZone) *AutoDateHistogramAggregationBuilder {
-	rb.v.TimeZone = &timezone
-	return rb
+	return r
 }

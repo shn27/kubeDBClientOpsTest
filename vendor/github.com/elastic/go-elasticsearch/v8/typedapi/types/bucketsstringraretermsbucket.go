@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
@@ -27,38 +25,5 @@ package types
 //	map[string]StringRareTermsBucket
 //	[]StringRareTermsBucket
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L303-L312
-type BucketsStringRareTermsBucket interface{}
-
-// BucketsStringRareTermsBucketBuilder holds BucketsStringRareTermsBucket struct and provides a builder API.
-type BucketsStringRareTermsBucketBuilder struct {
-	v BucketsStringRareTermsBucket
-}
-
-// NewBucketsStringRareTermsBucket provides a builder for the BucketsStringRareTermsBucket struct.
-func NewBucketsStringRareTermsBucketBuilder() *BucketsStringRareTermsBucketBuilder {
-	return &BucketsStringRareTermsBucketBuilder{}
-}
-
-// Build finalize the chain and returns the BucketsStringRareTermsBucket struct
-func (u *BucketsStringRareTermsBucketBuilder) Build() BucketsStringRareTermsBucket {
-	return u.v
-}
-
-func (u *BucketsStringRareTermsBucketBuilder) Map(values map[string]*StringRareTermsBucketBuilder) *BucketsStringRareTermsBucketBuilder {
-	tmp := make(map[string]StringRareTermsBucket, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	u.v = tmp
-	return u
-}
-
-func (u *BucketsStringRareTermsBucketBuilder) StringRareTermsBuckets(stringraretermsbuckets []StringRareTermsBucketBuilder) *BucketsStringRareTermsBucketBuilder {
-	tmp := make([]StringRareTermsBucket, len(stringraretermsbuckets))
-	for _, value := range stringraretermsbuckets {
-		tmp = append(tmp, value.Build())
-	}
-	u.v = tmp
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L346-L355
+type BucketsStringRareTermsBucket any

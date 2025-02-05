@@ -15,72 +15,120 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // FiltersAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/bucket.ts#L166-L171
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/bucket.ts#L374-L394
 type FiltersAggregation struct {
-	Filters        *BucketsQueryContainer `json:"filters,omitempty"`
-	Keyed          *bool                  `json:"keyed,omitempty"`
-	Meta           *Metadata              `json:"meta,omitempty"`
-	Name           *string                `json:"name,omitempty"`
-	OtherBucket    *bool                  `json:"other_bucket,omitempty"`
-	OtherBucketKey *string                `json:"other_bucket_key,omitempty"`
+	// Filters Collection of queries from which to build buckets.
+	Filters BucketsQuery `json:"filters,omitempty"`
+	// Keyed By default, the named filters aggregation returns the buckets as an object.
+	// Set to `false` to return the buckets as an array of objects.
+	Keyed *bool `json:"keyed,omitempty"`
+	// OtherBucket Set to `true` to add a bucket to the response which will contain all
+	// documents that do not match any of the given filters.
+	OtherBucket *bool `json:"other_bucket,omitempty"`
+	// OtherBucketKey The key with which the other bucket is returned.
+	OtherBucketKey *string `json:"other_bucket_key,omitempty"`
 }
 
-// FiltersAggregationBuilder holds FiltersAggregation struct and provides a builder API.
-type FiltersAggregationBuilder struct {
-	v *FiltersAggregation
-}
+func (s *FiltersAggregation) UnmarshalJSON(data []byte) error {
 
-// NewFiltersAggregation provides a builder for the FiltersAggregation struct.
-func NewFiltersAggregationBuilder() *FiltersAggregationBuilder {
-	r := FiltersAggregationBuilder{
-		&FiltersAggregation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "filters":
+
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			source := bytes.NewReader(rawMsg)
+			localDec := json.NewDecoder(source)
+			switch rawMsg[0] {
+			case '{':
+				o := make(map[string]Query, 0)
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Filters", err)
+				}
+				s.Filters = o
+			case '[':
+				o := []Query{}
+				if err := localDec.Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Filters", err)
+				}
+				s.Filters = o
+			}
+
+		case "keyed":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Keyed", err)
+				}
+				s.Keyed = &value
+			case bool:
+				s.Keyed = &v
+			}
+
+		case "other_bucket":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "OtherBucket", err)
+				}
+				s.OtherBucket = &value
+			case bool:
+				s.OtherBucket = &v
+			}
+
+		case "other_bucket_key":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "OtherBucketKey", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.OtherBucketKey = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the FiltersAggregation struct
-func (rb *FiltersAggregationBuilder) Build() FiltersAggregation {
-	return *rb.v
-}
+// NewFiltersAggregation returns a FiltersAggregation.
+func NewFiltersAggregation() *FiltersAggregation {
+	r := &FiltersAggregation{}
 
-func (rb *FiltersAggregationBuilder) Filters(filters *BucketsQueryContainerBuilder) *FiltersAggregationBuilder {
-	v := filters.Build()
-	rb.v.Filters = &v
-	return rb
-}
-
-func (rb *FiltersAggregationBuilder) Keyed(keyed bool) *FiltersAggregationBuilder {
-	rb.v.Keyed = &keyed
-	return rb
-}
-
-func (rb *FiltersAggregationBuilder) Meta(meta *MetadataBuilder) *FiltersAggregationBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *FiltersAggregationBuilder) Name(name string) *FiltersAggregationBuilder {
-	rb.v.Name = &name
-	return rb
-}
-
-func (rb *FiltersAggregationBuilder) OtherBucket(otherbucket bool) *FiltersAggregationBuilder {
-	rb.v.OtherBucket = &otherbucket
-	return rb
-}
-
-func (rb *FiltersAggregationBuilder) OtherBucketKey(otherbucketkey string) *FiltersAggregationBuilder {
-	rb.v.OtherBucketKey = &otherbucketkey
-	return rb
+	return r
 }

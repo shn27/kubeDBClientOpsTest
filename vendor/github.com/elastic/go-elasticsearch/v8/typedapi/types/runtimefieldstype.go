@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // RuntimeFieldsType type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/usage/types.ts#L262-L277
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/xpack/usage/types.ts#L277-L292
 type RuntimeFieldsType struct {
 	CharsMax        int64    `json:"chars_max"`
 	CharsTotal      int64    `json:"chars_total"`
@@ -35,98 +42,226 @@ type RuntimeFieldsType struct {
 	Lang            []string `json:"lang"`
 	LinesMax        int64    `json:"lines_max"`
 	LinesTotal      int64    `json:"lines_total"`
-	Name            Field    `json:"name"`
+	Name            string   `json:"name"`
 	ScriptlessCount int64    `json:"scriptless_count"`
 	ShadowedCount   int64    `json:"shadowed_count"`
 	SourceMax       int64    `json:"source_max"`
 	SourceTotal     int64    `json:"source_total"`
 }
 
-// RuntimeFieldsTypeBuilder holds RuntimeFieldsType struct and provides a builder API.
-type RuntimeFieldsTypeBuilder struct {
-	v *RuntimeFieldsType
-}
+func (s *RuntimeFieldsType) UnmarshalJSON(data []byte) error {
 
-// NewRuntimeFieldsType provides a builder for the RuntimeFieldsType struct.
-func NewRuntimeFieldsTypeBuilder() *RuntimeFieldsTypeBuilder {
-	r := RuntimeFieldsTypeBuilder{
-		&RuntimeFieldsType{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "chars_max":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CharsMax", err)
+				}
+				s.CharsMax = value
+			case float64:
+				f := int64(v)
+				s.CharsMax = f
+			}
+
+		case "chars_total":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CharsTotal", err)
+				}
+				s.CharsTotal = value
+			case float64:
+				f := int64(v)
+				s.CharsTotal = f
+			}
+
+		case "count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Count", err)
+				}
+				s.Count = value
+			case float64:
+				f := int64(v)
+				s.Count = f
+			}
+
+		case "doc_max":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DocMax", err)
+				}
+				s.DocMax = value
+			case float64:
+				f := int64(v)
+				s.DocMax = f
+			}
+
+		case "doc_total":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DocTotal", err)
+				}
+				s.DocTotal = value
+			case float64:
+				f := int64(v)
+				s.DocTotal = f
+			}
+
+		case "index_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IndexCount", err)
+				}
+				s.IndexCount = value
+			case float64:
+				f := int64(v)
+				s.IndexCount = f
+			}
+
+		case "lang":
+			if err := dec.Decode(&s.Lang); err != nil {
+				return fmt.Errorf("%s | %w", "Lang", err)
+			}
+
+		case "lines_max":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "LinesMax", err)
+				}
+				s.LinesMax = value
+			case float64:
+				f := int64(v)
+				s.LinesMax = f
+			}
+
+		case "lines_total":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "LinesTotal", err)
+				}
+				s.LinesTotal = value
+			case float64:
+				f := int64(v)
+				s.LinesTotal = f
+			}
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		case "scriptless_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ScriptlessCount", err)
+				}
+				s.ScriptlessCount = value
+			case float64:
+				f := int64(v)
+				s.ScriptlessCount = f
+			}
+
+		case "shadowed_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ShadowedCount", err)
+				}
+				s.ShadowedCount = value
+			case float64:
+				f := int64(v)
+				s.ShadowedCount = f
+			}
+
+		case "source_max":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "SourceMax", err)
+				}
+				s.SourceMax = value
+			case float64:
+				f := int64(v)
+				s.SourceMax = f
+			}
+
+		case "source_total":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "SourceTotal", err)
+				}
+				s.SourceTotal = value
+			case float64:
+				f := int64(v)
+				s.SourceTotal = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RuntimeFieldsType struct
-func (rb *RuntimeFieldsTypeBuilder) Build() RuntimeFieldsType {
-	return *rb.v
-}
+// NewRuntimeFieldsType returns a RuntimeFieldsType.
+func NewRuntimeFieldsType() *RuntimeFieldsType {
+	r := &RuntimeFieldsType{}
 
-func (rb *RuntimeFieldsTypeBuilder) CharsMax(charsmax int64) *RuntimeFieldsTypeBuilder {
-	rb.v.CharsMax = charsmax
-	return rb
-}
-
-func (rb *RuntimeFieldsTypeBuilder) CharsTotal(charstotal int64) *RuntimeFieldsTypeBuilder {
-	rb.v.CharsTotal = charstotal
-	return rb
-}
-
-func (rb *RuntimeFieldsTypeBuilder) Count(count int64) *RuntimeFieldsTypeBuilder {
-	rb.v.Count = count
-	return rb
-}
-
-func (rb *RuntimeFieldsTypeBuilder) DocMax(docmax int64) *RuntimeFieldsTypeBuilder {
-	rb.v.DocMax = docmax
-	return rb
-}
-
-func (rb *RuntimeFieldsTypeBuilder) DocTotal(doctotal int64) *RuntimeFieldsTypeBuilder {
-	rb.v.DocTotal = doctotal
-	return rb
-}
-
-func (rb *RuntimeFieldsTypeBuilder) IndexCount(indexcount int64) *RuntimeFieldsTypeBuilder {
-	rb.v.IndexCount = indexcount
-	return rb
-}
-
-func (rb *RuntimeFieldsTypeBuilder) Lang(lang ...string) *RuntimeFieldsTypeBuilder {
-	rb.v.Lang = lang
-	return rb
-}
-
-func (rb *RuntimeFieldsTypeBuilder) LinesMax(linesmax int64) *RuntimeFieldsTypeBuilder {
-	rb.v.LinesMax = linesmax
-	return rb
-}
-
-func (rb *RuntimeFieldsTypeBuilder) LinesTotal(linestotal int64) *RuntimeFieldsTypeBuilder {
-	rb.v.LinesTotal = linestotal
-	return rb
-}
-
-func (rb *RuntimeFieldsTypeBuilder) Name(name Field) *RuntimeFieldsTypeBuilder {
-	rb.v.Name = name
-	return rb
-}
-
-func (rb *RuntimeFieldsTypeBuilder) ScriptlessCount(scriptlesscount int64) *RuntimeFieldsTypeBuilder {
-	rb.v.ScriptlessCount = scriptlesscount
-	return rb
-}
-
-func (rb *RuntimeFieldsTypeBuilder) ShadowedCount(shadowedcount int64) *RuntimeFieldsTypeBuilder {
-	rb.v.ShadowedCount = shadowedcount
-	return rb
-}
-
-func (rb *RuntimeFieldsTypeBuilder) SourceMax(sourcemax int64) *RuntimeFieldsTypeBuilder {
-	rb.v.SourceMax = sourcemax
-	return rb
-}
-
-func (rb *RuntimeFieldsTypeBuilder) SourceTotal(sourcetotal int64) *RuntimeFieldsTypeBuilder {
-	rb.v.SourceTotal = sourcetotal
-	return rb
+	return r
 }

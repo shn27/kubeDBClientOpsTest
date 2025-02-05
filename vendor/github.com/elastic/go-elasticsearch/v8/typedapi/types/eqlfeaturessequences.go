@@ -15,16 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // EqlFeaturesSequences type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/usage/types.ts#L125-L132
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/xpack/usage/types.ts#L128-L135
 type EqlFeaturesSequences struct {
 	SequenceMaxspan           uint `json:"sequence_maxspan"`
 	SequenceQueriesFiveOrMore uint `json:"sequence_queries_five_or_more"`
@@ -34,51 +32,9 @@ type EqlFeaturesSequences struct {
 	SequenceUntil             uint `json:"sequence_until"`
 }
 
-// EqlFeaturesSequencesBuilder holds EqlFeaturesSequences struct and provides a builder API.
-type EqlFeaturesSequencesBuilder struct {
-	v *EqlFeaturesSequences
-}
+// NewEqlFeaturesSequences returns a EqlFeaturesSequences.
+func NewEqlFeaturesSequences() *EqlFeaturesSequences {
+	r := &EqlFeaturesSequences{}
 
-// NewEqlFeaturesSequences provides a builder for the EqlFeaturesSequences struct.
-func NewEqlFeaturesSequencesBuilder() *EqlFeaturesSequencesBuilder {
-	r := EqlFeaturesSequencesBuilder{
-		&EqlFeaturesSequences{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the EqlFeaturesSequences struct
-func (rb *EqlFeaturesSequencesBuilder) Build() EqlFeaturesSequences {
-	return *rb.v
-}
-
-func (rb *EqlFeaturesSequencesBuilder) SequenceMaxspan(sequencemaxspan uint) *EqlFeaturesSequencesBuilder {
-	rb.v.SequenceMaxspan = sequencemaxspan
-	return rb
-}
-
-func (rb *EqlFeaturesSequencesBuilder) SequenceQueriesFiveOrMore(sequencequeriesfiveormore uint) *EqlFeaturesSequencesBuilder {
-	rb.v.SequenceQueriesFiveOrMore = sequencequeriesfiveormore
-	return rb
-}
-
-func (rb *EqlFeaturesSequencesBuilder) SequenceQueriesFour(sequencequeriesfour uint) *EqlFeaturesSequencesBuilder {
-	rb.v.SequenceQueriesFour = sequencequeriesfour
-	return rb
-}
-
-func (rb *EqlFeaturesSequencesBuilder) SequenceQueriesThree(sequencequeriesthree uint) *EqlFeaturesSequencesBuilder {
-	rb.v.SequenceQueriesThree = sequencequeriesthree
-	return rb
-}
-
-func (rb *EqlFeaturesSequencesBuilder) SequenceQueriesTwo(sequencequeriestwo uint) *EqlFeaturesSequencesBuilder {
-	rb.v.SequenceQueriesTwo = sequencequeriestwo
-	return rb
-}
-
-func (rb *EqlFeaturesSequencesBuilder) SequenceUntil(sequenceuntil uint) *EqlFeaturesSequencesBuilder {
-	rb.v.SequenceUntil = sequenceuntil
-	return rb
+	return r
 }

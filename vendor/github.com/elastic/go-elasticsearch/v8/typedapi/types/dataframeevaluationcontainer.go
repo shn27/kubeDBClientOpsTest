@@ -15,16 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // DataframeEvaluationContainer type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/DataframeEvaluation.ts#L25-L33
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/DataframeEvaluation.ts#L25-L33
 type DataframeEvaluationContainer struct {
 	// Classification Classification evaluation evaluates the results of a classification analysis
 	// which outputs a prediction that identifies to which of the classes each
@@ -38,49 +36,9 @@ type DataframeEvaluationContainer struct {
 	Regression *DataframeEvaluationRegression `json:"regression,omitempty"`
 }
 
-// DataframeEvaluationContainerBuilder holds DataframeEvaluationContainer struct and provides a builder API.
-type DataframeEvaluationContainerBuilder struct {
-	v *DataframeEvaluationContainer
-}
+// NewDataframeEvaluationContainer returns a DataframeEvaluationContainer.
+func NewDataframeEvaluationContainer() *DataframeEvaluationContainer {
+	r := &DataframeEvaluationContainer{}
 
-// NewDataframeEvaluationContainer provides a builder for the DataframeEvaluationContainer struct.
-func NewDataframeEvaluationContainerBuilder() *DataframeEvaluationContainerBuilder {
-	r := DataframeEvaluationContainerBuilder{
-		&DataframeEvaluationContainer{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the DataframeEvaluationContainer struct
-func (rb *DataframeEvaluationContainerBuilder) Build() DataframeEvaluationContainer {
-	return *rb.v
-}
-
-// Classification Classification evaluation evaluates the results of a classification analysis
-// which outputs a prediction that identifies to which of the classes each
-// document belongs.
-
-func (rb *DataframeEvaluationContainerBuilder) Classification(classification *DataframeEvaluationClassificationBuilder) *DataframeEvaluationContainerBuilder {
-	v := classification.Build()
-	rb.v.Classification = &v
-	return rb
-}
-
-// OutlierDetection Outlier detection evaluates the results of an outlier detection analysis
-// which outputs the probability that each document is an outlier.
-
-func (rb *DataframeEvaluationContainerBuilder) OutlierDetection(outlierdetection *DataframeEvaluationOutlierDetectionBuilder) *DataframeEvaluationContainerBuilder {
-	v := outlierdetection.Build()
-	rb.v.OutlierDetection = &v
-	return rb
-}
-
-// Regression Regression evaluation evaluates the results of a regression analysis which
-// outputs a prediction of values.
-
-func (rb *DataframeEvaluationContainerBuilder) Regression(regression *DataframeEvaluationRegressionBuilder) *DataframeEvaluationContainerBuilder {
-	v := regression.Build()
-	rb.v.Regression = &v
-	return rb
+	return r
 }

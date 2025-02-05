@@ -15,102 +15,207 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // Transport type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/_types/Stats.ts#L413-L424
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/_types/Stats.ts#L1118-L1161
 type Transport struct {
-	InboundHandlingTimeHistogram  []TransportHistogram `json:"inbound_handling_time_histogram,omitempty"`
+	// InboundHandlingTimeHistogram The distribution of the time spent handling each inbound message on a
+	// transport thread, represented as a histogram.
+	InboundHandlingTimeHistogram []TransportHistogram `json:"inbound_handling_time_histogram,omitempty"`
+	// OutboundHandlingTimeHistogram The distribution of the time spent sending each outbound transport message on
+	// a transport thread, represented as a histogram.
 	OutboundHandlingTimeHistogram []TransportHistogram `json:"outbound_handling_time_histogram,omitempty"`
-	RxCount                       *int64               `json:"rx_count,omitempty"`
-	RxSize                        *string              `json:"rx_size,omitempty"`
-	RxSizeInBytes                 *int64               `json:"rx_size_in_bytes,omitempty"`
-	ServerOpen                    *int                 `json:"server_open,omitempty"`
-	TotalOutboundConnections      *int64               `json:"total_outbound_connections,omitempty"`
-	TxCount                       *int64               `json:"tx_count,omitempty"`
-	TxSize                        *string              `json:"tx_size,omitempty"`
-	TxSizeInBytes                 *int64               `json:"tx_size_in_bytes,omitempty"`
+	// RxCount Total number of RX (receive) packets received by the node during internal
+	// cluster communication.
+	RxCount *int64 `json:"rx_count,omitempty"`
+	// RxSize Size of RX packets received by the node during internal cluster
+	// communication.
+	RxSize *string `json:"rx_size,omitempty"`
+	// RxSizeInBytes Size, in bytes, of RX packets received by the node during internal cluster
+	// communication.
+	RxSizeInBytes *int64 `json:"rx_size_in_bytes,omitempty"`
+	// ServerOpen Current number of inbound TCP connections used for internal communication
+	// between nodes.
+	ServerOpen *int `json:"server_open,omitempty"`
+	// TotalOutboundConnections The cumulative number of outbound transport connections that this node has
+	// opened since it started.
+	// Each transport connection may comprise multiple TCP connections but is only
+	// counted once in this statistic.
+	// Transport connections are typically long-lived so this statistic should
+	// remain constant in a stable cluster.
+	TotalOutboundConnections *int64 `json:"total_outbound_connections,omitempty"`
+	// TxCount Total number of TX (transmit) packets sent by the node during internal
+	// cluster communication.
+	TxCount *int64 `json:"tx_count,omitempty"`
+	// TxSize Size of TX packets sent by the node during internal cluster communication.
+	TxSize *string `json:"tx_size,omitempty"`
+	// TxSizeInBytes Size, in bytes, of TX packets sent by the node during internal cluster
+	// communication.
+	TxSizeInBytes *int64 `json:"tx_size_in_bytes,omitempty"`
 }
 
-// TransportBuilder holds Transport struct and provides a builder API.
-type TransportBuilder struct {
-	v *Transport
-}
+func (s *Transport) UnmarshalJSON(data []byte) error {
 
-// NewTransport provides a builder for the Transport struct.
-func NewTransportBuilder() *TransportBuilder {
-	r := TransportBuilder{
-		&Transport{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "inbound_handling_time_histogram":
+			if err := dec.Decode(&s.InboundHandlingTimeHistogram); err != nil {
+				return fmt.Errorf("%s | %w", "InboundHandlingTimeHistogram", err)
+			}
+
+		case "outbound_handling_time_histogram":
+			if err := dec.Decode(&s.OutboundHandlingTimeHistogram); err != nil {
+				return fmt.Errorf("%s | %w", "OutboundHandlingTimeHistogram", err)
+			}
+
+		case "rx_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "RxCount", err)
+				}
+				s.RxCount = &value
+			case float64:
+				f := int64(v)
+				s.RxCount = &f
+			}
+
+		case "rx_size":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "RxSize", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.RxSize = &o
+
+		case "rx_size_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "RxSizeInBytes", err)
+				}
+				s.RxSizeInBytes = &value
+			case float64:
+				f := int64(v)
+				s.RxSizeInBytes = &f
+			}
+
+		case "server_open":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ServerOpen", err)
+				}
+				s.ServerOpen = &value
+			case float64:
+				f := int(v)
+				s.ServerOpen = &f
+			}
+
+		case "total_outbound_connections":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TotalOutboundConnections", err)
+				}
+				s.TotalOutboundConnections = &value
+			case float64:
+				f := int64(v)
+				s.TotalOutboundConnections = &f
+			}
+
+		case "tx_count":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TxCount", err)
+				}
+				s.TxCount = &value
+			case float64:
+				f := int64(v)
+				s.TxCount = &f
+			}
+
+		case "tx_size":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "TxSize", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.TxSize = &o
+
+		case "tx_size_in_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TxSizeInBytes", err)
+				}
+				s.TxSizeInBytes = &value
+			case float64:
+				f := int64(v)
+				s.TxSizeInBytes = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the Transport struct
-func (rb *TransportBuilder) Build() Transport {
-	return *rb.v
-}
+// NewTransport returns a Transport.
+func NewTransport() *Transport {
+	r := &Transport{}
 
-func (rb *TransportBuilder) InboundHandlingTimeHistogram(inbound_handling_time_histogram []TransportHistogramBuilder) *TransportBuilder {
-	tmp := make([]TransportHistogram, len(inbound_handling_time_histogram))
-	for _, value := range inbound_handling_time_histogram {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.InboundHandlingTimeHistogram = tmp
-	return rb
-}
-
-func (rb *TransportBuilder) OutboundHandlingTimeHistogram(outbound_handling_time_histogram []TransportHistogramBuilder) *TransportBuilder {
-	tmp := make([]TransportHistogram, len(outbound_handling_time_histogram))
-	for _, value := range outbound_handling_time_histogram {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.OutboundHandlingTimeHistogram = tmp
-	return rb
-}
-
-func (rb *TransportBuilder) RxCount(rxcount int64) *TransportBuilder {
-	rb.v.RxCount = &rxcount
-	return rb
-}
-
-func (rb *TransportBuilder) RxSize(rxsize string) *TransportBuilder {
-	rb.v.RxSize = &rxsize
-	return rb
-}
-
-func (rb *TransportBuilder) RxSizeInBytes(rxsizeinbytes int64) *TransportBuilder {
-	rb.v.RxSizeInBytes = &rxsizeinbytes
-	return rb
-}
-
-func (rb *TransportBuilder) ServerOpen(serveropen int) *TransportBuilder {
-	rb.v.ServerOpen = &serveropen
-	return rb
-}
-
-func (rb *TransportBuilder) TotalOutboundConnections(totaloutboundconnections int64) *TransportBuilder {
-	rb.v.TotalOutboundConnections = &totaloutboundconnections
-	return rb
-}
-
-func (rb *TransportBuilder) TxCount(txcount int64) *TransportBuilder {
-	rb.v.TxCount = &txcount
-	return rb
-}
-
-func (rb *TransportBuilder) TxSize(txsize string) *TransportBuilder {
-	rb.v.TxSize = &txsize
-	return rb
-}
-
-func (rb *TransportBuilder) TxSizeInBytes(txsizeinbytes int64) *TransportBuilder {
-	rb.v.TxSizeInBytes = &txsizeinbytes
-	return rb
+	return r
 }

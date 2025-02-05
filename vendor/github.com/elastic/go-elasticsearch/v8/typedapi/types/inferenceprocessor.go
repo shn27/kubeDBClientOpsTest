@@ -15,89 +15,151 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // InferenceProcessor type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ingest/_types/Processors.ts#L237-L242
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ingest/_types/Processors.ts#L1027-L1046
 type InferenceProcessor struct {
-	FieldMap        map[Field]interface{} `json:"field_map,omitempty"`
-	If              *string               `json:"if,omitempty"`
-	IgnoreFailure   *bool                 `json:"ignore_failure,omitempty"`
-	InferenceConfig *InferenceConfig      `json:"inference_config,omitempty"`
-	ModelId         Id                    `json:"model_id"`
-	OnFailure       []ProcessorContainer  `json:"on_failure,omitempty"`
-	Tag             *string               `json:"tag,omitempty"`
-	TargetField     Field                 `json:"target_field"`
+	// Description Description of the processor.
+	// Useful for describing the purpose of the processor or its configuration.
+	Description *string `json:"description,omitempty"`
+	// FieldMap Maps the document field names to the known field names of the model.
+	// This mapping takes precedence over any default mappings provided in the model
+	// configuration.
+	FieldMap map[string]json.RawMessage `json:"field_map,omitempty"`
+	// If Conditionally execute the processor.
+	If *string `json:"if,omitempty"`
+	// IgnoreFailure Ignore failures for the processor.
+	IgnoreFailure *bool `json:"ignore_failure,omitempty"`
+	// InferenceConfig Contains the inference type and its options.
+	InferenceConfig *InferenceConfig `json:"inference_config,omitempty"`
+	// ModelId The ID or alias for the trained model, or the ID of the deployment.
+	ModelId string `json:"model_id"`
+	// OnFailure Handle failures for the processor.
+	OnFailure []ProcessorContainer `json:"on_failure,omitempty"`
+	// Tag Identifier for the processor.
+	// Useful for debugging and metrics.
+	Tag *string `json:"tag,omitempty"`
+	// TargetField Field added to incoming documents to contain results objects.
+	TargetField *string `json:"target_field,omitempty"`
 }
 
-// InferenceProcessorBuilder holds InferenceProcessor struct and provides a builder API.
-type InferenceProcessorBuilder struct {
-	v *InferenceProcessor
+func (s *InferenceProcessor) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "description":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Description", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Description = &o
+
+		case "field_map":
+			if s.FieldMap == nil {
+				s.FieldMap = make(map[string]json.RawMessage, 0)
+			}
+			if err := dec.Decode(&s.FieldMap); err != nil {
+				return fmt.Errorf("%s | %w", "FieldMap", err)
+			}
+
+		case "if":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "If", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.If = &o
+
+		case "ignore_failure":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IgnoreFailure", err)
+				}
+				s.IgnoreFailure = &value
+			case bool:
+				s.IgnoreFailure = &v
+			}
+
+		case "inference_config":
+			if err := dec.Decode(&s.InferenceConfig); err != nil {
+				return fmt.Errorf("%s | %w", "InferenceConfig", err)
+			}
+
+		case "model_id":
+			if err := dec.Decode(&s.ModelId); err != nil {
+				return fmt.Errorf("%s | %w", "ModelId", err)
+			}
+
+		case "on_failure":
+			if err := dec.Decode(&s.OnFailure); err != nil {
+				return fmt.Errorf("%s | %w", "OnFailure", err)
+			}
+
+		case "tag":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Tag", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Tag = &o
+
+		case "target_field":
+			if err := dec.Decode(&s.TargetField); err != nil {
+				return fmt.Errorf("%s | %w", "TargetField", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewInferenceProcessor provides a builder for the InferenceProcessor struct.
-func NewInferenceProcessorBuilder() *InferenceProcessorBuilder {
-	r := InferenceProcessorBuilder{
-		&InferenceProcessor{
-			FieldMap: make(map[Field]interface{}, 0),
-		},
+// NewInferenceProcessor returns a InferenceProcessor.
+func NewInferenceProcessor() *InferenceProcessor {
+	r := &InferenceProcessor{
+		FieldMap: make(map[string]json.RawMessage, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the InferenceProcessor struct
-func (rb *InferenceProcessorBuilder) Build() InferenceProcessor {
-	return *rb.v
-}
-
-func (rb *InferenceProcessorBuilder) FieldMap(value map[Field]interface{}) *InferenceProcessorBuilder {
-	rb.v.FieldMap = value
-	return rb
-}
-
-func (rb *InferenceProcessorBuilder) If_(if_ string) *InferenceProcessorBuilder {
-	rb.v.If = &if_
-	return rb
-}
-
-func (rb *InferenceProcessorBuilder) IgnoreFailure(ignorefailure bool) *InferenceProcessorBuilder {
-	rb.v.IgnoreFailure = &ignorefailure
-	return rb
-}
-
-func (rb *InferenceProcessorBuilder) InferenceConfig(inferenceconfig *InferenceConfigBuilder) *InferenceProcessorBuilder {
-	v := inferenceconfig.Build()
-	rb.v.InferenceConfig = &v
-	return rb
-}
-
-func (rb *InferenceProcessorBuilder) ModelId(modelid Id) *InferenceProcessorBuilder {
-	rb.v.ModelId = modelid
-	return rb
-}
-
-func (rb *InferenceProcessorBuilder) OnFailure(on_failure []ProcessorContainerBuilder) *InferenceProcessorBuilder {
-	tmp := make([]ProcessorContainer, len(on_failure))
-	for _, value := range on_failure {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.OnFailure = tmp
-	return rb
-}
-
-func (rb *InferenceProcessorBuilder) Tag(tag string) *InferenceProcessorBuilder {
-	rb.v.Tag = &tag
-	return rb
-}
-
-func (rb *InferenceProcessorBuilder) TargetField(targetfield Field) *InferenceProcessorBuilder {
-	rb.v.TargetField = targetfield
-	return rb
+	return r
 }

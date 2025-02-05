@@ -15,47 +15,68 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // BuildInformation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/info/types.ts#L24-L27
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/xpack/info/types.ts#L24-L27
 type BuildInformation struct {
 	Date DateTime `json:"date"`
 	Hash string   `json:"hash"`
 }
 
-// BuildInformationBuilder holds BuildInformation struct and provides a builder API.
-type BuildInformationBuilder struct {
-	v *BuildInformation
-}
+func (s *BuildInformation) UnmarshalJSON(data []byte) error {
 
-// NewBuildInformation provides a builder for the BuildInformation struct.
-func NewBuildInformationBuilder() *BuildInformationBuilder {
-	r := BuildInformationBuilder{
-		&BuildInformation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "date":
+			if err := dec.Decode(&s.Date); err != nil {
+				return fmt.Errorf("%s | %w", "Date", err)
+			}
+
+		case "hash":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Hash", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Hash = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the BuildInformation struct
-func (rb *BuildInformationBuilder) Build() BuildInformation {
-	return *rb.v
-}
+// NewBuildInformation returns a BuildInformation.
+func NewBuildInformation() *BuildInformation {
+	r := &BuildInformation{}
 
-func (rb *BuildInformationBuilder) Date(date *DateTimeBuilder) *BuildInformationBuilder {
-	v := date.Build()
-	rb.v.Date = v
-	return rb
-}
-
-func (rb *BuildInformationBuilder) Hash(hash string) *BuildInformationBuilder {
-	rb.v.Hash = hash
-	return rb
+	return r
 }

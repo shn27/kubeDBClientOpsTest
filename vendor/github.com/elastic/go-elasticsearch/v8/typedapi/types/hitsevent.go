@@ -15,69 +15,98 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // HitsEvent type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/eql/_types/EqlHits.ts#L41-L49
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/eql/_types/EqlHits.ts#L41-L54
 type HitsEvent struct {
-	Fields map[Field][]interface{} `json:"fields,omitempty"`
+	Fields map[string][]json.RawMessage `json:"fields,omitempty"`
 	// Id_ Unique identifier for the event. This ID is only unique within the index.
-	Id_ Id `json:"_id"`
+	Id_ string `json:"_id"`
 	// Index_ Name of the index containing the event.
-	Index_ IndexName `json:"_index"`
+	Index_ string `json:"_index"`
+	// Missing Set to `true` for events in a timespan-constrained sequence that do not meet
+	// a given condition.
+	Missing *bool `json:"missing,omitempty"`
 	// Source_ Original JSON body passed for the event at index time.
-	Source_ interface{} `json:"_source,omitempty"`
+	Source_ json.RawMessage `json:"_source,omitempty"`
 }
 
-// HitsEventBuilder holds HitsEvent struct and provides a builder API.
-type HitsEventBuilder struct {
-	v *HitsEvent
+func (s *HitsEvent) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "fields":
+			if s.Fields == nil {
+				s.Fields = make(map[string][]json.RawMessage, 0)
+			}
+			if err := dec.Decode(&s.Fields); err != nil {
+				return fmt.Errorf("%s | %w", "Fields", err)
+			}
+
+		case "_id":
+			if err := dec.Decode(&s.Id_); err != nil {
+				return fmt.Errorf("%s | %w", "Id_", err)
+			}
+
+		case "_index":
+			if err := dec.Decode(&s.Index_); err != nil {
+				return fmt.Errorf("%s | %w", "Index_", err)
+			}
+
+		case "missing":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Missing", err)
+				}
+				s.Missing = &value
+			case bool:
+				s.Missing = &v
+			}
+
+		case "_source":
+			if err := dec.Decode(&s.Source_); err != nil {
+				return fmt.Errorf("%s | %w", "Source_", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewHitsEvent provides a builder for the HitsEvent struct.
-func NewHitsEventBuilder() *HitsEventBuilder {
-	r := HitsEventBuilder{
-		&HitsEvent{
-			Fields: make(map[Field][]interface{}, 0),
-		},
+// NewHitsEvent returns a HitsEvent.
+func NewHitsEvent() *HitsEvent {
+	r := &HitsEvent{
+		Fields: make(map[string][]json.RawMessage, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the HitsEvent struct
-func (rb *HitsEventBuilder) Build() HitsEvent {
-	return *rb.v
-}
-
-func (rb *HitsEventBuilder) Fields(value map[Field][]interface{}) *HitsEventBuilder {
-	rb.v.Fields = value
-	return rb
-}
-
-// Id_ Unique identifier for the event. This ID is only unique within the index.
-
-func (rb *HitsEventBuilder) Id_(id_ Id) *HitsEventBuilder {
-	rb.v.Id_ = id_
-	return rb
-}
-
-// Index_ Name of the index containing the event.
-
-func (rb *HitsEventBuilder) Index_(index_ IndexName) *HitsEventBuilder {
-	rb.v.Index_ = index_
-	return rb
-}
-
-// Source_ Original JSON body passed for the event at index time.
-
-func (rb *HitsEventBuilder) Source_(source_ interface{}) *HitsEventBuilder {
-	rb.v.Source_ = source_
-	return rb
+	return r
 }

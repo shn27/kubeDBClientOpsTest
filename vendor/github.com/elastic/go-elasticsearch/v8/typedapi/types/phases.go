@@ -15,62 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // Phases type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ilm/_types/Phase.ts#L35-L40
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ilm/_types/Phase.ts#L34-L40
 type Phases struct {
 	Cold   *Phase `json:"cold,omitempty"`
 	Delete *Phase `json:"delete,omitempty"`
+	Frozen *Phase `json:"frozen,omitempty"`
 	Hot    *Phase `json:"hot,omitempty"`
 	Warm   *Phase `json:"warm,omitempty"`
 }
 
-// PhasesBuilder holds Phases struct and provides a builder API.
-type PhasesBuilder struct {
-	v *Phases
-}
+// NewPhases returns a Phases.
+func NewPhases() *Phases {
+	r := &Phases{}
 
-// NewPhases provides a builder for the Phases struct.
-func NewPhasesBuilder() *PhasesBuilder {
-	r := PhasesBuilder{
-		&Phases{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the Phases struct
-func (rb *PhasesBuilder) Build() Phases {
-	return *rb.v
-}
-
-func (rb *PhasesBuilder) Cold(cold *PhaseBuilder) *PhasesBuilder {
-	v := cold.Build()
-	rb.v.Cold = &v
-	return rb
-}
-
-func (rb *PhasesBuilder) Delete(delete *PhaseBuilder) *PhasesBuilder {
-	v := delete.Build()
-	rb.v.Delete = &v
-	return rb
-}
-
-func (rb *PhasesBuilder) Hot(hot *PhaseBuilder) *PhasesBuilder {
-	v := hot.Build()
-	rb.v.Hot = &v
-	return rb
-}
-
-func (rb *PhasesBuilder) Warm(warm *PhaseBuilder) *PhasesBuilder {
-	v := warm.Build()
-	rb.v.Warm = &v
-	return rb
+	return r
 }

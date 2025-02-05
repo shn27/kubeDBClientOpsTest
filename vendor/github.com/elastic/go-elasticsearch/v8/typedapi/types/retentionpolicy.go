@@ -15,57 +15,64 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // RetentionPolicy type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/transform/_types/Transform.ts#L88-L96
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/transform/_types/Transform.ts#L88-L96
 type RetentionPolicy struct {
 	// Field The date field that is used to calculate the age of the document.
-	Field Field `json:"field"`
+	Field string `json:"field"`
 	// MaxAge Specifies the maximum age of a document in the destination index. Documents
 	// that are older than the configured
 	// value are removed from the destination index.
 	MaxAge Duration `json:"max_age"`
 }
 
-// RetentionPolicyBuilder holds RetentionPolicy struct and provides a builder API.
-type RetentionPolicyBuilder struct {
-	v *RetentionPolicy
-}
+func (s *RetentionPolicy) UnmarshalJSON(data []byte) error {
 
-// NewRetentionPolicy provides a builder for the RetentionPolicy struct.
-func NewRetentionPolicyBuilder() *RetentionPolicyBuilder {
-	r := RetentionPolicyBuilder{
-		&RetentionPolicy{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "max_age":
+			if err := dec.Decode(&s.MaxAge); err != nil {
+				return fmt.Errorf("%s | %w", "MaxAge", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RetentionPolicy struct
-func (rb *RetentionPolicyBuilder) Build() RetentionPolicy {
-	return *rb.v
-}
+// NewRetentionPolicy returns a RetentionPolicy.
+func NewRetentionPolicy() *RetentionPolicy {
+	r := &RetentionPolicy{}
 
-// Field The date field that is used to calculate the age of the document.
-
-func (rb *RetentionPolicyBuilder) Field(field Field) *RetentionPolicyBuilder {
-	rb.v.Field = field
-	return rb
-}
-
-// MaxAge Specifies the maximum age of a document in the destination index. Documents
-// that are older than the configured
-// value are removed from the destination index.
-
-func (rb *RetentionPolicyBuilder) MaxAge(maxage *DurationBuilder) *RetentionPolicyBuilder {
-	v := maxage.Build()
-	rb.v.MaxAge = v
-	return rb
+	return r
 }

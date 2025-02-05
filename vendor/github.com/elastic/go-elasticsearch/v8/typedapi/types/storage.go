@@ -15,20 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/storagetype"
 )
 
 // Storage type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/IndexSettings.ts#L496-L505
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/IndexSettings.ts#L509-L518
 type Storage struct {
 	// AllowMmap You can restrict the use of the mmapfs and the related hybridfs store type
 	// via the setting node.store.allow_mmap.
@@ -41,39 +46,48 @@ type Storage struct {
 	Type      storagetype.StorageType `json:"type"`
 }
 
-// StorageBuilder holds Storage struct and provides a builder API.
-type StorageBuilder struct {
-	v *Storage
-}
+func (s *Storage) UnmarshalJSON(data []byte) error {
 
-// NewStorage provides a builder for the Storage struct.
-func NewStorageBuilder() *StorageBuilder {
-	r := StorageBuilder{
-		&Storage{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "allow_mmap":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "AllowMmap", err)
+				}
+				s.AllowMmap = &value
+			case bool:
+				s.AllowMmap = &v
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the Storage struct
-func (rb *StorageBuilder) Build() Storage {
-	return *rb.v
-}
+// NewStorage returns a Storage.
+func NewStorage() *Storage {
+	r := &Storage{}
 
-// AllowMmap You can restrict the use of the mmapfs and the related hybridfs store type
-// via the setting node.store.allow_mmap.
-// This is a boolean setting indicating whether or not memory-mapping is
-// allowed. The default is to allow it. This
-// setting is useful, for example, if you are in an environment where you can
-// not control the ability to create a lot
-// of memory maps so you need disable the ability to use memory-mapping.
-
-func (rb *StorageBuilder) AllowMmap(allowmmap bool) *StorageBuilder {
-	rb.v.AllowMmap = &allowmmap
-	return rb
-}
-
-func (rb *StorageBuilder) Type_(type_ storagetype.StorageType) *StorageBuilder {
-	rb.v.Type = type_
-	return rb
+	return r
 }

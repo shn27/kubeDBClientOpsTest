@@ -15,55 +15,77 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // PassThroughInferenceOptions type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/inference.ts#L209-L215
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/inference.ts#L208-L215
 type PassThroughInferenceOptions struct {
 	// ResultsField The field that is added to incoming documents to contain the inference
 	// prediction. Defaults to predicted_value.
 	ResultsField *string `json:"results_field,omitempty"`
 	// Tokenization The tokenization options
 	Tokenization *TokenizationConfigContainer `json:"tokenization,omitempty"`
+	Vocabulary   *Vocabulary                  `json:"vocabulary,omitempty"`
 }
 
-// PassThroughInferenceOptionsBuilder holds PassThroughInferenceOptions struct and provides a builder API.
-type PassThroughInferenceOptionsBuilder struct {
-	v *PassThroughInferenceOptions
-}
+func (s *PassThroughInferenceOptions) UnmarshalJSON(data []byte) error {
 
-// NewPassThroughInferenceOptions provides a builder for the PassThroughInferenceOptions struct.
-func NewPassThroughInferenceOptionsBuilder() *PassThroughInferenceOptionsBuilder {
-	r := PassThroughInferenceOptionsBuilder{
-		&PassThroughInferenceOptions{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "results_field":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ResultsField", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ResultsField = &o
+
+		case "tokenization":
+			if err := dec.Decode(&s.Tokenization); err != nil {
+				return fmt.Errorf("%s | %w", "Tokenization", err)
+			}
+
+		case "vocabulary":
+			if err := dec.Decode(&s.Vocabulary); err != nil {
+				return fmt.Errorf("%s | %w", "Vocabulary", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the PassThroughInferenceOptions struct
-func (rb *PassThroughInferenceOptionsBuilder) Build() PassThroughInferenceOptions {
-	return *rb.v
-}
+// NewPassThroughInferenceOptions returns a PassThroughInferenceOptions.
+func NewPassThroughInferenceOptions() *PassThroughInferenceOptions {
+	r := &PassThroughInferenceOptions{}
 
-// ResultsField The field that is added to incoming documents to contain the inference
-// prediction. Defaults to predicted_value.
-
-func (rb *PassThroughInferenceOptionsBuilder) ResultsField(resultsfield string) *PassThroughInferenceOptionsBuilder {
-	rb.v.ResultsField = &resultsfield
-	return rb
-}
-
-// Tokenization The tokenization options
-
-func (rb *PassThroughInferenceOptionsBuilder) Tokenization(tokenization *TokenizationConfigContainerBuilder) *PassThroughInferenceOptionsBuilder {
-	v := tokenization.Build()
-	rb.v.Tokenization = &v
-	return rb
+	return r
 }

@@ -15,47 +15,60 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // AutoFollowPattern type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ccr/get_auto_follow_pattern/types.ts#L23-L26
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ccr/get_auto_follow_pattern/types.ts#L23-L26
 type AutoFollowPattern struct {
-	Name    Name                     `json:"name"`
+	Name    string                   `json:"name"`
 	Pattern AutoFollowPatternSummary `json:"pattern"`
 }
 
-// AutoFollowPatternBuilder holds AutoFollowPattern struct and provides a builder API.
-type AutoFollowPatternBuilder struct {
-	v *AutoFollowPattern
-}
+func (s *AutoFollowPattern) UnmarshalJSON(data []byte) error {
 
-// NewAutoFollowPattern provides a builder for the AutoFollowPattern struct.
-func NewAutoFollowPatternBuilder() *AutoFollowPatternBuilder {
-	r := AutoFollowPatternBuilder{
-		&AutoFollowPattern{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		case "pattern":
+			if err := dec.Decode(&s.Pattern); err != nil {
+				return fmt.Errorf("%s | %w", "Pattern", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the AutoFollowPattern struct
-func (rb *AutoFollowPatternBuilder) Build() AutoFollowPattern {
-	return *rb.v
-}
+// NewAutoFollowPattern returns a AutoFollowPattern.
+func NewAutoFollowPattern() *AutoFollowPattern {
+	r := &AutoFollowPattern{}
 
-func (rb *AutoFollowPatternBuilder) Name(name Name) *AutoFollowPatternBuilder {
-	rb.v.Name = name
-	return rb
-}
-
-func (rb *AutoFollowPatternBuilder) Pattern(pattern *AutoFollowPatternSummaryBuilder) *AutoFollowPatternBuilder {
-	v := pattern.Build()
-	rb.v.Pattern = v
-	return rb
+	return r
 }

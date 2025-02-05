@@ -15,40 +15,62 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // NodeInfoSettingsTransportFeatures type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/info/types.ts#L208-L210
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/info/types.ts#L219-L221
 type NodeInfoSettingsTransportFeatures struct {
 	XPack string `json:"x-pack"`
 }
 
-// NodeInfoSettingsTransportFeaturesBuilder holds NodeInfoSettingsTransportFeatures struct and provides a builder API.
-type NodeInfoSettingsTransportFeaturesBuilder struct {
-	v *NodeInfoSettingsTransportFeatures
-}
+func (s *NodeInfoSettingsTransportFeatures) UnmarshalJSON(data []byte) error {
 
-// NewNodeInfoSettingsTransportFeatures provides a builder for the NodeInfoSettingsTransportFeatures struct.
-func NewNodeInfoSettingsTransportFeaturesBuilder() *NodeInfoSettingsTransportFeaturesBuilder {
-	r := NodeInfoSettingsTransportFeaturesBuilder{
-		&NodeInfoSettingsTransportFeatures{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "x-pack":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "XPack", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.XPack = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the NodeInfoSettingsTransportFeatures struct
-func (rb *NodeInfoSettingsTransportFeaturesBuilder) Build() NodeInfoSettingsTransportFeatures {
-	return *rb.v
-}
+// NewNodeInfoSettingsTransportFeatures returns a NodeInfoSettingsTransportFeatures.
+func NewNodeInfoSettingsTransportFeatures() *NodeInfoSettingsTransportFeatures {
+	r := &NodeInfoSettingsTransportFeatures{}
 
-func (rb *NodeInfoSettingsTransportFeaturesBuilder) XPack(xpack string) *NodeInfoSettingsTransportFeaturesBuilder {
-	rb.v.XPack = xpack
-	return rb
+	return r
 }

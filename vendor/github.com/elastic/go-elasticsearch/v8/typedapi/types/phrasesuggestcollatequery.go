@@ -15,46 +15,70 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // PhraseSuggestCollateQuery type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/suggester.ts#L183-L186
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/suggester.ts#L348-L357
 type PhraseSuggestCollateQuery struct {
-	Id     *Id     `json:"id,omitempty"`
+	// Id The search template ID.
+	Id *string `json:"id,omitempty"`
+	// Source The query source.
 	Source *string `json:"source,omitempty"`
 }
 
-// PhraseSuggestCollateQueryBuilder holds PhraseSuggestCollateQuery struct and provides a builder API.
-type PhraseSuggestCollateQueryBuilder struct {
-	v *PhraseSuggestCollateQuery
-}
+func (s *PhraseSuggestCollateQuery) UnmarshalJSON(data []byte) error {
 
-// NewPhraseSuggestCollateQuery provides a builder for the PhraseSuggestCollateQuery struct.
-func NewPhraseSuggestCollateQueryBuilder() *PhraseSuggestCollateQueryBuilder {
-	r := PhraseSuggestCollateQueryBuilder{
-		&PhraseSuggestCollateQuery{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "id":
+			if err := dec.Decode(&s.Id); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
+
+		case "source":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Source", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Source = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the PhraseSuggestCollateQuery struct
-func (rb *PhraseSuggestCollateQueryBuilder) Build() PhraseSuggestCollateQuery {
-	return *rb.v
-}
+// NewPhraseSuggestCollateQuery returns a PhraseSuggestCollateQuery.
+func NewPhraseSuggestCollateQuery() *PhraseSuggestCollateQuery {
+	r := &PhraseSuggestCollateQuery{}
 
-func (rb *PhraseSuggestCollateQueryBuilder) Id(id Id) *PhraseSuggestCollateQueryBuilder {
-	rb.v.Id = &id
-	return rb
-}
-
-func (rb *PhraseSuggestCollateQueryBuilder) Source(source string) *PhraseSuggestCollateQueryBuilder {
-	rb.v.Source = &source
-	return rb
+	return r
 }

@@ -15,57 +15,74 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // RerouteExplanation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/reroute/types.ts#L92-L96
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/reroute/types.ts#L92-L96
 type RerouteExplanation struct {
 	Command    string            `json:"command"`
 	Decisions  []RerouteDecision `json:"decisions"`
 	Parameters RerouteParameters `json:"parameters"`
 }
 
-// RerouteExplanationBuilder holds RerouteExplanation struct and provides a builder API.
-type RerouteExplanationBuilder struct {
-	v *RerouteExplanation
-}
+func (s *RerouteExplanation) UnmarshalJSON(data []byte) error {
 
-// NewRerouteExplanation provides a builder for the RerouteExplanation struct.
-func NewRerouteExplanationBuilder() *RerouteExplanationBuilder {
-	r := RerouteExplanationBuilder{
-		&RerouteExplanation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "command":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Command", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Command = o
+
+		case "decisions":
+			if err := dec.Decode(&s.Decisions); err != nil {
+				return fmt.Errorf("%s | %w", "Decisions", err)
+			}
+
+		case "parameters":
+			if err := dec.Decode(&s.Parameters); err != nil {
+				return fmt.Errorf("%s | %w", "Parameters", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RerouteExplanation struct
-func (rb *RerouteExplanationBuilder) Build() RerouteExplanation {
-	return *rb.v
-}
+// NewRerouteExplanation returns a RerouteExplanation.
+func NewRerouteExplanation() *RerouteExplanation {
+	r := &RerouteExplanation{}
 
-func (rb *RerouteExplanationBuilder) Command(command string) *RerouteExplanationBuilder {
-	rb.v.Command = command
-	return rb
-}
-
-func (rb *RerouteExplanationBuilder) Decisions(decisions []RerouteDecisionBuilder) *RerouteExplanationBuilder {
-	tmp := make([]RerouteDecision, len(decisions))
-	for _, value := range decisions {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Decisions = tmp
-	return rb
-}
-
-func (rb *RerouteExplanationBuilder) Parameters(parameters *RerouteParametersBuilder) *RerouteExplanationBuilder {
-	v := parameters.Build()
-	rb.v.Parameters = v
-	return rb
+	return r
 }

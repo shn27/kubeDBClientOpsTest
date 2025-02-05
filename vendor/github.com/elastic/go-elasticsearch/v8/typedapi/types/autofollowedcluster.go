@@ -15,53 +15,66 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // AutoFollowedCluster type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ccr/stats/types.ts.ts#L27-L31
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ccr/stats/types.ts.ts#L26-L30
 type AutoFollowedCluster struct {
-	ClusterName              Name                    `json:"cluster_name"`
-	LastSeenMetadataVersion  VersionNumber           `json:"last_seen_metadata_version"`
-	TimeSinceLastCheckMillis DurationValueUnitMillis `json:"time_since_last_check_millis"`
+	ClusterName              string `json:"cluster_name"`
+	LastSeenMetadataVersion  int64  `json:"last_seen_metadata_version"`
+	TimeSinceLastCheckMillis int64  `json:"time_since_last_check_millis"`
 }
 
-// AutoFollowedClusterBuilder holds AutoFollowedCluster struct and provides a builder API.
-type AutoFollowedClusterBuilder struct {
-	v *AutoFollowedCluster
-}
+func (s *AutoFollowedCluster) UnmarshalJSON(data []byte) error {
 
-// NewAutoFollowedCluster provides a builder for the AutoFollowedCluster struct.
-func NewAutoFollowedClusterBuilder() *AutoFollowedClusterBuilder {
-	r := AutoFollowedClusterBuilder{
-		&AutoFollowedCluster{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "cluster_name":
+			if err := dec.Decode(&s.ClusterName); err != nil {
+				return fmt.Errorf("%s | %w", "ClusterName", err)
+			}
+
+		case "last_seen_metadata_version":
+			if err := dec.Decode(&s.LastSeenMetadataVersion); err != nil {
+				return fmt.Errorf("%s | %w", "LastSeenMetadataVersion", err)
+			}
+
+		case "time_since_last_check_millis":
+			if err := dec.Decode(&s.TimeSinceLastCheckMillis); err != nil {
+				return fmt.Errorf("%s | %w", "TimeSinceLastCheckMillis", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the AutoFollowedCluster struct
-func (rb *AutoFollowedClusterBuilder) Build() AutoFollowedCluster {
-	return *rb.v
-}
+// NewAutoFollowedCluster returns a AutoFollowedCluster.
+func NewAutoFollowedCluster() *AutoFollowedCluster {
+	r := &AutoFollowedCluster{}
 
-func (rb *AutoFollowedClusterBuilder) ClusterName(clustername Name) *AutoFollowedClusterBuilder {
-	rb.v.ClusterName = clustername
-	return rb
-}
-
-func (rb *AutoFollowedClusterBuilder) LastSeenMetadataVersion(lastseenmetadataversion VersionNumber) *AutoFollowedClusterBuilder {
-	rb.v.LastSeenMetadataVersion = lastseenmetadataversion
-	return rb
-}
-
-func (rb *AutoFollowedClusterBuilder) TimeSinceLastCheckMillis(timesincelastcheckmillis *DurationValueUnitMillisBuilder) *AutoFollowedClusterBuilder {
-	v := timesincelastcheckmillis.Build()
-	rb.v.TimeSinceLastCheckMillis = v
-	return rb
+	return r
 }

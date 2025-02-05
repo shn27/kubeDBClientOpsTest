@@ -15,64 +15,112 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
+	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/sourcefieldmode"
+)
+
 // SourceField type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/mapping/meta-fields.ts#L58-L64
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/mapping/meta-fields.ts#L58-L65
 type SourceField struct {
-	Compress          *bool    `json:"compress,omitempty"`
-	CompressThreshold *string  `json:"compress_threshold,omitempty"`
-	Enabled           *bool    `json:"enabled,omitempty"`
-	Excludes          []string `json:"excludes,omitempty"`
-	Includes          []string `json:"includes,omitempty"`
+	Compress          *bool                            `json:"compress,omitempty"`
+	CompressThreshold *string                          `json:"compress_threshold,omitempty"`
+	Enabled           *bool                            `json:"enabled,omitempty"`
+	Excludes          []string                         `json:"excludes,omitempty"`
+	Includes          []string                         `json:"includes,omitempty"`
+	Mode              *sourcefieldmode.SourceFieldMode `json:"mode,omitempty"`
 }
 
-// SourceFieldBuilder holds SourceField struct and provides a builder API.
-type SourceFieldBuilder struct {
-	v *SourceField
-}
+func (s *SourceField) UnmarshalJSON(data []byte) error {
 
-// NewSourceField provides a builder for the SourceField struct.
-func NewSourceFieldBuilder() *SourceFieldBuilder {
-	r := SourceFieldBuilder{
-		&SourceField{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "compress":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Compress", err)
+				}
+				s.Compress = &value
+			case bool:
+				s.Compress = &v
+			}
+
+		case "compress_threshold":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "CompressThreshold", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.CompressThreshold = &o
+
+		case "enabled":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Enabled", err)
+				}
+				s.Enabled = &value
+			case bool:
+				s.Enabled = &v
+			}
+
+		case "excludes":
+			if err := dec.Decode(&s.Excludes); err != nil {
+				return fmt.Errorf("%s | %w", "Excludes", err)
+			}
+
+		case "includes":
+			if err := dec.Decode(&s.Includes); err != nil {
+				return fmt.Errorf("%s | %w", "Includes", err)
+			}
+
+		case "mode":
+			if err := dec.Decode(&s.Mode); err != nil {
+				return fmt.Errorf("%s | %w", "Mode", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SourceField struct
-func (rb *SourceFieldBuilder) Build() SourceField {
-	return *rb.v
-}
+// NewSourceField returns a SourceField.
+func NewSourceField() *SourceField {
+	r := &SourceField{}
 
-func (rb *SourceFieldBuilder) Compress(compress bool) *SourceFieldBuilder {
-	rb.v.Compress = &compress
-	return rb
-}
-
-func (rb *SourceFieldBuilder) CompressThreshold(compressthreshold string) *SourceFieldBuilder {
-	rb.v.CompressThreshold = &compressthreshold
-	return rb
-}
-
-func (rb *SourceFieldBuilder) Enabled(enabled bool) *SourceFieldBuilder {
-	rb.v.Enabled = &enabled
-	return rb
-}
-
-func (rb *SourceFieldBuilder) Excludes(excludes ...string) *SourceFieldBuilder {
-	rb.v.Excludes = excludes
-	return rb
-}
-
-func (rb *SourceFieldBuilder) Includes(includes ...string) *SourceFieldBuilder {
-	rb.v.Includes = includes
-	return rb
+	return r
 }

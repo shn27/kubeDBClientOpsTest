@@ -15,52 +15,100 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DataframeEvaluationSummaryAucRocCurveItem type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/evaluate_data_frame/types.ts#L54-L58
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/evaluate_data_frame/types.ts#L95-L99
 type DataframeEvaluationSummaryAucRocCurveItem struct {
-	Fpr       float64 `json:"fpr"`
-	Threshold float64 `json:"threshold"`
-	Tpr       float64 `json:"tpr"`
+	Fpr       Float64 `json:"fpr"`
+	Threshold Float64 `json:"threshold"`
+	Tpr       Float64 `json:"tpr"`
 }
 
-// DataframeEvaluationSummaryAucRocCurveItemBuilder holds DataframeEvaluationSummaryAucRocCurveItem struct and provides a builder API.
-type DataframeEvaluationSummaryAucRocCurveItemBuilder struct {
-	v *DataframeEvaluationSummaryAucRocCurveItem
-}
+func (s *DataframeEvaluationSummaryAucRocCurveItem) UnmarshalJSON(data []byte) error {
 
-// NewDataframeEvaluationSummaryAucRocCurveItem provides a builder for the DataframeEvaluationSummaryAucRocCurveItem struct.
-func NewDataframeEvaluationSummaryAucRocCurveItemBuilder() *DataframeEvaluationSummaryAucRocCurveItemBuilder {
-	r := DataframeEvaluationSummaryAucRocCurveItemBuilder{
-		&DataframeEvaluationSummaryAucRocCurveItem{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "fpr":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Fpr", err)
+				}
+				f := Float64(value)
+				s.Fpr = f
+			case float64:
+				f := Float64(v)
+				s.Fpr = f
+			}
+
+		case "threshold":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Threshold", err)
+				}
+				f := Float64(value)
+				s.Threshold = f
+			case float64:
+				f := Float64(v)
+				s.Threshold = f
+			}
+
+		case "tpr":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Tpr", err)
+				}
+				f := Float64(value)
+				s.Tpr = f
+			case float64:
+				f := Float64(v)
+				s.Tpr = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DataframeEvaluationSummaryAucRocCurveItem struct
-func (rb *DataframeEvaluationSummaryAucRocCurveItemBuilder) Build() DataframeEvaluationSummaryAucRocCurveItem {
-	return *rb.v
-}
+// NewDataframeEvaluationSummaryAucRocCurveItem returns a DataframeEvaluationSummaryAucRocCurveItem.
+func NewDataframeEvaluationSummaryAucRocCurveItem() *DataframeEvaluationSummaryAucRocCurveItem {
+	r := &DataframeEvaluationSummaryAucRocCurveItem{}
 
-func (rb *DataframeEvaluationSummaryAucRocCurveItemBuilder) Fpr(fpr float64) *DataframeEvaluationSummaryAucRocCurveItemBuilder {
-	rb.v.Fpr = fpr
-	return rb
-}
-
-func (rb *DataframeEvaluationSummaryAucRocCurveItemBuilder) Threshold(threshold float64) *DataframeEvaluationSummaryAucRocCurveItemBuilder {
-	rb.v.Threshold = threshold
-	return rb
-}
-
-func (rb *DataframeEvaluationSummaryAucRocCurveItemBuilder) Tpr(tpr float64) *DataframeEvaluationSummaryAucRocCurveItemBuilder {
-	rb.v.Tpr = tpr
-	return rb
+	return r
 }

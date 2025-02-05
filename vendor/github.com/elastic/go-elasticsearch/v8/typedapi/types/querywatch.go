@@ -15,66 +15,90 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // QueryWatch type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Watch.ts#L58-L64
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Watch.ts#L58-L64
 type QueryWatch struct {
-	Id_          Id              `json:"_id"`
-	PrimaryTerm_ *int            `json:"_primary_term,omitempty"`
-	SeqNo_       *SequenceNumber `json:"_seq_no,omitempty"`
-	Status       *WatchStatus    `json:"status,omitempty"`
-	Watch        *Watch          `json:"watch,omitempty"`
+	Id_          string       `json:"_id"`
+	PrimaryTerm_ *int         `json:"_primary_term,omitempty"`
+	SeqNo_       *int64       `json:"_seq_no,omitempty"`
+	Status       *WatchStatus `json:"status,omitempty"`
+	Watch        *Watch       `json:"watch,omitempty"`
 }
 
-// QueryWatchBuilder holds QueryWatch struct and provides a builder API.
-type QueryWatchBuilder struct {
-	v *QueryWatch
-}
+func (s *QueryWatch) UnmarshalJSON(data []byte) error {
 
-// NewQueryWatch provides a builder for the QueryWatch struct.
-func NewQueryWatchBuilder() *QueryWatchBuilder {
-	r := QueryWatchBuilder{
-		&QueryWatch{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "_id":
+			if err := dec.Decode(&s.Id_); err != nil {
+				return fmt.Errorf("%s | %w", "Id_", err)
+			}
+
+		case "_primary_term":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PrimaryTerm_", err)
+				}
+				s.PrimaryTerm_ = &value
+			case float64:
+				f := int(v)
+				s.PrimaryTerm_ = &f
+			}
+
+		case "_seq_no":
+			if err := dec.Decode(&s.SeqNo_); err != nil {
+				return fmt.Errorf("%s | %w", "SeqNo_", err)
+			}
+
+		case "status":
+			if err := dec.Decode(&s.Status); err != nil {
+				return fmt.Errorf("%s | %w", "Status", err)
+			}
+
+		case "watch":
+			if err := dec.Decode(&s.Watch); err != nil {
+				return fmt.Errorf("%s | %w", "Watch", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the QueryWatch struct
-func (rb *QueryWatchBuilder) Build() QueryWatch {
-	return *rb.v
-}
+// NewQueryWatch returns a QueryWatch.
+func NewQueryWatch() *QueryWatch {
+	r := &QueryWatch{}
 
-func (rb *QueryWatchBuilder) Id_(id_ Id) *QueryWatchBuilder {
-	rb.v.Id_ = id_
-	return rb
-}
-
-func (rb *QueryWatchBuilder) PrimaryTerm_(primaryterm_ int) *QueryWatchBuilder {
-	rb.v.PrimaryTerm_ = &primaryterm_
-	return rb
-}
-
-func (rb *QueryWatchBuilder) SeqNo_(seqno_ SequenceNumber) *QueryWatchBuilder {
-	rb.v.SeqNo_ = &seqno_
-	return rb
-}
-
-func (rb *QueryWatchBuilder) Status(status *WatchStatusBuilder) *QueryWatchBuilder {
-	v := status.Build()
-	rb.v.Status = &v
-	return rb
-}
-
-func (rb *QueryWatchBuilder) Watch(watch *WatchBuilder) *QueryWatchBuilder {
-	v := watch.Build()
-	rb.v.Watch = &v
-	return rb
+	return r
 }

@@ -15,52 +15,90 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ShardSegmentRouting type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/segments/types.ts#L41-L45
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/segments/types.ts#L40-L44
 type ShardSegmentRouting struct {
 	Node    string `json:"node"`
 	Primary bool   `json:"primary"`
 	State   string `json:"state"`
 }
 
-// ShardSegmentRoutingBuilder holds ShardSegmentRouting struct and provides a builder API.
-type ShardSegmentRoutingBuilder struct {
-	v *ShardSegmentRouting
-}
+func (s *ShardSegmentRouting) UnmarshalJSON(data []byte) error {
 
-// NewShardSegmentRouting provides a builder for the ShardSegmentRouting struct.
-func NewShardSegmentRoutingBuilder() *ShardSegmentRoutingBuilder {
-	r := ShardSegmentRoutingBuilder{
-		&ShardSegmentRouting{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "node":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Node", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Node = o
+
+		case "primary":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Primary", err)
+				}
+				s.Primary = value
+			case bool:
+				s.Primary = v
+			}
+
+		case "state":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "State", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.State = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ShardSegmentRouting struct
-func (rb *ShardSegmentRoutingBuilder) Build() ShardSegmentRouting {
-	return *rb.v
-}
+// NewShardSegmentRouting returns a ShardSegmentRouting.
+func NewShardSegmentRouting() *ShardSegmentRouting {
+	r := &ShardSegmentRouting{}
 
-func (rb *ShardSegmentRoutingBuilder) Node(node string) *ShardSegmentRoutingBuilder {
-	rb.v.Node = node
-	return rb
-}
-
-func (rb *ShardSegmentRoutingBuilder) Primary(primary bool) *ShardSegmentRoutingBuilder {
-	rb.v.Primary = primary
-	return rb
-}
-
-func (rb *ShardSegmentRoutingBuilder) State(state string) *ShardSegmentRoutingBuilder {
-	rb.v.State = state
-	return rb
+	return r
 }

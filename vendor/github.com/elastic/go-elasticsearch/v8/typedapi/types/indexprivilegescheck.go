@@ -15,20 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/indexprivilege"
 )
 
 // IndexPrivilegesCheck type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/has_privileges/types.ts#L33-L44
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/has_privileges/types.ts#L33-L44
 type IndexPrivilegesCheck struct {
 	// AllowRestrictedIndices This needs to be set to true (default is false) if using wildcards or regexps
 	// for patterns that cover restricted indices.
@@ -40,55 +45,69 @@ type IndexPrivilegesCheck struct {
 	// allow_restricted_indices.
 	AllowRestrictedIndices *bool `json:"allow_restricted_indices,omitempty"`
 	// Names A list of indices.
-	Names Indices `json:"names"`
+	Names []string `json:"names"`
 	// Privileges A list of the privileges that you want to check for the specified indices.
 	Privileges []indexprivilege.IndexPrivilege `json:"privileges"`
 }
 
-// IndexPrivilegesCheckBuilder holds IndexPrivilegesCheck struct and provides a builder API.
-type IndexPrivilegesCheckBuilder struct {
-	v *IndexPrivilegesCheck
-}
+func (s *IndexPrivilegesCheck) UnmarshalJSON(data []byte) error {
 
-// NewIndexPrivilegesCheck provides a builder for the IndexPrivilegesCheck struct.
-func NewIndexPrivilegesCheckBuilder() *IndexPrivilegesCheckBuilder {
-	r := IndexPrivilegesCheckBuilder{
-		&IndexPrivilegesCheck{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "allow_restricted_indices":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "AllowRestrictedIndices", err)
+				}
+				s.AllowRestrictedIndices = &value
+			case bool:
+				s.AllowRestrictedIndices = &v
+			}
+
+		case "names":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Names", err)
+				}
+
+				s.Names = append(s.Names, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Names); err != nil {
+					return fmt.Errorf("%s | %w", "Names", err)
+				}
+			}
+
+		case "privileges":
+			if err := dec.Decode(&s.Privileges); err != nil {
+				return fmt.Errorf("%s | %w", "Privileges", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the IndexPrivilegesCheck struct
-func (rb *IndexPrivilegesCheckBuilder) Build() IndexPrivilegesCheck {
-	return *rb.v
-}
+// NewIndexPrivilegesCheck returns a IndexPrivilegesCheck.
+func NewIndexPrivilegesCheck() *IndexPrivilegesCheck {
+	r := &IndexPrivilegesCheck{}
 
-// AllowRestrictedIndices This needs to be set to true (default is false) if using wildcards or regexps
-// for patterns that cover restricted indices.
-// Implicitly, restricted indices do not match index patterns because restricted
-// indices usually have limited privileges and including them in pattern tests
-// would render most such tests false.
-// If restricted indices are explicitly included in the names list, privileges
-// will be checked against them regardless of the value of
-// allow_restricted_indices.
-
-func (rb *IndexPrivilegesCheckBuilder) AllowRestrictedIndices(allowrestrictedindices bool) *IndexPrivilegesCheckBuilder {
-	rb.v.AllowRestrictedIndices = &allowrestrictedindices
-	return rb
-}
-
-// Names A list of indices.
-
-func (rb *IndexPrivilegesCheckBuilder) Names(names *IndicesBuilder) *IndexPrivilegesCheckBuilder {
-	v := names.Build()
-	rb.v.Names = v
-	return rb
-}
-
-// Privileges A list of the privileges that you want to check for the specified indices.
-
-func (rb *IndexPrivilegesCheckBuilder) Privileges(privileges ...indexprivilege.IndexPrivilege) *IndexPrivilegesCheckBuilder {
-	rb.v.Privileges = privileges
-	return rb
+	return r
 }

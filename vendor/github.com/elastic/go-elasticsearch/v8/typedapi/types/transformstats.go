@@ -15,73 +15,105 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // TransformStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/transform/get_transform_stats/types.ts#L31-L38
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/transform/get_transform_stats/types.ts#L31-L42
 type TransformStats struct {
 	Checkpointing Checkpointing         `json:"checkpointing"`
-	Id            Id                    `json:"id"`
+	Health        *TransformStatsHealth `json:"health,omitempty"`
+	Id            string                `json:"id"`
 	Node          *NodeAttributes       `json:"node,omitempty"`
 	Reason        *string               `json:"reason,omitempty"`
 	State         string                `json:"state"`
 	Stats         TransformIndexerStats `json:"stats"`
 }
 
-// TransformStatsBuilder holds TransformStats struct and provides a builder API.
-type TransformStatsBuilder struct {
-	v *TransformStats
-}
+func (s *TransformStats) UnmarshalJSON(data []byte) error {
 
-// NewTransformStats provides a builder for the TransformStats struct.
-func NewTransformStatsBuilder() *TransformStatsBuilder {
-	r := TransformStatsBuilder{
-		&TransformStats{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "checkpointing":
+			if err := dec.Decode(&s.Checkpointing); err != nil {
+				return fmt.Errorf("%s | %w", "Checkpointing", err)
+			}
+
+		case "health":
+			if err := dec.Decode(&s.Health); err != nil {
+				return fmt.Errorf("%s | %w", "Health", err)
+			}
+
+		case "id":
+			if err := dec.Decode(&s.Id); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
+
+		case "node":
+			if err := dec.Decode(&s.Node); err != nil {
+				return fmt.Errorf("%s | %w", "Node", err)
+			}
+
+		case "reason":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Reason", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Reason = &o
+
+		case "state":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "State", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.State = o
+
+		case "stats":
+			if err := dec.Decode(&s.Stats); err != nil {
+				return fmt.Errorf("%s | %w", "Stats", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TransformStats struct
-func (rb *TransformStatsBuilder) Build() TransformStats {
-	return *rb.v
-}
+// NewTransformStats returns a TransformStats.
+func NewTransformStats() *TransformStats {
+	r := &TransformStats{}
 
-func (rb *TransformStatsBuilder) Checkpointing(checkpointing *CheckpointingBuilder) *TransformStatsBuilder {
-	v := checkpointing.Build()
-	rb.v.Checkpointing = v
-	return rb
-}
-
-func (rb *TransformStatsBuilder) Id(id Id) *TransformStatsBuilder {
-	rb.v.Id = id
-	return rb
-}
-
-func (rb *TransformStatsBuilder) Node(node *NodeAttributesBuilder) *TransformStatsBuilder {
-	v := node.Build()
-	rb.v.Node = &v
-	return rb
-}
-
-func (rb *TransformStatsBuilder) Reason(reason string) *TransformStatsBuilder {
-	rb.v.Reason = &reason
-	return rb
-}
-
-func (rb *TransformStatsBuilder) State(state string) *TransformStatsBuilder {
-	rb.v.State = state
-	return rb
-}
-
-func (rb *TransformStatsBuilder) Stats(stats *TransformIndexerStatsBuilder) *TransformStatsBuilder {
-	v := stats.Build()
-	rb.v.Stats = v
-	return rb
+	return r
 }

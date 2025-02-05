@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // TrainedModelInferenceStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/TrainedModel.ts#L98-L118
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/TrainedModel.ts#L115-L135
 type TrainedModelInferenceStats struct {
 	// CacheMissCount The number of times the model was loaded for inference and was not retrieved
 	// from the cache.
@@ -42,67 +49,101 @@ type TrainedModelInferenceStats struct {
 	// were missing.
 	MissingAllFieldsCount int `json:"missing_all_fields_count"`
 	// Timestamp The time when the statistics were last updated.
-	Timestamp DateTime `json:"timestamp"`
+	Timestamp int64 `json:"timestamp"`
 }
 
-// TrainedModelInferenceStatsBuilder holds TrainedModelInferenceStats struct and provides a builder API.
-type TrainedModelInferenceStatsBuilder struct {
-	v *TrainedModelInferenceStats
-}
+func (s *TrainedModelInferenceStats) UnmarshalJSON(data []byte) error {
 
-// NewTrainedModelInferenceStats provides a builder for the TrainedModelInferenceStats struct.
-func NewTrainedModelInferenceStatsBuilder() *TrainedModelInferenceStatsBuilder {
-	r := TrainedModelInferenceStatsBuilder{
-		&TrainedModelInferenceStats{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "cache_miss_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CacheMissCount", err)
+				}
+				s.CacheMissCount = value
+			case float64:
+				f := int(v)
+				s.CacheMissCount = f
+			}
+
+		case "failure_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "FailureCount", err)
+				}
+				s.FailureCount = value
+			case float64:
+				f := int(v)
+				s.FailureCount = f
+			}
+
+		case "inference_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "InferenceCount", err)
+				}
+				s.InferenceCount = value
+			case float64:
+				f := int(v)
+				s.InferenceCount = f
+			}
+
+		case "missing_all_fields_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MissingAllFieldsCount", err)
+				}
+				s.MissingAllFieldsCount = value
+			case float64:
+				f := int(v)
+				s.MissingAllFieldsCount = f
+			}
+
+		case "timestamp":
+			if err := dec.Decode(&s.Timestamp); err != nil {
+				return fmt.Errorf("%s | %w", "Timestamp", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the TrainedModelInferenceStats struct
-func (rb *TrainedModelInferenceStatsBuilder) Build() TrainedModelInferenceStats {
-	return *rb.v
-}
+// NewTrainedModelInferenceStats returns a TrainedModelInferenceStats.
+func NewTrainedModelInferenceStats() *TrainedModelInferenceStats {
+	r := &TrainedModelInferenceStats{}
 
-// CacheMissCount The number of times the model was loaded for inference and was not retrieved
-// from the cache.
-// If this number is close to the `inference_count`, the cache is not being
-// appropriately used.
-// This can be solved by increasing the cache size or its time-to-live (TTL).
-// Refer to general machine learning settings for the appropriate settings.
-
-func (rb *TrainedModelInferenceStatsBuilder) CacheMissCount(cachemisscount int) *TrainedModelInferenceStatsBuilder {
-	rb.v.CacheMissCount = cachemisscount
-	return rb
-}
-
-// FailureCount The number of failures when using the model for inference.
-
-func (rb *TrainedModelInferenceStatsBuilder) FailureCount(failurecount int) *TrainedModelInferenceStatsBuilder {
-	rb.v.FailureCount = failurecount
-	return rb
-}
-
-// InferenceCount The total number of times the model has been called for inference.
-// This is across all inference contexts, including all pipelines.
-
-func (rb *TrainedModelInferenceStatsBuilder) InferenceCount(inferencecount int) *TrainedModelInferenceStatsBuilder {
-	rb.v.InferenceCount = inferencecount
-	return rb
-}
-
-// MissingAllFieldsCount The number of inference calls where all the training features for the model
-// were missing.
-
-func (rb *TrainedModelInferenceStatsBuilder) MissingAllFieldsCount(missingallfieldscount int) *TrainedModelInferenceStatsBuilder {
-	rb.v.MissingAllFieldsCount = missingallfieldscount
-	return rb
-}
-
-// Timestamp The time when the statistics were last updated.
-
-func (rb *TrainedModelInferenceStatsBuilder) Timestamp(timestamp *DateTimeBuilder) *TrainedModelInferenceStatsBuilder {
-	v := timestamp.Build()
-	rb.v.Timestamp = v
-	return rb
+	return r
 }

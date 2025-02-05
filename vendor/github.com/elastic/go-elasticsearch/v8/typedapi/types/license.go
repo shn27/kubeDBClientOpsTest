@@ -15,101 +15,149 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/licensetype"
 )
 
 // License type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/license/_types/License.ts#L42-L53
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/license/_types/License.ts#L42-L53
 type License struct {
-	ExpiryDateInMillis EpochTimeUnitMillis     `json:"expiry_date_in_millis"`
-	IssueDateInMillis  EpochTimeUnitMillis     `json:"issue_date_in_millis"`
+	ExpiryDateInMillis int64                   `json:"expiry_date_in_millis"`
+	IssueDateInMillis  int64                   `json:"issue_date_in_millis"`
 	IssuedTo           string                  `json:"issued_to"`
 	Issuer             string                  `json:"issuer"`
-	MaxNodes           int64                   `json:"max_nodes,omitempty"`
+	MaxNodes           *int64                  `json:"max_nodes,omitempty"`
 	MaxResourceUnits   *int64                  `json:"max_resource_units,omitempty"`
 	Signature          string                  `json:"signature"`
-	StartDateInMillis  *EpochTimeUnitMillis    `json:"start_date_in_millis,omitempty"`
+	StartDateInMillis  *int64                  `json:"start_date_in_millis,omitempty"`
 	Type               licensetype.LicenseType `json:"type"`
 	Uid                string                  `json:"uid"`
 }
 
-// LicenseBuilder holds License struct and provides a builder API.
-type LicenseBuilder struct {
-	v *License
-}
+func (s *License) UnmarshalJSON(data []byte) error {
 
-// NewLicense provides a builder for the License struct.
-func NewLicenseBuilder() *LicenseBuilder {
-	r := LicenseBuilder{
-		&License{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "expiry_date_in_millis":
+			if err := dec.Decode(&s.ExpiryDateInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "ExpiryDateInMillis", err)
+			}
+
+		case "issue_date_in_millis":
+			if err := dec.Decode(&s.IssueDateInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "IssueDateInMillis", err)
+			}
+
+		case "issued_to":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "IssuedTo", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.IssuedTo = o
+
+		case "issuer":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Issuer", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Issuer = o
+
+		case "max_nodes":
+			if err := dec.Decode(&s.MaxNodes); err != nil {
+				return fmt.Errorf("%s | %w", "MaxNodes", err)
+			}
+
+		case "max_resource_units":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxResourceUnits", err)
+				}
+				s.MaxResourceUnits = &value
+			case float64:
+				f := int64(v)
+				s.MaxResourceUnits = &f
+			}
+
+		case "signature":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Signature", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Signature = o
+
+		case "start_date_in_millis":
+			if err := dec.Decode(&s.StartDateInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "StartDateInMillis", err)
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "uid":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Uid", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Uid = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the License struct
-func (rb *LicenseBuilder) Build() License {
-	return *rb.v
-}
+// NewLicense returns a License.
+func NewLicense() *License {
+	r := &License{}
 
-func (rb *LicenseBuilder) ExpiryDateInMillis(expirydateinmillis *EpochTimeUnitMillisBuilder) *LicenseBuilder {
-	v := expirydateinmillis.Build()
-	rb.v.ExpiryDateInMillis = v
-	return rb
-}
-
-func (rb *LicenseBuilder) IssueDateInMillis(issuedateinmillis *EpochTimeUnitMillisBuilder) *LicenseBuilder {
-	v := issuedateinmillis.Build()
-	rb.v.IssueDateInMillis = v
-	return rb
-}
-
-func (rb *LicenseBuilder) IssuedTo(issuedto string) *LicenseBuilder {
-	rb.v.IssuedTo = issuedto
-	return rb
-}
-
-func (rb *LicenseBuilder) Issuer(issuer string) *LicenseBuilder {
-	rb.v.Issuer = issuer
-	return rb
-}
-
-func (rb *LicenseBuilder) MaxNodes(maxnodes int64) *LicenseBuilder {
-	rb.v.MaxNodes = maxnodes
-	return rb
-}
-
-func (rb *LicenseBuilder) MaxResourceUnits(maxresourceunits int64) *LicenseBuilder {
-	rb.v.MaxResourceUnits = &maxresourceunits
-	return rb
-}
-
-func (rb *LicenseBuilder) Signature(signature string) *LicenseBuilder {
-	rb.v.Signature = signature
-	return rb
-}
-
-func (rb *LicenseBuilder) StartDateInMillis(startdateinmillis *EpochTimeUnitMillisBuilder) *LicenseBuilder {
-	v := startdateinmillis.Build()
-	rb.v.StartDateInMillis = &v
-	return rb
-}
-
-func (rb *LicenseBuilder) Type_(type_ licensetype.LicenseType) *LicenseBuilder {
-	rb.v.Type = type_
-	return rb
-}
-
-func (rb *LicenseBuilder) Uid(uid string) *LicenseBuilder {
-	rb.v.Uid = uid
-	return rb
+	return r
 }

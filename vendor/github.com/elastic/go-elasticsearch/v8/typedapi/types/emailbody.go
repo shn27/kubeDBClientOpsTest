@@ -15,46 +15,75 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // EmailBody type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Actions.ts#L192-L195
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Actions.ts#L192-L195
 type EmailBody struct {
 	Html *string `json:"html,omitempty"`
 	Text *string `json:"text,omitempty"`
 }
 
-// EmailBodyBuilder holds EmailBody struct and provides a builder API.
-type EmailBodyBuilder struct {
-	v *EmailBody
-}
+func (s *EmailBody) UnmarshalJSON(data []byte) error {
 
-// NewEmailBody provides a builder for the EmailBody struct.
-func NewEmailBodyBuilder() *EmailBodyBuilder {
-	r := EmailBodyBuilder{
-		&EmailBody{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "html":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Html", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Html = &o
+
+		case "text":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Text", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Text = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the EmailBody struct
-func (rb *EmailBodyBuilder) Build() EmailBody {
-	return *rb.v
-}
+// NewEmailBody returns a EmailBody.
+func NewEmailBody() *EmailBody {
+	r := &EmailBody{}
 
-func (rb *EmailBodyBuilder) Html(html string) *EmailBodyBuilder {
-	rb.v.Html = &html
-	return rb
-}
-
-func (rb *EmailBodyBuilder) Text(text string) *EmailBodyBuilder {
-	rb.v.Text = &text
-	return rb
+	return r
 }

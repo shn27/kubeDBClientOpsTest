@@ -15,53 +15,55 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // NestedAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/bucket.ts#L277-L279
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/bucket.ts#L655-L660
 type NestedAggregation struct {
-	Meta *Metadata `json:"meta,omitempty"`
-	Name *string   `json:"name,omitempty"`
-	Path *Field    `json:"path,omitempty"`
+	// Path The path to the field of type `nested`.
+	Path *string `json:"path,omitempty"`
 }
 
-// NestedAggregationBuilder holds NestedAggregation struct and provides a builder API.
-type NestedAggregationBuilder struct {
-	v *NestedAggregation
-}
+func (s *NestedAggregation) UnmarshalJSON(data []byte) error {
 
-// NewNestedAggregation provides a builder for the NestedAggregation struct.
-func NewNestedAggregationBuilder() *NestedAggregationBuilder {
-	r := NestedAggregationBuilder{
-		&NestedAggregation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "path":
+			if err := dec.Decode(&s.Path); err != nil {
+				return fmt.Errorf("%s | %w", "Path", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the NestedAggregation struct
-func (rb *NestedAggregationBuilder) Build() NestedAggregation {
-	return *rb.v
-}
+// NewNestedAggregation returns a NestedAggregation.
+func NewNestedAggregation() *NestedAggregation {
+	r := &NestedAggregation{}
 
-func (rb *NestedAggregationBuilder) Meta(meta *MetadataBuilder) *NestedAggregationBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *NestedAggregationBuilder) Name(name string) *NestedAggregationBuilder {
-	rb.v.Name = &name
-	return rb
-}
-
-func (rb *NestedAggregationBuilder) Path(path Field) *NestedAggregationBuilder {
-	rb.v.Path = &path
-	return rb
+	return r
 }

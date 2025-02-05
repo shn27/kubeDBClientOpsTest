@@ -15,84 +15,101 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+
+	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/noderole"
+)
+
 // ReindexNode type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/reindex_rethrottle/types.ts#L33-L35
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/reindex_rethrottle/types.ts#L33-L35
 type ReindexNode struct {
 	Attributes       map[string]string      `json:"attributes"`
-	Host             Host                   `json:"host"`
-	Ip               Ip                     `json:"ip"`
-	Name             Name                   `json:"name"`
-	Roles            *NodeRoles             `json:"roles,omitempty"`
-	Tasks            map[TaskId]ReindexTask `json:"tasks"`
-	TransportAddress TransportAddress       `json:"transport_address"`
+	Host             string                 `json:"host"`
+	Ip               string                 `json:"ip"`
+	Name             string                 `json:"name"`
+	Roles            []noderole.NodeRole    `json:"roles,omitempty"`
+	Tasks            map[string]ReindexTask `json:"tasks"`
+	TransportAddress string                 `json:"transport_address"`
 }
 
-// ReindexNodeBuilder holds ReindexNode struct and provides a builder API.
-type ReindexNodeBuilder struct {
-	v *ReindexNode
+func (s *ReindexNode) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "attributes":
+			if s.Attributes == nil {
+				s.Attributes = make(map[string]string, 0)
+			}
+			if err := dec.Decode(&s.Attributes); err != nil {
+				return fmt.Errorf("%s | %w", "Attributes", err)
+			}
+
+		case "host":
+			if err := dec.Decode(&s.Host); err != nil {
+				return fmt.Errorf("%s | %w", "Host", err)
+			}
+
+		case "ip":
+			if err := dec.Decode(&s.Ip); err != nil {
+				return fmt.Errorf("%s | %w", "Ip", err)
+			}
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		case "roles":
+			if err := dec.Decode(&s.Roles); err != nil {
+				return fmt.Errorf("%s | %w", "Roles", err)
+			}
+
+		case "tasks":
+			if s.Tasks == nil {
+				s.Tasks = make(map[string]ReindexTask, 0)
+			}
+			if err := dec.Decode(&s.Tasks); err != nil {
+				return fmt.Errorf("%s | %w", "Tasks", err)
+			}
+
+		case "transport_address":
+			if err := dec.Decode(&s.TransportAddress); err != nil {
+				return fmt.Errorf("%s | %w", "TransportAddress", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewReindexNode provides a builder for the ReindexNode struct.
-func NewReindexNodeBuilder() *ReindexNodeBuilder {
-	r := ReindexNodeBuilder{
-		&ReindexNode{
-			Attributes: make(map[string]string, 0),
-			Tasks:      make(map[TaskId]ReindexTask, 0),
-		},
+// NewReindexNode returns a ReindexNode.
+func NewReindexNode() *ReindexNode {
+	r := &ReindexNode{
+		Attributes: make(map[string]string, 0),
+		Tasks:      make(map[string]ReindexTask, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the ReindexNode struct
-func (rb *ReindexNodeBuilder) Build() ReindexNode {
-	return *rb.v
-}
-
-func (rb *ReindexNodeBuilder) Attributes(value map[string]string) *ReindexNodeBuilder {
-	rb.v.Attributes = value
-	return rb
-}
-
-func (rb *ReindexNodeBuilder) Host(host Host) *ReindexNodeBuilder {
-	rb.v.Host = host
-	return rb
-}
-
-func (rb *ReindexNodeBuilder) Ip(ip Ip) *ReindexNodeBuilder {
-	rb.v.Ip = ip
-	return rb
-}
-
-func (rb *ReindexNodeBuilder) Name(name Name) *ReindexNodeBuilder {
-	rb.v.Name = name
-	return rb
-}
-
-func (rb *ReindexNodeBuilder) Roles(roles *NodeRolesBuilder) *ReindexNodeBuilder {
-	v := roles.Build()
-	rb.v.Roles = &v
-	return rb
-}
-
-func (rb *ReindexNodeBuilder) Tasks(values map[TaskId]*ReindexTaskBuilder) *ReindexNodeBuilder {
-	tmp := make(map[TaskId]ReindexTask, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Tasks = tmp
-	return rb
-}
-
-func (rb *ReindexNodeBuilder) TransportAddress(transportaddress TransportAddress) *ReindexNodeBuilder {
-	rb.v.TransportAddress = transportaddress
-	return rb
+	return r
 }

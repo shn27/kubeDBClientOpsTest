@@ -15,73 +15,114 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/actionstatusoptions"
 )
 
 // PipelineSimulation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ingest/simulate/types.ts#L31-L37
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ingest/simulate/types.ts#L52-L60
 type PipelineSimulation struct {
-	Doc              *DocumentSimulation                      `json:"doc,omitempty"`
-	ProcessorResults []PipelineSimulation                     `json:"processor_results,omitempty"`
-	ProcessorType    *string                                  `json:"processor_type,omitempty"`
-	Status           *actionstatusoptions.ActionStatusOptions `json:"status,omitempty"`
-	Tag              *string                                  `json:"tag,omitempty"`
+	Description   *string                                  `json:"description,omitempty"`
+	Doc           *DocumentSimulation                      `json:"doc,omitempty"`
+	Error         *ErrorCause                              `json:"error,omitempty"`
+	IgnoredError  *ErrorCause                              `json:"ignored_error,omitempty"`
+	ProcessorType *string                                  `json:"processor_type,omitempty"`
+	Status        *actionstatusoptions.ActionStatusOptions `json:"status,omitempty"`
+	Tag           *string                                  `json:"tag,omitempty"`
 }
 
-// PipelineSimulationBuilder holds PipelineSimulation struct and provides a builder API.
-type PipelineSimulationBuilder struct {
-	v *PipelineSimulation
-}
+func (s *PipelineSimulation) UnmarshalJSON(data []byte) error {
 
-// NewPipelineSimulation provides a builder for the PipelineSimulation struct.
-func NewPipelineSimulationBuilder() *PipelineSimulationBuilder {
-	r := PipelineSimulationBuilder{
-		&PipelineSimulation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "description":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Description", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Description = &o
+
+		case "doc":
+			if err := dec.Decode(&s.Doc); err != nil {
+				return fmt.Errorf("%s | %w", "Doc", err)
+			}
+
+		case "error":
+			if err := dec.Decode(&s.Error); err != nil {
+				return fmt.Errorf("%s | %w", "Error", err)
+			}
+
+		case "ignored_error":
+			if err := dec.Decode(&s.IgnoredError); err != nil {
+				return fmt.Errorf("%s | %w", "IgnoredError", err)
+			}
+
+		case "processor_type":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ProcessorType", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ProcessorType = &o
+
+		case "status":
+			if err := dec.Decode(&s.Status); err != nil {
+				return fmt.Errorf("%s | %w", "Status", err)
+			}
+
+		case "tag":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Tag", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Tag = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the PipelineSimulation struct
-func (rb *PipelineSimulationBuilder) Build() PipelineSimulation {
-	return *rb.v
-}
+// NewPipelineSimulation returns a PipelineSimulation.
+func NewPipelineSimulation() *PipelineSimulation {
+	r := &PipelineSimulation{}
 
-func (rb *PipelineSimulationBuilder) Doc(doc *DocumentSimulationBuilder) *PipelineSimulationBuilder {
-	v := doc.Build()
-	rb.v.Doc = &v
-	return rb
-}
-
-func (rb *PipelineSimulationBuilder) ProcessorResults(processor_results []PipelineSimulationBuilder) *PipelineSimulationBuilder {
-	tmp := make([]PipelineSimulation, len(processor_results))
-	for _, value := range processor_results {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.ProcessorResults = tmp
-	return rb
-}
-
-func (rb *PipelineSimulationBuilder) ProcessorType(processortype string) *PipelineSimulationBuilder {
-	rb.v.ProcessorType = &processortype
-	return rb
-}
-
-func (rb *PipelineSimulationBuilder) Status(status actionstatusoptions.ActionStatusOptions) *PipelineSimulationBuilder {
-	rb.v.Status = &status
-	return rb
-}
-
-func (rb *PipelineSimulationBuilder) Tag(tag string) *PipelineSimulationBuilder {
-	rb.v.Tag = &tag
-	return rb
+	return r
 }

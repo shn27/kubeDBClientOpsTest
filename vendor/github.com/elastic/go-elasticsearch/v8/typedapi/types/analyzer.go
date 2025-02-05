@@ -15,128 +15,63 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // Analyzer holds the union for the following types:
 //
 //	CustomAnalyzer
-//	DutchAnalyzer
 //	FingerprintAnalyzer
-//	IcuAnalyzer
 //	KeywordAnalyzer
-//	KuromojiAnalyzer
 //	LanguageAnalyzer
 //	NoriAnalyzer
 //	PatternAnalyzer
 //	SimpleAnalyzer
-//	SnowballAnalyzer
 //	StandardAnalyzer
 //	StopAnalyzer
 //	WhitespaceAnalyzer
+//	IcuAnalyzer
+//	KuromojiAnalyzer
+//	SnowballAnalyzer
+//	ArabicAnalyzer
+//	ArmenianAnalyzer
+//	BasqueAnalyzer
+//	BengaliAnalyzer
+//	BrazilianAnalyzer
+//	BulgarianAnalyzer
+//	CatalanAnalyzer
+//	ChineseAnalyzer
+//	CjkAnalyzer
+//	CzechAnalyzer
+//	DanishAnalyzer
+//	DutchAnalyzer
+//	EnglishAnalyzer
+//	EstonianAnalyzer
+//	FinnishAnalyzer
+//	FrenchAnalyzer
+//	GalicianAnalyzer
+//	GermanAnalyzer
+//	GreekAnalyzer
+//	HindiAnalyzer
+//	HungarianAnalyzer
+//	IndonesianAnalyzer
+//	IrishAnalyzer
+//	ItalianAnalyzer
+//	LatvianAnalyzer
+//	LithuanianAnalyzer
+//	NorwegianAnalyzer
+//	PersianAnalyzer
+//	PortugueseAnalyzer
+//	RomanianAnalyzer
+//	RussianAnalyzer
+//	SerbianAnalyzer
+//	SoraniAnalyzer
+//	SpanishAnalyzer
+//	SwedishAnalyzer
+//	TurkishAnalyzer
+//	ThaiAnalyzer
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/analyzers.ts#L113-L131
-type Analyzer interface{}
-
-// AnalyzerBuilder holds Analyzer struct and provides a builder API.
-type AnalyzerBuilder struct {
-	v Analyzer
-}
-
-// NewAnalyzer provides a builder for the Analyzer struct.
-func NewAnalyzerBuilder() *AnalyzerBuilder {
-	return &AnalyzerBuilder{}
-}
-
-// Build finalize the chain and returns the Analyzer struct
-func (u *AnalyzerBuilder) Build() Analyzer {
-	return u.v
-}
-
-func (u *AnalyzerBuilder) CustomAnalyzer(customanalyzer *CustomAnalyzerBuilder) *AnalyzerBuilder {
-	v := customanalyzer.Build()
-	u.v = &v
-	return u
-}
-
-func (u *AnalyzerBuilder) DutchAnalyzer(dutchanalyzer *DutchAnalyzerBuilder) *AnalyzerBuilder {
-	v := dutchanalyzer.Build()
-	u.v = &v
-	return u
-}
-
-func (u *AnalyzerBuilder) FingerprintAnalyzer(fingerprintanalyzer *FingerprintAnalyzerBuilder) *AnalyzerBuilder {
-	v := fingerprintanalyzer.Build()
-	u.v = &v
-	return u
-}
-
-func (u *AnalyzerBuilder) IcuAnalyzer(icuanalyzer *IcuAnalyzerBuilder) *AnalyzerBuilder {
-	v := icuanalyzer.Build()
-	u.v = &v
-	return u
-}
-
-func (u *AnalyzerBuilder) KeywordAnalyzer(keywordanalyzer *KeywordAnalyzerBuilder) *AnalyzerBuilder {
-	v := keywordanalyzer.Build()
-	u.v = &v
-	return u
-}
-
-func (u *AnalyzerBuilder) KuromojiAnalyzer(kuromojianalyzer *KuromojiAnalyzerBuilder) *AnalyzerBuilder {
-	v := kuromojianalyzer.Build()
-	u.v = &v
-	return u
-}
-
-func (u *AnalyzerBuilder) LanguageAnalyzer(languageanalyzer *LanguageAnalyzerBuilder) *AnalyzerBuilder {
-	v := languageanalyzer.Build()
-	u.v = &v
-	return u
-}
-
-func (u *AnalyzerBuilder) NoriAnalyzer(norianalyzer *NoriAnalyzerBuilder) *AnalyzerBuilder {
-	v := norianalyzer.Build()
-	u.v = &v
-	return u
-}
-
-func (u *AnalyzerBuilder) PatternAnalyzer(patternanalyzer *PatternAnalyzerBuilder) *AnalyzerBuilder {
-	v := patternanalyzer.Build()
-	u.v = &v
-	return u
-}
-
-func (u *AnalyzerBuilder) SimpleAnalyzer(simpleanalyzer *SimpleAnalyzerBuilder) *AnalyzerBuilder {
-	v := simpleanalyzer.Build()
-	u.v = &v
-	return u
-}
-
-func (u *AnalyzerBuilder) SnowballAnalyzer(snowballanalyzer *SnowballAnalyzerBuilder) *AnalyzerBuilder {
-	v := snowballanalyzer.Build()
-	u.v = &v
-	return u
-}
-
-func (u *AnalyzerBuilder) StandardAnalyzer(standardanalyzer *StandardAnalyzerBuilder) *AnalyzerBuilder {
-	v := standardanalyzer.Build()
-	u.v = &v
-	return u
-}
-
-func (u *AnalyzerBuilder) StopAnalyzer(stopanalyzer *StopAnalyzerBuilder) *AnalyzerBuilder {
-	v := stopanalyzer.Build()
-	u.v = &v
-	return u
-}
-
-func (u *AnalyzerBuilder) WhitespaceAnalyzer(whitespaceanalyzer *WhitespaceAnalyzerBuilder) *AnalyzerBuilder {
-	v := whitespaceanalyzer.Build()
-	u.v = &v
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/analyzers.ts#L359-L413
+type Analyzer any

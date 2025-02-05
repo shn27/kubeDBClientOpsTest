@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // Monitoring type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/usage/types.ts#L370-L373
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/xpack/usage/types.ts#L379-L382
 type Monitoring struct {
 	Available         bool             `json:"available"`
 	CollectionEnabled bool             `json:"collection_enabled"`
@@ -32,43 +39,81 @@ type Monitoring struct {
 	EnabledExporters  map[string]int64 `json:"enabled_exporters"`
 }
 
-// MonitoringBuilder holds Monitoring struct and provides a builder API.
-type MonitoringBuilder struct {
-	v *Monitoring
+func (s *Monitoring) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "available":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Available", err)
+				}
+				s.Available = value
+			case bool:
+				s.Available = v
+			}
+
+		case "collection_enabled":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CollectionEnabled", err)
+				}
+				s.CollectionEnabled = value
+			case bool:
+				s.CollectionEnabled = v
+			}
+
+		case "enabled":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Enabled", err)
+				}
+				s.Enabled = value
+			case bool:
+				s.Enabled = v
+			}
+
+		case "enabled_exporters":
+			if s.EnabledExporters == nil {
+				s.EnabledExporters = make(map[string]int64, 0)
+			}
+			if err := dec.Decode(&s.EnabledExporters); err != nil {
+				return fmt.Errorf("%s | %w", "EnabledExporters", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewMonitoring provides a builder for the Monitoring struct.
-func NewMonitoringBuilder() *MonitoringBuilder {
-	r := MonitoringBuilder{
-		&Monitoring{
-			EnabledExporters: make(map[string]int64, 0),
-		},
+// NewMonitoring returns a Monitoring.
+func NewMonitoring() *Monitoring {
+	r := &Monitoring{
+		EnabledExporters: make(map[string]int64, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the Monitoring struct
-func (rb *MonitoringBuilder) Build() Monitoring {
-	return *rb.v
-}
-
-func (rb *MonitoringBuilder) Available(available bool) *MonitoringBuilder {
-	rb.v.Available = available
-	return rb
-}
-
-func (rb *MonitoringBuilder) CollectionEnabled(collectionenabled bool) *MonitoringBuilder {
-	rb.v.CollectionEnabled = collectionenabled
-	return rb
-}
-
-func (rb *MonitoringBuilder) Enabled(enabled bool) *MonitoringBuilder {
-	rb.v.Enabled = enabled
-	return rb
-}
-
-func (rb *MonitoringBuilder) EnabledExporters(value map[string]int64) *MonitoringBuilder {
-	rb.v.EnabledExporters = value
-	return rb
+	return r
 }

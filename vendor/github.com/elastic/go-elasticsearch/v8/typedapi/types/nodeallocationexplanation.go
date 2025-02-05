@@ -15,93 +15,122 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/decision"
+	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/noderole"
 )
 
 // NodeAllocationExplanation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/allocation_explain/types.ts#L97-L106
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/allocation_explain/types.ts#L103-L117
 type NodeAllocationExplanation struct {
 	Deciders         []AllocationDecision `json:"deciders"`
 	NodeAttributes   map[string]string    `json:"node_attributes"`
 	NodeDecision     decision.Decision    `json:"node_decision"`
-	NodeId           Id                   `json:"node_id"`
-	NodeName         Name                 `json:"node_name"`
+	NodeId           string               `json:"node_id"`
+	NodeName         string               `json:"node_name"`
+	Roles            []noderole.NodeRole  `json:"roles"`
 	Store            *AllocationStore     `json:"store,omitempty"`
-	TransportAddress TransportAddress     `json:"transport_address"`
+	TransportAddress string               `json:"transport_address"`
 	WeightRanking    int                  `json:"weight_ranking"`
 }
 
-// NodeAllocationExplanationBuilder holds NodeAllocationExplanation struct and provides a builder API.
-type NodeAllocationExplanationBuilder struct {
-	v *NodeAllocationExplanation
+func (s *NodeAllocationExplanation) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "deciders":
+			if err := dec.Decode(&s.Deciders); err != nil {
+				return fmt.Errorf("%s | %w", "Deciders", err)
+			}
+
+		case "node_attributes":
+			if s.NodeAttributes == nil {
+				s.NodeAttributes = make(map[string]string, 0)
+			}
+			if err := dec.Decode(&s.NodeAttributes); err != nil {
+				return fmt.Errorf("%s | %w", "NodeAttributes", err)
+			}
+
+		case "node_decision":
+			if err := dec.Decode(&s.NodeDecision); err != nil {
+				return fmt.Errorf("%s | %w", "NodeDecision", err)
+			}
+
+		case "node_id":
+			if err := dec.Decode(&s.NodeId); err != nil {
+				return fmt.Errorf("%s | %w", "NodeId", err)
+			}
+
+		case "node_name":
+			if err := dec.Decode(&s.NodeName); err != nil {
+				return fmt.Errorf("%s | %w", "NodeName", err)
+			}
+
+		case "roles":
+			if err := dec.Decode(&s.Roles); err != nil {
+				return fmt.Errorf("%s | %w", "Roles", err)
+			}
+
+		case "store":
+			if err := dec.Decode(&s.Store); err != nil {
+				return fmt.Errorf("%s | %w", "Store", err)
+			}
+
+		case "transport_address":
+			if err := dec.Decode(&s.TransportAddress); err != nil {
+				return fmt.Errorf("%s | %w", "TransportAddress", err)
+			}
+
+		case "weight_ranking":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "WeightRanking", err)
+				}
+				s.WeightRanking = value
+			case float64:
+				f := int(v)
+				s.WeightRanking = f
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewNodeAllocationExplanation provides a builder for the NodeAllocationExplanation struct.
-func NewNodeAllocationExplanationBuilder() *NodeAllocationExplanationBuilder {
-	r := NodeAllocationExplanationBuilder{
-		&NodeAllocationExplanation{
-			NodeAttributes: make(map[string]string, 0),
-		},
+// NewNodeAllocationExplanation returns a NodeAllocationExplanation.
+func NewNodeAllocationExplanation() *NodeAllocationExplanation {
+	r := &NodeAllocationExplanation{
+		NodeAttributes: make(map[string]string, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the NodeAllocationExplanation struct
-func (rb *NodeAllocationExplanationBuilder) Build() NodeAllocationExplanation {
-	return *rb.v
-}
-
-func (rb *NodeAllocationExplanationBuilder) Deciders(deciders []AllocationDecisionBuilder) *NodeAllocationExplanationBuilder {
-	tmp := make([]AllocationDecision, len(deciders))
-	for _, value := range deciders {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Deciders = tmp
-	return rb
-}
-
-func (rb *NodeAllocationExplanationBuilder) NodeAttributes(value map[string]string) *NodeAllocationExplanationBuilder {
-	rb.v.NodeAttributes = value
-	return rb
-}
-
-func (rb *NodeAllocationExplanationBuilder) NodeDecision(nodedecision decision.Decision) *NodeAllocationExplanationBuilder {
-	rb.v.NodeDecision = nodedecision
-	return rb
-}
-
-func (rb *NodeAllocationExplanationBuilder) NodeId(nodeid Id) *NodeAllocationExplanationBuilder {
-	rb.v.NodeId = nodeid
-	return rb
-}
-
-func (rb *NodeAllocationExplanationBuilder) NodeName(nodename Name) *NodeAllocationExplanationBuilder {
-	rb.v.NodeName = nodename
-	return rb
-}
-
-func (rb *NodeAllocationExplanationBuilder) Store(store *AllocationStoreBuilder) *NodeAllocationExplanationBuilder {
-	v := store.Build()
-	rb.v.Store = &v
-	return rb
-}
-
-func (rb *NodeAllocationExplanationBuilder) TransportAddress(transportaddress TransportAddress) *NodeAllocationExplanationBuilder {
-	rb.v.TransportAddress = transportaddress
-	return rb
-}
-
-func (rb *NodeAllocationExplanationBuilder) WeightRanking(weightranking int) *NodeAllocationExplanationBuilder {
-	rb.v.WeightRanking = weightranking
-	return rb
+	return r
 }

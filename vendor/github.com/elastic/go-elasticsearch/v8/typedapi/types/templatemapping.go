@@ -15,78 +15,105 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // TemplateMapping type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/TemplateMapping.ts#L27-L34
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/TemplateMapping.ts#L27-L34
 type TemplateMapping struct {
-	Aliases       map[IndexName]Alias    `json:"aliases"`
-	IndexPatterns []Name                 `json:"index_patterns"`
-	Mappings      TypeMapping            `json:"mappings"`
-	Order         int                    `json:"order"`
-	Settings      map[string]interface{} `json:"settings"`
-	Version       *VersionNumber         `json:"version,omitempty"`
+	Aliases       map[string]Alias           `json:"aliases"`
+	IndexPatterns []string                   `json:"index_patterns"`
+	Mappings      TypeMapping                `json:"mappings"`
+	Order         int                        `json:"order"`
+	Settings      map[string]json.RawMessage `json:"settings"`
+	Version       *int64                     `json:"version,omitempty"`
 }
 
-// TemplateMappingBuilder holds TemplateMapping struct and provides a builder API.
-type TemplateMappingBuilder struct {
-	v *TemplateMapping
+func (s *TemplateMapping) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "aliases":
+			if s.Aliases == nil {
+				s.Aliases = make(map[string]Alias, 0)
+			}
+			if err := dec.Decode(&s.Aliases); err != nil {
+				return fmt.Errorf("%s | %w", "Aliases", err)
+			}
+
+		case "index_patterns":
+			if err := dec.Decode(&s.IndexPatterns); err != nil {
+				return fmt.Errorf("%s | %w", "IndexPatterns", err)
+			}
+
+		case "mappings":
+			if err := dec.Decode(&s.Mappings); err != nil {
+				return fmt.Errorf("%s | %w", "Mappings", err)
+			}
+
+		case "order":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Order", err)
+				}
+				s.Order = value
+			case float64:
+				f := int(v)
+				s.Order = f
+			}
+
+		case "settings":
+			if s.Settings == nil {
+				s.Settings = make(map[string]json.RawMessage, 0)
+			}
+			if err := dec.Decode(&s.Settings); err != nil {
+				return fmt.Errorf("%s | %w", "Settings", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewTemplateMapping provides a builder for the TemplateMapping struct.
-func NewTemplateMappingBuilder() *TemplateMappingBuilder {
-	r := TemplateMappingBuilder{
-		&TemplateMapping{
-			Aliases:  make(map[IndexName]Alias, 0),
-			Settings: make(map[string]interface{}, 0),
-		},
+// NewTemplateMapping returns a TemplateMapping.
+func NewTemplateMapping() *TemplateMapping {
+	r := &TemplateMapping{
+		Aliases:  make(map[string]Alias, 0),
+		Settings: make(map[string]json.RawMessage, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the TemplateMapping struct
-func (rb *TemplateMappingBuilder) Build() TemplateMapping {
-	return *rb.v
-}
-
-func (rb *TemplateMappingBuilder) Aliases(values map[IndexName]*AliasBuilder) *TemplateMappingBuilder {
-	tmp := make(map[IndexName]Alias, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Aliases = tmp
-	return rb
-}
-
-func (rb *TemplateMappingBuilder) IndexPatterns(index_patterns ...Name) *TemplateMappingBuilder {
-	rb.v.IndexPatterns = index_patterns
-	return rb
-}
-
-func (rb *TemplateMappingBuilder) Mappings(mappings *TypeMappingBuilder) *TemplateMappingBuilder {
-	v := mappings.Build()
-	rb.v.Mappings = v
-	return rb
-}
-
-func (rb *TemplateMappingBuilder) Order(order int) *TemplateMappingBuilder {
-	rb.v.Order = order
-	return rb
-}
-
-func (rb *TemplateMappingBuilder) Settings(value map[string]interface{}) *TemplateMappingBuilder {
-	rb.v.Settings = value
-	return rb
-}
-
-func (rb *TemplateMappingBuilder) Version(version VersionNumber) *TemplateMappingBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

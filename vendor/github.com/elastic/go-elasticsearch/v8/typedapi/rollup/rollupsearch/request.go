@@ -15,49 +15,46 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package rollupsearch
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"strconv"
 
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 )
 
 // Request holds the request body struct for the package rollupsearch
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/rollup/rollup_search/RollupSearchRequest.ts#L27-L47
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/rollup/rollup_search/RollupSearchRequest.ts#L27-L57
 type Request struct {
-	Aggregations map[string]types.AggregationContainer `json:"aggregations,omitempty"`
 
-	Query *types.QueryContainer `json:"query,omitempty"`
-
-	// Size Must be zero if set, as rollups work on pre-aggregated data
+	// Aggregations Specifies aggregations.
+	Aggregations map[string]types.Aggregations `json:"aggregations,omitempty"`
+	// Query Specifies a DSL query.
+	Query *types.Query `json:"query,omitempty"`
+	// Size Must be zero if set, as rollups work on pre-aggregated data.
 	Size *int `json:"size,omitempty"`
 }
 
-// RequestBuilder is the builder API for the rollupsearch.Request
-type RequestBuilder struct {
-	v *Request
-}
-
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{
-			Aggregations: make(map[string]types.AggregationContainer, 0),
-		},
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{
+		Aggregations: make(map[string]types.Aggregations, 0),
 	}
-	return &r
+
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -68,27 +65,50 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) Aggregations(values map[string]*types.AggregationContainerBuilder) *RequestBuilder {
-	tmp := make(map[string]types.AggregationContainer, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "aggregations", "aggs":
+			if s.Aggregations == nil {
+				s.Aggregations = make(map[string]types.Aggregations, 0)
+			}
+			if err := dec.Decode(&s.Aggregations); err != nil {
+				return fmt.Errorf("%s | %w", "Aggregations", err)
+			}
+
+		case "query":
+			if err := dec.Decode(&s.Query); err != nil {
+				return fmt.Errorf("%s | %w", "Query", err)
+			}
+
+		case "size":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Size", err)
+				}
+				s.Size = &value
+			case float64:
+				f := int(v)
+				s.Size = &f
+			}
+
+		}
 	}
-	rb.v.Aggregations = tmp
-	return rb
-}
-
-func (rb *RequestBuilder) Query(query *types.QueryContainerBuilder) *RequestBuilder {
-	v := query.Build()
-	rb.v.Query = &v
-	return rb
-}
-
-func (rb *RequestBuilder) Size(size int) *RequestBuilder {
-	rb.v.Size = &size
-	return rb
+	return nil
 }

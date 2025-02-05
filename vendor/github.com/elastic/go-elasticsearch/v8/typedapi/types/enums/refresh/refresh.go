@@ -15,19 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package refresh
 package refresh
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/common.ts#L233-L240
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/common.ts#L267-L274
 type Refresh struct {
-	name string
+	Name string
 }
 
 var (
@@ -38,12 +36,16 @@ var (
 	Waitfor = Refresh{"wait_for"}
 )
 
+func (r *Refresh) UnmarshalJSON(data []byte) error {
+	return r.UnmarshalText(data)
+}
+
 func (r Refresh) MarshalText() (text []byte, err error) {
 	return []byte(r.String()), nil
 }
 
 func (r *Refresh) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
 	case "true":
 		*r = True
@@ -59,5 +61,5 @@ func (r *Refresh) UnmarshalText(text []byte) error {
 }
 
 func (r Refresh) String() string {
-	return r.name
+	return r.Name
 }

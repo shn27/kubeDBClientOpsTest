@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // RankEvalMetricPrecision type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/rank_eval/types.ts#L42-L52
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/rank_eval/types.ts#L42-L52
 type RankEvalMetricPrecision struct {
 	// IgnoreUnlabeled Controls how unlabeled documents in the search results are counted. If set to
 	// true, unlabeled documents are ignored and neither count as relevant or
@@ -38,46 +45,75 @@ type RankEvalMetricPrecision struct {
 	RelevantRatingThreshold *int `json:"relevant_rating_threshold,omitempty"`
 }
 
-// RankEvalMetricPrecisionBuilder holds RankEvalMetricPrecision struct and provides a builder API.
-type RankEvalMetricPrecisionBuilder struct {
-	v *RankEvalMetricPrecision
-}
+func (s *RankEvalMetricPrecision) UnmarshalJSON(data []byte) error {
 
-// NewRankEvalMetricPrecision provides a builder for the RankEvalMetricPrecision struct.
-func NewRankEvalMetricPrecisionBuilder() *RankEvalMetricPrecisionBuilder {
-	r := RankEvalMetricPrecisionBuilder{
-		&RankEvalMetricPrecision{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "ignore_unlabeled":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IgnoreUnlabeled", err)
+				}
+				s.IgnoreUnlabeled = &value
+			case bool:
+				s.IgnoreUnlabeled = &v
+			}
+
+		case "k":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "K", err)
+				}
+				s.K = &value
+			case float64:
+				f := int(v)
+				s.K = &f
+			}
+
+		case "relevant_rating_threshold":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "RelevantRatingThreshold", err)
+				}
+				s.RelevantRatingThreshold = &value
+			case float64:
+				f := int(v)
+				s.RelevantRatingThreshold = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RankEvalMetricPrecision struct
-func (rb *RankEvalMetricPrecisionBuilder) Build() RankEvalMetricPrecision {
-	return *rb.v
-}
+// NewRankEvalMetricPrecision returns a RankEvalMetricPrecision.
+func NewRankEvalMetricPrecision() *RankEvalMetricPrecision {
+	r := &RankEvalMetricPrecision{}
 
-// IgnoreUnlabeled Controls how unlabeled documents in the search results are counted. If set to
-// true, unlabeled documents are ignored and neither count as relevant or
-// irrelevant. Set to false (the default), they are treated as irrelevant.
-
-func (rb *RankEvalMetricPrecisionBuilder) IgnoreUnlabeled(ignoreunlabeled bool) *RankEvalMetricPrecisionBuilder {
-	rb.v.IgnoreUnlabeled = &ignoreunlabeled
-	return rb
-}
-
-// K Sets the maximum number of documents retrieved per query. This value will act
-// in place of the usual size parameter in the query.
-
-func (rb *RankEvalMetricPrecisionBuilder) K(k int) *RankEvalMetricPrecisionBuilder {
-	rb.v.K = &k
-	return rb
-}
-
-// RelevantRatingThreshold Sets the rating threshold above which documents are considered to be
-// "relevant".
-
-func (rb *RankEvalMetricPrecisionBuilder) RelevantRatingThreshold(relevantratingthreshold int) *RankEvalMetricPrecisionBuilder {
-	rb.v.RelevantRatingThreshold = &relevantratingthreshold
-	return rb
+	return r
 }

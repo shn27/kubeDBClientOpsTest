@@ -15,20 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/dataframestate"
 )
 
 // DataframeAnalytics type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/DataframeAnalytics.ts#L324-L341
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/DataframeAnalytics.ts#L325-L345
 type DataframeAnalytics struct {
 	// AnalysisStats An object containing information about the analysis job.
 	AnalysisStats *DataframeAnalyticsStatsContainer `json:"analysis_stats,omitempty"`
@@ -39,7 +44,7 @@ type DataframeAnalytics struct {
 	// training, or available for testing.
 	DataCounts DataframeAnalyticsStatsDataCounts `json:"data_counts"`
 	// Id The unique identifier of the data frame analytics job.
-	Id Id `json:"id"`
+	Id string `json:"id"`
 	// MemoryUsage An object describing memory usage of the analytics. It is present only after
 	// the job is started and memory usage is reported.
 	MemoryUsage DataframeAnalyticsStatsMemoryUsage `json:"memory_usage"`
@@ -53,90 +58,76 @@ type DataframeAnalytics struct {
 	State dataframestate.DataframeState `json:"state"`
 }
 
-// DataframeAnalyticsBuilder holds DataframeAnalytics struct and provides a builder API.
-type DataframeAnalyticsBuilder struct {
-	v *DataframeAnalytics
-}
+func (s *DataframeAnalytics) UnmarshalJSON(data []byte) error {
 
-// NewDataframeAnalytics provides a builder for the DataframeAnalytics struct.
-func NewDataframeAnalyticsBuilder() *DataframeAnalyticsBuilder {
-	r := DataframeAnalyticsBuilder{
-		&DataframeAnalytics{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "analysis_stats":
+			if err := dec.Decode(&s.AnalysisStats); err != nil {
+				return fmt.Errorf("%s | %w", "AnalysisStats", err)
+			}
+
+		case "assignment_explanation":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "AssignmentExplanation", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.AssignmentExplanation = &o
+
+		case "data_counts":
+			if err := dec.Decode(&s.DataCounts); err != nil {
+				return fmt.Errorf("%s | %w", "DataCounts", err)
+			}
+
+		case "id":
+			if err := dec.Decode(&s.Id); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
+
+		case "memory_usage":
+			if err := dec.Decode(&s.MemoryUsage); err != nil {
+				return fmt.Errorf("%s | %w", "MemoryUsage", err)
+			}
+
+		case "node":
+			if err := dec.Decode(&s.Node); err != nil {
+				return fmt.Errorf("%s | %w", "Node", err)
+			}
+
+		case "progress":
+			if err := dec.Decode(&s.Progress); err != nil {
+				return fmt.Errorf("%s | %w", "Progress", err)
+			}
+
+		case "state":
+			if err := dec.Decode(&s.State); err != nil {
+				return fmt.Errorf("%s | %w", "State", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DataframeAnalytics struct
-func (rb *DataframeAnalyticsBuilder) Build() DataframeAnalytics {
-	return *rb.v
-}
+// NewDataframeAnalytics returns a DataframeAnalytics.
+func NewDataframeAnalytics() *DataframeAnalytics {
+	r := &DataframeAnalytics{}
 
-// AnalysisStats An object containing information about the analysis job.
-
-func (rb *DataframeAnalyticsBuilder) AnalysisStats(analysisstats *DataframeAnalyticsStatsContainerBuilder) *DataframeAnalyticsBuilder {
-	v := analysisstats.Build()
-	rb.v.AnalysisStats = &v
-	return rb
-}
-
-// AssignmentExplanation For running jobs only, contains messages relating to the selection of a node
-// to run the job.
-
-func (rb *DataframeAnalyticsBuilder) AssignmentExplanation(assignmentexplanation string) *DataframeAnalyticsBuilder {
-	rb.v.AssignmentExplanation = &assignmentexplanation
-	return rb
-}
-
-// DataCounts An object that provides counts for the quantity of documents skipped, used in
-// training, or available for testing.
-
-func (rb *DataframeAnalyticsBuilder) DataCounts(datacounts *DataframeAnalyticsStatsDataCountsBuilder) *DataframeAnalyticsBuilder {
-	v := datacounts.Build()
-	rb.v.DataCounts = v
-	return rb
-}
-
-// Id The unique identifier of the data frame analytics job.
-
-func (rb *DataframeAnalyticsBuilder) Id(id Id) *DataframeAnalyticsBuilder {
-	rb.v.Id = id
-	return rb
-}
-
-// MemoryUsage An object describing memory usage of the analytics. It is present only after
-// the job is started and memory usage is reported.
-
-func (rb *DataframeAnalyticsBuilder) MemoryUsage(memoryusage *DataframeAnalyticsStatsMemoryUsageBuilder) *DataframeAnalyticsBuilder {
-	v := memoryusage.Build()
-	rb.v.MemoryUsage = v
-	return rb
-}
-
-// Node Contains properties for the node that runs the job. This information is
-// available only for running jobs.
-
-func (rb *DataframeAnalyticsBuilder) Node(node *NodeAttributesBuilder) *DataframeAnalyticsBuilder {
-	v := node.Build()
-	rb.v.Node = &v
-	return rb
-}
-
-// Progress The progress report of the data frame analytics job by phase.
-
-func (rb *DataframeAnalyticsBuilder) Progress(progress []DataframeAnalyticsStatsProgressBuilder) *DataframeAnalyticsBuilder {
-	tmp := make([]DataframeAnalyticsStatsProgress, len(progress))
-	for _, value := range progress {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Progress = tmp
-	return rb
-}
-
-// State The status of the data frame analytics job, which can be one of the following
-// values: failed, started, starting, stopping, stopped.
-
-func (rb *DataframeAnalyticsBuilder) State(state dataframestate.DataframeState) *DataframeAnalyticsBuilder {
-	rb.v.State = state
-	return rb
+	return r
 }

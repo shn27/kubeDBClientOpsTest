@@ -15,47 +15,70 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ScriptField type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Scripting.ts#L59-L62
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Scripting.ts#L99-L102
 type ScriptField struct {
 	IgnoreFailure *bool  `json:"ignore_failure,omitempty"`
 	Script        Script `json:"script"`
 }
 
-// ScriptFieldBuilder holds ScriptField struct and provides a builder API.
-type ScriptFieldBuilder struct {
-	v *ScriptField
-}
+func (s *ScriptField) UnmarshalJSON(data []byte) error {
 
-// NewScriptField provides a builder for the ScriptField struct.
-func NewScriptFieldBuilder() *ScriptFieldBuilder {
-	r := ScriptFieldBuilder{
-		&ScriptField{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "ignore_failure":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IgnoreFailure", err)
+				}
+				s.IgnoreFailure = &value
+			case bool:
+				s.IgnoreFailure = &v
+			}
+
+		case "script":
+			if err := dec.Decode(&s.Script); err != nil {
+				return fmt.Errorf("%s | %w", "Script", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ScriptField struct
-func (rb *ScriptFieldBuilder) Build() ScriptField {
-	return *rb.v
-}
+// NewScriptField returns a ScriptField.
+func NewScriptField() *ScriptField {
+	r := &ScriptField{}
 
-func (rb *ScriptFieldBuilder) IgnoreFailure(ignorefailure bool) *ScriptFieldBuilder {
-	rb.v.IgnoreFailure = &ignorefailure
-	return rb
-}
-
-func (rb *ScriptFieldBuilder) Script(script *ScriptBuilder) *ScriptFieldBuilder {
-	v := script.Build()
-	rb.v.Script = v
-	return rb
+	return r
 }

@@ -15,34 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // ScrollIds type alias.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/common.ts#L43-L43
-type ScrollIds []ScrollId
-
-// ScrollIdsBuilder holds ScrollIds struct and provides a builder API.
-type ScrollIdsBuilder struct {
-	v ScrollIds
-}
-
-// NewScrollIds provides a builder for the ScrollIds struct.
-func NewScrollIdsBuilder() *ScrollIdsBuilder {
-	return &ScrollIdsBuilder{}
-}
-
-// Build finalize the chain and returns the ScrollIds struct
-func (b *ScrollIdsBuilder) Build() ScrollIds {
-	return b.v
-}
-
-func (b *ScrollIdsBuilder) ScrollIds(value ScrollIds) *ScrollIdsBuilder {
-	b.v = value
-	return b
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/common.ts#L56-L56
+type ScrollIds []string

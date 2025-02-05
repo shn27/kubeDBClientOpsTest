@@ -15,50 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // BucketsLongRareTermsBucket holds the union for the following types:
 //
-//	[]LongRareTermsBucket
 //	map[string]LongRareTermsBucket
+//	[]LongRareTermsBucket
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L303-L312
-type BucketsLongRareTermsBucket interface{}
-
-// BucketsLongRareTermsBucketBuilder holds BucketsLongRareTermsBucket struct and provides a builder API.
-type BucketsLongRareTermsBucketBuilder struct {
-	v BucketsLongRareTermsBucket
-}
-
-// NewBucketsLongRareTermsBucket provides a builder for the BucketsLongRareTermsBucket struct.
-func NewBucketsLongRareTermsBucketBuilder() *BucketsLongRareTermsBucketBuilder {
-	return &BucketsLongRareTermsBucketBuilder{}
-}
-
-// Build finalize the chain and returns the BucketsLongRareTermsBucket struct
-func (u *BucketsLongRareTermsBucketBuilder) Build() BucketsLongRareTermsBucket {
-	return u.v
-}
-
-func (u *BucketsLongRareTermsBucketBuilder) LongRareTermsBuckets(longraretermsbuckets []LongRareTermsBucketBuilder) *BucketsLongRareTermsBucketBuilder {
-	tmp := make([]LongRareTermsBucket, len(longraretermsbuckets))
-	for _, value := range longraretermsbuckets {
-		tmp = append(tmp, value.Build())
-	}
-	u.v = tmp
-	return u
-}
-
-func (u *BucketsLongRareTermsBucketBuilder) Map(values map[string]*LongRareTermsBucketBuilder) *BucketsLongRareTermsBucketBuilder {
-	tmp := make(map[string]LongRareTermsBucket, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	u.v = tmp
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L346-L355
+type BucketsLongRareTermsBucket any

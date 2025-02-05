@@ -15,89 +15,180 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/synonymformat"
 )
 
 // SynonymGraphTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L109-L118
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L109-L119
 type SynonymGraphTokenFilter struct {
 	Expand       *bool                        `json:"expand,omitempty"`
 	Format       *synonymformat.SynonymFormat `json:"format,omitempty"`
 	Lenient      *bool                        `json:"lenient,omitempty"`
 	Synonyms     []string                     `json:"synonyms,omitempty"`
 	SynonymsPath *string                      `json:"synonyms_path,omitempty"`
+	SynonymsSet  *string                      `json:"synonyms_set,omitempty"`
 	Tokenizer    *string                      `json:"tokenizer,omitempty"`
 	Type         string                       `json:"type,omitempty"`
 	Updateable   *bool                        `json:"updateable,omitempty"`
-	Version      *VersionString               `json:"version,omitempty"`
+	Version      *string                      `json:"version,omitempty"`
 }
 
-// SynonymGraphTokenFilterBuilder holds SynonymGraphTokenFilter struct and provides a builder API.
-type SynonymGraphTokenFilterBuilder struct {
-	v *SynonymGraphTokenFilter
+func (s *SynonymGraphTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "expand":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Expand", err)
+				}
+				s.Expand = &value
+			case bool:
+				s.Expand = &v
+			}
+
+		case "format":
+			if err := dec.Decode(&s.Format); err != nil {
+				return fmt.Errorf("%s | %w", "Format", err)
+			}
+
+		case "lenient":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Lenient", err)
+				}
+				s.Lenient = &value
+			case bool:
+				s.Lenient = &v
+			}
+
+		case "synonyms":
+			if err := dec.Decode(&s.Synonyms); err != nil {
+				return fmt.Errorf("%s | %w", "Synonyms", err)
+			}
+
+		case "synonyms_path":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SynonymsPath", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SynonymsPath = &o
+
+		case "synonyms_set":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "SynonymsSet", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.SynonymsSet = &o
+
+		case "tokenizer":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Tokenizer", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Tokenizer = &o
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "updateable":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Updateable", err)
+				}
+				s.Updateable = &value
+			case bool:
+				s.Updateable = &v
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewSynonymGraphTokenFilter provides a builder for the SynonymGraphTokenFilter struct.
-func NewSynonymGraphTokenFilterBuilder() *SynonymGraphTokenFilterBuilder {
-	r := SynonymGraphTokenFilterBuilder{
-		&SynonymGraphTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s SynonymGraphTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerSynonymGraphTokenFilter SynonymGraphTokenFilter
+	tmp := innerSynonymGraphTokenFilter{
+		Expand:       s.Expand,
+		Format:       s.Format,
+		Lenient:      s.Lenient,
+		Synonyms:     s.Synonyms,
+		SynonymsPath: s.SynonymsPath,
+		SynonymsSet:  s.SynonymsSet,
+		Tokenizer:    s.Tokenizer,
+		Type:         s.Type,
+		Updateable:   s.Updateable,
+		Version:      s.Version,
 	}
 
-	r.v.Type = "synonym_graph"
+	tmp.Type = "synonym_graph"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the SynonymGraphTokenFilter struct
-func (rb *SynonymGraphTokenFilterBuilder) Build() SynonymGraphTokenFilter {
-	return *rb.v
-}
+// NewSynonymGraphTokenFilter returns a SynonymGraphTokenFilter.
+func NewSynonymGraphTokenFilter() *SynonymGraphTokenFilter {
+	r := &SynonymGraphTokenFilter{}
 
-func (rb *SynonymGraphTokenFilterBuilder) Expand(expand bool) *SynonymGraphTokenFilterBuilder {
-	rb.v.Expand = &expand
-	return rb
-}
-
-func (rb *SynonymGraphTokenFilterBuilder) Format(format synonymformat.SynonymFormat) *SynonymGraphTokenFilterBuilder {
-	rb.v.Format = &format
-	return rb
-}
-
-func (rb *SynonymGraphTokenFilterBuilder) Lenient(lenient bool) *SynonymGraphTokenFilterBuilder {
-	rb.v.Lenient = &lenient
-	return rb
-}
-
-func (rb *SynonymGraphTokenFilterBuilder) Synonyms(synonyms ...string) *SynonymGraphTokenFilterBuilder {
-	rb.v.Synonyms = synonyms
-	return rb
-}
-
-func (rb *SynonymGraphTokenFilterBuilder) SynonymsPath(synonymspath string) *SynonymGraphTokenFilterBuilder {
-	rb.v.SynonymsPath = &synonymspath
-	return rb
-}
-
-func (rb *SynonymGraphTokenFilterBuilder) Tokenizer(tokenizer string) *SynonymGraphTokenFilterBuilder {
-	rb.v.Tokenizer = &tokenizer
-	return rb
-}
-
-func (rb *SynonymGraphTokenFilterBuilder) Updateable(updateable bool) *SynonymGraphTokenFilterBuilder {
-	rb.v.Updateable = &updateable
-	return rb
-}
-
-func (rb *SynonymGraphTokenFilterBuilder) Version(version VersionString) *SynonymGraphTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

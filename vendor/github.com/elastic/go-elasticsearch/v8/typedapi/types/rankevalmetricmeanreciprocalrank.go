@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // RankEvalMetricMeanReciprocalRank type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/rank_eval/types.ts#L60-L64
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/rank_eval/types.ts#L60-L64
 type RankEvalMetricMeanReciprocalRank struct {
 	// K Sets the maximum number of documents retrieved per query. This value will act
 	// in place of the usual size parameter in the query.
@@ -34,37 +41,61 @@ type RankEvalMetricMeanReciprocalRank struct {
 	RelevantRatingThreshold *int `json:"relevant_rating_threshold,omitempty"`
 }
 
-// RankEvalMetricMeanReciprocalRankBuilder holds RankEvalMetricMeanReciprocalRank struct and provides a builder API.
-type RankEvalMetricMeanReciprocalRankBuilder struct {
-	v *RankEvalMetricMeanReciprocalRank
-}
+func (s *RankEvalMetricMeanReciprocalRank) UnmarshalJSON(data []byte) error {
 
-// NewRankEvalMetricMeanReciprocalRank provides a builder for the RankEvalMetricMeanReciprocalRank struct.
-func NewRankEvalMetricMeanReciprocalRankBuilder() *RankEvalMetricMeanReciprocalRankBuilder {
-	r := RankEvalMetricMeanReciprocalRankBuilder{
-		&RankEvalMetricMeanReciprocalRank{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "k":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "K", err)
+				}
+				s.K = &value
+			case float64:
+				f := int(v)
+				s.K = &f
+			}
+
+		case "relevant_rating_threshold":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "RelevantRatingThreshold", err)
+				}
+				s.RelevantRatingThreshold = &value
+			case float64:
+				f := int(v)
+				s.RelevantRatingThreshold = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the RankEvalMetricMeanReciprocalRank struct
-func (rb *RankEvalMetricMeanReciprocalRankBuilder) Build() RankEvalMetricMeanReciprocalRank {
-	return *rb.v
-}
+// NewRankEvalMetricMeanReciprocalRank returns a RankEvalMetricMeanReciprocalRank.
+func NewRankEvalMetricMeanReciprocalRank() *RankEvalMetricMeanReciprocalRank {
+	r := &RankEvalMetricMeanReciprocalRank{}
 
-// K Sets the maximum number of documents retrieved per query. This value will act
-// in place of the usual size parameter in the query.
-
-func (rb *RankEvalMetricMeanReciprocalRankBuilder) K(k int) *RankEvalMetricMeanReciprocalRankBuilder {
-	rb.v.K = &k
-	return rb
-}
-
-// RelevantRatingThreshold Sets the rating threshold above which documents are considered to be
-// "relevant".
-
-func (rb *RankEvalMetricMeanReciprocalRankBuilder) RelevantRatingThreshold(relevantratingthreshold int) *RankEvalMetricMeanReciprocalRankBuilder {
-	rb.v.RelevantRatingThreshold = &relevantratingthreshold
-	return rb
+	return r
 }

@@ -15,34 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // NodeIds type alias.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/common.ts#L51-L51
-type NodeIds []NodeId
-
-// NodeIdsBuilder holds NodeIds struct and provides a builder API.
-type NodeIdsBuilder struct {
-	v NodeIds
-}
-
-// NewNodeIds provides a builder for the NodeIds struct.
-func NewNodeIdsBuilder() *NodeIdsBuilder {
-	return &NodeIdsBuilder{}
-}
-
-// Build finalize the chain and returns the NodeIds struct
-func (b *NodeIdsBuilder) Build() NodeIds {
-	return b.v
-}
-
-func (b *NodeIdsBuilder) NodeIds(value NodeIds) *NodeIdsBuilder {
-	b.v = value
-	return b
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/common.ts#L64-L64
+type NodeIds []string

@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // QuestionAnsweringInferenceOptions type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/inference.ts#L245-L255
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/inference.ts#L270-L280
 type QuestionAnsweringInferenceOptions struct {
 	// MaxAnswerLength The maximum answer length to consider
 	MaxAnswerLength *int `json:"max_answer_length,omitempty"`
@@ -37,51 +44,78 @@ type QuestionAnsweringInferenceOptions struct {
 	Tokenization *TokenizationConfigContainer `json:"tokenization,omitempty"`
 }
 
-// QuestionAnsweringInferenceOptionsBuilder holds QuestionAnsweringInferenceOptions struct and provides a builder API.
-type QuestionAnsweringInferenceOptionsBuilder struct {
-	v *QuestionAnsweringInferenceOptions
-}
+func (s *QuestionAnsweringInferenceOptions) UnmarshalJSON(data []byte) error {
 
-// NewQuestionAnsweringInferenceOptions provides a builder for the QuestionAnsweringInferenceOptions struct.
-func NewQuestionAnsweringInferenceOptionsBuilder() *QuestionAnsweringInferenceOptionsBuilder {
-	r := QuestionAnsweringInferenceOptionsBuilder{
-		&QuestionAnsweringInferenceOptions{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "max_answer_length":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxAnswerLength", err)
+				}
+				s.MaxAnswerLength = &value
+			case float64:
+				f := int(v)
+				s.MaxAnswerLength = &f
+			}
+
+		case "num_top_classes":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NumTopClasses", err)
+				}
+				s.NumTopClasses = &value
+			case float64:
+				f := int(v)
+				s.NumTopClasses = &f
+			}
+
+		case "results_field":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ResultsField", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ResultsField = &o
+
+		case "tokenization":
+			if err := dec.Decode(&s.Tokenization); err != nil {
+				return fmt.Errorf("%s | %w", "Tokenization", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the QuestionAnsweringInferenceOptions struct
-func (rb *QuestionAnsweringInferenceOptionsBuilder) Build() QuestionAnsweringInferenceOptions {
-	return *rb.v
-}
+// NewQuestionAnsweringInferenceOptions returns a QuestionAnsweringInferenceOptions.
+func NewQuestionAnsweringInferenceOptions() *QuestionAnsweringInferenceOptions {
+	r := &QuestionAnsweringInferenceOptions{}
 
-// MaxAnswerLength The maximum answer length to consider
-
-func (rb *QuestionAnsweringInferenceOptionsBuilder) MaxAnswerLength(maxanswerlength int) *QuestionAnsweringInferenceOptionsBuilder {
-	rb.v.MaxAnswerLength = &maxanswerlength
-	return rb
-}
-
-// NumTopClasses Specifies the number of top class predictions to return. Defaults to 0.
-
-func (rb *QuestionAnsweringInferenceOptionsBuilder) NumTopClasses(numtopclasses int) *QuestionAnsweringInferenceOptionsBuilder {
-	rb.v.NumTopClasses = &numtopclasses
-	return rb
-}
-
-// ResultsField The field that is added to incoming documents to contain the inference
-// prediction. Defaults to predicted_value.
-
-func (rb *QuestionAnsweringInferenceOptionsBuilder) ResultsField(resultsfield string) *QuestionAnsweringInferenceOptionsBuilder {
-	rb.v.ResultsField = &resultsfield
-	return rb
-}
-
-// Tokenization The tokenization options to update when inferring
-
-func (rb *QuestionAnsweringInferenceOptionsBuilder) Tokenization(tokenization *TokenizationConfigContainerBuilder) *QuestionAnsweringInferenceOptionsBuilder {
-	v := tokenization.Build()
-	rb.v.Tokenization = &v
-	return rb
+	return r
 }

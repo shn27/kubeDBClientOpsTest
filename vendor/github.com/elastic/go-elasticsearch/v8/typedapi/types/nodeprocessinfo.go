@@ -15,62 +15,89 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // NodeProcessInfo type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/info/types.ts#L383-L390
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/info/types.ts#L399-L406
 type NodeProcessInfo struct {
 	// Id Process identifier (PID)
 	Id int64 `json:"id"`
 	// Mlockall Indicates if the process address space has been successfully locked in memory
 	Mlockall bool `json:"mlockall"`
 	// RefreshIntervalInMillis Refresh interval for the process statistics
-	RefreshIntervalInMillis DurationValueUnitMillis `json:"refresh_interval_in_millis"`
+	RefreshIntervalInMillis int64 `json:"refresh_interval_in_millis"`
 }
 
-// NodeProcessInfoBuilder holds NodeProcessInfo struct and provides a builder API.
-type NodeProcessInfoBuilder struct {
-	v *NodeProcessInfo
-}
+func (s *NodeProcessInfo) UnmarshalJSON(data []byte) error {
 
-// NewNodeProcessInfo provides a builder for the NodeProcessInfo struct.
-func NewNodeProcessInfoBuilder() *NodeProcessInfoBuilder {
-	r := NodeProcessInfoBuilder{
-		&NodeProcessInfo{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "id":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Id", err)
+				}
+				s.Id = value
+			case float64:
+				f := int64(v)
+				s.Id = f
+			}
+
+		case "mlockall":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Mlockall", err)
+				}
+				s.Mlockall = value
+			case bool:
+				s.Mlockall = v
+			}
+
+		case "refresh_interval_in_millis":
+			if err := dec.Decode(&s.RefreshIntervalInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "RefreshIntervalInMillis", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the NodeProcessInfo struct
-func (rb *NodeProcessInfoBuilder) Build() NodeProcessInfo {
-	return *rb.v
-}
+// NewNodeProcessInfo returns a NodeProcessInfo.
+func NewNodeProcessInfo() *NodeProcessInfo {
+	r := &NodeProcessInfo{}
 
-// Id Process identifier (PID)
-
-func (rb *NodeProcessInfoBuilder) Id(id int64) *NodeProcessInfoBuilder {
-	rb.v.Id = id
-	return rb
-}
-
-// Mlockall Indicates if the process address space has been successfully locked in memory
-
-func (rb *NodeProcessInfoBuilder) Mlockall(mlockall bool) *NodeProcessInfoBuilder {
-	rb.v.Mlockall = mlockall
-	return rb
-}
-
-// RefreshIntervalInMillis Refresh interval for the process statistics
-
-func (rb *NodeProcessInfoBuilder) RefreshIntervalInMillis(refreshintervalinmillis *DurationValueUnitMillisBuilder) *NodeProcessInfoBuilder {
-	v := refreshintervalinmillis.Build()
-	rb.v.RefreshIntervalInMillis = v
-	return rb
+	return r
 }

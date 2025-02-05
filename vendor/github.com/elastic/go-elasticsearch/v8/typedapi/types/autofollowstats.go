@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // AutoFollowStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ccr/stats/types.ts.ts#L33-L39
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ccr/stats/types.ts.ts#L32-L38
 type AutoFollowStats struct {
 	AutoFollowedClusters                     []AutoFollowedCluster `json:"auto_followed_clusters"`
 	NumberOfFailedFollowIndices              int64                 `json:"number_of_failed_follow_indices"`
@@ -33,54 +40,84 @@ type AutoFollowStats struct {
 	RecentAutoFollowErrors                   []ErrorCause          `json:"recent_auto_follow_errors"`
 }
 
-// AutoFollowStatsBuilder holds AutoFollowStats struct and provides a builder API.
-type AutoFollowStatsBuilder struct {
-	v *AutoFollowStats
-}
+func (s *AutoFollowStats) UnmarshalJSON(data []byte) error {
 
-// NewAutoFollowStats provides a builder for the AutoFollowStats struct.
-func NewAutoFollowStatsBuilder() *AutoFollowStatsBuilder {
-	r := AutoFollowStatsBuilder{
-		&AutoFollowStats{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "auto_followed_clusters":
+			if err := dec.Decode(&s.AutoFollowedClusters); err != nil {
+				return fmt.Errorf("%s | %w", "AutoFollowedClusters", err)
+			}
+
+		case "number_of_failed_follow_indices":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NumberOfFailedFollowIndices", err)
+				}
+				s.NumberOfFailedFollowIndices = value
+			case float64:
+				f := int64(v)
+				s.NumberOfFailedFollowIndices = f
+			}
+
+		case "number_of_failed_remote_cluster_state_requests":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NumberOfFailedRemoteClusterStateRequests", err)
+				}
+				s.NumberOfFailedRemoteClusterStateRequests = value
+			case float64:
+				f := int64(v)
+				s.NumberOfFailedRemoteClusterStateRequests = f
+			}
+
+		case "number_of_successful_follow_indices":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NumberOfSuccessfulFollowIndices", err)
+				}
+				s.NumberOfSuccessfulFollowIndices = value
+			case float64:
+				f := int64(v)
+				s.NumberOfSuccessfulFollowIndices = f
+			}
+
+		case "recent_auto_follow_errors":
+			if err := dec.Decode(&s.RecentAutoFollowErrors); err != nil {
+				return fmt.Errorf("%s | %w", "RecentAutoFollowErrors", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the AutoFollowStats struct
-func (rb *AutoFollowStatsBuilder) Build() AutoFollowStats {
-	return *rb.v
-}
+// NewAutoFollowStats returns a AutoFollowStats.
+func NewAutoFollowStats() *AutoFollowStats {
+	r := &AutoFollowStats{}
 
-func (rb *AutoFollowStatsBuilder) AutoFollowedClusters(auto_followed_clusters []AutoFollowedClusterBuilder) *AutoFollowStatsBuilder {
-	tmp := make([]AutoFollowedCluster, len(auto_followed_clusters))
-	for _, value := range auto_followed_clusters {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.AutoFollowedClusters = tmp
-	return rb
-}
-
-func (rb *AutoFollowStatsBuilder) NumberOfFailedFollowIndices(numberoffailedfollowindices int64) *AutoFollowStatsBuilder {
-	rb.v.NumberOfFailedFollowIndices = numberoffailedfollowindices
-	return rb
-}
-
-func (rb *AutoFollowStatsBuilder) NumberOfFailedRemoteClusterStateRequests(numberoffailedremoteclusterstaterequests int64) *AutoFollowStatsBuilder {
-	rb.v.NumberOfFailedRemoteClusterStateRequests = numberoffailedremoteclusterstaterequests
-	return rb
-}
-
-func (rb *AutoFollowStatsBuilder) NumberOfSuccessfulFollowIndices(numberofsuccessfulfollowindices int64) *AutoFollowStatsBuilder {
-	rb.v.NumberOfSuccessfulFollowIndices = numberofsuccessfulfollowindices
-	return rb
-}
-
-func (rb *AutoFollowStatsBuilder) RecentAutoFollowErrors(recent_auto_follow_errors []ErrorCauseBuilder) *AutoFollowStatsBuilder {
-	tmp := make([]ErrorCause, len(recent_auto_follow_errors))
-	for _, value := range recent_auto_follow_errors {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.RecentAutoFollowErrors = tmp
-	return rb
+	return r
 }

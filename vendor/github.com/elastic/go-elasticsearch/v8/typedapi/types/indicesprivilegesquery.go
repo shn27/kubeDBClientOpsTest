@@ -15,50 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // IndicesPrivilegesQuery holds the union for the following types:
 //
-//	QueryContainer
-//	RoleTemplateQuery
 //	string
+//	Query
+//	RoleTemplateQuery
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/_types/Privileges.ts#L106-L114
-type IndicesPrivilegesQuery interface{}
-
-// IndicesPrivilegesQueryBuilder holds IndicesPrivilegesQuery struct and provides a builder API.
-type IndicesPrivilegesQueryBuilder struct {
-	v IndicesPrivilegesQuery
-}
-
-// NewIndicesPrivilegesQuery provides a builder for the IndicesPrivilegesQuery struct.
-func NewIndicesPrivilegesQueryBuilder() *IndicesPrivilegesQueryBuilder {
-	return &IndicesPrivilegesQueryBuilder{}
-}
-
-// Build finalize the chain and returns the IndicesPrivilegesQuery struct
-func (u *IndicesPrivilegesQueryBuilder) Build() IndicesPrivilegesQuery {
-	return u.v
-}
-
-func (u *IndicesPrivilegesQueryBuilder) QueryContainer(querycontainer *QueryContainerBuilder) *IndicesPrivilegesQueryBuilder {
-	v := querycontainer.Build()
-	u.v = &v
-	return u
-}
-
-func (u *IndicesPrivilegesQueryBuilder) RoleTemplateQuery(roletemplatequery *RoleTemplateQueryBuilder) *IndicesPrivilegesQueryBuilder {
-	v := roletemplatequery.Build()
-	u.v = &v
-	return u
-}
-
-func (u *IndicesPrivilegesQueryBuilder) String(string string) *IndicesPrivilegesQueryBuilder {
-	u.v = &string
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/_types/Privileges.ts#L317-L325
+type IndicesPrivilegesQuery any

@@ -15,86 +15,95 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/gappolicy"
 )
 
 // InferenceAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/pipeline.ts#L159-L162
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/pipeline.ts#L225-L234
 type InferenceAggregation struct {
 	// BucketsPath Path to the buckets that contain one set of values to correlate.
-	BucketsPath     *BucketsPath              `json:"buckets_path,omitempty"`
-	Format          *string                   `json:"format,omitempty"`
-	GapPolicy       *gappolicy.GapPolicy      `json:"gap_policy,omitempty"`
+	BucketsPath BucketsPath `json:"buckets_path,omitempty"`
+	// Format `DecimalFormat` pattern for the output value.
+	// If specified, the formatted value is returned in the aggregation’s
+	// `value_as_string` property.
+	Format *string `json:"format,omitempty"`
+	// GapPolicy Policy to apply when gaps are found in the data.
+	GapPolicy *gappolicy.GapPolicy `json:"gap_policy,omitempty"`
+	// InferenceConfig Contains the inference type and its options.
 	InferenceConfig *InferenceConfigContainer `json:"inference_config,omitempty"`
-	Meta            *Metadata                 `json:"meta,omitempty"`
-	ModelId         Name                      `json:"model_id"`
-	Name            *string                   `json:"name,omitempty"`
+	// ModelId The ID or alias for the trained model.
+	ModelId string `json:"model_id"`
 }
 
-// InferenceAggregationBuilder holds InferenceAggregation struct and provides a builder API.
-type InferenceAggregationBuilder struct {
-	v *InferenceAggregation
-}
+func (s *InferenceAggregation) UnmarshalJSON(data []byte) error {
 
-// NewInferenceAggregation provides a builder for the InferenceAggregation struct.
-func NewInferenceAggregationBuilder() *InferenceAggregationBuilder {
-	r := InferenceAggregationBuilder{
-		&InferenceAggregation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "buckets_path":
+			if err := dec.Decode(&s.BucketsPath); err != nil {
+				return fmt.Errorf("%s | %w", "BucketsPath", err)
+			}
+
+		case "format":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Format", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Format = &o
+
+		case "gap_policy":
+			if err := dec.Decode(&s.GapPolicy); err != nil {
+				return fmt.Errorf("%s | %w", "GapPolicy", err)
+			}
+
+		case "inference_config":
+			if err := dec.Decode(&s.InferenceConfig); err != nil {
+				return fmt.Errorf("%s | %w", "InferenceConfig", err)
+			}
+
+		case "model_id":
+			if err := dec.Decode(&s.ModelId); err != nil {
+				return fmt.Errorf("%s | %w", "ModelId", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the InferenceAggregation struct
-func (rb *InferenceAggregationBuilder) Build() InferenceAggregation {
-	return *rb.v
-}
+// NewInferenceAggregation returns a InferenceAggregation.
+func NewInferenceAggregation() *InferenceAggregation {
+	r := &InferenceAggregation{}
 
-// BucketsPath Path to the buckets that contain one set of values to correlate.
-
-func (rb *InferenceAggregationBuilder) BucketsPath(bucketspath *BucketsPathBuilder) *InferenceAggregationBuilder {
-	v := bucketspath.Build()
-	rb.v.BucketsPath = &v
-	return rb
-}
-
-func (rb *InferenceAggregationBuilder) Format(format string) *InferenceAggregationBuilder {
-	rb.v.Format = &format
-	return rb
-}
-
-func (rb *InferenceAggregationBuilder) GapPolicy(gappolicy gappolicy.GapPolicy) *InferenceAggregationBuilder {
-	rb.v.GapPolicy = &gappolicy
-	return rb
-}
-
-func (rb *InferenceAggregationBuilder) InferenceConfig(inferenceconfig *InferenceConfigContainerBuilder) *InferenceAggregationBuilder {
-	v := inferenceconfig.Build()
-	rb.v.InferenceConfig = &v
-	return rb
-}
-
-func (rb *InferenceAggregationBuilder) Meta(meta *MetadataBuilder) *InferenceAggregationBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *InferenceAggregationBuilder) ModelId(modelid Name) *InferenceAggregationBuilder {
-	rb.v.ModelId = modelid
-	return rb
-}
-
-func (rb *InferenceAggregationBuilder) Name(name string) *InferenceAggregationBuilder {
-	rb.v.Name = &name
-	return rb
+	return r
 }

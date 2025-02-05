@@ -15,53 +15,66 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // MultiGetError type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/mget/types.ts#L62-L66
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/mget/types.ts#L62-L66
 type MultiGetError struct {
 	Error  ErrorCause `json:"error"`
-	Id_    Id         `json:"_id"`
-	Index_ IndexName  `json:"_index"`
+	Id_    string     `json:"_id"`
+	Index_ string     `json:"_index"`
 }
 
-// MultiGetErrorBuilder holds MultiGetError struct and provides a builder API.
-type MultiGetErrorBuilder struct {
-	v *MultiGetError
-}
+func (s *MultiGetError) UnmarshalJSON(data []byte) error {
 
-// NewMultiGetError provides a builder for the MultiGetError struct.
-func NewMultiGetErrorBuilder() *MultiGetErrorBuilder {
-	r := MultiGetErrorBuilder{
-		&MultiGetError{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "error":
+			if err := dec.Decode(&s.Error); err != nil {
+				return fmt.Errorf("%s | %w", "Error", err)
+			}
+
+		case "_id":
+			if err := dec.Decode(&s.Id_); err != nil {
+				return fmt.Errorf("%s | %w", "Id_", err)
+			}
+
+		case "_index":
+			if err := dec.Decode(&s.Index_); err != nil {
+				return fmt.Errorf("%s | %w", "Index_", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the MultiGetError struct
-func (rb *MultiGetErrorBuilder) Build() MultiGetError {
-	return *rb.v
-}
+// NewMultiGetError returns a MultiGetError.
+func NewMultiGetError() *MultiGetError {
+	r := &MultiGetError{}
 
-func (rb *MultiGetErrorBuilder) Error(error *ErrorCauseBuilder) *MultiGetErrorBuilder {
-	v := error.Build()
-	rb.v.Error = v
-	return rb
-}
-
-func (rb *MultiGetErrorBuilder) Id_(id_ Id) *MultiGetErrorBuilder {
-	rb.v.Id_ = id_
-	return rb
-}
-
-func (rb *MultiGetErrorBuilder) Index_(index_ IndexName) *MultiGetErrorBuilder {
-	rb.v.Index_ = index_
-	return rb
+	return r
 }

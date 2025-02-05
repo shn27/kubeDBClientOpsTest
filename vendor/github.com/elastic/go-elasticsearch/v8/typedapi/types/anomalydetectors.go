@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // AnomalyDetectors type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/info/types.ts#L44-L50
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/info/types.ts#L46-L52
 type AnomalyDetectors struct {
 	CategorizationAnalyzer               CategorizationAnalyzer `json:"categorization_analyzer"`
 	CategorizationExamplesLimit          int                    `json:"categorization_examples_limit"`
@@ -33,47 +40,125 @@ type AnomalyDetectors struct {
 	ModelSnapshotRetentionDays           int                    `json:"model_snapshot_retention_days"`
 }
 
-// AnomalyDetectorsBuilder holds AnomalyDetectors struct and provides a builder API.
-type AnomalyDetectorsBuilder struct {
-	v *AnomalyDetectors
-}
+func (s *AnomalyDetectors) UnmarshalJSON(data []byte) error {
 
-// NewAnomalyDetectors provides a builder for the AnomalyDetectors struct.
-func NewAnomalyDetectorsBuilder() *AnomalyDetectorsBuilder {
-	r := AnomalyDetectorsBuilder{
-		&AnomalyDetectors{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "categorization_analyzer":
+			message := json.RawMessage{}
+			if err := dec.Decode(&message); err != nil {
+				return fmt.Errorf("%s | %w", "CategorizationAnalyzer", err)
+			}
+			keyDec := json.NewDecoder(bytes.NewReader(message))
+		categorizationanalyzer_field:
+			for {
+				t, err := keyDec.Token()
+				if err != nil {
+					if errors.Is(err, io.EOF) {
+						break
+					}
+					return fmt.Errorf("%s | %w", "CategorizationAnalyzer", err)
+				}
+
+				switch t {
+
+				case "char_filter", "filter", "tokenizer":
+					o := NewCategorizationAnalyzerDefinition()
+					localDec := json.NewDecoder(bytes.NewReader(message))
+					if err := localDec.Decode(&o); err != nil {
+						return fmt.Errorf("%s | %w", "CategorizationAnalyzer", err)
+					}
+					s.CategorizationAnalyzer = o
+					break categorizationanalyzer_field
+
+				}
+			}
+			if s.CategorizationAnalyzer == nil {
+				localDec := json.NewDecoder(bytes.NewReader(message))
+				if err := localDec.Decode(&s.CategorizationAnalyzer); err != nil {
+					return fmt.Errorf("%s | %w", "CategorizationAnalyzer", err)
+				}
+			}
+
+		case "categorization_examples_limit":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "CategorizationExamplesLimit", err)
+				}
+				s.CategorizationExamplesLimit = value
+			case float64:
+				f := int(v)
+				s.CategorizationExamplesLimit = f
+			}
+
+		case "daily_model_snapshot_retention_after_days":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "DailyModelSnapshotRetentionAfterDays", err)
+				}
+				s.DailyModelSnapshotRetentionAfterDays = value
+			case float64:
+				f := int(v)
+				s.DailyModelSnapshotRetentionAfterDays = f
+			}
+
+		case "model_memory_limit":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ModelMemoryLimit", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ModelMemoryLimit = o
+
+		case "model_snapshot_retention_days":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ModelSnapshotRetentionDays", err)
+				}
+				s.ModelSnapshotRetentionDays = value
+			case float64:
+				f := int(v)
+				s.ModelSnapshotRetentionDays = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the AnomalyDetectors struct
-func (rb *AnomalyDetectorsBuilder) Build() AnomalyDetectors {
-	return *rb.v
-}
+// NewAnomalyDetectors returns a AnomalyDetectors.
+func NewAnomalyDetectors() *AnomalyDetectors {
+	r := &AnomalyDetectors{}
 
-func (rb *AnomalyDetectorsBuilder) CategorizationAnalyzer(categorizationanalyzer *CategorizationAnalyzerBuilder) *AnomalyDetectorsBuilder {
-	v := categorizationanalyzer.Build()
-	rb.v.CategorizationAnalyzer = v
-	return rb
-}
-
-func (rb *AnomalyDetectorsBuilder) CategorizationExamplesLimit(categorizationexampleslimit int) *AnomalyDetectorsBuilder {
-	rb.v.CategorizationExamplesLimit = categorizationexampleslimit
-	return rb
-}
-
-func (rb *AnomalyDetectorsBuilder) DailyModelSnapshotRetentionAfterDays(dailymodelsnapshotretentionafterdays int) *AnomalyDetectorsBuilder {
-	rb.v.DailyModelSnapshotRetentionAfterDays = dailymodelsnapshotretentionafterdays
-	return rb
-}
-
-func (rb *AnomalyDetectorsBuilder) ModelMemoryLimit(modelmemorylimit string) *AnomalyDetectorsBuilder {
-	rb.v.ModelMemoryLimit = modelmemorylimit
-	return rb
-}
-
-func (rb *AnomalyDetectorsBuilder) ModelSnapshotRetentionDays(modelsnapshotretentiondays int) *AnomalyDetectorsBuilder {
-	rb.v.ModelSnapshotRetentionDays = modelsnapshotretentiondays
-	return rb
+	return r
 }

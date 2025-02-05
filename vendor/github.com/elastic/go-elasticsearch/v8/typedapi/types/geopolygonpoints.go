@@ -15,40 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // GeoPolygonPoints type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/geo.ts#L59-L61
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/geo.ts#L95-L97
 type GeoPolygonPoints struct {
 	Points []GeoLocation `json:"points"`
 }
 
-// GeoPolygonPointsBuilder holds GeoPolygonPoints struct and provides a builder API.
-type GeoPolygonPointsBuilder struct {
-	v *GeoPolygonPoints
-}
+// NewGeoPolygonPoints returns a GeoPolygonPoints.
+func NewGeoPolygonPoints() *GeoPolygonPoints {
+	r := &GeoPolygonPoints{}
 
-// NewGeoPolygonPoints provides a builder for the GeoPolygonPoints struct.
-func NewGeoPolygonPointsBuilder() *GeoPolygonPointsBuilder {
-	r := GeoPolygonPointsBuilder{
-		&GeoPolygonPoints{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the GeoPolygonPoints struct
-func (rb *GeoPolygonPointsBuilder) Build() GeoPolygonPoints {
-	return *rb.v
-}
-
-func (rb *GeoPolygonPointsBuilder) Points(points ...GeoLocation) *GeoPolygonPointsBuilder {
-	rb.v.Points = points
-	return rb
+	return r
 }

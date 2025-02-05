@@ -15,55 +15,99 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // CharGroupTokenizer type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/tokenizers.ts#L55-L59
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/tokenizers.ts#L31-L38
 type CharGroupTokenizer struct {
-	MaxTokenLength  *int           `json:"max_token_length,omitempty"`
-	TokenizeOnChars []string       `json:"tokenize_on_chars"`
-	Type            string         `json:"type,omitempty"`
-	Version         *VersionString `json:"version,omitempty"`
+	MaxTokenLength  *int     `json:"max_token_length,omitempty"`
+	TokenizeOnChars []string `json:"tokenize_on_chars"`
+	Type            string   `json:"type,omitempty"`
+	Version         *string  `json:"version,omitempty"`
 }
 
-// CharGroupTokenizerBuilder holds CharGroupTokenizer struct and provides a builder API.
-type CharGroupTokenizerBuilder struct {
-	v *CharGroupTokenizer
+func (s *CharGroupTokenizer) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "max_token_length":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxTokenLength", err)
+				}
+				s.MaxTokenLength = &value
+			case float64:
+				f := int(v)
+				s.MaxTokenLength = &f
+			}
+
+		case "tokenize_on_chars":
+			if err := dec.Decode(&s.TokenizeOnChars); err != nil {
+				return fmt.Errorf("%s | %w", "TokenizeOnChars", err)
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewCharGroupTokenizer provides a builder for the CharGroupTokenizer struct.
-func NewCharGroupTokenizerBuilder() *CharGroupTokenizerBuilder {
-	r := CharGroupTokenizerBuilder{
-		&CharGroupTokenizer{},
+// MarshalJSON override marshalling to include literal value
+func (s CharGroupTokenizer) MarshalJSON() ([]byte, error) {
+	type innerCharGroupTokenizer CharGroupTokenizer
+	tmp := innerCharGroupTokenizer{
+		MaxTokenLength:  s.MaxTokenLength,
+		TokenizeOnChars: s.TokenizeOnChars,
+		Type:            s.Type,
+		Version:         s.Version,
 	}
 
-	r.v.Type = "char_group"
+	tmp.Type = "char_group"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the CharGroupTokenizer struct
-func (rb *CharGroupTokenizerBuilder) Build() CharGroupTokenizer {
-	return *rb.v
-}
+// NewCharGroupTokenizer returns a CharGroupTokenizer.
+func NewCharGroupTokenizer() *CharGroupTokenizer {
+	r := &CharGroupTokenizer{}
 
-func (rb *CharGroupTokenizerBuilder) MaxTokenLength(maxtokenlength int) *CharGroupTokenizerBuilder {
-	rb.v.MaxTokenLength = &maxtokenlength
-	return rb
-}
-
-func (rb *CharGroupTokenizerBuilder) TokenizeOnChars(tokenize_on_chars ...string) *CharGroupTokenizerBuilder {
-	rb.v.TokenizeOnChars = tokenize_on_chars
-	return rb
-}
-
-func (rb *CharGroupTokenizerBuilder) Version(version VersionString) *CharGroupTokenizerBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

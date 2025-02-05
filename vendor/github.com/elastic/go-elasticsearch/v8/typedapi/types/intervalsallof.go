@@ -15,63 +15,101 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // IntervalsAllOf type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/query_dsl/fulltext.ts#L49-L56
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/query_dsl/fulltext.ts#L50-L70
 type IntervalsAllOf struct {
-	Filter    *IntervalsFilter     `json:"filter,omitempty"`
-	Intervals []IntervalsContainer `json:"intervals"`
-	MaxGaps   *int                 `json:"max_gaps,omitempty"`
-	Ordered   *bool                `json:"ordered,omitempty"`
+	// Filter Rule used to filter returned intervals.
+	Filter *IntervalsFilter `json:"filter,omitempty"`
+	// Intervals An array of rules to combine. All rules must produce a match in a document
+	// for the overall source to match.
+	Intervals []Intervals `json:"intervals"`
+	// MaxGaps Maximum number of positions between the matching terms.
+	// Intervals produced by the rules further apart than this are not considered
+	// matches.
+	MaxGaps *int `json:"max_gaps,omitempty"`
+	// Ordered If `true`, intervals produced by the rules should appear in the order in
+	// which they are specified.
+	Ordered *bool `json:"ordered,omitempty"`
 }
 
-// IntervalsAllOfBuilder holds IntervalsAllOf struct and provides a builder API.
-type IntervalsAllOfBuilder struct {
-	v *IntervalsAllOf
-}
+func (s *IntervalsAllOf) UnmarshalJSON(data []byte) error {
 
-// NewIntervalsAllOf provides a builder for the IntervalsAllOf struct.
-func NewIntervalsAllOfBuilder() *IntervalsAllOfBuilder {
-	r := IntervalsAllOfBuilder{
-		&IntervalsAllOf{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "filter":
+			if err := dec.Decode(&s.Filter); err != nil {
+				return fmt.Errorf("%s | %w", "Filter", err)
+			}
+
+		case "intervals":
+			if err := dec.Decode(&s.Intervals); err != nil {
+				return fmt.Errorf("%s | %w", "Intervals", err)
+			}
+
+		case "max_gaps":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "MaxGaps", err)
+				}
+				s.MaxGaps = &value
+			case float64:
+				f := int(v)
+				s.MaxGaps = &f
+			}
+
+		case "ordered":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Ordered", err)
+				}
+				s.Ordered = &value
+			case bool:
+				s.Ordered = &v
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the IntervalsAllOf struct
-func (rb *IntervalsAllOfBuilder) Build() IntervalsAllOf {
-	return *rb.v
-}
+// NewIntervalsAllOf returns a IntervalsAllOf.
+func NewIntervalsAllOf() *IntervalsAllOf {
+	r := &IntervalsAllOf{}
 
-func (rb *IntervalsAllOfBuilder) Filter(filter *IntervalsFilterBuilder) *IntervalsAllOfBuilder {
-	v := filter.Build()
-	rb.v.Filter = &v
-	return rb
-}
-
-func (rb *IntervalsAllOfBuilder) Intervals(intervals []IntervalsContainerBuilder) *IntervalsAllOfBuilder {
-	tmp := make([]IntervalsContainer, len(intervals))
-	for _, value := range intervals {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Intervals = tmp
-	return rb
-}
-
-func (rb *IntervalsAllOfBuilder) MaxGaps(maxgaps int) *IntervalsAllOfBuilder {
-	rb.v.MaxGaps = &maxgaps
-	return rb
-}
-
-func (rb *IntervalsAllOfBuilder) Ordered(ordered bool) *IntervalsAllOfBuilder {
-	rb.v.Ordered = &ordered
-	return rb
+	return r
 }

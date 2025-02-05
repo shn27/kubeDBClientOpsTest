@@ -15,41 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // GlobalPrivilege type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/_types/Privileges.ts#L160-L162
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/_types/Privileges.ts#L406-L408
 type GlobalPrivilege struct {
 	Application ApplicationGlobalUserPrivileges `json:"application"`
 }
 
-// GlobalPrivilegeBuilder holds GlobalPrivilege struct and provides a builder API.
-type GlobalPrivilegeBuilder struct {
-	v *GlobalPrivilege
-}
+// NewGlobalPrivilege returns a GlobalPrivilege.
+func NewGlobalPrivilege() *GlobalPrivilege {
+	r := &GlobalPrivilege{}
 
-// NewGlobalPrivilege provides a builder for the GlobalPrivilege struct.
-func NewGlobalPrivilegeBuilder() *GlobalPrivilegeBuilder {
-	r := GlobalPrivilegeBuilder{
-		&GlobalPrivilege{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the GlobalPrivilege struct
-func (rb *GlobalPrivilegeBuilder) Build() GlobalPrivilege {
-	return *rb.v
-}
-
-func (rb *GlobalPrivilegeBuilder) Application(application *ApplicationGlobalUserPrivilegesBuilder) *GlobalPrivilegeBuilder {
-	v := application.Build()
-	rb.v.Application = v
-	return rb
+	return r
 }

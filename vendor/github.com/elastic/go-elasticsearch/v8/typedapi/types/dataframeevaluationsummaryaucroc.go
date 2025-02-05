@@ -15,50 +15,72 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DataframeEvaluationSummaryAucRoc type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/evaluate_data_frame/types.ts#L50-L52
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/evaluate_data_frame/types.ts#L91-L93
 type DataframeEvaluationSummaryAucRoc struct {
 	Curve []DataframeEvaluationSummaryAucRocCurveItem `json:"curve,omitempty"`
-	Value float64                                     `json:"value"`
+	Value Float64                                     `json:"value"`
 }
 
-// DataframeEvaluationSummaryAucRocBuilder holds DataframeEvaluationSummaryAucRoc struct and provides a builder API.
-type DataframeEvaluationSummaryAucRocBuilder struct {
-	v *DataframeEvaluationSummaryAucRoc
-}
+func (s *DataframeEvaluationSummaryAucRoc) UnmarshalJSON(data []byte) error {
 
-// NewDataframeEvaluationSummaryAucRoc provides a builder for the DataframeEvaluationSummaryAucRoc struct.
-func NewDataframeEvaluationSummaryAucRocBuilder() *DataframeEvaluationSummaryAucRocBuilder {
-	r := DataframeEvaluationSummaryAucRocBuilder{
-		&DataframeEvaluationSummaryAucRoc{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "curve":
+			if err := dec.Decode(&s.Curve); err != nil {
+				return fmt.Errorf("%s | %w", "Curve", err)
+			}
+
+		case "value":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Value", err)
+				}
+				f := Float64(value)
+				s.Value = f
+			case float64:
+				f := Float64(v)
+				s.Value = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DataframeEvaluationSummaryAucRoc struct
-func (rb *DataframeEvaluationSummaryAucRocBuilder) Build() DataframeEvaluationSummaryAucRoc {
-	return *rb.v
-}
+// NewDataframeEvaluationSummaryAucRoc returns a DataframeEvaluationSummaryAucRoc.
+func NewDataframeEvaluationSummaryAucRoc() *DataframeEvaluationSummaryAucRoc {
+	r := &DataframeEvaluationSummaryAucRoc{}
 
-func (rb *DataframeEvaluationSummaryAucRocBuilder) Curve(curve []DataframeEvaluationSummaryAucRocCurveItemBuilder) *DataframeEvaluationSummaryAucRocBuilder {
-	tmp := make([]DataframeEvaluationSummaryAucRocCurveItem, len(curve))
-	for _, value := range curve {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Curve = tmp
-	return rb
-}
-
-func (rb *DataframeEvaluationSummaryAucRocBuilder) Value(value float64) *DataframeEvaluationSummaryAucRocBuilder {
-	rb.v.Value = value
-	return rb
+	return r
 }

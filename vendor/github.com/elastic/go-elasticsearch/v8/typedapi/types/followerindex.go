@@ -15,69 +15,80 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/followerindexstatus"
 )
 
 // FollowerIndex type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ccr/follow_info/types.ts#L22-L28
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ccr/follow_info/types.ts#L24-L30
 type FollowerIndex struct {
-	FollowerIndex IndexName                               `json:"follower_index"`
-	LeaderIndex   IndexName                               `json:"leader_index"`
+	FollowerIndex string                                  `json:"follower_index"`
+	LeaderIndex   string                                  `json:"leader_index"`
 	Parameters    *FollowerIndexParameters                `json:"parameters,omitempty"`
-	RemoteCluster Name                                    `json:"remote_cluster"`
+	RemoteCluster string                                  `json:"remote_cluster"`
 	Status        followerindexstatus.FollowerIndexStatus `json:"status"`
 }
 
-// FollowerIndexBuilder holds FollowerIndex struct and provides a builder API.
-type FollowerIndexBuilder struct {
-	v *FollowerIndex
-}
+func (s *FollowerIndex) UnmarshalJSON(data []byte) error {
 
-// NewFollowerIndex provides a builder for the FollowerIndex struct.
-func NewFollowerIndexBuilder() *FollowerIndexBuilder {
-	r := FollowerIndexBuilder{
-		&FollowerIndex{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "follower_index":
+			if err := dec.Decode(&s.FollowerIndex); err != nil {
+				return fmt.Errorf("%s | %w", "FollowerIndex", err)
+			}
+
+		case "leader_index":
+			if err := dec.Decode(&s.LeaderIndex); err != nil {
+				return fmt.Errorf("%s | %w", "LeaderIndex", err)
+			}
+
+		case "parameters":
+			if err := dec.Decode(&s.Parameters); err != nil {
+				return fmt.Errorf("%s | %w", "Parameters", err)
+			}
+
+		case "remote_cluster":
+			if err := dec.Decode(&s.RemoteCluster); err != nil {
+				return fmt.Errorf("%s | %w", "RemoteCluster", err)
+			}
+
+		case "status":
+			if err := dec.Decode(&s.Status); err != nil {
+				return fmt.Errorf("%s | %w", "Status", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the FollowerIndex struct
-func (rb *FollowerIndexBuilder) Build() FollowerIndex {
-	return *rb.v
-}
+// NewFollowerIndex returns a FollowerIndex.
+func NewFollowerIndex() *FollowerIndex {
+	r := &FollowerIndex{}
 
-func (rb *FollowerIndexBuilder) FollowerIndex(followerindex IndexName) *FollowerIndexBuilder {
-	rb.v.FollowerIndex = followerindex
-	return rb
-}
-
-func (rb *FollowerIndexBuilder) LeaderIndex(leaderindex IndexName) *FollowerIndexBuilder {
-	rb.v.LeaderIndex = leaderindex
-	return rb
-}
-
-func (rb *FollowerIndexBuilder) Parameters(parameters *FollowerIndexParametersBuilder) *FollowerIndexBuilder {
-	v := parameters.Build()
-	rb.v.Parameters = &v
-	return rb
-}
-
-func (rb *FollowerIndexBuilder) RemoteCluster(remotecluster Name) *FollowerIndexBuilder {
-	rb.v.RemoteCluster = remotecluster
-	return rb
-}
-
-func (rb *FollowerIndexBuilder) Status(status followerindexstatus.FollowerIndexStatus) *FollowerIndexBuilder {
-	rb.v.Status = status
-	return rb
+	return r
 }

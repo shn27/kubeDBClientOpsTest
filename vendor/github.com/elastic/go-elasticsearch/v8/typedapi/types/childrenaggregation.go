@@ -15,53 +15,55 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // ChildrenAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/bucket.ts#L73-L75
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/bucket.ts#L121-L126
 type ChildrenAggregation struct {
-	Meta *Metadata     `json:"meta,omitempty"`
-	Name *string       `json:"name,omitempty"`
-	Type *RelationName `json:"type,omitempty"`
+	// Type The child type that should be selected.
+	Type *string `json:"type,omitempty"`
 }
 
-// ChildrenAggregationBuilder holds ChildrenAggregation struct and provides a builder API.
-type ChildrenAggregationBuilder struct {
-	v *ChildrenAggregation
-}
+func (s *ChildrenAggregation) UnmarshalJSON(data []byte) error {
 
-// NewChildrenAggregation provides a builder for the ChildrenAggregation struct.
-func NewChildrenAggregationBuilder() *ChildrenAggregationBuilder {
-	r := ChildrenAggregationBuilder{
-		&ChildrenAggregation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ChildrenAggregation struct
-func (rb *ChildrenAggregationBuilder) Build() ChildrenAggregation {
-	return *rb.v
-}
+// NewChildrenAggregation returns a ChildrenAggregation.
+func NewChildrenAggregation() *ChildrenAggregation {
+	r := &ChildrenAggregation{}
 
-func (rb *ChildrenAggregationBuilder) Meta(meta *MetadataBuilder) *ChildrenAggregationBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *ChildrenAggregationBuilder) Name(name string) *ChildrenAggregationBuilder {
-	rb.v.Name = &name
-	return rb
-}
-
-func (rb *ChildrenAggregationBuilder) Type_(type_ RelationName) *ChildrenAggregationBuilder {
-	rb.v.Type = &type_
-	return rb
+	return r
 }

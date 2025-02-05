@@ -15,69 +15,78 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // SnapshotStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/snapshot/_types/SnapshotStats.ts#L23-L29
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/snapshot/_types/SnapshotStats.ts#L23-L29
 type SnapshotStats struct {
-	Incremental       FileCountSnapshotStats  `json:"incremental"`
-	StartTimeInMillis EpochTimeUnitMillis     `json:"start_time_in_millis"`
-	Time              *Duration               `json:"time,omitempty"`
-	TimeInMillis      DurationValueUnitMillis `json:"time_in_millis"`
-	Total             FileCountSnapshotStats  `json:"total"`
+	Incremental       FileCountSnapshotStats `json:"incremental"`
+	StartTimeInMillis int64                  `json:"start_time_in_millis"`
+	Time              Duration               `json:"time,omitempty"`
+	TimeInMillis      int64                  `json:"time_in_millis"`
+	Total             FileCountSnapshotStats `json:"total"`
 }
 
-// SnapshotStatsBuilder holds SnapshotStats struct and provides a builder API.
-type SnapshotStatsBuilder struct {
-	v *SnapshotStats
-}
+func (s *SnapshotStats) UnmarshalJSON(data []byte) error {
 
-// NewSnapshotStats provides a builder for the SnapshotStats struct.
-func NewSnapshotStatsBuilder() *SnapshotStatsBuilder {
-	r := SnapshotStatsBuilder{
-		&SnapshotStats{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "incremental":
+			if err := dec.Decode(&s.Incremental); err != nil {
+				return fmt.Errorf("%s | %w", "Incremental", err)
+			}
+
+		case "start_time_in_millis":
+			if err := dec.Decode(&s.StartTimeInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "StartTimeInMillis", err)
+			}
+
+		case "time":
+			if err := dec.Decode(&s.Time); err != nil {
+				return fmt.Errorf("%s | %w", "Time", err)
+			}
+
+		case "time_in_millis":
+			if err := dec.Decode(&s.TimeInMillis); err != nil {
+				return fmt.Errorf("%s | %w", "TimeInMillis", err)
+			}
+
+		case "total":
+			if err := dec.Decode(&s.Total); err != nil {
+				return fmt.Errorf("%s | %w", "Total", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SnapshotStats struct
-func (rb *SnapshotStatsBuilder) Build() SnapshotStats {
-	return *rb.v
-}
+// NewSnapshotStats returns a SnapshotStats.
+func NewSnapshotStats() *SnapshotStats {
+	r := &SnapshotStats{}
 
-func (rb *SnapshotStatsBuilder) Incremental(incremental *FileCountSnapshotStatsBuilder) *SnapshotStatsBuilder {
-	v := incremental.Build()
-	rb.v.Incremental = v
-	return rb
-}
-
-func (rb *SnapshotStatsBuilder) StartTimeInMillis(starttimeinmillis *EpochTimeUnitMillisBuilder) *SnapshotStatsBuilder {
-	v := starttimeinmillis.Build()
-	rb.v.StartTimeInMillis = v
-	return rb
-}
-
-func (rb *SnapshotStatsBuilder) Time(time *DurationBuilder) *SnapshotStatsBuilder {
-	v := time.Build()
-	rb.v.Time = &v
-	return rb
-}
-
-func (rb *SnapshotStatsBuilder) TimeInMillis(timeinmillis *DurationValueUnitMillisBuilder) *SnapshotStatsBuilder {
-	v := timeinmillis.Build()
-	rb.v.TimeInMillis = v
-	return rb
-}
-
-func (rb *SnapshotStatsBuilder) Total(total *FileCountSnapshotStatsBuilder) *SnapshotStatsBuilder {
-	v := total.Build()
-	rb.v.Total = v
-	return rb
+	return r
 }

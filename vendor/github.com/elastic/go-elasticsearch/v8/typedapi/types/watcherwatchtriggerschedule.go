@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // WatcherWatchTriggerSchedule type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/usage/types.ts#L455-L458
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/xpack/usage/types.ts#L464-L467
 type WatcherWatchTriggerSchedule struct {
 	Active int64   `json:"active"`
 	All_   Counter `json:"_all"`
@@ -32,43 +39,69 @@ type WatcherWatchTriggerSchedule struct {
 	Total  int64   `json:"total"`
 }
 
-// WatcherWatchTriggerScheduleBuilder holds WatcherWatchTriggerSchedule struct and provides a builder API.
-type WatcherWatchTriggerScheduleBuilder struct {
-	v *WatcherWatchTriggerSchedule
-}
+func (s *WatcherWatchTriggerSchedule) UnmarshalJSON(data []byte) error {
 
-// NewWatcherWatchTriggerSchedule provides a builder for the WatcherWatchTriggerSchedule struct.
-func NewWatcherWatchTriggerScheduleBuilder() *WatcherWatchTriggerScheduleBuilder {
-	r := WatcherWatchTriggerScheduleBuilder{
-		&WatcherWatchTriggerSchedule{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "active":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Active", err)
+				}
+				s.Active = value
+			case float64:
+				f := int64(v)
+				s.Active = f
+			}
+
+		case "_all":
+			if err := dec.Decode(&s.All_); err != nil {
+				return fmt.Errorf("%s | %w", "All_", err)
+			}
+
+		case "cron":
+			if err := dec.Decode(&s.Cron); err != nil {
+				return fmt.Errorf("%s | %w", "Cron", err)
+			}
+
+		case "total":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Total", err)
+				}
+				s.Total = value
+			case float64:
+				f := int64(v)
+				s.Total = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the WatcherWatchTriggerSchedule struct
-func (rb *WatcherWatchTriggerScheduleBuilder) Build() WatcherWatchTriggerSchedule {
-	return *rb.v
-}
+// NewWatcherWatchTriggerSchedule returns a WatcherWatchTriggerSchedule.
+func NewWatcherWatchTriggerSchedule() *WatcherWatchTriggerSchedule {
+	r := &WatcherWatchTriggerSchedule{}
 
-func (rb *WatcherWatchTriggerScheduleBuilder) Active(active int64) *WatcherWatchTriggerScheduleBuilder {
-	rb.v.Active = active
-	return rb
-}
-
-func (rb *WatcherWatchTriggerScheduleBuilder) All_(all_ *CounterBuilder) *WatcherWatchTriggerScheduleBuilder {
-	v := all_.Build()
-	rb.v.All_ = v
-	return rb
-}
-
-func (rb *WatcherWatchTriggerScheduleBuilder) Cron(cron *CounterBuilder) *WatcherWatchTriggerScheduleBuilder {
-	v := cron.Build()
-	rb.v.Cron = v
-	return rb
-}
-
-func (rb *WatcherWatchTriggerScheduleBuilder) Total(total int64) *WatcherWatchTriggerScheduleBuilder {
-	rb.v.Total = total
-	return rb
+	return r
 }

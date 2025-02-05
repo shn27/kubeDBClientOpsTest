@@ -15,46 +15,68 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // Influence type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/_types/Anomaly.ts#L66-L69
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/_types/Anomaly.ts#L140-L143
 type Influence struct {
 	InfluencerFieldName   string   `json:"influencer_field_name"`
 	InfluencerFieldValues []string `json:"influencer_field_values"`
 }
 
-// InfluenceBuilder holds Influence struct and provides a builder API.
-type InfluenceBuilder struct {
-	v *Influence
-}
+func (s *Influence) UnmarshalJSON(data []byte) error {
 
-// NewInfluence provides a builder for the Influence struct.
-func NewInfluenceBuilder() *InfluenceBuilder {
-	r := InfluenceBuilder{
-		&Influence{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "influencer_field_name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "InfluencerFieldName", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.InfluencerFieldName = o
+
+		case "influencer_field_values":
+			if err := dec.Decode(&s.InfluencerFieldValues); err != nil {
+				return fmt.Errorf("%s | %w", "InfluencerFieldValues", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the Influence struct
-func (rb *InfluenceBuilder) Build() Influence {
-	return *rb.v
-}
+// NewInfluence returns a Influence.
+func NewInfluence() *Influence {
+	r := &Influence{}
 
-func (rb *InfluenceBuilder) InfluencerFieldName(influencerfieldname string) *InfluenceBuilder {
-	rb.v.InfluencerFieldName = influencerfieldname
-	return rb
-}
-
-func (rb *InfluenceBuilder) InfluencerFieldValues(influencer_field_values ...string) *InfluenceBuilder {
-	rb.v.InfluencerFieldValues = influencer_field_values
-	return rb
+	return r
 }

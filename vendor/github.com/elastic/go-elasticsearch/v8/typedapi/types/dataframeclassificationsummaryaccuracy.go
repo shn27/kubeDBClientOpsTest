@@ -15,50 +15,72 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // DataframeClassificationSummaryAccuracy type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/evaluate_data_frame/types.ts#L70-L73
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/evaluate_data_frame/types.ts#L111-L114
 type DataframeClassificationSummaryAccuracy struct {
 	Classes         []DataframeEvaluationClass `json:"classes"`
-	OverallAccuracy float64                    `json:"overall_accuracy"`
+	OverallAccuracy Float64                    `json:"overall_accuracy"`
 }
 
-// DataframeClassificationSummaryAccuracyBuilder holds DataframeClassificationSummaryAccuracy struct and provides a builder API.
-type DataframeClassificationSummaryAccuracyBuilder struct {
-	v *DataframeClassificationSummaryAccuracy
-}
+func (s *DataframeClassificationSummaryAccuracy) UnmarshalJSON(data []byte) error {
 
-// NewDataframeClassificationSummaryAccuracy provides a builder for the DataframeClassificationSummaryAccuracy struct.
-func NewDataframeClassificationSummaryAccuracyBuilder() *DataframeClassificationSummaryAccuracyBuilder {
-	r := DataframeClassificationSummaryAccuracyBuilder{
-		&DataframeClassificationSummaryAccuracy{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "classes":
+			if err := dec.Decode(&s.Classes); err != nil {
+				return fmt.Errorf("%s | %w", "Classes", err)
+			}
+
+		case "overall_accuracy":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "OverallAccuracy", err)
+				}
+				f := Float64(value)
+				s.OverallAccuracy = f
+			case float64:
+				f := Float64(v)
+				s.OverallAccuracy = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DataframeClassificationSummaryAccuracy struct
-func (rb *DataframeClassificationSummaryAccuracyBuilder) Build() DataframeClassificationSummaryAccuracy {
-	return *rb.v
-}
+// NewDataframeClassificationSummaryAccuracy returns a DataframeClassificationSummaryAccuracy.
+func NewDataframeClassificationSummaryAccuracy() *DataframeClassificationSummaryAccuracy {
+	r := &DataframeClassificationSummaryAccuracy{}
 
-func (rb *DataframeClassificationSummaryAccuracyBuilder) Classes(classes []DataframeEvaluationClassBuilder) *DataframeClassificationSummaryAccuracyBuilder {
-	tmp := make([]DataframeEvaluationClass, len(classes))
-	for _, value := range classes {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Classes = tmp
-	return rb
-}
-
-func (rb *DataframeClassificationSummaryAccuracyBuilder) OverallAccuracy(overallaccuracy float64) *DataframeClassificationSummaryAccuracyBuilder {
-	rb.v.OverallAccuracy = overallaccuracy
-	return rb
+	return r
 }

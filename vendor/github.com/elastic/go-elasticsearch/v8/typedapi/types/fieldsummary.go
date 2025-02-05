@@ -15,16 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // FieldSummary type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/field_usage_stats/IndicesFieldUsageStatsResponse.ts#L54-L63
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/field_usage_stats/IndicesFieldUsageStatsResponse.ts#L57-L66
 type FieldSummary struct {
 	Any           uint          `json:"any"`
 	DocValues     uint          `json:"doc_values"`
@@ -36,62 +34,9 @@ type FieldSummary struct {
 	TermVectors   uint          `json:"term_vectors"`
 }
 
-// FieldSummaryBuilder holds FieldSummary struct and provides a builder API.
-type FieldSummaryBuilder struct {
-	v *FieldSummary
-}
+// NewFieldSummary returns a FieldSummary.
+func NewFieldSummary() *FieldSummary {
+	r := &FieldSummary{}
 
-// NewFieldSummary provides a builder for the FieldSummary struct.
-func NewFieldSummaryBuilder() *FieldSummaryBuilder {
-	r := FieldSummaryBuilder{
-		&FieldSummary{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the FieldSummary struct
-func (rb *FieldSummaryBuilder) Build() FieldSummary {
-	return *rb.v
-}
-
-func (rb *FieldSummaryBuilder) Any(any uint) *FieldSummaryBuilder {
-	rb.v.Any = any
-	return rb
-}
-
-func (rb *FieldSummaryBuilder) DocValues(docvalues uint) *FieldSummaryBuilder {
-	rb.v.DocValues = docvalues
-	return rb
-}
-
-func (rb *FieldSummaryBuilder) InvertedIndex(invertedindex *InvertedIndexBuilder) *FieldSummaryBuilder {
-	v := invertedindex.Build()
-	rb.v.InvertedIndex = v
-	return rb
-}
-
-func (rb *FieldSummaryBuilder) KnnVectors(knnvectors uint) *FieldSummaryBuilder {
-	rb.v.KnnVectors = knnvectors
-	return rb
-}
-
-func (rb *FieldSummaryBuilder) Norms(norms uint) *FieldSummaryBuilder {
-	rb.v.Norms = norms
-	return rb
-}
-
-func (rb *FieldSummaryBuilder) Points(points uint) *FieldSummaryBuilder {
-	rb.v.Points = points
-	return rb
-}
-
-func (rb *FieldSummaryBuilder) StoredFields(storedfields uint) *FieldSummaryBuilder {
-	rb.v.StoredFields = storedfields
-	return rb
-}
-
-func (rb *FieldSummaryBuilder) TermVectors(termvectors uint) *FieldSummaryBuilder {
-	rb.v.TermVectors = termvectors
-	return rb
+	return r
 }

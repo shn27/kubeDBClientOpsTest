@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package putsettings
 
@@ -29,31 +27,24 @@ import (
 
 // Request holds the request body struct for the package putsettings
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/put_settings/ClusterPutSettingsRequest.ts#L25-L43
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/put_settings/ClusterPutSettingsRequest.ts#L25-L61
 type Request struct {
-	Persistent map[string]interface{} `json:"persistent,omitempty"`
-
-	Transient map[string]interface{} `json:"transient,omitempty"`
+	Persistent map[string]json.RawMessage `json:"persistent,omitempty"`
+	Transient  map[string]json.RawMessage `json:"transient,omitempty"`
 }
 
-// RequestBuilder is the builder API for the putsettings.Request
-type RequestBuilder struct {
-	v *Request
-}
-
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{
-			Persistent: make(map[string]interface{}, 0),
-			Transient:  make(map[string]interface{}, 0),
-		},
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{
+		Persistent: make(map[string]json.RawMessage, 0),
+		Transient:  make(map[string]json.RawMessage, 0),
 	}
-	return &r
+
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -62,19 +53,4 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	}
 
 	return &req, nil
-}
-
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
-
-func (rb *RequestBuilder) Persistent(value map[string]interface{}) *RequestBuilder {
-	rb.v.Persistent = value
-	return rb
-}
-
-func (rb *RequestBuilder) Transient(value map[string]interface{}) *RequestBuilder {
-	rb.v.Transient = value
-	return rb
 }

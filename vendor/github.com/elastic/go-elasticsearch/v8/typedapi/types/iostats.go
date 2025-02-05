@@ -15,51 +15,28 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // IoStats type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/_types/Stats.ts#L287-L290
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/_types/Stats.ts#L789-L799
 type IoStats struct {
+	// Devices Array of disk metrics for each device that is backing an Elasticsearch data
+	// path.
+	// These disk metrics are probed periodically and averages between the last
+	// probe and the current probe are computed.
 	Devices []IoStatDevice `json:"devices,omitempty"`
-	Total   *IoStatDevice  `json:"total,omitempty"`
+	// Total The sum of the disk metrics for all devices that back an Elasticsearch data
+	// path.
+	Total *IoStatDevice `json:"total,omitempty"`
 }
 
-// IoStatsBuilder holds IoStats struct and provides a builder API.
-type IoStatsBuilder struct {
-	v *IoStats
-}
+// NewIoStats returns a IoStats.
+func NewIoStats() *IoStats {
+	r := &IoStats{}
 
-// NewIoStats provides a builder for the IoStats struct.
-func NewIoStatsBuilder() *IoStatsBuilder {
-	r := IoStatsBuilder{
-		&IoStats{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the IoStats struct
-func (rb *IoStatsBuilder) Build() IoStats {
-	return *rb.v
-}
-
-func (rb *IoStatsBuilder) Devices(devices []IoStatDeviceBuilder) *IoStatsBuilder {
-	tmp := make([]IoStatDevice, len(devices))
-	for _, value := range devices {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Devices = tmp
-	return rb
-}
-
-func (rb *IoStatsBuilder) Total(total *IoStatDeviceBuilder) *IoStatsBuilder {
-	v := total.Build()
-	rb.v.Total = &v
-	return rb
+	return r
 }

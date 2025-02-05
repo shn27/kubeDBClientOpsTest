@@ -15,58 +15,101 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // Vertex type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/graph/_types/Vertex.ts#L23-L28
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/graph/_types/Vertex.ts#L23-L28
 type Vertex struct {
 	Depth  int64   `json:"depth"`
-	Field  Field   `json:"field"`
+	Field  string  `json:"field"`
 	Term   string  `json:"term"`
-	Weight float64 `json:"weight"`
+	Weight Float64 `json:"weight"`
 }
 
-// VertexBuilder holds Vertex struct and provides a builder API.
-type VertexBuilder struct {
-	v *Vertex
-}
+func (s *Vertex) UnmarshalJSON(data []byte) error {
 
-// NewVertex provides a builder for the Vertex struct.
-func NewVertexBuilder() *VertexBuilder {
-	r := VertexBuilder{
-		&Vertex{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "depth":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Depth", err)
+				}
+				s.Depth = value
+			case float64:
+				f := int64(v)
+				s.Depth = f
+			}
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "term":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Term", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Term = o
+
+		case "weight":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Weight", err)
+				}
+				f := Float64(value)
+				s.Weight = f
+			case float64:
+				f := Float64(v)
+				s.Weight = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the Vertex struct
-func (rb *VertexBuilder) Build() Vertex {
-	return *rb.v
-}
+// NewVertex returns a Vertex.
+func NewVertex() *Vertex {
+	r := &Vertex{}
 
-func (rb *VertexBuilder) Depth(depth int64) *VertexBuilder {
-	rb.v.Depth = depth
-	return rb
-}
-
-func (rb *VertexBuilder) Field(field Field) *VertexBuilder {
-	rb.v.Field = field
-	return rb
-}
-
-func (rb *VertexBuilder) Term(term string) *VertexBuilder {
-	rb.v.Term = term
-	return rb
-}
-
-func (rb *VertexBuilder) Weight(weight float64) *VertexBuilder {
-	rb.v.Weight = weight
-	return rb
+	return r
 }

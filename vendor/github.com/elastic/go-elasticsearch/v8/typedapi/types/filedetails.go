@@ -15,52 +15,94 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // FileDetails type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/recovery/types.ts#L50-L54
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/recovery/types.ts#L50-L54
 type FileDetails struct {
 	Length    int64  `json:"length"`
 	Name      string `json:"name"`
 	Recovered int64  `json:"recovered"`
 }
 
-// FileDetailsBuilder holds FileDetails struct and provides a builder API.
-type FileDetailsBuilder struct {
-	v *FileDetails
-}
+func (s *FileDetails) UnmarshalJSON(data []byte) error {
 
-// NewFileDetails provides a builder for the FileDetails struct.
-func NewFileDetailsBuilder() *FileDetailsBuilder {
-	r := FileDetailsBuilder{
-		&FileDetails{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "length":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Length", err)
+				}
+				s.Length = value
+			case float64:
+				f := int64(v)
+				s.Length = f
+			}
+
+		case "name":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Name = o
+
+		case "recovered":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Recovered", err)
+				}
+				s.Recovered = value
+			case float64:
+				f := int64(v)
+				s.Recovered = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the FileDetails struct
-func (rb *FileDetailsBuilder) Build() FileDetails {
-	return *rb.v
-}
+// NewFileDetails returns a FileDetails.
+func NewFileDetails() *FileDetails {
+	r := &FileDetails{}
 
-func (rb *FileDetailsBuilder) Length(length int64) *FileDetailsBuilder {
-	rb.v.Length = length
-	return rb
-}
-
-func (rb *FileDetailsBuilder) Name(name string) *FileDetailsBuilder {
-	rb.v.Name = name
-	return rb
-}
-
-func (rb *FileDetailsBuilder) Recovered(recovered int64) *FileDetailsBuilder {
-	rb.v.Recovered = recovered
-	return rb
+	return r
 }

@@ -15,52 +15,74 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // CustomCategorizeTextAnalyzer type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/bucket.ts#L504-L508
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/bucket.ts#L1189-L1193
 type CustomCategorizeTextAnalyzer struct {
 	CharFilter []string `json:"char_filter,omitempty"`
 	Filter     []string `json:"filter,omitempty"`
 	Tokenizer  *string  `json:"tokenizer,omitempty"`
 }
 
-// CustomCategorizeTextAnalyzerBuilder holds CustomCategorizeTextAnalyzer struct and provides a builder API.
-type CustomCategorizeTextAnalyzerBuilder struct {
-	v *CustomCategorizeTextAnalyzer
-}
+func (s *CustomCategorizeTextAnalyzer) UnmarshalJSON(data []byte) error {
 
-// NewCustomCategorizeTextAnalyzer provides a builder for the CustomCategorizeTextAnalyzer struct.
-func NewCustomCategorizeTextAnalyzerBuilder() *CustomCategorizeTextAnalyzerBuilder {
-	r := CustomCategorizeTextAnalyzerBuilder{
-		&CustomCategorizeTextAnalyzer{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "char_filter":
+			if err := dec.Decode(&s.CharFilter); err != nil {
+				return fmt.Errorf("%s | %w", "CharFilter", err)
+			}
+
+		case "filter":
+			if err := dec.Decode(&s.Filter); err != nil {
+				return fmt.Errorf("%s | %w", "Filter", err)
+			}
+
+		case "tokenizer":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Tokenizer", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Tokenizer = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the CustomCategorizeTextAnalyzer struct
-func (rb *CustomCategorizeTextAnalyzerBuilder) Build() CustomCategorizeTextAnalyzer {
-	return *rb.v
-}
+// NewCustomCategorizeTextAnalyzer returns a CustomCategorizeTextAnalyzer.
+func NewCustomCategorizeTextAnalyzer() *CustomCategorizeTextAnalyzer {
+	r := &CustomCategorizeTextAnalyzer{}
 
-func (rb *CustomCategorizeTextAnalyzerBuilder) CharFilter(char_filter ...string) *CustomCategorizeTextAnalyzerBuilder {
-	rb.v.CharFilter = char_filter
-	return rb
-}
-
-func (rb *CustomCategorizeTextAnalyzerBuilder) Filter(filter ...string) *CustomCategorizeTextAnalyzerBuilder {
-	rb.v.Filter = filter
-	return rb
-}
-
-func (rb *CustomCategorizeTextAnalyzerBuilder) Tokenizer(tokenizer string) *CustomCategorizeTextAnalyzerBuilder {
-	rb.v.Tokenizer = &tokenizer
-	return rb
+	return r
 }

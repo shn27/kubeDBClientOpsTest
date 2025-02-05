@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
@@ -27,38 +25,5 @@ package types
 //	map[string]StringTermsBucket
 //	[]StringTermsBucket
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L303-L312
-type BucketsStringTermsBucket interface{}
-
-// BucketsStringTermsBucketBuilder holds BucketsStringTermsBucket struct and provides a builder API.
-type BucketsStringTermsBucketBuilder struct {
-	v BucketsStringTermsBucket
-}
-
-// NewBucketsStringTermsBucket provides a builder for the BucketsStringTermsBucket struct.
-func NewBucketsStringTermsBucketBuilder() *BucketsStringTermsBucketBuilder {
-	return &BucketsStringTermsBucketBuilder{}
-}
-
-// Build finalize the chain and returns the BucketsStringTermsBucket struct
-func (u *BucketsStringTermsBucketBuilder) Build() BucketsStringTermsBucket {
-	return u.v
-}
-
-func (u *BucketsStringTermsBucketBuilder) Map(values map[string]*StringTermsBucketBuilder) *BucketsStringTermsBucketBuilder {
-	tmp := make(map[string]StringTermsBucket, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	u.v = tmp
-	return u
-}
-
-func (u *BucketsStringTermsBucketBuilder) StringTermsBuckets(stringtermsbuckets []StringTermsBucketBuilder) *BucketsStringTermsBucketBuilder {
-	tmp := make([]StringTermsBucket, len(stringtermsbuckets))
-	for _, value := range stringtermsbuckets {
-		tmp = append(tmp, value.Build())
-	}
-	u.v = tmp
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L346-L355
+type BucketsStringTermsBucket any

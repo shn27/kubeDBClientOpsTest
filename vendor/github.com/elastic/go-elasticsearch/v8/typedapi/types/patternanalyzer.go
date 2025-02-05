@@ -15,68 +15,136 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // PatternAnalyzer type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/analyzers.ts#L74-L81
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/analyzers.ts#L320-L327
 type PatternAnalyzer struct {
-	Flags     *string        `json:"flags,omitempty"`
-	Lowercase *bool          `json:"lowercase,omitempty"`
-	Pattern   string         `json:"pattern"`
-	Stopwords *StopWords     `json:"stopwords,omitempty"`
-	Type      string         `json:"type,omitempty"`
-	Version   *VersionString `json:"version,omitempty"`
+	Flags     *string  `json:"flags,omitempty"`
+	Lowercase *bool    `json:"lowercase,omitempty"`
+	Pattern   string   `json:"pattern"`
+	Stopwords []string `json:"stopwords,omitempty"`
+	Type      string   `json:"type,omitempty"`
+	Version   *string  `json:"version,omitempty"`
 }
 
-// PatternAnalyzerBuilder holds PatternAnalyzer struct and provides a builder API.
-type PatternAnalyzerBuilder struct {
-	v *PatternAnalyzer
+func (s *PatternAnalyzer) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "flags":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Flags", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Flags = &o
+
+		case "lowercase":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Lowercase", err)
+				}
+				s.Lowercase = &value
+			case bool:
+				s.Lowercase = &v
+			}
+
+		case "pattern":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Pattern", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Pattern = o
+
+		case "stopwords":
+			rawMsg := json.RawMessage{}
+			dec.Decode(&rawMsg)
+			if !bytes.HasPrefix(rawMsg, []byte("[")) {
+				o := new(string)
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&o); err != nil {
+					return fmt.Errorf("%s | %w", "Stopwords", err)
+				}
+
+				s.Stopwords = append(s.Stopwords, *o)
+			} else {
+				if err := json.NewDecoder(bytes.NewReader(rawMsg)).Decode(&s.Stopwords); err != nil {
+					return fmt.Errorf("%s | %w", "Stopwords", err)
+				}
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewPatternAnalyzer provides a builder for the PatternAnalyzer struct.
-func NewPatternAnalyzerBuilder() *PatternAnalyzerBuilder {
-	r := PatternAnalyzerBuilder{
-		&PatternAnalyzer{},
+// MarshalJSON override marshalling to include literal value
+func (s PatternAnalyzer) MarshalJSON() ([]byte, error) {
+	type innerPatternAnalyzer PatternAnalyzer
+	tmp := innerPatternAnalyzer{
+		Flags:     s.Flags,
+		Lowercase: s.Lowercase,
+		Pattern:   s.Pattern,
+		Stopwords: s.Stopwords,
+		Type:      s.Type,
+		Version:   s.Version,
 	}
 
-	r.v.Type = "pattern"
+	tmp.Type = "pattern"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the PatternAnalyzer struct
-func (rb *PatternAnalyzerBuilder) Build() PatternAnalyzer {
-	return *rb.v
-}
+// NewPatternAnalyzer returns a PatternAnalyzer.
+func NewPatternAnalyzer() *PatternAnalyzer {
+	r := &PatternAnalyzer{}
 
-func (rb *PatternAnalyzerBuilder) Flags(flags string) *PatternAnalyzerBuilder {
-	rb.v.Flags = &flags
-	return rb
-}
-
-func (rb *PatternAnalyzerBuilder) Lowercase(lowercase bool) *PatternAnalyzerBuilder {
-	rb.v.Lowercase = &lowercase
-	return rb
-}
-
-func (rb *PatternAnalyzerBuilder) Pattern(pattern string) *PatternAnalyzerBuilder {
-	rb.v.Pattern = pattern
-	return rb
-}
-
-func (rb *PatternAnalyzerBuilder) Stopwords(stopwords *StopWordsBuilder) *PatternAnalyzerBuilder {
-	v := stopwords.Build()
-	rb.v.Stopwords = &v
-	return rb
-}
-
-func (rb *PatternAnalyzerBuilder) Version(version VersionString) *PatternAnalyzerBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

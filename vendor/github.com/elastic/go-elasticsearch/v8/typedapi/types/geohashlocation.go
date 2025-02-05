@@ -15,40 +15,54 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // GeoHashLocation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Geo.ts#L112-L114
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Geo.ts#L131-L133
 type GeoHashLocation struct {
-	Geohash GeoHash `json:"geohash"`
+	Geohash string `json:"geohash"`
 }
 
-// GeoHashLocationBuilder holds GeoHashLocation struct and provides a builder API.
-type GeoHashLocationBuilder struct {
-	v *GeoHashLocation
-}
+func (s *GeoHashLocation) UnmarshalJSON(data []byte) error {
 
-// NewGeoHashLocation provides a builder for the GeoHashLocation struct.
-func NewGeoHashLocationBuilder() *GeoHashLocationBuilder {
-	r := GeoHashLocationBuilder{
-		&GeoHashLocation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "geohash":
+			if err := dec.Decode(&s.Geohash); err != nil {
+				return fmt.Errorf("%s | %w", "Geohash", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the GeoHashLocation struct
-func (rb *GeoHashLocationBuilder) Build() GeoHashLocation {
-	return *rb.v
-}
+// NewGeoHashLocation returns a GeoHashLocation.
+func NewGeoHashLocation() *GeoHashLocation {
+	r := &GeoHashLocation{}
 
-func (rb *GeoHashLocationBuilder) Geohash(geohash GeoHash) *GeoHashLocationBuilder {
-	rb.v.Geohash = geohash
-	return rb
+	return r
 }

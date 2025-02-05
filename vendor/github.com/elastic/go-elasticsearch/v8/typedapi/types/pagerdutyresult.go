@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // PagerDutyResult type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Actions.ts#L78-L83
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Actions.ts#L78-L83
 type PagerDutyResult struct {
 	Event    PagerDutyEvent           `json:"event"`
 	Reason   *string                  `json:"reason,omitempty"`
@@ -32,44 +39,56 @@ type PagerDutyResult struct {
 	Response *HttpInputResponseResult `json:"response,omitempty"`
 }
 
-// PagerDutyResultBuilder holds PagerDutyResult struct and provides a builder API.
-type PagerDutyResultBuilder struct {
-	v *PagerDutyResult
-}
+func (s *PagerDutyResult) UnmarshalJSON(data []byte) error {
 
-// NewPagerDutyResult provides a builder for the PagerDutyResult struct.
-func NewPagerDutyResultBuilder() *PagerDutyResultBuilder {
-	r := PagerDutyResultBuilder{
-		&PagerDutyResult{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "event":
+			if err := dec.Decode(&s.Event); err != nil {
+				return fmt.Errorf("%s | %w", "Event", err)
+			}
+
+		case "reason":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Reason", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Reason = &o
+
+		case "request":
+			if err := dec.Decode(&s.Request); err != nil {
+				return fmt.Errorf("%s | %w", "Request", err)
+			}
+
+		case "response":
+			if err := dec.Decode(&s.Response); err != nil {
+				return fmt.Errorf("%s | %w", "Response", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the PagerDutyResult struct
-func (rb *PagerDutyResultBuilder) Build() PagerDutyResult {
-	return *rb.v
-}
+// NewPagerDutyResult returns a PagerDutyResult.
+func NewPagerDutyResult() *PagerDutyResult {
+	r := &PagerDutyResult{}
 
-func (rb *PagerDutyResultBuilder) Event(event *PagerDutyEventBuilder) *PagerDutyResultBuilder {
-	v := event.Build()
-	rb.v.Event = v
-	return rb
-}
-
-func (rb *PagerDutyResultBuilder) Reason(reason string) *PagerDutyResultBuilder {
-	rb.v.Reason = &reason
-	return rb
-}
-
-func (rb *PagerDutyResultBuilder) Request(request *HttpInputRequestResultBuilder) *PagerDutyResultBuilder {
-	v := request.Build()
-	rb.v.Request = &v
-	return rb
-}
-
-func (rb *PagerDutyResultBuilder) Response(response *HttpInputResponseResultBuilder) *PagerDutyResultBuilder {
-	v := response.Build()
-	rb.v.Response = &v
-	return rb
+	return r
 }

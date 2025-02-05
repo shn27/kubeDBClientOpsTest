@@ -15,43 +15,73 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // UppercaseTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L338-L340
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L341-L343
 type UppercaseTokenFilter struct {
-	Type    string         `json:"type,omitempty"`
-	Version *VersionString `json:"version,omitempty"`
+	Type    string  `json:"type,omitempty"`
+	Version *string `json:"version,omitempty"`
 }
 
-// UppercaseTokenFilterBuilder holds UppercaseTokenFilter struct and provides a builder API.
-type UppercaseTokenFilterBuilder struct {
-	v *UppercaseTokenFilter
+func (s *UppercaseTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewUppercaseTokenFilter provides a builder for the UppercaseTokenFilter struct.
-func NewUppercaseTokenFilterBuilder() *UppercaseTokenFilterBuilder {
-	r := UppercaseTokenFilterBuilder{
-		&UppercaseTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s UppercaseTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerUppercaseTokenFilter UppercaseTokenFilter
+	tmp := innerUppercaseTokenFilter{
+		Type:    s.Type,
+		Version: s.Version,
 	}
 
-	r.v.Type = "uppercase"
+	tmp.Type = "uppercase"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the UppercaseTokenFilter struct
-func (rb *UppercaseTokenFilterBuilder) Build() UppercaseTokenFilter {
-	return *rb.v
-}
+// NewUppercaseTokenFilter returns a UppercaseTokenFilter.
+func NewUppercaseTokenFilter() *UppercaseTokenFilter {
+	r := &UppercaseTokenFilter{}
 
-func (rb *UppercaseTokenFilterBuilder) Version(version VersionString) *UppercaseTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

@@ -15,51 +15,62 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/acknowledgementoptions"
 )
 
 // AcknowledgeState type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Action.ts#L112-L115
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Action.ts#L109-L112
 type AcknowledgeState struct {
 	State     acknowledgementoptions.AcknowledgementOptions `json:"state"`
 	Timestamp DateTime                                      `json:"timestamp"`
 }
 
-// AcknowledgeStateBuilder holds AcknowledgeState struct and provides a builder API.
-type AcknowledgeStateBuilder struct {
-	v *AcknowledgeState
-}
+func (s *AcknowledgeState) UnmarshalJSON(data []byte) error {
 
-// NewAcknowledgeState provides a builder for the AcknowledgeState struct.
-func NewAcknowledgeStateBuilder() *AcknowledgeStateBuilder {
-	r := AcknowledgeStateBuilder{
-		&AcknowledgeState{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "state":
+			if err := dec.Decode(&s.State); err != nil {
+				return fmt.Errorf("%s | %w", "State", err)
+			}
+
+		case "timestamp":
+			if err := dec.Decode(&s.Timestamp); err != nil {
+				return fmt.Errorf("%s | %w", "Timestamp", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the AcknowledgeState struct
-func (rb *AcknowledgeStateBuilder) Build() AcknowledgeState {
-	return *rb.v
-}
+// NewAcknowledgeState returns a AcknowledgeState.
+func NewAcknowledgeState() *AcknowledgeState {
+	r := &AcknowledgeState{}
 
-func (rb *AcknowledgeStateBuilder) State(state acknowledgementoptions.AcknowledgementOptions) *AcknowledgeStateBuilder {
-	rb.v.State = state
-	return rb
-}
-
-func (rb *AcknowledgeStateBuilder) Timestamp(timestamp *DateTimeBuilder) *AcknowledgeStateBuilder {
-	v := timestamp.Build()
-	rb.v.Timestamp = v
-	return rb
+	return r
 }

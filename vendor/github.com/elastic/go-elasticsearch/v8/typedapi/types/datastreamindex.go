@@ -15,46 +15,96 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
+	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/managedby"
+)
+
 // DataStreamIndex type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/DataStream.ts#L52-L55
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/DataStream.ts#L136-L157
 type DataStreamIndex struct {
-	IndexName IndexName `json:"index_name"`
-	IndexUuid Uuid      `json:"index_uuid"`
+	// IlmPolicy Name of the current ILM lifecycle policy configured for this backing index.
+	IlmPolicy *string `json:"ilm_policy,omitempty"`
+	// IndexName Name of the backing index.
+	IndexName string `json:"index_name"`
+	// IndexUuid Universally unique identifier (UUID) for the index.
+	IndexUuid string `json:"index_uuid"`
+	// ManagedBy Name of the lifecycle system that's currently managing this backing index.
+	ManagedBy *managedby.ManagedBy `json:"managed_by,omitempty"`
+	// PreferIlm Indicates if ILM should take precedence over DSL in case both are configured
+	// to manage this index.
+	PreferIlm *bool `json:"prefer_ilm,omitempty"`
 }
 
-// DataStreamIndexBuilder holds DataStreamIndex struct and provides a builder API.
-type DataStreamIndexBuilder struct {
-	v *DataStreamIndex
-}
+func (s *DataStreamIndex) UnmarshalJSON(data []byte) error {
 
-// NewDataStreamIndex provides a builder for the DataStreamIndex struct.
-func NewDataStreamIndexBuilder() *DataStreamIndexBuilder {
-	r := DataStreamIndexBuilder{
-		&DataStreamIndex{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "ilm_policy":
+			if err := dec.Decode(&s.IlmPolicy); err != nil {
+				return fmt.Errorf("%s | %w", "IlmPolicy", err)
+			}
+
+		case "index_name":
+			if err := dec.Decode(&s.IndexName); err != nil {
+				return fmt.Errorf("%s | %w", "IndexName", err)
+			}
+
+		case "index_uuid":
+			if err := dec.Decode(&s.IndexUuid); err != nil {
+				return fmt.Errorf("%s | %w", "IndexUuid", err)
+			}
+
+		case "managed_by":
+			if err := dec.Decode(&s.ManagedBy); err != nil {
+				return fmt.Errorf("%s | %w", "ManagedBy", err)
+			}
+
+		case "prefer_ilm":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PreferIlm", err)
+				}
+				s.PreferIlm = &value
+			case bool:
+				s.PreferIlm = &v
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the DataStreamIndex struct
-func (rb *DataStreamIndexBuilder) Build() DataStreamIndex {
-	return *rb.v
-}
+// NewDataStreamIndex returns a DataStreamIndex.
+func NewDataStreamIndex() *DataStreamIndex {
+	r := &DataStreamIndex{}
 
-func (rb *DataStreamIndexBuilder) IndexName(indexname IndexName) *DataStreamIndexBuilder {
-	rb.v.IndexName = indexname
-	return rb
-}
-
-func (rb *DataStreamIndexBuilder) IndexUuid(indexuuid Uuid) *DataStreamIndexBuilder {
-	rb.v.IndexUuid = indexuuid
-	return rb
+	return r
 }

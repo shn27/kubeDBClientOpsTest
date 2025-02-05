@@ -15,60 +15,36 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // IndexTemplateMapping type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/put_index_template/IndicesPutIndexTemplateRequest.ts#L60-L64
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/put_index_template/IndicesPutIndexTemplateRequest.ts#L121-L143
 type IndexTemplateMapping struct {
-	Aliases  map[IndexName]Alias `json:"aliases,omitempty"`
-	Mappings *TypeMapping        `json:"mappings,omitempty"`
-	Settings *IndexSettings      `json:"settings,omitempty"`
+	// Aliases Aliases to add.
+	// If the index template includes a `data_stream` object, these are data stream
+	// aliases.
+	// Otherwise, these are index aliases.
+	// Data stream aliases ignore the `index_routing`, `routing`, and
+	// `search_routing` options.
+	Aliases   map[string]Alias     `json:"aliases,omitempty"`
+	Lifecycle *DataStreamLifecycle `json:"lifecycle,omitempty"`
+	// Mappings Mapping for fields in the index.
+	// If specified, this mapping can include field names, field data types, and
+	// mapping parameters.
+	Mappings *TypeMapping `json:"mappings,omitempty"`
+	// Settings Configuration options for the index.
+	Settings *IndexSettings `json:"settings,omitempty"`
 }
 
-// IndexTemplateMappingBuilder holds IndexTemplateMapping struct and provides a builder API.
-type IndexTemplateMappingBuilder struct {
-	v *IndexTemplateMapping
-}
-
-// NewIndexTemplateMapping provides a builder for the IndexTemplateMapping struct.
-func NewIndexTemplateMappingBuilder() *IndexTemplateMappingBuilder {
-	r := IndexTemplateMappingBuilder{
-		&IndexTemplateMapping{
-			Aliases: make(map[IndexName]Alias, 0),
-		},
+// NewIndexTemplateMapping returns a IndexTemplateMapping.
+func NewIndexTemplateMapping() *IndexTemplateMapping {
+	r := &IndexTemplateMapping{
+		Aliases: make(map[string]Alias, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the IndexTemplateMapping struct
-func (rb *IndexTemplateMappingBuilder) Build() IndexTemplateMapping {
-	return *rb.v
-}
-
-func (rb *IndexTemplateMappingBuilder) Aliases(values map[IndexName]*AliasBuilder) *IndexTemplateMappingBuilder {
-	tmp := make(map[IndexName]Alias, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Aliases = tmp
-	return rb
-}
-
-func (rb *IndexTemplateMappingBuilder) Mappings(mappings *TypeMappingBuilder) *IndexTemplateMappingBuilder {
-	v := mappings.Build()
-	rb.v.Mappings = &v
-	return rb
-}
-
-func (rb *IndexTemplateMappingBuilder) Settings(settings *IndexSettingsBuilder) *IndexTemplateMappingBuilder {
-	v := settings.Build()
-	rb.v.Settings = &v
-	return rb
+	return r
 }

@@ -15,19 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 // Package edgengramside
 package edgengramside
 
 import "strings"
 
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L73-L76
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L73-L76
 type EdgeNGramSide struct {
-	name string
+	Name string
 }
 
 var (
@@ -41,7 +39,7 @@ func (e EdgeNGramSide) MarshalText() (text []byte, err error) {
 }
 
 func (e *EdgeNGramSide) UnmarshalText(text []byte) error {
-	switch strings.ToLower(string(text)) {
+	switch strings.ReplaceAll(strings.ToLower(string(text)), "\"", "") {
 
 	case "front":
 		*e = Front
@@ -55,5 +53,5 @@ func (e *EdgeNGramSide) UnmarshalText(text []byte) error {
 }
 
 func (e EdgeNGramSide) String() string {
-	return e.name
+	return e.Name
 }

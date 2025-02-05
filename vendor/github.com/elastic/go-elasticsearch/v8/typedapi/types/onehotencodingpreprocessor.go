@@ -15,48 +15,73 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // OneHotEncodingPreprocessor type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/put_trained_model/types.ts#L44-L47
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/put_trained_model/types.ts#L44-L47
 type OneHotEncodingPreprocessor struct {
 	Field  string            `json:"field"`
 	HotMap map[string]string `json:"hot_map"`
 }
 
-// OneHotEncodingPreprocessorBuilder holds OneHotEncodingPreprocessor struct and provides a builder API.
-type OneHotEncodingPreprocessorBuilder struct {
-	v *OneHotEncodingPreprocessor
+func (s *OneHotEncodingPreprocessor) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "field":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Field = o
+
+		case "hot_map":
+			if s.HotMap == nil {
+				s.HotMap = make(map[string]string, 0)
+			}
+			if err := dec.Decode(&s.HotMap); err != nil {
+				return fmt.Errorf("%s | %w", "HotMap", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewOneHotEncodingPreprocessor provides a builder for the OneHotEncodingPreprocessor struct.
-func NewOneHotEncodingPreprocessorBuilder() *OneHotEncodingPreprocessorBuilder {
-	r := OneHotEncodingPreprocessorBuilder{
-		&OneHotEncodingPreprocessor{
-			HotMap: make(map[string]string, 0),
-		},
+// NewOneHotEncodingPreprocessor returns a OneHotEncodingPreprocessor.
+func NewOneHotEncodingPreprocessor() *OneHotEncodingPreprocessor {
+	r := &OneHotEncodingPreprocessor{
+		HotMap: make(map[string]string, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the OneHotEncodingPreprocessor struct
-func (rb *OneHotEncodingPreprocessorBuilder) Build() OneHotEncodingPreprocessor {
-	return *rb.v
-}
-
-func (rb *OneHotEncodingPreprocessorBuilder) Field(field string) *OneHotEncodingPreprocessorBuilder {
-	rb.v.Field = field
-	return rb
-}
-
-func (rb *OneHotEncodingPreprocessorBuilder) HotMap(value map[string]string) *OneHotEncodingPreprocessorBuilder {
-	rb.v.HotMap = value
-	return rb
+	return r
 }

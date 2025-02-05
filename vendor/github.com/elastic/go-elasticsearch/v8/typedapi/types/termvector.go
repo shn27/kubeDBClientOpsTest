@@ -15,53 +15,24 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // TermVector type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/termvectors/types.ts#L23-L26
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/termvectors/types.ts#L23-L26
 type TermVector struct {
-	FieldStatistics FieldStatistics `json:"field_statistics"`
-	Terms           map[string]Term `json:"terms"`
+	FieldStatistics *FieldStatistics `json:"field_statistics,omitempty"`
+	Terms           map[string]Term  `json:"terms"`
 }
 
-// TermVectorBuilder holds TermVector struct and provides a builder API.
-type TermVectorBuilder struct {
-	v *TermVector
-}
-
-// NewTermVector provides a builder for the TermVector struct.
-func NewTermVectorBuilder() *TermVectorBuilder {
-	r := TermVectorBuilder{
-		&TermVector{
-			Terms: make(map[string]Term, 0),
-		},
+// NewTermVector returns a TermVector.
+func NewTermVector() *TermVector {
+	r := &TermVector{
+		Terms: make(map[string]Term, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the TermVector struct
-func (rb *TermVectorBuilder) Build() TermVector {
-	return *rb.v
-}
-
-func (rb *TermVectorBuilder) FieldStatistics(fieldstatistics *FieldStatisticsBuilder) *TermVectorBuilder {
-	v := fieldstatistics.Build()
-	rb.v.FieldStatistics = v
-	return rb
-}
-
-func (rb *TermVectorBuilder) Terms(values map[string]*TermBuilder) *TermVectorBuilder {
-	tmp := make(map[string]Term, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Terms = tmp
-	return rb
+	return r
 }

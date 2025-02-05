@@ -15,67 +15,127 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ShardProfile type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/search/_types/profile.ts#L130-L135
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/search/_types/profile.ts#L142-L152
 type ShardProfile struct {
 	Aggregations []AggregationProfile `json:"aggregations"`
+	Cluster      string               `json:"cluster"`
+	Dfs          *DfsProfile          `json:"dfs,omitempty"`
 	Fetch        *FetchProfile        `json:"fetch,omitempty"`
 	Id           string               `json:"id"`
+	Index        string               `json:"index"`
+	NodeId       string               `json:"node_id"`
 	Searches     []SearchProfile      `json:"searches"`
+	ShardId      int64                `json:"shard_id"`
 }
 
-// ShardProfileBuilder holds ShardProfile struct and provides a builder API.
-type ShardProfileBuilder struct {
-	v *ShardProfile
-}
+func (s *ShardProfile) UnmarshalJSON(data []byte) error {
 
-// NewShardProfile provides a builder for the ShardProfile struct.
-func NewShardProfileBuilder() *ShardProfileBuilder {
-	r := ShardProfileBuilder{
-		&ShardProfile{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "aggregations":
+			if err := dec.Decode(&s.Aggregations); err != nil {
+				return fmt.Errorf("%s | %w", "Aggregations", err)
+			}
+
+		case "cluster":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Cluster", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Cluster = o
+
+		case "dfs":
+			if err := dec.Decode(&s.Dfs); err != nil {
+				return fmt.Errorf("%s | %w", "Dfs", err)
+			}
+
+		case "fetch":
+			if err := dec.Decode(&s.Fetch); err != nil {
+				return fmt.Errorf("%s | %w", "Fetch", err)
+			}
+
+		case "id":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Id = o
+
+		case "index":
+			if err := dec.Decode(&s.Index); err != nil {
+				return fmt.Errorf("%s | %w", "Index", err)
+			}
+
+		case "node_id":
+			if err := dec.Decode(&s.NodeId); err != nil {
+				return fmt.Errorf("%s | %w", "NodeId", err)
+			}
+
+		case "searches":
+			if err := dec.Decode(&s.Searches); err != nil {
+				return fmt.Errorf("%s | %w", "Searches", err)
+			}
+
+		case "shard_id":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ShardId", err)
+				}
+				s.ShardId = value
+			case float64:
+				f := int64(v)
+				s.ShardId = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ShardProfile struct
-func (rb *ShardProfileBuilder) Build() ShardProfile {
-	return *rb.v
-}
+// NewShardProfile returns a ShardProfile.
+func NewShardProfile() *ShardProfile {
+	r := &ShardProfile{}
 
-func (rb *ShardProfileBuilder) Aggregations(aggregations []AggregationProfileBuilder) *ShardProfileBuilder {
-	tmp := make([]AggregationProfile, len(aggregations))
-	for _, value := range aggregations {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Aggregations = tmp
-	return rb
-}
-
-func (rb *ShardProfileBuilder) Fetch(fetch *FetchProfileBuilder) *ShardProfileBuilder {
-	v := fetch.Build()
-	rb.v.Fetch = &v
-	return rb
-}
-
-func (rb *ShardProfileBuilder) Id(id string) *ShardProfileBuilder {
-	rb.v.Id = id
-	return rb
-}
-
-func (rb *ShardProfileBuilder) Searches(searches []SearchProfileBuilder) *ShardProfileBuilder {
-	tmp := make([]SearchProfile, len(searches))
-	for _, value := range searches {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.Searches = tmp
-	return rb
+	return r
 }

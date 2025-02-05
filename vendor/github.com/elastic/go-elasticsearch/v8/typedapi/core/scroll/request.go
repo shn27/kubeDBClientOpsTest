@@ -15,47 +15,41 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package scroll
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 )
 
 // Request holds the request body struct for the package scroll
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/scroll/ScrollRequest.ts#L24-L59
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/scroll/ScrollRequest.ts#L24-L75
 type Request struct {
 
 	// Scroll Period to retain the search context for scrolling.
-	Scroll *types.Duration `json:"scroll,omitempty"`
-
+	Scroll types.Duration `json:"scroll,omitempty"`
 	// ScrollId Scroll ID of the search.
-	ScrollId types.ScrollId `json:"scroll_id"`
+	ScrollId string `json:"scroll_id"`
 }
 
-// RequestBuilder is the builder API for the scroll.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -66,18 +60,31 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) Scroll(scroll *types.DurationBuilder) *RequestBuilder {
-	v := scroll.Build()
-	rb.v.Scroll = &v
-	return rb
-}
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
 
-func (rb *RequestBuilder) ScrollId(scrollid types.ScrollId) *RequestBuilder {
-	rb.v.ScrollId = scrollid
-	return rb
+		switch t {
+
+		case "scroll":
+			if err := dec.Decode(&s.Scroll); err != nil {
+				return fmt.Errorf("%s | %w", "Scroll", err)
+			}
+
+		case "scroll_id":
+			if err := dec.Decode(&s.ScrollId); err != nil {
+				return fmt.Errorf("%s | %w", "ScrollId", err)
+			}
+
+		}
+	}
+	return nil
 }

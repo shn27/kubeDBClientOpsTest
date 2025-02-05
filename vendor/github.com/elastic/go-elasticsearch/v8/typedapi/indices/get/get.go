@@ -15,27 +15,30 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
-
-// Returns information about one or more indices.
+// Get index information.
+// Returns information about one or more indices. For data streams, the API
+// returns information about the
+// stream’s backing indices.
 package get
 
 import (
-	gobytes "bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 
 	"github.com/elastic/elastic-transport-go/v8/elastictransport"
+	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
+	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/expandwildcard"
+	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/feature"
 )
 
 const (
@@ -52,11 +55,15 @@ type Get struct {
 	values  url.Values
 	path    url.URL
 
-	buf *gobytes.Buffer
+	raw io.Reader
 
 	paramSet int
 
 	index string
+
+	spanStarted bool
+
+	instrument elastictransport.Instrumentation
 }
 
 // NewGet type alias for index.
@@ -68,21 +75,29 @@ func NewGetFunc(tp elastictransport.Interface) NewGet {
 	return func(index string) *Get {
 		n := New(tp)
 
-		n.Index(index)
+		n._index(index)
 
 		return n
 	}
 }
 
-// Returns information about one or more indices.
+// Get index information.
+// Returns information about one or more indices. For data streams, the API
+// returns information about the
+// stream’s backing indices.
 //
-// https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-get-index.html
+// https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-get-index.html
 func New(tp elastictransport.Interface) *Get {
 	r := &Get{
 		transport: tp,
 		values:    make(url.Values),
 		headers:   make(http.Header),
-		buf:       gobytes.NewBuffer(nil),
+	}
+
+	if instrumented, ok := r.transport.(elastictransport.Instrumented); ok {
+		if instrument := instrumented.InstrumentationEnabled(); instrument != nil {
+			r.instrument = instrument
+		}
 	}
 
 	return r
@@ -102,7 +117,11 @@ func (r *Get) HttpRequest(ctx context.Context) (*http.Request, error) {
 	switch {
 	case r.paramSet == indexMask:
 		path.WriteString("/")
-		path.WriteString(url.PathEscape(r.index))
+
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordPathPart(ctx, "index", r.index)
+		}
+		path.WriteString(r.index)
 
 		method = http.MethodGet
 	}
@@ -115,12 +134,16 @@ func (r *Get) HttpRequest(ctx context.Context) (*http.Request, error) {
 	}
 
 	if ctx != nil {
-		req, err = http.NewRequestWithContext(ctx, method, r.path.String(), r.buf)
+		req, err = http.NewRequestWithContext(ctx, method, r.path.String(), r.raw)
 	} else {
-		req, err = http.NewRequest(method, r.path.String(), r.buf)
+		req, err = http.NewRequest(method, r.path.String(), r.raw)
 	}
 
-	req.Header.Set("accept", "application/vnd.elasticsearch+json;compatible-with=8")
+	req.Header = r.headers.Clone()
+
+	if req.Header.Get("Accept") == "" {
+		req.Header.Set("Accept", "application/vnd.elasticsearch+json;compatible-with=8")
+	}
 
 	if err != nil {
 		return req, fmt.Errorf("could not build http.Request: %w", err)
@@ -129,30 +152,121 @@ func (r *Get) HttpRequest(ctx context.Context) (*http.Request, error) {
 	return req, nil
 }
 
-// Do runs the http.Request through the provided transport.
-func (r Get) Do(ctx context.Context) (*http.Response, error) {
+// Perform runs the http.Request through the provided transport and returns an http.Response.
+func (r Get) Perform(providedCtx context.Context) (*http.Response, error) {
+	var ctx context.Context
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		if r.spanStarted == false {
+			ctx := instrument.Start(providedCtx, "indices.get")
+			defer instrument.Close(ctx)
+		}
+	}
+	if ctx == nil {
+		ctx = providedCtx
+	}
+
 	req, err := r.HttpRequest(ctx)
 	if err != nil {
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
 		return nil, err
 	}
 
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		instrument.BeforeRequest(req, "indices.get")
+		if reader := instrument.RecordRequestBody(ctx, "indices.get", r.raw); reader != nil {
+			req.Body = reader
+		}
+	}
 	res, err := r.transport.Perform(req)
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		instrument.AfterRequest(req, "elasticsearch", "indices.get")
+	}
 	if err != nil {
-		return nil, fmt.Errorf("an error happened during the Get query execution: %w", err)
+		localErr := fmt.Errorf("an error happened during the Get query execution: %w", err)
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, localErr)
+		}
+		return nil, localErr
 	}
 
 	return res, nil
 }
 
+// Do runs the request through the transport, handle the response and returns a get.Response
+func (r Get) Do(providedCtx context.Context) (Response, error) {
+	var ctx context.Context
+	r.spanStarted = true
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		ctx = instrument.Start(providedCtx, "indices.get")
+		defer instrument.Close(ctx)
+	}
+	if ctx == nil {
+		ctx = providedCtx
+	}
+
+	response := NewResponse()
+
+	res, err := r.Perform(ctx)
+	if err != nil {
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode < 299 {
+		err = json.NewDecoder(res.Body).Decode(&response)
+		if err != nil {
+			if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+				instrument.RecordError(ctx, err)
+			}
+			return nil, err
+		}
+
+		return response, nil
+	}
+
+	errorResponse := types.NewElasticsearchError()
+	err = json.NewDecoder(res.Body).Decode(errorResponse)
+	if err != nil {
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
+		return nil, err
+	}
+
+	if errorResponse.Status == 0 {
+		errorResponse.Status = res.StatusCode
+	}
+
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		instrument.RecordError(ctx, errorResponse)
+	}
+	return nil, errorResponse
+}
+
 // IsSuccess allows to run a query with a context and retrieve the result as a boolean.
 // This only exists for endpoints without a request payload and allows for quick control flow.
-func (r Get) IsSuccess(ctx context.Context) (bool, error) {
-	res, err := r.Do(ctx)
+func (r Get) IsSuccess(providedCtx context.Context) (bool, error) {
+	var ctx context.Context
+	r.spanStarted = true
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		ctx = instrument.Start(providedCtx, "indices.get")
+		defer instrument.Close(ctx)
+	}
+	if ctx == nil {
+		ctx = providedCtx
+	}
+
+	res, err := r.Perform(ctx)
 
 	if err != nil {
 		return false, err
 	}
-	io.Copy(ioutil.Discard, res.Body)
+	io.Copy(io.Discard, res.Body)
 	err = res.Body.Close()
 	if err != nil {
 		return false, err
@@ -160,6 +274,14 @@ func (r Get) IsSuccess(ctx context.Context) (bool, error) {
 
 	if res.StatusCode >= 200 && res.StatusCode < 300 {
 		return true, nil
+	}
+
+	if res.StatusCode != 404 {
+		err := fmt.Errorf("an error happened during the Get query execution, status code: %d", res.StatusCode)
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
+		return false, err
 	}
 
 	return false, nil
@@ -176,9 +298,9 @@ func (r *Get) Header(key, value string) *Get {
 // limit the request.
 // Wildcard expressions (*) are supported.
 // API Name: index
-func (r *Get) Index(v string) *Get {
+func (r *Get) _index(index string) *Get {
 	r.paramSet |= indexMask
-	r.index = v
+	r.index = index
 
 	return r
 }
@@ -190,8 +312,8 @@ func (r *Get) Index(v string) *Get {
 // a request targeting foo*,bar* returns an error if an index starts with foo
 // but no index starts with bar.
 // API name: allow_no_indices
-func (r *Get) AllowNoIndices(b bool) *Get {
-	r.values.Set("allow_no_indices", strconv.FormatBool(b))
+func (r *Get) AllowNoIndices(allownoindices bool) *Get {
+	r.values.Set("allow_no_indices", strconv.FormatBool(allownoindices))
 
 	return r
 }
@@ -202,32 +324,36 @@ func (r *Get) AllowNoIndices(b bool) *Get {
 // comma-separated values,
 // such as open,hidden.
 // API name: expand_wildcards
-func (r *Get) ExpandWildcards(value string) *Get {
-	r.values.Set("expand_wildcards", value)
+func (r *Get) ExpandWildcards(expandwildcards ...expandwildcard.ExpandWildcard) *Get {
+	tmp := []string{}
+	for _, item := range expandwildcards {
+		tmp = append(tmp, item.String())
+	}
+	r.values.Set("expand_wildcards", strings.Join(tmp, ","))
 
 	return r
 }
 
 // FlatSettings If true, returns settings in flat format.
 // API name: flat_settings
-func (r *Get) FlatSettings(b bool) *Get {
-	r.values.Set("flat_settings", strconv.FormatBool(b))
+func (r *Get) FlatSettings(flatsettings bool) *Get {
+	r.values.Set("flat_settings", strconv.FormatBool(flatsettings))
 
 	return r
 }
 
 // IgnoreUnavailable If false, requests that target a missing index return an error.
 // API name: ignore_unavailable
-func (r *Get) IgnoreUnavailable(b bool) *Get {
-	r.values.Set("ignore_unavailable", strconv.FormatBool(b))
+func (r *Get) IgnoreUnavailable(ignoreunavailable bool) *Get {
+	r.values.Set("ignore_unavailable", strconv.FormatBool(ignoreunavailable))
 
 	return r
 }
 
 // IncludeDefaults If true, return all default settings in the response.
 // API name: include_defaults
-func (r *Get) IncludeDefaults(b bool) *Get {
-	r.values.Set("include_defaults", strconv.FormatBool(b))
+func (r *Get) IncludeDefaults(includedefaults bool) *Get {
+	r.values.Set("include_defaults", strconv.FormatBool(includedefaults))
 
 	return r
 }
@@ -235,8 +361,8 @@ func (r *Get) IncludeDefaults(b bool) *Get {
 // Local If true, the request retrieves information from the local node only. Defaults
 // to false, which means information is retrieved from the master node.
 // API name: local
-func (r *Get) Local(b bool) *Get {
-	r.values.Set("local", strconv.FormatBool(b))
+func (r *Get) Local(local bool) *Get {
+	r.values.Set("local", strconv.FormatBool(local))
 
 	return r
 }
@@ -244,16 +370,64 @@ func (r *Get) Local(b bool) *Get {
 // MasterTimeout Period to wait for a connection to the master node. If no response is
 // received before the timeout expires, the request fails and returns an error.
 // API name: master_timeout
-func (r *Get) MasterTimeout(value string) *Get {
-	r.values.Set("master_timeout", value)
+func (r *Get) MasterTimeout(duration string) *Get {
+	r.values.Set("master_timeout", duration)
 
 	return r
 }
 
 // Features Return only information on specified index features
 // API name: features
-func (r *Get) Features(value string) *Get {
-	r.values.Set("features", value)
+func (r *Get) Features(features ...feature.Feature) *Get {
+	tmp := []string{}
+	for _, item := range features {
+		tmp = append(tmp, item.String())
+	}
+	r.values.Set("expand_wildcards", strings.Join(tmp, ","))
+
+	return r
+}
+
+// ErrorTrace When set to `true` Elasticsearch will include the full stack trace of errors
+// when they occur.
+// API name: error_trace
+func (r *Get) ErrorTrace(errortrace bool) *Get {
+	r.values.Set("error_trace", strconv.FormatBool(errortrace))
+
+	return r
+}
+
+// FilterPath Comma-separated list of filters in dot notation which reduce the response
+// returned by Elasticsearch.
+// API name: filter_path
+func (r *Get) FilterPath(filterpaths ...string) *Get {
+	tmp := []string{}
+	for _, item := range filterpaths {
+		tmp = append(tmp, fmt.Sprintf("%v", item))
+	}
+	r.values.Set("filter_path", strings.Join(tmp, ","))
+
+	return r
+}
+
+// Human When set to `true` will return statistics in a format suitable for humans.
+// For example `"exists_time": "1h"` for humans and
+// `"eixsts_time_in_millis": 3600000` for computers. When disabled the human
+// readable values will be omitted. This makes sense for responses being
+// consumed
+// only by machines.
+// API name: human
+func (r *Get) Human(human bool) *Get {
+	r.values.Set("human", strconv.FormatBool(human))
+
+	return r
+}
+
+// Pretty If set to `true` the returned JSON will be "pretty-formatted". Only use
+// this option for debugging only.
+// API name: pretty
+func (r *Get) Pretty(pretty bool) *Get {
+	r.values.Set("pretty", strconv.FormatBool(pretty))
 
 	return r
 }

@@ -15,128 +15,31 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // TokenizerDefinition holds the union for the following types:
 //
 //	CharGroupTokenizer
+//	ClassicTokenizer
 //	EdgeNGramTokenizer
-//	IcuTokenizer
 //	KeywordTokenizer
-//	KuromojiTokenizer
 //	LetterTokenizer
 //	LowercaseTokenizer
 //	NGramTokenizer
-//	NoriTokenizer
 //	PathHierarchyTokenizer
 //	PatternTokenizer
+//	SimplePatternTokenizer
+//	SimplePatternSplitTokenizer
 //	StandardTokenizer
+//	ThaiTokenizer
 //	UaxEmailUrlTokenizer
 //	WhitespaceTokenizer
+//	IcuTokenizer
+//	KuromojiTokenizer
+//	NoriTokenizer
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/tokenizers.ts#L123-L141
-type TokenizerDefinition interface{}
-
-// TokenizerDefinitionBuilder holds TokenizerDefinition struct and provides a builder API.
-type TokenizerDefinitionBuilder struct {
-	v TokenizerDefinition
-}
-
-// NewTokenizerDefinition provides a builder for the TokenizerDefinition struct.
-func NewTokenizerDefinitionBuilder() *TokenizerDefinitionBuilder {
-	return &TokenizerDefinitionBuilder{}
-}
-
-// Build finalize the chain and returns the TokenizerDefinition struct
-func (u *TokenizerDefinitionBuilder) Build() TokenizerDefinition {
-	return u.v
-}
-
-func (u *TokenizerDefinitionBuilder) CharGroupTokenizer(chargrouptokenizer *CharGroupTokenizerBuilder) *TokenizerDefinitionBuilder {
-	v := chargrouptokenizer.Build()
-	u.v = &v
-	return u
-}
-
-func (u *TokenizerDefinitionBuilder) EdgeNGramTokenizer(edgengramtokenizer *EdgeNGramTokenizerBuilder) *TokenizerDefinitionBuilder {
-	v := edgengramtokenizer.Build()
-	u.v = &v
-	return u
-}
-
-func (u *TokenizerDefinitionBuilder) IcuTokenizer(icutokenizer *IcuTokenizerBuilder) *TokenizerDefinitionBuilder {
-	v := icutokenizer.Build()
-	u.v = &v
-	return u
-}
-
-func (u *TokenizerDefinitionBuilder) KeywordTokenizer(keywordtokenizer *KeywordTokenizerBuilder) *TokenizerDefinitionBuilder {
-	v := keywordtokenizer.Build()
-	u.v = &v
-	return u
-}
-
-func (u *TokenizerDefinitionBuilder) KuromojiTokenizer(kuromojitokenizer *KuromojiTokenizerBuilder) *TokenizerDefinitionBuilder {
-	v := kuromojitokenizer.Build()
-	u.v = &v
-	return u
-}
-
-func (u *TokenizerDefinitionBuilder) LetterTokenizer(lettertokenizer *LetterTokenizerBuilder) *TokenizerDefinitionBuilder {
-	v := lettertokenizer.Build()
-	u.v = &v
-	return u
-}
-
-func (u *TokenizerDefinitionBuilder) LowercaseTokenizer(lowercasetokenizer *LowercaseTokenizerBuilder) *TokenizerDefinitionBuilder {
-	v := lowercasetokenizer.Build()
-	u.v = &v
-	return u
-}
-
-func (u *TokenizerDefinitionBuilder) NGramTokenizer(ngramtokenizer *NGramTokenizerBuilder) *TokenizerDefinitionBuilder {
-	v := ngramtokenizer.Build()
-	u.v = &v
-	return u
-}
-
-func (u *TokenizerDefinitionBuilder) NoriTokenizer(noritokenizer *NoriTokenizerBuilder) *TokenizerDefinitionBuilder {
-	v := noritokenizer.Build()
-	u.v = &v
-	return u
-}
-
-func (u *TokenizerDefinitionBuilder) PathHierarchyTokenizer(pathhierarchytokenizer *PathHierarchyTokenizerBuilder) *TokenizerDefinitionBuilder {
-	v := pathhierarchytokenizer.Build()
-	u.v = &v
-	return u
-}
-
-func (u *TokenizerDefinitionBuilder) PatternTokenizer(patterntokenizer *PatternTokenizerBuilder) *TokenizerDefinitionBuilder {
-	v := patterntokenizer.Build()
-	u.v = &v
-	return u
-}
-
-func (u *TokenizerDefinitionBuilder) StandardTokenizer(standardtokenizer *StandardTokenizerBuilder) *TokenizerDefinitionBuilder {
-	v := standardtokenizer.Build()
-	u.v = &v
-	return u
-}
-
-func (u *TokenizerDefinitionBuilder) UaxEmailUrlTokenizer(uaxemailurltokenizer *UaxEmailUrlTokenizerBuilder) *TokenizerDefinitionBuilder {
-	v := uaxemailurltokenizer.Build()
-	u.v = &v
-	return u
-}
-
-func (u *TokenizerDefinitionBuilder) WhitespaceTokenizer(whitespacetokenizer *WhitespaceTokenizerBuilder) *TokenizerDefinitionBuilder {
-	v := whitespacetokenizer.Build()
-	u.v = &v
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/tokenizers.ts#L147-L170
+type TokenizerDefinition any

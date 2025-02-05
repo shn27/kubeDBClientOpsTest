@@ -15,58 +15,105 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // IndicesVersions type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/stats/types.ts#L137-L142
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/stats/types.ts#L263-L268
 type IndicesVersions struct {
-	IndexCount        int           `json:"index_count"`
-	PrimaryShardCount int           `json:"primary_shard_count"`
-	TotalPrimaryBytes int64         `json:"total_primary_bytes"`
-	Version           VersionString `json:"version"`
+	IndexCount        int    `json:"index_count"`
+	PrimaryShardCount int    `json:"primary_shard_count"`
+	TotalPrimaryBytes int64  `json:"total_primary_bytes"`
+	Version           string `json:"version"`
 }
 
-// IndicesVersionsBuilder holds IndicesVersions struct and provides a builder API.
-type IndicesVersionsBuilder struct {
-	v *IndicesVersions
-}
+func (s *IndicesVersions) UnmarshalJSON(data []byte) error {
 
-// NewIndicesVersions provides a builder for the IndicesVersions struct.
-func NewIndicesVersionsBuilder() *IndicesVersionsBuilder {
-	r := IndicesVersionsBuilder{
-		&IndicesVersions{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "index_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IndexCount", err)
+				}
+				s.IndexCount = value
+			case float64:
+				f := int(v)
+				s.IndexCount = f
+			}
+
+		case "primary_shard_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "PrimaryShardCount", err)
+				}
+				s.PrimaryShardCount = value
+			case float64:
+				f := int(v)
+				s.PrimaryShardCount = f
+			}
+
+		case "total_primary_bytes":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "TotalPrimaryBytes", err)
+				}
+				s.TotalPrimaryBytes = value
+			case float64:
+				f := int64(v)
+				s.TotalPrimaryBytes = f
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the IndicesVersions struct
-func (rb *IndicesVersionsBuilder) Build() IndicesVersions {
-	return *rb.v
-}
+// NewIndicesVersions returns a IndicesVersions.
+func NewIndicesVersions() *IndicesVersions {
+	r := &IndicesVersions{}
 
-func (rb *IndicesVersionsBuilder) IndexCount(indexcount int) *IndicesVersionsBuilder {
-	rb.v.IndexCount = indexcount
-	return rb
-}
-
-func (rb *IndicesVersionsBuilder) PrimaryShardCount(primaryshardcount int) *IndicesVersionsBuilder {
-	rb.v.PrimaryShardCount = primaryshardcount
-	return rb
-}
-
-func (rb *IndicesVersionsBuilder) TotalPrimaryBytes(totalprimarybytes int64) *IndicesVersionsBuilder {
-	rb.v.TotalPrimaryBytes = totalprimarybytes
-	return rb
-}
-
-func (rb *IndicesVersionsBuilder) Version(version VersionString) *IndicesVersionsBuilder {
-	rb.v.Version = version
-	return rb
+	return r
 }

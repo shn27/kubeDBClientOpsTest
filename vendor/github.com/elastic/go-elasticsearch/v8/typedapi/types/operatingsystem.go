@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // OperatingSystem type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/_types/Stats.ts#L367-L373
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/_types/Stats.ts#L1016-L1022
 type OperatingSystem struct {
 	Cgroup    *Cgroup              `json:"cgroup,omitempty"`
 	Cpu       *Cpu                 `json:"cpu,omitempty"`
@@ -33,50 +40,64 @@ type OperatingSystem struct {
 	Timestamp *int64               `json:"timestamp,omitempty"`
 }
 
-// OperatingSystemBuilder holds OperatingSystem struct and provides a builder API.
-type OperatingSystemBuilder struct {
-	v *OperatingSystem
-}
+func (s *OperatingSystem) UnmarshalJSON(data []byte) error {
 
-// NewOperatingSystem provides a builder for the OperatingSystem struct.
-func NewOperatingSystemBuilder() *OperatingSystemBuilder {
-	r := OperatingSystemBuilder{
-		&OperatingSystem{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "cgroup":
+			if err := dec.Decode(&s.Cgroup); err != nil {
+				return fmt.Errorf("%s | %w", "Cgroup", err)
+			}
+
+		case "cpu":
+			if err := dec.Decode(&s.Cpu); err != nil {
+				return fmt.Errorf("%s | %w", "Cpu", err)
+			}
+
+		case "mem":
+			if err := dec.Decode(&s.Mem); err != nil {
+				return fmt.Errorf("%s | %w", "Mem", err)
+			}
+
+		case "swap":
+			if err := dec.Decode(&s.Swap); err != nil {
+				return fmt.Errorf("%s | %w", "Swap", err)
+			}
+
+		case "timestamp":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Timestamp", err)
+				}
+				s.Timestamp = &value
+			case float64:
+				f := int64(v)
+				s.Timestamp = &f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the OperatingSystem struct
-func (rb *OperatingSystemBuilder) Build() OperatingSystem {
-	return *rb.v
-}
+// NewOperatingSystem returns a OperatingSystem.
+func NewOperatingSystem() *OperatingSystem {
+	r := &OperatingSystem{}
 
-func (rb *OperatingSystemBuilder) Cgroup(cgroup *CgroupBuilder) *OperatingSystemBuilder {
-	v := cgroup.Build()
-	rb.v.Cgroup = &v
-	return rb
-}
-
-func (rb *OperatingSystemBuilder) Cpu(cpu *CpuBuilder) *OperatingSystemBuilder {
-	v := cpu.Build()
-	rb.v.Cpu = &v
-	return rb
-}
-
-func (rb *OperatingSystemBuilder) Mem(mem *ExtendedMemoryStatsBuilder) *OperatingSystemBuilder {
-	v := mem.Build()
-	rb.v.Mem = &v
-	return rb
-}
-
-func (rb *OperatingSystemBuilder) Swap(swap *MemoryStatsBuilder) *OperatingSystemBuilder {
-	v := swap.Build()
-	rb.v.Swap = &v
-	return rb
-}
-
-func (rb *OperatingSystemBuilder) Timestamp(timestamp int64) *OperatingSystemBuilder {
-	rb.v.Timestamp = &timestamp
-	return rb
+	return r
 }

@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
@@ -28,25 +26,5 @@ import (
 
 // CatTrainedModelsColumns type alias.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cat/_types/CatBase.ts#L636-L638
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cat/_types/CatBase.ts#L636-L638
 type CatTrainedModelsColumns []cattrainedmodelscolumn.CatTrainedModelsColumn
-
-// CatTrainedModelsColumnsBuilder holds CatTrainedModelsColumns struct and provides a builder API.
-type CatTrainedModelsColumnsBuilder struct {
-	v CatTrainedModelsColumns
-}
-
-// NewCatTrainedModelsColumns provides a builder for the CatTrainedModelsColumns struct.
-func NewCatTrainedModelsColumnsBuilder() *CatTrainedModelsColumnsBuilder {
-	return &CatTrainedModelsColumnsBuilder{}
-}
-
-// Build finalize the chain and returns the CatTrainedModelsColumns struct
-func (b *CatTrainedModelsColumnsBuilder) Build() CatTrainedModelsColumns {
-	return b.v
-}
-
-func (b *CatTrainedModelsColumnsBuilder) CatTrainedModelsColumns(value CatTrainedModelsColumns) *CatTrainedModelsColumnsBuilder {
-	b.v = value
-	return b
-}

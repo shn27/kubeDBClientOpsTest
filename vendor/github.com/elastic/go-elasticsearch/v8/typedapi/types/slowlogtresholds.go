@@ -15,62 +15,22 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // SlowlogTresholds type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/_types/IndexSettings.ts#L478-L487
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/_types/IndexSettings.ts#L497-L500
 type SlowlogTresholds struct {
 	Fetch *SlowlogTresholdLevels `json:"fetch,omitempty"`
-	// Index The indexing slow log, similar in functionality to the search slow log. The
-	// log file name ends with `_index_indexing_slowlog.json`.
-	// Log and the thresholds are configured in the same way as the search slowlog.
-	Index *SlowlogTresholdLevels `json:"index,omitempty"`
 	Query *SlowlogTresholdLevels `json:"query,omitempty"`
 }
 
-// SlowlogTresholdsBuilder holds SlowlogTresholds struct and provides a builder API.
-type SlowlogTresholdsBuilder struct {
-	v *SlowlogTresholds
-}
+// NewSlowlogTresholds returns a SlowlogTresholds.
+func NewSlowlogTresholds() *SlowlogTresholds {
+	r := &SlowlogTresholds{}
 
-// NewSlowlogTresholds provides a builder for the SlowlogTresholds struct.
-func NewSlowlogTresholdsBuilder() *SlowlogTresholdsBuilder {
-	r := SlowlogTresholdsBuilder{
-		&SlowlogTresholds{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the SlowlogTresholds struct
-func (rb *SlowlogTresholdsBuilder) Build() SlowlogTresholds {
-	return *rb.v
-}
-
-func (rb *SlowlogTresholdsBuilder) Fetch(fetch *SlowlogTresholdLevelsBuilder) *SlowlogTresholdsBuilder {
-	v := fetch.Build()
-	rb.v.Fetch = &v
-	return rb
-}
-
-// Index The indexing slow log, similar in functionality to the search slow log. The
-// log file name ends with `_index_indexing_slowlog.json`.
-// Log and the thresholds are configured in the same way as the search slowlog.
-
-func (rb *SlowlogTresholdsBuilder) Index(index *SlowlogTresholdLevelsBuilder) *SlowlogTresholdsBuilder {
-	v := index.Build()
-	rb.v.Index = &v
-	return rb
-}
-
-func (rb *SlowlogTresholdsBuilder) Query(query *SlowlogTresholdLevelsBuilder) *SlowlogTresholdsBuilder {
-	v := query.Build()
-	rb.v.Query = &v
-	return rb
+	return r
 }

@@ -15,56 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // GeoLocation holds the union for the following types:
 //
-//	[]float64
-//	GeoHashLocation
 //	LatLonGeoLocation
+//	GeoHashLocation
+//	[]Float64
 //	string
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Geo.ts#L91-L105
-type GeoLocation interface{}
-
-// GeoLocationBuilder holds GeoLocation struct and provides a builder API.
-type GeoLocationBuilder struct {
-	v GeoLocation
-}
-
-// NewGeoLocation provides a builder for the GeoLocation struct.
-func NewGeoLocationBuilder() *GeoLocationBuilder {
-	return &GeoLocationBuilder{}
-}
-
-// Build finalize the chain and returns the GeoLocation struct
-func (u *GeoLocationBuilder) Build() GeoLocation {
-	return u.v
-}
-
-func (u *GeoLocationBuilder) Doubles(doubles ...float64) *GeoLocationBuilder {
-	u.v = doubles
-	return u
-}
-
-func (u *GeoLocationBuilder) GeoHashLocation(geohashlocation *GeoHashLocationBuilder) *GeoLocationBuilder {
-	v := geohashlocation.Build()
-	u.v = &v
-	return u
-}
-
-func (u *GeoLocationBuilder) LatLonGeoLocation(latlongeolocation *LatLonGeoLocationBuilder) *GeoLocationBuilder {
-	v := latlongeolocation.Build()
-	u.v = &v
-	return u
-}
-
-func (u *GeoLocationBuilder) String(string string) *GeoLocationBuilder {
-	u.v = &string
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Geo.ts#L104-L118
+type GeoLocation any

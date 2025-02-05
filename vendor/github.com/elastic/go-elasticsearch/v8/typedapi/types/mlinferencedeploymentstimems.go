@@ -15,40 +15,66 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // MlInferenceDeploymentsTimeMs type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/usage/types.ts#L219-L221
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/xpack/usage/types.ts#L232-L234
 type MlInferenceDeploymentsTimeMs struct {
-	Avg float64 `json:"avg"`
+	Avg Float64 `json:"avg"`
 }
 
-// MlInferenceDeploymentsTimeMsBuilder holds MlInferenceDeploymentsTimeMs struct and provides a builder API.
-type MlInferenceDeploymentsTimeMsBuilder struct {
-	v *MlInferenceDeploymentsTimeMs
-}
+func (s *MlInferenceDeploymentsTimeMs) UnmarshalJSON(data []byte) error {
 
-// NewMlInferenceDeploymentsTimeMs provides a builder for the MlInferenceDeploymentsTimeMs struct.
-func NewMlInferenceDeploymentsTimeMsBuilder() *MlInferenceDeploymentsTimeMsBuilder {
-	r := MlInferenceDeploymentsTimeMsBuilder{
-		&MlInferenceDeploymentsTimeMs{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "avg":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Avg", err)
+				}
+				f := Float64(value)
+				s.Avg = f
+			case float64:
+				f := Float64(v)
+				s.Avg = f
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the MlInferenceDeploymentsTimeMs struct
-func (rb *MlInferenceDeploymentsTimeMsBuilder) Build() MlInferenceDeploymentsTimeMs {
-	return *rb.v
-}
+// NewMlInferenceDeploymentsTimeMs returns a MlInferenceDeploymentsTimeMs.
+func NewMlInferenceDeploymentsTimeMs() *MlInferenceDeploymentsTimeMs {
+	r := &MlInferenceDeploymentsTimeMs{}
 
-func (rb *MlInferenceDeploymentsTimeMsBuilder) Avg(avg float64) *MlInferenceDeploymentsTimeMsBuilder {
-	rb.v.Avg = avg
-	return rb
+	return r
 }

@@ -15,16 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // MlInferenceDeployments type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/xpack/usage/types.ts#L212-L217
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/xpack/usage/types.ts#L225-L230
 type MlInferenceDeployments struct {
 	Count           int                          `json:"count"`
 	InferenceCounts JobStatistics                `json:"inference_counts"`
@@ -32,44 +39,60 @@ type MlInferenceDeployments struct {
 	TimeMs          MlInferenceDeploymentsTimeMs `json:"time_ms"`
 }
 
-// MlInferenceDeploymentsBuilder holds MlInferenceDeployments struct and provides a builder API.
-type MlInferenceDeploymentsBuilder struct {
-	v *MlInferenceDeployments
-}
+func (s *MlInferenceDeployments) UnmarshalJSON(data []byte) error {
 
-// NewMlInferenceDeployments provides a builder for the MlInferenceDeployments struct.
-func NewMlInferenceDeploymentsBuilder() *MlInferenceDeploymentsBuilder {
-	r := MlInferenceDeploymentsBuilder{
-		&MlInferenceDeployments{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Count", err)
+				}
+				s.Count = value
+			case float64:
+				f := int(v)
+				s.Count = f
+			}
+
+		case "inference_counts":
+			if err := dec.Decode(&s.InferenceCounts); err != nil {
+				return fmt.Errorf("%s | %w", "InferenceCounts", err)
+			}
+
+		case "model_sizes_bytes":
+			if err := dec.Decode(&s.ModelSizesBytes); err != nil {
+				return fmt.Errorf("%s | %w", "ModelSizesBytes", err)
+			}
+
+		case "time_ms":
+			if err := dec.Decode(&s.TimeMs); err != nil {
+				return fmt.Errorf("%s | %w", "TimeMs", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the MlInferenceDeployments struct
-func (rb *MlInferenceDeploymentsBuilder) Build() MlInferenceDeployments {
-	return *rb.v
-}
+// NewMlInferenceDeployments returns a MlInferenceDeployments.
+func NewMlInferenceDeployments() *MlInferenceDeployments {
+	r := &MlInferenceDeployments{}
 
-func (rb *MlInferenceDeploymentsBuilder) Count(count int) *MlInferenceDeploymentsBuilder {
-	rb.v.Count = count
-	return rb
-}
-
-func (rb *MlInferenceDeploymentsBuilder) InferenceCounts(inferencecounts *JobStatisticsBuilder) *MlInferenceDeploymentsBuilder {
-	v := inferencecounts.Build()
-	rb.v.InferenceCounts = v
-	return rb
-}
-
-func (rb *MlInferenceDeploymentsBuilder) ModelSizesBytes(modelsizesbytes *JobStatisticsBuilder) *MlInferenceDeploymentsBuilder {
-	v := modelsizesbytes.Build()
-	rb.v.ModelSizesBytes = v
-	return rb
-}
-
-func (rb *MlInferenceDeploymentsBuilder) TimeMs(timems *MlInferenceDeploymentsTimeMsBuilder) *MlInferenceDeploymentsBuilder {
-	v := timems.Build()
-	rb.v.TimeMs = v
-	return rb
+	return r
 }

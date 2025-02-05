@@ -15,46 +15,75 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // NodeInfoScript type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/info/types.ts#L273-L276
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/info/types.ts#L289-L292
 type NodeInfoScript struct {
-	AllowedTypes               string `json:"allowed_types"`
-	DisableMaxCompilationsRate string `json:"disable_max_compilations_rate"`
+	AllowedTypes               string  `json:"allowed_types"`
+	DisableMaxCompilationsRate *string `json:"disable_max_compilations_rate,omitempty"`
 }
 
-// NodeInfoScriptBuilder holds NodeInfoScript struct and provides a builder API.
-type NodeInfoScriptBuilder struct {
-	v *NodeInfoScript
-}
+func (s *NodeInfoScript) UnmarshalJSON(data []byte) error {
 
-// NewNodeInfoScript provides a builder for the NodeInfoScript struct.
-func NewNodeInfoScriptBuilder() *NodeInfoScriptBuilder {
-	r := NodeInfoScriptBuilder{
-		&NodeInfoScript{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "allowed_types":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "AllowedTypes", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.AllowedTypes = o
+
+		case "disable_max_compilations_rate":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "DisableMaxCompilationsRate", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.DisableMaxCompilationsRate = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the NodeInfoScript struct
-func (rb *NodeInfoScriptBuilder) Build() NodeInfoScript {
-	return *rb.v
-}
+// NewNodeInfoScript returns a NodeInfoScript.
+func NewNodeInfoScript() *NodeInfoScript {
+	r := &NodeInfoScript{}
 
-func (rb *NodeInfoScriptBuilder) AllowedTypes(allowedtypes string) *NodeInfoScriptBuilder {
-	rb.v.AllowedTypes = allowedtypes
-	return rb
-}
-
-func (rb *NodeInfoScriptBuilder) DisableMaxCompilationsRate(disablemaxcompilationsrate string) *NodeInfoScriptBuilder {
-	rb.v.DisableMaxCompilationsRate = disablemaxcompilationsrate
-	return rb
+	return r
 }

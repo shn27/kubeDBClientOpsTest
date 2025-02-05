@@ -15,62 +15,95 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ConfusionMatrixItem type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ml/evaluate_data_frame/types.ts#L84-L89
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ml/evaluate_data_frame/types.ts#L125-L130
 type ConfusionMatrixItem struct {
-	ActualClass                 Name                        `json:"actual_class"`
+	ActualClass                 string                      `json:"actual_class"`
 	ActualClassDocCount         int                         `json:"actual_class_doc_count"`
 	OtherPredictedClassDocCount int                         `json:"other_predicted_class_doc_count"`
 	PredictedClasses            []ConfusionMatrixPrediction `json:"predicted_classes"`
 }
 
-// ConfusionMatrixItemBuilder holds ConfusionMatrixItem struct and provides a builder API.
-type ConfusionMatrixItemBuilder struct {
-	v *ConfusionMatrixItem
-}
+func (s *ConfusionMatrixItem) UnmarshalJSON(data []byte) error {
 
-// NewConfusionMatrixItem provides a builder for the ConfusionMatrixItem struct.
-func NewConfusionMatrixItemBuilder() *ConfusionMatrixItemBuilder {
-	r := ConfusionMatrixItemBuilder{
-		&ConfusionMatrixItem{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "actual_class":
+			if err := dec.Decode(&s.ActualClass); err != nil {
+				return fmt.Errorf("%s | %w", "ActualClass", err)
+			}
+
+		case "actual_class_doc_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "ActualClassDocCount", err)
+				}
+				s.ActualClassDocCount = value
+			case float64:
+				f := int(v)
+				s.ActualClassDocCount = f
+			}
+
+		case "other_predicted_class_doc_count":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "OtherPredictedClassDocCount", err)
+				}
+				s.OtherPredictedClassDocCount = value
+			case float64:
+				f := int(v)
+				s.OtherPredictedClassDocCount = f
+			}
+
+		case "predicted_classes":
+			if err := dec.Decode(&s.PredictedClasses); err != nil {
+				return fmt.Errorf("%s | %w", "PredictedClasses", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the ConfusionMatrixItem struct
-func (rb *ConfusionMatrixItemBuilder) Build() ConfusionMatrixItem {
-	return *rb.v
-}
+// NewConfusionMatrixItem returns a ConfusionMatrixItem.
+func NewConfusionMatrixItem() *ConfusionMatrixItem {
+	r := &ConfusionMatrixItem{}
 
-func (rb *ConfusionMatrixItemBuilder) ActualClass(actualclass Name) *ConfusionMatrixItemBuilder {
-	rb.v.ActualClass = actualclass
-	return rb
-}
-
-func (rb *ConfusionMatrixItemBuilder) ActualClassDocCount(actualclassdoccount int) *ConfusionMatrixItemBuilder {
-	rb.v.ActualClassDocCount = actualclassdoccount
-	return rb
-}
-
-func (rb *ConfusionMatrixItemBuilder) OtherPredictedClassDocCount(otherpredictedclassdoccount int) *ConfusionMatrixItemBuilder {
-	rb.v.OtherPredictedClassDocCount = otherpredictedclassdoccount
-	return rb
-}
-
-func (rb *ConfusionMatrixItemBuilder) PredictedClasses(predicted_classes []ConfusionMatrixPredictionBuilder) *ConfusionMatrixItemBuilder {
-	tmp := make([]ConfusionMatrixPrediction, len(predicted_classes))
-	for _, value := range predicted_classes {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.PredictedClasses = tmp
-	return rb
+	return r
 }

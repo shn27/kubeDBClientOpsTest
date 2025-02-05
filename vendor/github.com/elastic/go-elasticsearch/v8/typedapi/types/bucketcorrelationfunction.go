@@ -15,46 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // BucketCorrelationFunction type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/pipeline.ts#L110-L115
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/pipeline.ts#L148-L153
 type BucketCorrelationFunction struct {
 	// CountCorrelation The configuration to calculate a count correlation. This function is designed
 	// for determining the correlation of a term value and a given metric.
 	CountCorrelation BucketCorrelationFunctionCountCorrelation `json:"count_correlation"`
 }
 
-// BucketCorrelationFunctionBuilder holds BucketCorrelationFunction struct and provides a builder API.
-type BucketCorrelationFunctionBuilder struct {
-	v *BucketCorrelationFunction
-}
+// NewBucketCorrelationFunction returns a BucketCorrelationFunction.
+func NewBucketCorrelationFunction() *BucketCorrelationFunction {
+	r := &BucketCorrelationFunction{}
 
-// NewBucketCorrelationFunction provides a builder for the BucketCorrelationFunction struct.
-func NewBucketCorrelationFunctionBuilder() *BucketCorrelationFunctionBuilder {
-	r := BucketCorrelationFunctionBuilder{
-		&BucketCorrelationFunction{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the BucketCorrelationFunction struct
-func (rb *BucketCorrelationFunctionBuilder) Build() BucketCorrelationFunction {
-	return *rb.v
-}
-
-// CountCorrelation The configuration to calculate a count correlation. This function is designed
-// for determining the correlation of a term value and a given metric.
-
-func (rb *BucketCorrelationFunctionBuilder) CountCorrelation(countcorrelation *BucketCorrelationFunctionCountCorrelationBuilder) *BucketCorrelationFunctionBuilder {
-	v := countcorrelation.Build()
-	rb.v.CountCorrelation = v
-	return rb
+	return r
 }

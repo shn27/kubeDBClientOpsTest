@@ -15,128 +15,253 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // KeyValueProcessor type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/ingest/_types/Processors.ts#L277-L289
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/ingest/_types/Processors.ts#L1158-L1210
 type KeyValueProcessor struct {
-	ExcludeKeys   []string             `json:"exclude_keys,omitempty"`
-	Field         Field                `json:"field"`
-	FieldSplit    string               `json:"field_split"`
-	If            *string              `json:"if,omitempty"`
-	IgnoreFailure *bool                `json:"ignore_failure,omitempty"`
-	IgnoreMissing *bool                `json:"ignore_missing,omitempty"`
-	IncludeKeys   []string             `json:"include_keys,omitempty"`
-	OnFailure     []ProcessorContainer `json:"on_failure,omitempty"`
-	Prefix        *string              `json:"prefix,omitempty"`
-	StripBrackets *bool                `json:"strip_brackets,omitempty"`
-	Tag           *string              `json:"tag,omitempty"`
-	TargetField   *Field               `json:"target_field,omitempty"`
-	TrimKey       *string              `json:"trim_key,omitempty"`
-	TrimValue     *string              `json:"trim_value,omitempty"`
-	ValueSplit    string               `json:"value_split"`
+	// Description Description of the processor.
+	// Useful for describing the purpose of the processor or its configuration.
+	Description *string `json:"description,omitempty"`
+	// ExcludeKeys List of keys to exclude from document.
+	ExcludeKeys []string `json:"exclude_keys,omitempty"`
+	// Field The field to be parsed.
+	// Supports template snippets.
+	Field string `json:"field"`
+	// FieldSplit Regex pattern to use for splitting key-value pairs.
+	FieldSplit string `json:"field_split"`
+	// If Conditionally execute the processor.
+	If *string `json:"if,omitempty"`
+	// IgnoreFailure Ignore failures for the processor.
+	IgnoreFailure *bool `json:"ignore_failure,omitempty"`
+	// IgnoreMissing If `true` and `field` does not exist or is `null`, the processor quietly
+	// exits without modifying the document.
+	IgnoreMissing *bool `json:"ignore_missing,omitempty"`
+	// IncludeKeys List of keys to filter and insert into document.
+	// Defaults to including all keys.
+	IncludeKeys []string `json:"include_keys,omitempty"`
+	// OnFailure Handle failures for the processor.
+	OnFailure []ProcessorContainer `json:"on_failure,omitempty"`
+	// Prefix Prefix to be added to extracted keys.
+	Prefix *string `json:"prefix,omitempty"`
+	// StripBrackets If `true`. strip brackets `()`, `<>`, `[]` as well as quotes `'` and `"` from
+	// extracted values.
+	StripBrackets *bool `json:"strip_brackets,omitempty"`
+	// Tag Identifier for the processor.
+	// Useful for debugging and metrics.
+	Tag *string `json:"tag,omitempty"`
+	// TargetField The field to insert the extracted keys into.
+	// Defaults to the root of the document.
+	// Supports template snippets.
+	TargetField *string `json:"target_field,omitempty"`
+	// TrimKey String of characters to trim from extracted keys.
+	TrimKey *string `json:"trim_key,omitempty"`
+	// TrimValue String of characters to trim from extracted values.
+	TrimValue *string `json:"trim_value,omitempty"`
+	// ValueSplit Regex pattern to use for splitting the key from the value within a key-value
+	// pair.
+	ValueSplit string `json:"value_split"`
 }
 
-// KeyValueProcessorBuilder holds KeyValueProcessor struct and provides a builder API.
-type KeyValueProcessorBuilder struct {
-	v *KeyValueProcessor
-}
+func (s *KeyValueProcessor) UnmarshalJSON(data []byte) error {
 
-// NewKeyValueProcessor provides a builder for the KeyValueProcessor struct.
-func NewKeyValueProcessorBuilder() *KeyValueProcessorBuilder {
-	r := KeyValueProcessorBuilder{
-		&KeyValueProcessor{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "description":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Description", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Description = &o
+
+		case "exclude_keys":
+			if err := dec.Decode(&s.ExcludeKeys); err != nil {
+				return fmt.Errorf("%s | %w", "ExcludeKeys", err)
+			}
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "field_split":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "FieldSplit", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.FieldSplit = o
+
+		case "if":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "If", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.If = &o
+
+		case "ignore_failure":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IgnoreFailure", err)
+				}
+				s.IgnoreFailure = &value
+			case bool:
+				s.IgnoreFailure = &v
+			}
+
+		case "ignore_missing":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "IgnoreMissing", err)
+				}
+				s.IgnoreMissing = &value
+			case bool:
+				s.IgnoreMissing = &v
+			}
+
+		case "include_keys":
+			if err := dec.Decode(&s.IncludeKeys); err != nil {
+				return fmt.Errorf("%s | %w", "IncludeKeys", err)
+			}
+
+		case "on_failure":
+			if err := dec.Decode(&s.OnFailure); err != nil {
+				return fmt.Errorf("%s | %w", "OnFailure", err)
+			}
+
+		case "prefix":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Prefix", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Prefix = &o
+
+		case "strip_brackets":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseBool(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "StripBrackets", err)
+				}
+				s.StripBrackets = &value
+			case bool:
+				s.StripBrackets = &v
+			}
+
+		case "tag":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Tag", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Tag = &o
+
+		case "target_field":
+			if err := dec.Decode(&s.TargetField); err != nil {
+				return fmt.Errorf("%s | %w", "TargetField", err)
+			}
+
+		case "trim_key":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "TrimKey", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.TrimKey = &o
+
+		case "trim_value":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "TrimValue", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.TrimValue = &o
+
+		case "value_split":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "ValueSplit", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.ValueSplit = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the KeyValueProcessor struct
-func (rb *KeyValueProcessorBuilder) Build() KeyValueProcessor {
-	return *rb.v
-}
+// NewKeyValueProcessor returns a KeyValueProcessor.
+func NewKeyValueProcessor() *KeyValueProcessor {
+	r := &KeyValueProcessor{}
 
-func (rb *KeyValueProcessorBuilder) ExcludeKeys(exclude_keys ...string) *KeyValueProcessorBuilder {
-	rb.v.ExcludeKeys = exclude_keys
-	return rb
-}
-
-func (rb *KeyValueProcessorBuilder) Field(field Field) *KeyValueProcessorBuilder {
-	rb.v.Field = field
-	return rb
-}
-
-func (rb *KeyValueProcessorBuilder) FieldSplit(fieldsplit string) *KeyValueProcessorBuilder {
-	rb.v.FieldSplit = fieldsplit
-	return rb
-}
-
-func (rb *KeyValueProcessorBuilder) If_(if_ string) *KeyValueProcessorBuilder {
-	rb.v.If = &if_
-	return rb
-}
-
-func (rb *KeyValueProcessorBuilder) IgnoreFailure(ignorefailure bool) *KeyValueProcessorBuilder {
-	rb.v.IgnoreFailure = &ignorefailure
-	return rb
-}
-
-func (rb *KeyValueProcessorBuilder) IgnoreMissing(ignoremissing bool) *KeyValueProcessorBuilder {
-	rb.v.IgnoreMissing = &ignoremissing
-	return rb
-}
-
-func (rb *KeyValueProcessorBuilder) IncludeKeys(include_keys ...string) *KeyValueProcessorBuilder {
-	rb.v.IncludeKeys = include_keys
-	return rb
-}
-
-func (rb *KeyValueProcessorBuilder) OnFailure(on_failure []ProcessorContainerBuilder) *KeyValueProcessorBuilder {
-	tmp := make([]ProcessorContainer, len(on_failure))
-	for _, value := range on_failure {
-		tmp = append(tmp, value.Build())
-	}
-	rb.v.OnFailure = tmp
-	return rb
-}
-
-func (rb *KeyValueProcessorBuilder) Prefix(prefix string) *KeyValueProcessorBuilder {
-	rb.v.Prefix = &prefix
-	return rb
-}
-
-func (rb *KeyValueProcessorBuilder) StripBrackets(stripbrackets bool) *KeyValueProcessorBuilder {
-	rb.v.StripBrackets = &stripbrackets
-	return rb
-}
-
-func (rb *KeyValueProcessorBuilder) Tag(tag string) *KeyValueProcessorBuilder {
-	rb.v.Tag = &tag
-	return rb
-}
-
-func (rb *KeyValueProcessorBuilder) TargetField(targetfield Field) *KeyValueProcessorBuilder {
-	rb.v.TargetField = &targetfield
-	return rb
-}
-
-func (rb *KeyValueProcessorBuilder) TrimKey(trimkey string) *KeyValueProcessorBuilder {
-	rb.v.TrimKey = &trimkey
-	return rb
-}
-
-func (rb *KeyValueProcessorBuilder) TrimValue(trimvalue string) *KeyValueProcessorBuilder {
-	rb.v.TrimValue = &trimvalue
-	return rb
-}
-
-func (rb *KeyValueProcessorBuilder) ValueSplit(valuesplit string) *KeyValueProcessorBuilder {
-	rb.v.ValueSplit = valuesplit
-	return rb
+	return r
 }

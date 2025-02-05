@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
@@ -28,31 +26,14 @@ import (
 
 // DataEmailAttachment type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/watcher/_types/Actions.ts#L234-L236
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/watcher/_types/Actions.ts#L234-L236
 type DataEmailAttachment struct {
 	Format *dataattachmentformat.DataAttachmentFormat `json:"format,omitempty"`
 }
 
-// DataEmailAttachmentBuilder holds DataEmailAttachment struct and provides a builder API.
-type DataEmailAttachmentBuilder struct {
-	v *DataEmailAttachment
-}
+// NewDataEmailAttachment returns a DataEmailAttachment.
+func NewDataEmailAttachment() *DataEmailAttachment {
+	r := &DataEmailAttachment{}
 
-// NewDataEmailAttachment provides a builder for the DataEmailAttachment struct.
-func NewDataEmailAttachmentBuilder() *DataEmailAttachmentBuilder {
-	r := DataEmailAttachmentBuilder{
-		&DataEmailAttachment{},
-	}
-
-	return &r
-}
-
-// Build finalize the chain and returns the DataEmailAttachment struct
-func (rb *DataEmailAttachmentBuilder) Build() DataEmailAttachment {
-	return *rb.v
-}
-
-func (rb *DataEmailAttachmentBuilder) Format(format dataattachmentformat.DataAttachmentFormat) *DataEmailAttachmentBuilder {
-	rb.v.Format = &format
-	return rb
+	return r
 }

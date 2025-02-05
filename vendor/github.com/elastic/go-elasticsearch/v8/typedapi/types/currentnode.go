@@ -15,66 +15,103 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
+	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/noderole"
+)
+
 // CurrentNode type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/cluster/allocation_explain/types.ts#L78-L84
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/cluster/allocation_explain/types.ts#L79-L90
 type CurrentNode struct {
-	Attributes       map[string]string `json:"attributes"`
-	Id               Id                `json:"id"`
-	Name             Name              `json:"name"`
-	TransportAddress TransportAddress  `json:"transport_address"`
-	WeightRanking    int               `json:"weight_ranking"`
+	Attributes       map[string]string   `json:"attributes"`
+	Id               string              `json:"id"`
+	Name             string              `json:"name"`
+	Roles            []noderole.NodeRole `json:"roles"`
+	TransportAddress string              `json:"transport_address"`
+	WeightRanking    int                 `json:"weight_ranking"`
 }
 
-// CurrentNodeBuilder holds CurrentNode struct and provides a builder API.
-type CurrentNodeBuilder struct {
-	v *CurrentNode
+func (s *CurrentNode) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "attributes":
+			if s.Attributes == nil {
+				s.Attributes = make(map[string]string, 0)
+			}
+			if err := dec.Decode(&s.Attributes); err != nil {
+				return fmt.Errorf("%s | %w", "Attributes", err)
+			}
+
+		case "id":
+			if err := dec.Decode(&s.Id); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
+
+		case "name":
+			if err := dec.Decode(&s.Name); err != nil {
+				return fmt.Errorf("%s | %w", "Name", err)
+			}
+
+		case "roles":
+			if err := dec.Decode(&s.Roles); err != nil {
+				return fmt.Errorf("%s | %w", "Roles", err)
+			}
+
+		case "transport_address":
+			if err := dec.Decode(&s.TransportAddress); err != nil {
+				return fmt.Errorf("%s | %w", "TransportAddress", err)
+			}
+
+		case "weight_ranking":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "WeightRanking", err)
+				}
+				s.WeightRanking = value
+			case float64:
+				f := int(v)
+				s.WeightRanking = f
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewCurrentNode provides a builder for the CurrentNode struct.
-func NewCurrentNodeBuilder() *CurrentNodeBuilder {
-	r := CurrentNodeBuilder{
-		&CurrentNode{
-			Attributes: make(map[string]string, 0),
-		},
+// NewCurrentNode returns a CurrentNode.
+func NewCurrentNode() *CurrentNode {
+	r := &CurrentNode{
+		Attributes: make(map[string]string, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the CurrentNode struct
-func (rb *CurrentNodeBuilder) Build() CurrentNode {
-	return *rb.v
-}
-
-func (rb *CurrentNodeBuilder) Attributes(value map[string]string) *CurrentNodeBuilder {
-	rb.v.Attributes = value
-	return rb
-}
-
-func (rb *CurrentNodeBuilder) Id(id Id) *CurrentNodeBuilder {
-	rb.v.Id = id
-	return rb
-}
-
-func (rb *CurrentNodeBuilder) Name(name Name) *CurrentNodeBuilder {
-	rb.v.Name = name
-	return rb
-}
-
-func (rb *CurrentNodeBuilder) TransportAddress(transportaddress TransportAddress) *CurrentNodeBuilder {
-	rb.v.TransportAddress = transportaddress
-	return rb
-}
-
-func (rb *CurrentNodeBuilder) WeightRanking(weightranking int) *CurrentNodeBuilder {
-	rb.v.WeightRanking = weightranking
-	return rb
+	return r
 }

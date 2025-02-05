@@ -15,59 +15,76 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // AdjacencyMatrixAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/bucket.ts#L48-L50
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/bucket.ts#L60-L70
 type AdjacencyMatrixAggregation struct {
-	Filters map[string]QueryContainer `json:"filters,omitempty"`
-	Meta    *Metadata                 `json:"meta,omitempty"`
-	Name    *string                   `json:"name,omitempty"`
+	// Filters Filters used to create buckets.
+	// At least one filter is required.
+	Filters map[string]Query `json:"filters,omitempty"`
+	// Separator Separator used to concatenate filter names. Defaults to &.
+	Separator *string `json:"separator,omitempty"`
 }
 
-// AdjacencyMatrixAggregationBuilder holds AdjacencyMatrixAggregation struct and provides a builder API.
-type AdjacencyMatrixAggregationBuilder struct {
-	v *AdjacencyMatrixAggregation
+func (s *AdjacencyMatrixAggregation) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "filters":
+			if s.Filters == nil {
+				s.Filters = make(map[string]Query, 0)
+			}
+			if err := dec.Decode(&s.Filters); err != nil {
+				return fmt.Errorf("%s | %w", "Filters", err)
+			}
+
+		case "separator":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Separator", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Separator = &o
+
+		}
+	}
+	return nil
 }
 
-// NewAdjacencyMatrixAggregation provides a builder for the AdjacencyMatrixAggregation struct.
-func NewAdjacencyMatrixAggregationBuilder() *AdjacencyMatrixAggregationBuilder {
-	r := AdjacencyMatrixAggregationBuilder{
-		&AdjacencyMatrixAggregation{
-			Filters: make(map[string]QueryContainer, 0),
-		},
+// NewAdjacencyMatrixAggregation returns a AdjacencyMatrixAggregation.
+func NewAdjacencyMatrixAggregation() *AdjacencyMatrixAggregation {
+	r := &AdjacencyMatrixAggregation{
+		Filters: make(map[string]Query, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the AdjacencyMatrixAggregation struct
-func (rb *AdjacencyMatrixAggregationBuilder) Build() AdjacencyMatrixAggregation {
-	return *rb.v
-}
-
-func (rb *AdjacencyMatrixAggregationBuilder) Filters(values map[string]*QueryContainerBuilder) *AdjacencyMatrixAggregationBuilder {
-	tmp := make(map[string]QueryContainer, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.Filters = tmp
-	return rb
-}
-
-func (rb *AdjacencyMatrixAggregationBuilder) Meta(meta *MetadataBuilder) *AdjacencyMatrixAggregationBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *AdjacencyMatrixAggregationBuilder) Name(name string) *AdjacencyMatrixAggregationBuilder {
-	rb.v.Name = &name
-	return rb
+	return r
 }

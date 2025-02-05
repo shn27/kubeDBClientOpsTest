@@ -15,53 +15,66 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // MigrationFeatureIndexInfo type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/migration/get_feature_upgrade_status/GetFeatureUpgradeStatusResponse.ts#L44-L48
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/migration/get_feature_upgrade_status/GetFeatureUpgradeStatusResponse.ts#L44-L48
 type MigrationFeatureIndexInfo struct {
-	FailureCause *ErrorCause   `json:"failure_cause,omitempty"`
-	Index        IndexName     `json:"index"`
-	Version      VersionString `json:"version"`
+	FailureCause *ErrorCause `json:"failure_cause,omitempty"`
+	Index        string      `json:"index"`
+	Version      string      `json:"version"`
 }
 
-// MigrationFeatureIndexInfoBuilder holds MigrationFeatureIndexInfo struct and provides a builder API.
-type MigrationFeatureIndexInfoBuilder struct {
-	v *MigrationFeatureIndexInfo
-}
+func (s *MigrationFeatureIndexInfo) UnmarshalJSON(data []byte) error {
 
-// NewMigrationFeatureIndexInfo provides a builder for the MigrationFeatureIndexInfo struct.
-func NewMigrationFeatureIndexInfoBuilder() *MigrationFeatureIndexInfoBuilder {
-	r := MigrationFeatureIndexInfoBuilder{
-		&MigrationFeatureIndexInfo{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "failure_cause":
+			if err := dec.Decode(&s.FailureCause); err != nil {
+				return fmt.Errorf("%s | %w", "FailureCause", err)
+			}
+
+		case "index":
+			if err := dec.Decode(&s.Index); err != nil {
+				return fmt.Errorf("%s | %w", "Index", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the MigrationFeatureIndexInfo struct
-func (rb *MigrationFeatureIndexInfoBuilder) Build() MigrationFeatureIndexInfo {
-	return *rb.v
-}
+// NewMigrationFeatureIndexInfo returns a MigrationFeatureIndexInfo.
+func NewMigrationFeatureIndexInfo() *MigrationFeatureIndexInfo {
+	r := &MigrationFeatureIndexInfo{}
 
-func (rb *MigrationFeatureIndexInfoBuilder) FailureCause(failurecause *ErrorCauseBuilder) *MigrationFeatureIndexInfoBuilder {
-	v := failurecause.Build()
-	rb.v.FailureCause = &v
-	return rb
-}
-
-func (rb *MigrationFeatureIndexInfoBuilder) Index(index IndexName) *MigrationFeatureIndexInfoBuilder {
-	rb.v.Index = index
-	return rb
-}
-
-func (rb *MigrationFeatureIndexInfoBuilder) Version(version VersionString) *MigrationFeatureIndexInfoBuilder {
-	rb.v.Version = version
-	return rb
+	return r
 }

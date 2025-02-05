@@ -15,54 +15,74 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // NodeInfoSettingsTransport type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/info/types.ts#L197-L201
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/info/types.ts#L208-L212
 type NodeInfoSettingsTransport struct {
 	Features    *NodeInfoSettingsTransportFeatures `json:"features,omitempty"`
 	Type        NodeInfoSettingsTransportType      `json:"type"`
 	TypeDefault *string                            `json:"type.default,omitempty"`
 }
 
-// NodeInfoSettingsTransportBuilder holds NodeInfoSettingsTransport struct and provides a builder API.
-type NodeInfoSettingsTransportBuilder struct {
-	v *NodeInfoSettingsTransport
-}
+func (s *NodeInfoSettingsTransport) UnmarshalJSON(data []byte) error {
 
-// NewNodeInfoSettingsTransport provides a builder for the NodeInfoSettingsTransport struct.
-func NewNodeInfoSettingsTransportBuilder() *NodeInfoSettingsTransportBuilder {
-	r := NodeInfoSettingsTransportBuilder{
-		&NodeInfoSettingsTransport{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "features":
+			if err := dec.Decode(&s.Features); err != nil {
+				return fmt.Errorf("%s | %w", "Features", err)
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "type.default":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "TypeDefault", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.TypeDefault = &o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the NodeInfoSettingsTransport struct
-func (rb *NodeInfoSettingsTransportBuilder) Build() NodeInfoSettingsTransport {
-	return *rb.v
-}
+// NewNodeInfoSettingsTransport returns a NodeInfoSettingsTransport.
+func NewNodeInfoSettingsTransport() *NodeInfoSettingsTransport {
+	r := &NodeInfoSettingsTransport{}
 
-func (rb *NodeInfoSettingsTransportBuilder) Features(features *NodeInfoSettingsTransportFeaturesBuilder) *NodeInfoSettingsTransportBuilder {
-	v := features.Build()
-	rb.v.Features = &v
-	return rb
-}
-
-func (rb *NodeInfoSettingsTransportBuilder) Type_(type_ *NodeInfoSettingsTransportTypeBuilder) *NodeInfoSettingsTransportBuilder {
-	v := type_.Build()
-	rb.v.Type = v
-	return rb
-}
-
-func (rb *NodeInfoSettingsTransportBuilder) TypeDefault(typedefault string) *NodeInfoSettingsTransportBuilder {
-	rb.v.TypeDefault = &typedefault
-	return rb
+	return r
 }

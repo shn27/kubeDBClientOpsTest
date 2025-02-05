@@ -15,34 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"encoding/json"
+)
+
 // Metadata type alias.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/common.ts#L84-L84
-type Metadata map[string]interface{}
-
-// MetadataBuilder holds Metadata struct and provides a builder API.
-type MetadataBuilder struct {
-	v Metadata
-}
-
-// NewMetadata provides a builder for the Metadata struct.
-func NewMetadataBuilder() *MetadataBuilder {
-	return &MetadataBuilder{}
-}
-
-// Build finalize the chain and returns the Metadata struct
-func (b *MetadataBuilder) Build() Metadata {
-	return b.v
-}
-
-func (b *MetadataBuilder) Metadata(value Metadata) *MetadataBuilder {
-	b.v = value
-	return b
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/common.ts#L100-L100
+type Metadata map[string]json.RawMessage

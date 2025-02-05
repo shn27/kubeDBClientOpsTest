@@ -15,12 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
-
-// Returns information and statistics about terms in the fields of a particular
+// Get term vector information.
+//
+// Get information and statistics about terms in the fields of a particular
 // document.
 package termvectors
 
@@ -30,13 +30,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 
 	"github.com/elastic/elastic-transport-go/v8/elastictransport"
-
+	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/versiontype"
 )
 
@@ -56,15 +57,20 @@ type Termvectors struct {
 	values  url.Values
 	path    url.URL
 
-	buf *gobytes.Buffer
+	raw io.Reader
 
-	req *Request
-	raw json.RawMessage
+	req      *Request
+	deferred []func(request *Request) error
+	buf      *gobytes.Buffer
 
 	paramSet int
 
 	index string
 	id    string
+
+	spanStarted bool
+
+	instrument elastictransport.Instrumentation
 }
 
 // NewTermvectors type alias for index.
@@ -76,22 +82,33 @@ func NewTermvectorsFunc(tp elastictransport.Interface) NewTermvectors {
 	return func(index string) *Termvectors {
 		n := New(tp)
 
-		n.Index(index)
+		n._index(index)
 
 		return n
 	}
 }
 
-// Returns information and statistics about terms in the fields of a particular
+// Get term vector information.
+//
+// Get information and statistics about terms in the fields of a particular
 // document.
 //
-// https://www.elastic.co/guide/en/elasticsearch/reference/master/docs-termvectors.html
+// https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-termvectors.html
 func New(tp elastictransport.Interface) *Termvectors {
 	r := &Termvectors{
 		transport: tp,
 		values:    make(url.Values),
 		headers:   make(http.Header),
-		buf:       gobytes.NewBuffer(nil),
+
+		buf: gobytes.NewBuffer(nil),
+
+		req: NewRequest(),
+	}
+
+	if instrumented, ok := r.transport.(elastictransport.Instrumented); ok {
+		if instrument := instrumented.InstrumentationEnabled(); instrument != nil {
+			r.instrument = instrument
+		}
 	}
 
 	return r
@@ -99,7 +116,7 @@ func New(tp elastictransport.Interface) *Termvectors {
 
 // Raw takes a json payload as input which is then passed to the http.Request
 // If specified Raw takes precedence on Request method.
-func (r *Termvectors) Raw(raw json.RawMessage) *Termvectors {
+func (r *Termvectors) Raw(raw io.Reader) *Termvectors {
 	r.raw = raw
 
 	return r
@@ -121,9 +138,17 @@ func (r *Termvectors) HttpRequest(ctx context.Context) (*http.Request, error) {
 
 	var err error
 
-	if r.raw != nil {
-		r.buf.Write(r.raw)
-	} else if r.req != nil {
+	if len(r.deferred) > 0 {
+		for _, f := range r.deferred {
+			deferredErr := f(r.req)
+			if deferredErr != nil {
+				return nil, deferredErr
+			}
+		}
+	}
+
+	if r.raw == nil && r.req != nil {
+
 		data, err := json.Marshal(r.req)
 
 		if err != nil {
@@ -131,6 +156,11 @@ func (r *Termvectors) HttpRequest(ctx context.Context) (*http.Request, error) {
 		}
 
 		r.buf.Write(data)
+
+	}
+
+	if r.buf.Len() > 0 {
+		r.raw = r.buf
 	}
 
 	r.path.Scheme = "http"
@@ -138,16 +168,28 @@ func (r *Termvectors) HttpRequest(ctx context.Context) (*http.Request, error) {
 	switch {
 	case r.paramSet == indexMask|idMask:
 		path.WriteString("/")
-		path.WriteString(url.PathEscape(r.index))
+
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordPathPart(ctx, "index", r.index)
+		}
+		path.WriteString(r.index)
 		path.WriteString("/")
 		path.WriteString("_termvectors")
 		path.WriteString("/")
-		path.WriteString(url.PathEscape(r.id))
+
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordPathPart(ctx, "id", r.id)
+		}
+		path.WriteString(r.id)
 
 		method = http.MethodPost
 	case r.paramSet == indexMask:
 		path.WriteString("/")
-		path.WriteString(url.PathEscape(r.index))
+
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordPathPart(ctx, "index", r.index)
+		}
+		path.WriteString(r.index)
 		path.WriteString("/")
 		path.WriteString("_termvectors")
 
@@ -162,16 +204,22 @@ func (r *Termvectors) HttpRequest(ctx context.Context) (*http.Request, error) {
 	}
 
 	if ctx != nil {
-		req, err = http.NewRequestWithContext(ctx, method, r.path.String(), r.buf)
+		req, err = http.NewRequestWithContext(ctx, method, r.path.String(), r.raw)
 	} else {
-		req, err = http.NewRequest(method, r.path.String(), r.buf)
+		req, err = http.NewRequest(method, r.path.String(), r.raw)
 	}
 
-	if r.buf.Len() > 0 {
-		req.Header.Set("content-type", "application/vnd.elasticsearch+json;compatible-with=8")
+	req.Header = r.headers.Clone()
+
+	if req.Header.Get("Content-Type") == "" {
+		if r.raw != nil {
+			req.Header.Set("Content-Type", "application/vnd.elasticsearch+json;compatible-with=8")
+		}
 	}
 
-	req.Header.Set("accept", "application/vnd.elasticsearch+json;compatible-with=8")
+	if req.Header.Get("Accept") == "" {
+		req.Header.Set("Accept", "application/vnd.elasticsearch+json;compatible-with=8")
+	}
 
 	if err != nil {
 		return req, fmt.Errorf("could not build http.Request: %w", err)
@@ -180,19 +228,100 @@ func (r *Termvectors) HttpRequest(ctx context.Context) (*http.Request, error) {
 	return req, nil
 }
 
-// Do runs the http.Request through the provided transport.
-func (r Termvectors) Do(ctx context.Context) (*http.Response, error) {
+// Perform runs the http.Request through the provided transport and returns an http.Response.
+func (r Termvectors) Perform(providedCtx context.Context) (*http.Response, error) {
+	var ctx context.Context
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		if r.spanStarted == false {
+			ctx := instrument.Start(providedCtx, "termvectors")
+			defer instrument.Close(ctx)
+		}
+	}
+	if ctx == nil {
+		ctx = providedCtx
+	}
+
 	req, err := r.HttpRequest(ctx)
 	if err != nil {
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
 		return nil, err
 	}
 
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		instrument.BeforeRequest(req, "termvectors")
+		if reader := instrument.RecordRequestBody(ctx, "termvectors", r.raw); reader != nil {
+			req.Body = reader
+		}
+	}
 	res, err := r.transport.Perform(req)
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		instrument.AfterRequest(req, "elasticsearch", "termvectors")
+	}
 	if err != nil {
-		return nil, fmt.Errorf("an error happened during the Termvectors query execution: %w", err)
+		localErr := fmt.Errorf("an error happened during the Termvectors query execution: %w", err)
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, localErr)
+		}
+		return nil, localErr
 	}
 
 	return res, nil
+}
+
+// Do runs the request through the transport, handle the response and returns a termvectors.Response
+func (r Termvectors) Do(providedCtx context.Context) (*Response, error) {
+	var ctx context.Context
+	r.spanStarted = true
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		ctx = instrument.Start(providedCtx, "termvectors")
+		defer instrument.Close(ctx)
+	}
+	if ctx == nil {
+		ctx = providedCtx
+	}
+
+	response := NewResponse()
+
+	res, err := r.Perform(ctx)
+	if err != nil {
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode < 299 {
+		err = json.NewDecoder(res.Body).Decode(response)
+		if err != nil {
+			if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+				instrument.RecordError(ctx, err)
+			}
+			return nil, err
+		}
+
+		return response, nil
+	}
+
+	errorResponse := types.NewElasticsearchError()
+	err = json.NewDecoder(res.Body).Decode(errorResponse)
+	if err != nil {
+		if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+			instrument.RecordError(ctx, err)
+		}
+		return nil, err
+	}
+
+	if errorResponse.Status == 0 {
+		errorResponse.Status = res.StatusCode
+	}
+
+	if instrument, ok := r.instrument.(elastictransport.Instrumentation); ok {
+		instrument.RecordError(ctx, errorResponse)
+	}
+	return nil, errorResponse
 }
 
 // Header set a key, value pair in the Termvectors headers map.
@@ -202,111 +331,200 @@ func (r *Termvectors) Header(key, value string) *Termvectors {
 	return r
 }
 
-// Index The index in which the document resides.
+// Index Name of the index that contains the document.
 // API Name: index
-func (r *Termvectors) Index(v string) *Termvectors {
+func (r *Termvectors) _index(index string) *Termvectors {
 	r.paramSet |= indexMask
-	r.index = v
+	r.index = index
 
 	return r
 }
 
-// Id The id of the document, when not specified a doc param should be supplied.
+// Id Unique identifier of the document.
 // API Name: id
-func (r *Termvectors) Id(v string) *Termvectors {
+func (r *Termvectors) Id(id string) *Termvectors {
 	r.paramSet |= idMask
-	r.id = v
+	r.id = id
 
 	return r
 }
 
-// Fields A comma-separated list of fields to return.
+// Fields Comma-separated list or wildcard expressions of fields to include in the
+// statistics.
+// Used as the default list unless a specific field list is provided in the
+// `completion_fields` or `fielddata_fields` parameters.
 // API name: fields
-func (r *Termvectors) Fields(value string) *Termvectors {
-	r.values.Set("fields", value)
+func (r *Termvectors) Fields(fields ...string) *Termvectors {
+	r.values.Set("fields", strings.Join(fields, ","))
 
 	return r
 }
 
-// FieldStatistics Specifies if document count, sum of document frequencies and sum of total
-// term frequencies should be returned.
+// FieldStatistics If `true`, the response includes the document count, sum of document
+// frequencies, and sum of total term frequencies.
 // API name: field_statistics
-func (r *Termvectors) FieldStatistics(b bool) *Termvectors {
-	r.values.Set("field_statistics", strconv.FormatBool(b))
+func (r *Termvectors) FieldStatistics(fieldstatistics bool) *Termvectors {
+	r.values.Set("field_statistics", strconv.FormatBool(fieldstatistics))
 
 	return r
 }
 
-// Offsets Specifies if term offsets should be returned.
+// Offsets If `true`, the response includes term offsets.
 // API name: offsets
-func (r *Termvectors) Offsets(b bool) *Termvectors {
-	r.values.Set("offsets", strconv.FormatBool(b))
+func (r *Termvectors) Offsets(offsets bool) *Termvectors {
+	r.values.Set("offsets", strconv.FormatBool(offsets))
 
 	return r
 }
 
-// Payloads Specifies if term payloads should be returned.
+// Payloads If `true`, the response includes term payloads.
 // API name: payloads
-func (r *Termvectors) Payloads(b bool) *Termvectors {
-	r.values.Set("payloads", strconv.FormatBool(b))
+func (r *Termvectors) Payloads(payloads bool) *Termvectors {
+	r.values.Set("payloads", strconv.FormatBool(payloads))
 
 	return r
 }
 
-// Positions Specifies if term positions should be returned.
+// Positions If `true`, the response includes term positions.
 // API name: positions
-func (r *Termvectors) Positions(b bool) *Termvectors {
-	r.values.Set("positions", strconv.FormatBool(b))
+func (r *Termvectors) Positions(positions bool) *Termvectors {
+	r.values.Set("positions", strconv.FormatBool(positions))
 
 	return r
 }
 
-// Preference Specify the node or shard the operation should be performed on (default:
-// random).
+// Preference Specifies the node or shard the operation should be performed on.
+// Random by default.
 // API name: preference
-func (r *Termvectors) Preference(value string) *Termvectors {
-	r.values.Set("preference", value)
+func (r *Termvectors) Preference(preference string) *Termvectors {
+	r.values.Set("preference", preference)
 
 	return r
 }
 
-// Realtime Specifies if request is real-time as opposed to near-real-time (default:
-// true).
+// Realtime If true, the request is real-time as opposed to near-real-time.
 // API name: realtime
-func (r *Termvectors) Realtime(b bool) *Termvectors {
-	r.values.Set("realtime", strconv.FormatBool(b))
+func (r *Termvectors) Realtime(realtime bool) *Termvectors {
+	r.values.Set("realtime", strconv.FormatBool(realtime))
 
 	return r
 }
 
-// Routing Specific routing value.
+// Routing Custom value used to route operations to a specific shard.
 // API name: routing
-func (r *Termvectors) Routing(value string) *Termvectors {
-	r.values.Set("routing", value)
+func (r *Termvectors) Routing(routing string) *Termvectors {
+	r.values.Set("routing", routing)
 
 	return r
 }
 
-// TermStatistics Specifies if total term frequency and document frequency should be returned.
+// TermStatistics If `true`, the response includes term frequency and document frequency.
 // API name: term_statistics
-func (r *Termvectors) TermStatistics(b bool) *Termvectors {
-	r.values.Set("term_statistics", strconv.FormatBool(b))
+func (r *Termvectors) TermStatistics(termstatistics bool) *Termvectors {
+	r.values.Set("term_statistics", strconv.FormatBool(termstatistics))
 
 	return r
 }
 
-// Version Explicit version number for concurrency control
+// Version If `true`, returns the document version as part of a hit.
 // API name: version
-func (r *Termvectors) Version(value string) *Termvectors {
-	r.values.Set("version", value)
+func (r *Termvectors) Version(versionnumber string) *Termvectors {
+	r.values.Set("version", versionnumber)
 
 	return r
 }
 
-// VersionType Specific version type
+// VersionType Specific version type.
 // API name: version_type
-func (r *Termvectors) VersionType(enum versiontype.VersionType) *Termvectors {
-	r.values.Set("version_type", enum.String())
+func (r *Termvectors) VersionType(versiontype versiontype.VersionType) *Termvectors {
+	r.values.Set("version_type", versiontype.String())
+
+	return r
+}
+
+// ErrorTrace When set to `true` Elasticsearch will include the full stack trace of errors
+// when they occur.
+// API name: error_trace
+func (r *Termvectors) ErrorTrace(errortrace bool) *Termvectors {
+	r.values.Set("error_trace", strconv.FormatBool(errortrace))
+
+	return r
+}
+
+// FilterPath Comma-separated list of filters in dot notation which reduce the response
+// returned by Elasticsearch.
+// API name: filter_path
+func (r *Termvectors) FilterPath(filterpaths ...string) *Termvectors {
+	tmp := []string{}
+	for _, item := range filterpaths {
+		tmp = append(tmp, fmt.Sprintf("%v", item))
+	}
+	r.values.Set("filter_path", strings.Join(tmp, ","))
+
+	return r
+}
+
+// Human When set to `true` will return statistics in a format suitable for humans.
+// For example `"exists_time": "1h"` for humans and
+// `"eixsts_time_in_millis": 3600000` for computers. When disabled the human
+// readable values will be omitted. This makes sense for responses being
+// consumed
+// only by machines.
+// API name: human
+func (r *Termvectors) Human(human bool) *Termvectors {
+	r.values.Set("human", strconv.FormatBool(human))
+
+	return r
+}
+
+// Pretty If set to `true` the returned JSON will be "pretty-formatted". Only use
+// this option for debugging only.
+// API name: pretty
+func (r *Termvectors) Pretty(pretty bool) *Termvectors {
+	r.values.Set("pretty", strconv.FormatBool(pretty))
+
+	return r
+}
+
+// Doc An artificial document (a document not present in the index) for which you
+// want to retrieve term vectors.
+// API name: doc
+//
+// doc should be a json.RawMessage or a structure
+// if a structure is provided, the client will defer a json serialization
+// prior to sending the payload to Elasticsearch.
+func (r *Termvectors) Doc(doc any) *Termvectors {
+	switch casted := doc.(type) {
+	case json.RawMessage:
+		r.req.Doc = casted
+	default:
+		r.deferred = append(r.deferred, func(request *Request) error {
+			data, err := json.Marshal(doc)
+			if err != nil {
+				return err
+			}
+			r.req.Doc = data
+			return nil
+		})
+	}
+
+	return r
+}
+
+// Filter Filter terms based on their tf-idf scores.
+// API name: filter
+func (r *Termvectors) Filter(filter *types.TermVectorsFilter) *Termvectors {
+
+	r.req.Filter = filter
+
+	return r
+}
+
+// PerFieldAnalyzer Overrides the default per-field analyzer.
+// API name: per_field_analyzer
+func (r *Termvectors) PerFieldAnalyzer(perfieldanalyzer map[string]string) *Termvectors {
+
+	r.req.PerFieldAnalyzer = perfieldanalyzer
 
 	return r
 }

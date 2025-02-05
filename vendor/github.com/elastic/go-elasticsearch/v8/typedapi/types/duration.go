@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
@@ -26,25 +24,5 @@ package types
 //
 //	string
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/Time.ts#L52-L58
-type Duration interface{}
-
-// DurationBuilder holds Duration struct and provides a builder API.
-type DurationBuilder struct {
-	v Duration
-}
-
-// NewDuration provides a builder for the Duration struct.
-func NewDurationBuilder() *DurationBuilder {
-	return &DurationBuilder{}
-}
-
-// Build finalize the chain and returns the Duration struct
-func (u *DurationBuilder) Build() Duration {
-	return u.v
-}
-
-func (u *DurationBuilder) String(string string) *DurationBuilder {
-	u.v = &string
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/Time.ts#L52-L58
+type Duration any

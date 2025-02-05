@@ -15,10 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
@@ -27,38 +25,5 @@ package types
 //	map[string]SignificantStringTermsBucket
 //	[]SignificantStringTermsBucket
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/Aggregate.ts#L303-L312
-type BucketsSignificantStringTermsBucket interface{}
-
-// BucketsSignificantStringTermsBucketBuilder holds BucketsSignificantStringTermsBucket struct and provides a builder API.
-type BucketsSignificantStringTermsBucketBuilder struct {
-	v BucketsSignificantStringTermsBucket
-}
-
-// NewBucketsSignificantStringTermsBucket provides a builder for the BucketsSignificantStringTermsBucket struct.
-func NewBucketsSignificantStringTermsBucketBuilder() *BucketsSignificantStringTermsBucketBuilder {
-	return &BucketsSignificantStringTermsBucketBuilder{}
-}
-
-// Build finalize the chain and returns the BucketsSignificantStringTermsBucket struct
-func (u *BucketsSignificantStringTermsBucketBuilder) Build() BucketsSignificantStringTermsBucket {
-	return u.v
-}
-
-func (u *BucketsSignificantStringTermsBucketBuilder) Map(values map[string]*SignificantStringTermsBucketBuilder) *BucketsSignificantStringTermsBucketBuilder {
-	tmp := make(map[string]SignificantStringTermsBucket, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	u.v = tmp
-	return u
-}
-
-func (u *BucketsSignificantStringTermsBucketBuilder) SignificantStringTermsBuckets(significantstringtermsbuckets []SignificantStringTermsBucketBuilder) *BucketsSignificantStringTermsBucketBuilder {
-	tmp := make([]SignificantStringTermsBucket, len(significantstringtermsbuckets))
-	for _, value := range significantstringtermsbuckets {
-		tmp = append(tmp, value.Build())
-	}
-	u.v = tmp
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/Aggregate.ts#L346-L355
+type BucketsSignificantStringTermsBucket any

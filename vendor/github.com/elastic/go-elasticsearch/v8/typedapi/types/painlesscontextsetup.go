@@ -15,53 +15,71 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // PainlessContextSetup type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_global/scripts_painless_execute/types.ts#L25-L29
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_global/scripts_painless_execute/types.ts#L25-L39
 type PainlessContextSetup struct {
-	Document interface{}    `json:"document,omitempty"`
-	Index    IndexName      `json:"index"`
-	Query    QueryContainer `json:"query"`
+	// Document Document that’s temporarily indexed in-memory and accessible from the script.
+	Document json.RawMessage `json:"document,omitempty"`
+	// Index Index containing a mapping that’s compatible with the indexed document.
+	// You may specify a remote index by prefixing the index with the remote cluster
+	// alias.
+	Index string `json:"index"`
+	// Query Use this parameter to specify a query for computing a score.
+	Query *Query `json:"query,omitempty"`
 }
 
-// PainlessContextSetupBuilder holds PainlessContextSetup struct and provides a builder API.
-type PainlessContextSetupBuilder struct {
-	v *PainlessContextSetup
-}
+func (s *PainlessContextSetup) UnmarshalJSON(data []byte) error {
 
-// NewPainlessContextSetup provides a builder for the PainlessContextSetup struct.
-func NewPainlessContextSetupBuilder() *PainlessContextSetupBuilder {
-	r := PainlessContextSetupBuilder{
-		&PainlessContextSetup{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "document":
+			if err := dec.Decode(&s.Document); err != nil {
+				return fmt.Errorf("%s | %w", "Document", err)
+			}
+
+		case "index":
+			if err := dec.Decode(&s.Index); err != nil {
+				return fmt.Errorf("%s | %w", "Index", err)
+			}
+
+		case "query":
+			if err := dec.Decode(&s.Query); err != nil {
+				return fmt.Errorf("%s | %w", "Query", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the PainlessContextSetup struct
-func (rb *PainlessContextSetupBuilder) Build() PainlessContextSetup {
-	return *rb.v
-}
+// NewPainlessContextSetup returns a PainlessContextSetup.
+func NewPainlessContextSetup() *PainlessContextSetup {
+	r := &PainlessContextSetup{}
 
-func (rb *PainlessContextSetupBuilder) Document(document interface{}) *PainlessContextSetupBuilder {
-	rb.v.Document = document
-	return rb
-}
-
-func (rb *PainlessContextSetupBuilder) Index(index IndexName) *PainlessContextSetupBuilder {
-	rb.v.Index = index
-	return rb
-}
-
-func (rb *PainlessContextSetupBuilder) Query(query *QueryContainerBuilder) *PainlessContextSetupBuilder {
-	v := query.Build()
-	rb.v.Query = v
-	return rb
+	return r
 }

@@ -15,80 +15,89 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/gappolicy"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/normalizemethod"
 )
 
 // NormalizeAggregation type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/pipeline.ts#L250-L252
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/pipeline.ts#L351-L359
 type NormalizeAggregation struct {
 	// BucketsPath Path to the buckets that contain one set of values to correlate.
-	BucketsPath *BucketsPath                     `json:"buckets_path,omitempty"`
-	Format      *string                          `json:"format,omitempty"`
-	GapPolicy   *gappolicy.GapPolicy             `json:"gap_policy,omitempty"`
-	Meta        *Metadata                        `json:"meta,omitempty"`
-	Method      *normalizemethod.NormalizeMethod `json:"method,omitempty"`
-	Name        *string                          `json:"name,omitempty"`
+	BucketsPath BucketsPath `json:"buckets_path,omitempty"`
+	// Format `DecimalFormat` pattern for the output value.
+	// If specified, the formatted value is returned in the aggregation’s
+	// `value_as_string` property.
+	Format *string `json:"format,omitempty"`
+	// GapPolicy Policy to apply when gaps are found in the data.
+	GapPolicy *gappolicy.GapPolicy `json:"gap_policy,omitempty"`
+	// Method The specific method to apply.
+	Method *normalizemethod.NormalizeMethod `json:"method,omitempty"`
 }
 
-// NormalizeAggregationBuilder holds NormalizeAggregation struct and provides a builder API.
-type NormalizeAggregationBuilder struct {
-	v *NormalizeAggregation
-}
+func (s *NormalizeAggregation) UnmarshalJSON(data []byte) error {
 
-// NewNormalizeAggregation provides a builder for the NormalizeAggregation struct.
-func NewNormalizeAggregationBuilder() *NormalizeAggregationBuilder {
-	r := NormalizeAggregationBuilder{
-		&NormalizeAggregation{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "buckets_path":
+			if err := dec.Decode(&s.BucketsPath); err != nil {
+				return fmt.Errorf("%s | %w", "BucketsPath", err)
+			}
+
+		case "format":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Format", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Format = &o
+
+		case "gap_policy":
+			if err := dec.Decode(&s.GapPolicy); err != nil {
+				return fmt.Errorf("%s | %w", "GapPolicy", err)
+			}
+
+		case "method":
+			if err := dec.Decode(&s.Method); err != nil {
+				return fmt.Errorf("%s | %w", "Method", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the NormalizeAggregation struct
-func (rb *NormalizeAggregationBuilder) Build() NormalizeAggregation {
-	return *rb.v
-}
+// NewNormalizeAggregation returns a NormalizeAggregation.
+func NewNormalizeAggregation() *NormalizeAggregation {
+	r := &NormalizeAggregation{}
 
-// BucketsPath Path to the buckets that contain one set of values to correlate.
-
-func (rb *NormalizeAggregationBuilder) BucketsPath(bucketspath *BucketsPathBuilder) *NormalizeAggregationBuilder {
-	v := bucketspath.Build()
-	rb.v.BucketsPath = &v
-	return rb
-}
-
-func (rb *NormalizeAggregationBuilder) Format(format string) *NormalizeAggregationBuilder {
-	rb.v.Format = &format
-	return rb
-}
-
-func (rb *NormalizeAggregationBuilder) GapPolicy(gappolicy gappolicy.GapPolicy) *NormalizeAggregationBuilder {
-	rb.v.GapPolicy = &gappolicy
-	return rb
-}
-
-func (rb *NormalizeAggregationBuilder) Meta(meta *MetadataBuilder) *NormalizeAggregationBuilder {
-	v := meta.Build()
-	rb.v.Meta = &v
-	return rb
-}
-
-func (rb *NormalizeAggregationBuilder) Method(method normalizemethod.NormalizeMethod) *NormalizeAggregationBuilder {
-	rb.v.Method = &method
-	return rb
-}
-
-func (rb *NormalizeAggregationBuilder) Name(name string) *NormalizeAggregationBuilder {
-	rb.v.Name = &name
-	return rb
+	return r
 }

@@ -15,60 +15,99 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // ShardCommit type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/stats/types.ts#L100-L105
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/stats/types.ts#L112-L117
 type ShardCommit struct {
 	Generation int               `json:"generation"`
-	Id         Id                `json:"id"`
+	Id         string            `json:"id"`
 	NumDocs    int64             `json:"num_docs"`
 	UserData   map[string]string `json:"user_data"`
 }
 
-// ShardCommitBuilder holds ShardCommit struct and provides a builder API.
-type ShardCommitBuilder struct {
-	v *ShardCommit
+func (s *ShardCommit) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "generation":
+
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Generation", err)
+				}
+				s.Generation = value
+			case float64:
+				f := int(v)
+				s.Generation = f
+			}
+
+		case "id":
+			if err := dec.Decode(&s.Id); err != nil {
+				return fmt.Errorf("%s | %w", "Id", err)
+			}
+
+		case "num_docs":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "NumDocs", err)
+				}
+				s.NumDocs = value
+			case float64:
+				f := int64(v)
+				s.NumDocs = f
+			}
+
+		case "user_data":
+			if s.UserData == nil {
+				s.UserData = make(map[string]string, 0)
+			}
+			if err := dec.Decode(&s.UserData); err != nil {
+				return fmt.Errorf("%s | %w", "UserData", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewShardCommit provides a builder for the ShardCommit struct.
-func NewShardCommitBuilder() *ShardCommitBuilder {
-	r := ShardCommitBuilder{
-		&ShardCommit{
-			UserData: make(map[string]string, 0),
-		},
+// NewShardCommit returns a ShardCommit.
+func NewShardCommit() *ShardCommit {
+	r := &ShardCommit{
+		UserData: make(map[string]string, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the ShardCommit struct
-func (rb *ShardCommitBuilder) Build() ShardCommit {
-	return *rb.v
-}
-
-func (rb *ShardCommitBuilder) Generation(generation int) *ShardCommitBuilder {
-	rb.v.Generation = generation
-	return rb
-}
-
-func (rb *ShardCommitBuilder) Id(id Id) *ShardCommitBuilder {
-	rb.v.Id = id
-	return rb
-}
-
-func (rb *ShardCommitBuilder) NumDocs(numdocs int64) *ShardCommitBuilder {
-	rb.v.NumDocs = numdocs
-	return rb
-}
-
-func (rb *ShardCommitBuilder) UserData(value map[string]string) *ShardCommitBuilder {
-	rb.v.UserData = value
-	return rb
+	return r
 }

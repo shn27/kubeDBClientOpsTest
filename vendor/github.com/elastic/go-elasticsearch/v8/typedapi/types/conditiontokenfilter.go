@@ -15,56 +15,87 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // ConditionTokenFilter type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/analysis/token_filters.ts#L180-L184
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/analysis/token_filters.ts#L182-L186
 type ConditionTokenFilter struct {
-	Filter  []string       `json:"filter"`
-	Script  Script         `json:"script"`
-	Type    string         `json:"type,omitempty"`
-	Version *VersionString `json:"version,omitempty"`
+	Filter  []string `json:"filter"`
+	Script  Script   `json:"script"`
+	Type    string   `json:"type,omitempty"`
+	Version *string  `json:"version,omitempty"`
 }
 
-// ConditionTokenFilterBuilder holds ConditionTokenFilter struct and provides a builder API.
-type ConditionTokenFilterBuilder struct {
-	v *ConditionTokenFilter
+func (s *ConditionTokenFilter) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "filter":
+			if err := dec.Decode(&s.Filter); err != nil {
+				return fmt.Errorf("%s | %w", "Filter", err)
+			}
+
+		case "script":
+			if err := dec.Decode(&s.Script); err != nil {
+				return fmt.Errorf("%s | %w", "Script", err)
+			}
+
+		case "type":
+			if err := dec.Decode(&s.Type); err != nil {
+				return fmt.Errorf("%s | %w", "Type", err)
+			}
+
+		case "version":
+			if err := dec.Decode(&s.Version); err != nil {
+				return fmt.Errorf("%s | %w", "Version", err)
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewConditionTokenFilter provides a builder for the ConditionTokenFilter struct.
-func NewConditionTokenFilterBuilder() *ConditionTokenFilterBuilder {
-	r := ConditionTokenFilterBuilder{
-		&ConditionTokenFilter{},
+// MarshalJSON override marshalling to include literal value
+func (s ConditionTokenFilter) MarshalJSON() ([]byte, error) {
+	type innerConditionTokenFilter ConditionTokenFilter
+	tmp := innerConditionTokenFilter{
+		Filter:  s.Filter,
+		Script:  s.Script,
+		Type:    s.Type,
+		Version: s.Version,
 	}
 
-	r.v.Type = "condition"
+	tmp.Type = "condition"
 
-	return &r
+	return json.Marshal(tmp)
 }
 
-// Build finalize the chain and returns the ConditionTokenFilter struct
-func (rb *ConditionTokenFilterBuilder) Build() ConditionTokenFilter {
-	return *rb.v
-}
+// NewConditionTokenFilter returns a ConditionTokenFilter.
+func NewConditionTokenFilter() *ConditionTokenFilter {
+	r := &ConditionTokenFilter{}
 
-func (rb *ConditionTokenFilterBuilder) Filter(filter ...string) *ConditionTokenFilterBuilder {
-	rb.v.Filter = filter
-	return rb
-}
-
-func (rb *ConditionTokenFilterBuilder) Script(script *ScriptBuilder) *ConditionTokenFilterBuilder {
-	v := script.Build()
-	rb.v.Script = v
-	return rb
-}
-
-func (rb *ConditionTokenFilterBuilder) Version(version VersionString) *ConditionTokenFilterBuilder {
-	rb.v.Version = &version
-	return rb
+	return r
 }

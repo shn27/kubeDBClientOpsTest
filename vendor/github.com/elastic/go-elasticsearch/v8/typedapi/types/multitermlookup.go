@@ -15,40 +15,63 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+)
+
 // MultiTermLookup type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/bucket.ts#L273-L275
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/bucket.ts#L643-L653
 type MultiTermLookup struct {
-	Field Field `json:"field"`
+	// Field A fields from which to retrieve terms.
+	Field string `json:"field"`
+	// Missing The value to apply to documents that do not have a value.
+	// By default, documents without a value are ignored.
+	Missing Missing `json:"missing,omitempty"`
 }
 
-// MultiTermLookupBuilder holds MultiTermLookup struct and provides a builder API.
-type MultiTermLookupBuilder struct {
-	v *MultiTermLookup
-}
+func (s *MultiTermLookup) UnmarshalJSON(data []byte) error {
 
-// NewMultiTermLookup provides a builder for the MultiTermLookup struct.
-func NewMultiTermLookupBuilder() *MultiTermLookupBuilder {
-	r := MultiTermLookupBuilder{
-		&MultiTermLookup{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "field":
+			if err := dec.Decode(&s.Field); err != nil {
+				return fmt.Errorf("%s | %w", "Field", err)
+			}
+
+		case "missing":
+			if err := dec.Decode(&s.Missing); err != nil {
+				return fmt.Errorf("%s | %w", "Missing", err)
+			}
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the MultiTermLookup struct
-func (rb *MultiTermLookupBuilder) Build() MultiTermLookup {
-	return *rb.v
-}
+// NewMultiTermLookup returns a MultiTermLookup.
+func NewMultiTermLookup() *MultiTermLookup {
+	r := &MultiTermLookup{}
 
-func (rb *MultiTermLookupBuilder) Field(field Field) *MultiTermLookupBuilder {
-	rb.v.Field = field
-	return rb
+	return r
 }

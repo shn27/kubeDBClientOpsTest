@@ -15,54 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // Missing holds the union for the following types:
 //
-//	bool
-//	float64
-//	int
 //	string
+//	int
+//	Float64
+//	bool
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/_types/aggregations/AggregationContainer.ts#L209-L209
-type Missing interface{}
-
-// MissingBuilder holds Missing struct and provides a builder API.
-type MissingBuilder struct {
-	v Missing
-}
-
-// NewMissing provides a builder for the Missing struct.
-func NewMissingBuilder() *MissingBuilder {
-	return &MissingBuilder{}
-}
-
-// Build finalize the chain and returns the Missing struct
-func (u *MissingBuilder) Build() Missing {
-	return u.v
-}
-
-func (u *MissingBuilder) Bool(bool bool) *MissingBuilder {
-	u.v = &bool
-	return u
-}
-
-func (u *MissingBuilder) Float64(float64 float64) *MissingBuilder {
-	u.v = &float64
-	return u
-}
-
-func (u *MissingBuilder) Int(int int) *MissingBuilder {
-	u.v = &int
-	return u
-}
-
-func (u *MissingBuilder) String(string string) *MissingBuilder {
-	u.v = &string
-	return u
-}
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/_types/aggregations/AggregationContainer.ts#L535-L535
+type Missing any

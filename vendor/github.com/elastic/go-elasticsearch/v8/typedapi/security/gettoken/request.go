@@ -15,53 +15,43 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package gettoken
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"strconv"
 
-	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types/enums/accesstokengranttype"
 )
 
 // Request holds the request body struct for the package gettoken
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/security/get_token/GetUserAccessTokenRequest.ts#L25-L39
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/security/get_token/GetUserAccessTokenRequest.ts#L25-L42
 type Request struct {
-	GrantType *accesstokengranttype.AccessTokenGrantType `json:"grant_type,omitempty"`
-
-	KerberosTicket *string `json:"kerberos_ticket,omitempty"`
-
-	Password *types.Password `json:"password,omitempty"`
-
-	RefreshToken *string `json:"refresh_token,omitempty"`
-
-	Scope *string `json:"scope,omitempty"`
-
-	Username *types.Username `json:"username,omitempty"`
+	GrantType      *accesstokengranttype.AccessTokenGrantType `json:"grant_type,omitempty"`
+	KerberosTicket *string                                    `json:"kerberos_ticket,omitempty"`
+	Password       *string                                    `json:"password,omitempty"`
+	RefreshToken   *string                                    `json:"refresh_token,omitempty"`
+	Scope          *string                                    `json:"scope,omitempty"`
+	Username       *string                                    `json:"username,omitempty"`
 }
 
-// RequestBuilder is the builder API for the gettoken.Request
-type RequestBuilder struct {
-	v *Request
-}
+// NewRequest returns a Request
+func NewRequest() *Request {
+	r := &Request{}
 
-// NewRequest returns a RequestBuilder which can be chained and built to retrieve a RequestBuilder
-func NewRequestBuilder() *RequestBuilder {
-	r := RequestBuilder{
-		&Request{},
-	}
-	return &r
+	return r
 }
 
 // FromJSON allows to load an arbitrary json into the request structure
-func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
+func (r *Request) FromJSON(data string) (*Request, error) {
 	var req Request
 	err := json.Unmarshal([]byte(data), &req)
 
@@ -72,37 +62,72 @@ func (rb *RequestBuilder) FromJSON(data string) (*Request, error) {
 	return &req, nil
 }
 
-// Build finalize the chain and returns the Request struct.
-func (rb *RequestBuilder) Build() *Request {
-	return rb.v
-}
+func (s *Request) UnmarshalJSON(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
 
-func (rb *RequestBuilder) GrantType(granttype accesstokengranttype.AccessTokenGrantType) *RequestBuilder {
-	rb.v.GrantType = &granttype
-	return rb
-}
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
 
-func (rb *RequestBuilder) KerberosTicket(kerberosticket string) *RequestBuilder {
-	rb.v.KerberosTicket = &kerberosticket
-	return rb
-}
+		switch t {
 
-func (rb *RequestBuilder) Password(password types.Password) *RequestBuilder {
-	rb.v.Password = &password
-	return rb
-}
+		case "grant_type":
+			if err := dec.Decode(&s.GrantType); err != nil {
+				return fmt.Errorf("%s | %w", "GrantType", err)
+			}
 
-func (rb *RequestBuilder) RefreshToken(refreshtoken string) *RequestBuilder {
-	rb.v.RefreshToken = &refreshtoken
-	return rb
-}
+		case "kerberos_ticket":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "KerberosTicket", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.KerberosTicket = &o
 
-func (rb *RequestBuilder) Scope(scope string) *RequestBuilder {
-	rb.v.Scope = &scope
-	return rb
-}
+		case "password":
+			if err := dec.Decode(&s.Password); err != nil {
+				return fmt.Errorf("%s | %w", "Password", err)
+			}
 
-func (rb *RequestBuilder) Username(username types.Username) *RequestBuilder {
-	rb.v.Username = &username
-	return rb
+		case "refresh_token":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "RefreshToken", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.RefreshToken = &o
+
+		case "scope":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Scope", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Scope = &o
+
+		case "username":
+			if err := dec.Decode(&s.Username); err != nil {
+				return fmt.Errorf("%s | %w", "Username", err)
+			}
+
+		}
+	}
+	return nil
 }

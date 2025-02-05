@@ -15,92 +15,138 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // Jvm type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/nodes/_types/Stats.ts#L318-L327
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/nodes/_types/Stats.ts#L882-L916
 type Jvm struct {
-	BufferPools    map[string]NodeBufferPool `json:"buffer_pools,omitempty"`
-	Classes        *JvmClasses               `json:"classes,omitempty"`
-	Gc             *GarbageCollector         `json:"gc,omitempty"`
-	Mem            *JvmMemoryStats           `json:"mem,omitempty"`
-	Threads        *JvmThreads               `json:"threads,omitempty"`
-	Timestamp      *int64                    `json:"timestamp,omitempty"`
-	Uptime         *string                   `json:"uptime,omitempty"`
-	UptimeInMillis *int64                    `json:"uptime_in_millis,omitempty"`
+	// BufferPools Contains statistics about JVM buffer pools for the node.
+	BufferPools map[string]NodeBufferPool `json:"buffer_pools,omitempty"`
+	// Classes Contains statistics about classes loaded by JVM for the node.
+	Classes *JvmClasses `json:"classes,omitempty"`
+	// Gc Contains statistics about JVM garbage collectors for the node.
+	Gc *GarbageCollector `json:"gc,omitempty"`
+	// Mem Contains JVM memory usage statistics for the node.
+	Mem *JvmMemoryStats `json:"mem,omitempty"`
+	// Threads Contains statistics about JVM thread usage for the node.
+	Threads *JvmThreads `json:"threads,omitempty"`
+	// Timestamp Last time JVM statistics were refreshed.
+	Timestamp *int64 `json:"timestamp,omitempty"`
+	// Uptime Human-readable JVM uptime.
+	// Only returned if the `human` query parameter is `true`.
+	Uptime *string `json:"uptime,omitempty"`
+	// UptimeInMillis JVM uptime in milliseconds.
+	UptimeInMillis *int64 `json:"uptime_in_millis,omitempty"`
 }
 
-// JvmBuilder holds Jvm struct and provides a builder API.
-type JvmBuilder struct {
-	v *Jvm
+func (s *Jvm) UnmarshalJSON(data []byte) error {
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "buffer_pools":
+			if s.BufferPools == nil {
+				s.BufferPools = make(map[string]NodeBufferPool, 0)
+			}
+			if err := dec.Decode(&s.BufferPools); err != nil {
+				return fmt.Errorf("%s | %w", "BufferPools", err)
+			}
+
+		case "classes":
+			if err := dec.Decode(&s.Classes); err != nil {
+				return fmt.Errorf("%s | %w", "Classes", err)
+			}
+
+		case "gc":
+			if err := dec.Decode(&s.Gc); err != nil {
+				return fmt.Errorf("%s | %w", "Gc", err)
+			}
+
+		case "mem":
+			if err := dec.Decode(&s.Mem); err != nil {
+				return fmt.Errorf("%s | %w", "Mem", err)
+			}
+
+		case "threads":
+			if err := dec.Decode(&s.Threads); err != nil {
+				return fmt.Errorf("%s | %w", "Threads", err)
+			}
+
+		case "timestamp":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "Timestamp", err)
+				}
+				s.Timestamp = &value
+			case float64:
+				f := int64(v)
+				s.Timestamp = &f
+			}
+
+		case "uptime":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Uptime", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Uptime = &o
+
+		case "uptime_in_millis":
+			var tmp any
+			dec.Decode(&tmp)
+			switch v := tmp.(type) {
+			case string:
+				value, err := strconv.ParseInt(v, 10, 64)
+				if err != nil {
+					return fmt.Errorf("%s | %w", "UptimeInMillis", err)
+				}
+				s.UptimeInMillis = &value
+			case float64:
+				f := int64(v)
+				s.UptimeInMillis = &f
+			}
+
+		}
+	}
+	return nil
 }
 
-// NewJvm provides a builder for the Jvm struct.
-func NewJvmBuilder() *JvmBuilder {
-	r := JvmBuilder{
-		&Jvm{
-			BufferPools: make(map[string]NodeBufferPool, 0),
-		},
+// NewJvm returns a Jvm.
+func NewJvm() *Jvm {
+	r := &Jvm{
+		BufferPools: make(map[string]NodeBufferPool, 0),
 	}
 
-	return &r
-}
-
-// Build finalize the chain and returns the Jvm struct
-func (rb *JvmBuilder) Build() Jvm {
-	return *rb.v
-}
-
-func (rb *JvmBuilder) BufferPools(values map[string]*NodeBufferPoolBuilder) *JvmBuilder {
-	tmp := make(map[string]NodeBufferPool, len(values))
-	for key, builder := range values {
-		tmp[key] = builder.Build()
-	}
-	rb.v.BufferPools = tmp
-	return rb
-}
-
-func (rb *JvmBuilder) Classes(classes *JvmClassesBuilder) *JvmBuilder {
-	v := classes.Build()
-	rb.v.Classes = &v
-	return rb
-}
-
-func (rb *JvmBuilder) Gc(gc *GarbageCollectorBuilder) *JvmBuilder {
-	v := gc.Build()
-	rb.v.Gc = &v
-	return rb
-}
-
-func (rb *JvmBuilder) Mem(mem *JvmMemoryStatsBuilder) *JvmBuilder {
-	v := mem.Build()
-	rb.v.Mem = &v
-	return rb
-}
-
-func (rb *JvmBuilder) Threads(threads *JvmThreadsBuilder) *JvmBuilder {
-	v := threads.Build()
-	rb.v.Threads = &v
-	return rb
-}
-
-func (rb *JvmBuilder) Timestamp(timestamp int64) *JvmBuilder {
-	rb.v.Timestamp = &timestamp
-	return rb
-}
-
-func (rb *JvmBuilder) Uptime(uptime string) *JvmBuilder {
-	rb.v.Uptime = &uptime
-	return rb
-}
-
-func (rb *JvmBuilder) UptimeInMillis(uptimeinmillis int64) *JvmBuilder {
-	rb.v.UptimeInMillis = &uptimeinmillis
-	return rb
+	return r
 }

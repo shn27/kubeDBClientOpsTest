@@ -15,34 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
 // TextToAnalyze type alias.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/indices/analyze/types.ts#L66-L66
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/indices/analyze/types.ts#L69-L69
 type TextToAnalyze []string
-
-// TextToAnalyzeBuilder holds TextToAnalyze struct and provides a builder API.
-type TextToAnalyzeBuilder struct {
-	v TextToAnalyze
-}
-
-// NewTextToAnalyze provides a builder for the TextToAnalyze struct.
-func NewTextToAnalyzeBuilder() *TextToAnalyzeBuilder {
-	return &TextToAnalyzeBuilder{}
-}
-
-// Build finalize the chain and returns the TextToAnalyze struct
-func (b *TextToAnalyzeBuilder) Build() TextToAnalyze {
-	return b.v
-}
-
-func (b *TextToAnalyzeBuilder) TextToAnalyze(value TextToAnalyze) *TextToAnalyzeBuilder {
-	b.v = value
-	return b
-}

@@ -15,53 +15,74 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 // Code generated from the elasticsearch-specification DO NOT EDIT.
-// https://github.com/elastic/elasticsearch-specification/tree/4316fc1aa18bb04678b156f23b22c9d3f996f9c9
-
+// https://github.com/elastic/elasticsearch-specification/tree/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64
 
 package types
 
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+)
+
 // SnapshotRestore type.
 //
-// https://github.com/elastic/elasticsearch-specification/blob/4316fc1aa18bb04678b156f23b22c9d3f996f9c9/specification/snapshot/restore/SnapshotRestoreResponse.ts#L27-L31
+// https://github.com/elastic/elasticsearch-specification/blob/2f823ff6fcaa7f3f0f9b990dc90512d8901e5d64/specification/snapshot/restore/SnapshotRestoreResponse.ts#L30-L34
 type SnapshotRestore struct {
-	Indices  []IndexName     `json:"indices"`
+	Indices  []string        `json:"indices"`
 	Shards   ShardStatistics `json:"shards"`
 	Snapshot string          `json:"snapshot"`
 }
 
-// SnapshotRestoreBuilder holds SnapshotRestore struct and provides a builder API.
-type SnapshotRestoreBuilder struct {
-	v *SnapshotRestore
-}
+func (s *SnapshotRestore) UnmarshalJSON(data []byte) error {
 
-// NewSnapshotRestore provides a builder for the SnapshotRestore struct.
-func NewSnapshotRestoreBuilder() *SnapshotRestoreBuilder {
-	r := SnapshotRestoreBuilder{
-		&SnapshotRestore{},
+	dec := json.NewDecoder(bytes.NewReader(data))
+
+	for {
+		t, err := dec.Token()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+
+		switch t {
+
+		case "indices":
+			if err := dec.Decode(&s.Indices); err != nil {
+				return fmt.Errorf("%s | %w", "Indices", err)
+			}
+
+		case "shards":
+			if err := dec.Decode(&s.Shards); err != nil {
+				return fmt.Errorf("%s | %w", "Shards", err)
+			}
+
+		case "snapshot":
+			var tmp json.RawMessage
+			if err := dec.Decode(&tmp); err != nil {
+				return fmt.Errorf("%s | %w", "Snapshot", err)
+			}
+			o := string(tmp[:])
+			o, err = strconv.Unquote(o)
+			if err != nil {
+				o = string(tmp[:])
+			}
+			s.Snapshot = o
+
+		}
 	}
-
-	return &r
+	return nil
 }
 
-// Build finalize the chain and returns the SnapshotRestore struct
-func (rb *SnapshotRestoreBuilder) Build() SnapshotRestore {
-	return *rb.v
-}
+// NewSnapshotRestore returns a SnapshotRestore.
+func NewSnapshotRestore() *SnapshotRestore {
+	r := &SnapshotRestore{}
 
-func (rb *SnapshotRestoreBuilder) Indices(indices ...IndexName) *SnapshotRestoreBuilder {
-	rb.v.Indices = indices
-	return rb
-}
-
-func (rb *SnapshotRestoreBuilder) Shards(shards *ShardStatisticsBuilder) *SnapshotRestoreBuilder {
-	v := shards.Build()
-	rb.v.Shards = v
-	return rb
-}
-
-func (rb *SnapshotRestoreBuilder) Snapshot(snapshot string) *SnapshotRestoreBuilder {
-	rb.v.Snapshot = snapshot
-	return rb
+	return r
 }
