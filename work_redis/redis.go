@@ -23,7 +23,7 @@ func getRedisClient() (*redis.ClusterClient, error) {
 	gvk := schema.GroupVersionKind{
 		Version: "v1",
 		Group:   "kubedb.com",
-		Kind:    "Elasticsearch",
+		Kind:    "Redis",
 	}
 	obj, err := utils.GetK8sObject(gvk, ref, kbClient)
 	if err != nil {
@@ -38,6 +38,7 @@ func getRedisClient() (*redis.ClusterClient, error) {
 	}
 
 	redisClient, err := redis.NewKubeDBClientBuilder(kbClient, db).
+		WithURL("http://127.0.0.1:6379").
 		GetRedisClusterClient(context.Background())
 
 	if err != nil {
