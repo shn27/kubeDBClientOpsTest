@@ -38,6 +38,7 @@ import (
 	kmapi "kmodules.xyz/client-go/api/v1"
 	"kmodules.xyz/client-go/apiextensions"
 	coreutil "kmodules.xyz/client-go/core/v1"
+	meta_util "kmodules.xyz/client-go/meta"
 	metautil "kmodules.xyz/client-go/meta"
 	"kmodules.xyz/client-go/policy/secomp"
 	appcat "kmodules.xyz/custom-resources/apis/appcatalog/v1alpha1"
@@ -88,7 +89,7 @@ func (m *MSSQLServer) ServiceName() string {
 }
 
 func (m *MSSQLServer) SecondaryServiceName() string {
-	return metautil.NameWithPrefix(m.ServiceName(), "secondary")
+	return metautil.NameWithPrefix(m.ServiceName(), string(SecondaryServiceAlias))
 }
 
 func (m *MSSQLServer) GoverningServiceName() string {
@@ -225,6 +226,14 @@ func (m *MSSQLServer) AvailabilityGroupName() string {
 	return availabilityGroupName
 }
 
+func (m MSSQLServer) SidekickLabels(skName string) map[string]string {
+	return meta_util.OverwriteKeys(nil, kubedb.CommonSidekickLabels(), map[string]string{
+		meta_util.InstanceLabelKey: skName,
+		kubedb.SidekickOwnerName:   m.Name,
+		kubedb.SidekickOwnerKind:   m.ResourceFQN(),
+	})
+}
+
 func (m *MSSQLServer) PodControllerLabels(extraLabels ...map[string]string) map[string]string {
 	return m.offshootLabels(metautil.OverwriteKeys(m.OffshootSelectors(), extraLabels...), m.Spec.PodTemplate.Controller.Labels)
 }
@@ -245,6 +254,7 @@ func (m *MSSQLServer) GetPersistentSecrets() []string {
 	secrets = append(secrets, m.EndpointCertSecretName())
 	secrets = append(secrets, m.DbmLoginSecretName())
 	secrets = append(secrets, m.MasterKeySecretName())
+	secrets = append(secrets, m.ConfigSecretName())
 
 	return secrets
 }
@@ -325,16 +335,19 @@ func (m *MSSQLServer) SetDefaults() {
 		m.Spec.StorageType = StorageTypeDurable
 	}
 	if m.Spec.DeletionPolicy == "" {
-		m.Spec.DeletionPolicy = TerminationPolicyDelete
+		m.Spec.DeletionPolicy = DeletionPolicyDelete
 	}
 
 	if m.IsStandalone() {
 		if m.Spec.Replicas == nil {
 			m.Spec.Replicas = pointer.Int32P(1)
 		}
-	} else {
-		if m.Spec.LeaderElection == nil {
-			m.Spec.LeaderElection = &MSSQLServerLeaderElectionConfig{
+	} else if m.IsAvailabilityGroup() {
+		if m.Spec.Topology.AvailabilityGroup == nil {
+			m.Spec.Topology.AvailabilityGroup = &MSSQLServerAvailabilityGroupSpec{}
+		}
+		if m.Spec.Topology.AvailabilityGroup.LeaderElection == nil {
+			m.Spec.Topology.AvailabilityGroup.LeaderElection = &MSSQLServerLeaderElectionConfig{
 				// The upper limit of election timeout is 50000ms (50s), which should only be used when deploying a
 				// globally-distributed etcd cluster. A reasonable round-trip time for the continental United States is around 130-150ms,
 				// and the time between US and Japan is around 350-400ms. If the network has uneven performance or regular packet
@@ -349,11 +362,11 @@ func (m *MSSQLServer) SetDefaults() {
 				HeartbeatTick: 1,
 			}
 		}
-		if m.Spec.LeaderElection.TransferLeadershipInterval == nil {
-			m.Spec.LeaderElection.TransferLeadershipInterval = &meta.Duration{Duration: 1 * time.Second}
+		if m.Spec.Topology.AvailabilityGroup.LeaderElection.TransferLeadershipInterval == nil {
+			m.Spec.Topology.AvailabilityGroup.LeaderElection.TransferLeadershipInterval = &meta.Duration{Duration: 1 * time.Second}
 		}
-		if m.Spec.LeaderElection.TransferLeadershipTimeout == nil {
-			m.Spec.LeaderElection.TransferLeadershipTimeout = &meta.Duration{Duration: 60 * time.Second}
+		if m.Spec.Topology.AvailabilityGroup.LeaderElection.TransferLeadershipTimeout == nil {
+			m.Spec.Topology.AvailabilityGroup.LeaderElection.TransferLeadershipTimeout = &meta.Duration{Duration: 60 * time.Second}
 		}
 	}
 
@@ -378,8 +391,14 @@ func (m *MSSQLServer) SetDefaults() {
 
 	m.setDefaultContainerResourceLimits(m.Spec.PodTemplate)
 
-	m.Spec.Monitor.SetDefaults()
-	if m.Spec.Monitor != nil && m.Spec.Monitor.Prometheus != nil {
+	if m.Spec.Monitor != nil {
+		if m.Spec.Monitor.Prometheus == nil {
+			m.Spec.Monitor.Prometheus = &mona.PrometheusSpec{}
+		}
+		if m.Spec.Monitor.Prometheus.Exporter.Port == 0 {
+			m.Spec.Monitor.Prometheus.Exporter.Port = kubedb.MSSQLMonitoringDefaultServicePort
+		}
+		m.Spec.Monitor.SetDefaults()
 		if m.Spec.Monitor.Prometheus.Exporter.SecurityContext.RunAsUser == nil {
 			m.Spec.Monitor.Prometheus.Exporter.SecurityContext.RunAsUser = mssqlVersion.Spec.SecurityContext.RunAsUser
 		}
@@ -491,10 +510,13 @@ func (m *MSSQLServer) setDefaultContainerResourceLimits(podTemplate *ofst.PodTem
 }
 
 func (m *MSSQLServer) SetTLSDefaults() {
-	m.SetTLSDefaultsForInternalAuth()
-
 	if m.Spec.TLS == nil || m.Spec.TLS.IssuerRef == nil {
 		return
+	}
+
+	if m.Spec.TLS.ClientTLS == nil {
+		defaultValue := false
+		m.Spec.TLS.ClientTLS = &defaultValue
 	}
 
 	// Server-cert
@@ -539,34 +561,30 @@ func (m *MSSQLServer) SetTLSDefaults() {
 			OrganizationalUnits: defaultClientOrgUnit,
 		},
 	})
-}
 
-func (m *MSSQLServer) SetTLSDefaultsForInternalAuth() {
-	if m.Spec.InternalAuth == nil || m.Spec.InternalAuth.EndpointCert == nil || m.Spec.InternalAuth.EndpointCert.IssuerRef == nil {
-		return
-	}
-
-	// Endpoint-cert
-	defaultServerOrg := []string{kubedb.KubeDBOrganization}
-	defaultServerOrgUnit := []string{string(MSSQLServerEndpointCert)}
-	_, cert := kmapi.GetCertificate(m.Spec.InternalAuth.EndpointCert.Certificates, string(MSSQLServerEndpointCert))
-	if cert != nil && cert.Subject != nil {
-		if cert.Subject.Organizations != nil {
-			defaultServerOrg = cert.Subject.Organizations
+	if m.IsAvailabilityGroup() {
+		// Endpoint-cert
+		defaultEndpointOrg := []string{kubedb.KubeDBOrganization}
+		defaultEndpointOrgUnit := []string{string(MSSQLServerEndpointCert)}
+		_, cert = kmapi.GetCertificate(m.Spec.TLS.Certificates, string(MSSQLServerEndpointCert))
+		if cert != nil && cert.Subject != nil {
+			if cert.Subject.Organizations != nil {
+				defaultEndpointOrg = cert.Subject.Organizations
+			}
+			if cert.Subject.OrganizationalUnits != nil {
+				defaultEndpointOrgUnit = cert.Subject.OrganizationalUnits
+			}
 		}
-		if cert.Subject.OrganizationalUnits != nil {
-			defaultServerOrgUnit = cert.Subject.OrganizationalUnits
-		}
-	}
 
-	m.Spec.InternalAuth.EndpointCert.Certificates = kmapi.SetMissingSpecForCertificate(m.Spec.InternalAuth.EndpointCert.Certificates, kmapi.CertificateSpec{
-		Alias:      string(MSSQLServerEndpointCert),
-		SecretName: m.GetCertSecretName(MSSQLServerEndpointCert),
-		Subject: &kmapi.X509Subject{
-			Organizations:       defaultServerOrg,
-			OrganizationalUnits: defaultServerOrgUnit,
-		},
-	})
+		m.Spec.TLS.Certificates = kmapi.SetMissingSpecForCertificate(m.Spec.TLS.Certificates, kmapi.CertificateSpec{
+			Alias:      string(MSSQLServerEndpointCert),
+			SecretName: m.GetCertSecretName(MSSQLServerEndpointCert),
+			Subject: &kmapi.X509Subject{
+				Organizations:       defaultEndpointOrg,
+				OrganizationalUnits: defaultEndpointOrgUnit,
+			},
+		})
+	}
 }
 
 func (m *MSSQLServer) ReplicasAreReady(lister pslister.PetSetLister) (bool, string, error) {

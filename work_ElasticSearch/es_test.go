@@ -3,9 +3,9 @@ package work_ElasticSearch
 import "testing"
 
 func Test_GetESClient(t *testing.T) {
-	_, err := GetElasticSearchClient()
+	err := Test()
 	if err != nil {
 		return
 	}
-	
+
 }

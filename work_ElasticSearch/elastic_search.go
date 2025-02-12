@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	_ "github.com/elastic/go-elasticsearch/v8/esapi"
 	utils "github.com/shn27/Test/utils"
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -11,7 +12,6 @@ import (
 	kmapi "kmodules.xyz/client-go/api/v1"
 	api "kubedb.dev/apimachinery/apis/kubedb/v1"
 	"kubedb.dev/db-client-go/elasticsearch"
-	"log"
 )
 
 var ElasticSearch = &cobra.Command{
@@ -64,19 +64,21 @@ func GetElasticSearchClient() (*elasticsearch.Client, error) {
 		fmt.Println("failed to get kube db client: %w", err)
 		return nil, err
 	}
-	fmt.Println("========================done===============")
-	nodesStats, err := elasticsearchClient.NodesStats()
-	if err != nil {
-		log.Fatalf("Failed to get node stats: %v", err)
-	}
-	nodes, ok := nodesStats["nodes"].(map[string]interface{})
-	if !ok {
-		log.Fatalf("Failed to parse node data")
-	}
-	var data bytes.Buffer
-	getGCData(&data, nodes)
-
 	return elasticsearchClient, nil
+}
+
+func Test() error {
+	elasticSearchClient, err := GetElasticSearchClient()
+	if err != nil {
+		return err
+	}
+	nodeStats, err := elasticSearchClient.NodesStats()
+	if err != nil {
+		return err
+	}
+	fmt.Printf("node stats: %+v\n", nodeStats)
+
+	return nil
 }
 
 func getGCData(data *bytes.Buffer, nodes map[string]interface{}) {
