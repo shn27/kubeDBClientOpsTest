@@ -7,7 +7,6 @@ import (
 	"net"
 	"strings"
 
-	"github.com/redis/go-redis/v9/internal"
 	"github.com/redis/go-redis/v9/internal/pool"
 	"github.com/redis/go-redis/v9/internal/proto"
 )
@@ -130,9 +129,7 @@ func isMovedError(err error) (moved bool, ask bool, addr string) {
 	if ind == -1 {
 		return false, false, ""
 	}
-
 	addr = s[ind+1:]
-	addr = internal.GetAddr(addr)
 	return
 }
 
