@@ -47,8 +47,3 @@ func getRedisClient() (*redis.ClusterClient, error) {
 	}
 	return redisClient, nil
 }
-
-func Test() error {
-
-	return nil
-}
