@@ -906,6 +906,9 @@ github.com/mailru/easyjson/jwriter
 # github.com/mattn/go-runewidth v0.0.10
 ## explicit; go 1.9
 github.com/mattn/go-runewidth
+# github.com/michaelklishin/rabbit-hole/v3 v3.1.0
+## explicit; go 1.22.0
+github.com/michaelklishin/rabbit-hole/v3
 # github.com/mitchellh/mapstructure v1.5.0
 ## explicit; go 1.14
 github.com/mitchellh/mapstructure
@@ -963,6 +966,9 @@ github.com/prometheus/common/model
 github.com/prometheus/procfs
 github.com/prometheus/procfs/internal/fs
 github.com/prometheus/procfs/internal/util
+# github.com/rabbitmq/amqp091-go v1.10.0
+## explicit; go 1.20
+github.com/rabbitmq/amqp091-go
 # github.com/rivo/uniseg v0.1.0
 ## explicit; go 1.12
 github.com/rivo/uniseg
@@ -1662,6 +1668,7 @@ kubedb.dev/apimachinery/pkg/validator
 kubedb.dev/db-client-go/elasticsearch
 kubedb.dev/db-client-go/mongodb
 kubedb.dev/db-client-go/postgres
+kubedb.dev/db-client-go/rabbitmq
 # kubeops.dev/petset v0.0.7
 ## explicit; go 1.22.1
 kubeops.dev/petset/apis/apps/v1
