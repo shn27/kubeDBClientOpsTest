@@ -38,7 +38,8 @@ func getRedisClient() (*redis.ClusterClient, error) {
 	}
 
 	redisClient, err := redis.NewKubeDBClientBuilder(kbClient, db).
-		WithURL("http://127.0.0.1:6379").
+		//WithURL("127.0.0.1:6379").
+		//WithPod("redis-0").
 		GetRedisClusterClient(context.Background())
 
 	if err != nil {
