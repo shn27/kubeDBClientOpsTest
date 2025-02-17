@@ -11,7 +11,7 @@ import (
 	"kubedb.dev/db-client-go/redis"
 )
 
-func getRedisClient() (*redis.ClusterClient, error) {
+func getRedisClient() (*redis.Client, error) {
 	kbClient, err := utils.GetKBClient()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get k8s client: %w", err)
@@ -38,9 +38,9 @@ func getRedisClient() (*redis.ClusterClient, error) {
 	}
 
 	redisClient, err := redis.NewKubeDBClientBuilder(kbClient, db).
-		//WithURL("127.0.0.1:6379").
+		WithURL("127.0.0.1:6379").
 		//WithPod("redis-0").
-		GetRedisClusterClient(context.Background())
+		GetRedisClient(context.Background())
 
 	if err != nil {
 		fmt.Println("failed to get kube db client: %w", err)
