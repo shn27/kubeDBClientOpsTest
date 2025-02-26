@@ -1,10 +1,11 @@
 apiVersion: kubedb.com/v1alpha2
 kind: RabbitMQ
 metadata:
-  name: rabbitmq
+  name: rm-quickstart
   namespace: demo
 spec:
-  deletionPolicy: Delete
+  version: "3.13.2"
+  disableSecurity: true
   replicas: 3
   storage:
     accessModes:
@@ -12,6 +13,19 @@ spec:
     resources:
       requests:
         storage: 1Gi
-    storageClassName: standard
-  storageType: WipeOut
-  version: 3.12.12
+  deletionPolicy: WipeOut  # DoNotTerminate(blocks deletion), Halt( retains pvc,secret), Delete (retains secret)
+  podTemplate:
+    spec:
+      containers:
+        - name: rabbitmq
+          resources:
+            requests:
+              cpu: "0.5"
+              memory: "1Gi"
+            limits:
+              cpu: "2"
+              memory: "2Gi"
+  serviceTemplates:
+    - alias: primary
+      spec:
+        type: LoadBalancer
