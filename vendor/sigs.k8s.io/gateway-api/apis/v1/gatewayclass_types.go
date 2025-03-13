@@ -60,7 +60,7 @@ type GatewayClass struct {
 	// Implementations MUST populate status on all GatewayClass resources which
 	// specify their controller name.
 	//
-	// +kubebuilder:default={conditions: {{type: "Accepted", status: "Unknown", message: "Waiting for controller", reason: "Pending", lastTransitionTime: "1970-01-01T00:00:00Z"}}}
+	// +kubebuilder:default={conditions: {{type: "Accepted", status: "Unknown", message: "Waiting for controller", reason: "Waiting", lastTransitionTime: "1970-01-01T00:00:00Z"}}}
 	Status GatewayClassStatus `json:"status,omitempty"`
 }
 
@@ -93,10 +93,8 @@ type GatewayClassSpec struct {
 	// or an implementation-specific custom resource. The resource can be
 	// cluster-scoped or namespace-scoped.
 	//
-	// If the referent cannot be found, refers to an unsupported kind, or when
-	// the data within that resource is malformed, the GatewayClass SHOULD be
-	// rejected with the "Accepted" status condition set to "False" and an
-	// "InvalidParameters" reason.
+	// If the referent cannot be found, the GatewayClass's "InvalidParameters"
+	// status condition will be true.
 	//
 	// A Gateway for this GatewayClass may provide its own `parametersRef`. When both are specified,
 	// the merging behavior is implementation specific.
@@ -164,7 +162,6 @@ const (
 	// Possible reasons for this condition to be False are:
 	//
 	// * "InvalidParameters"
-	// * "Unsupported"
 	// * "UnsupportedVersion"
 	//
 	// Possible reasons for this condition to be Unknown are:
@@ -179,10 +176,9 @@ const (
 	// true.
 	GatewayClassReasonAccepted GatewayClassConditionReason = "Accepted"
 
-	// This reason is used with the "Accepted" condition when the GatewayClass
-	// was not accepted because the parametersRef field refers to a nonexistent
-	// or unsupported resource or kind, or when the data within that resource is
-	// malformed.
+	// This reason is used with the "Accepted" condition when the
+	// GatewayClass was not accepted because the parametersRef field
+	// was invalid, with more detail in the message.
 	GatewayClassReasonInvalidParameters GatewayClassConditionReason = "InvalidParameters"
 
 	// This reason is used with the "Accepted" condition when the
@@ -190,11 +186,6 @@ const (
 	// to admit the GatewayClass. It is the default Reason on a new
 	// GatewayClass.
 	GatewayClassReasonPending GatewayClassConditionReason = "Pending"
-
-	// This reason is used with the "Accepted" condition when the GatewayClass
-	// was not accepted because the implementation does not support a
-	// user-defined GatewayClass.
-	GatewayClassReasonUnsupported GatewayClassConditionReason = "Unsupported"
 
 	// Deprecated: Use "Pending" instead.
 	GatewayClassReasonWaiting GatewayClassConditionReason = "Waiting"
@@ -261,10 +252,9 @@ type GatewayClassStatus struct {
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
 
 	// SupportedFeatures is the set of features the GatewayClass support.
-	// It MUST be sorted in ascending alphabetical order by the Name key.
+	// It MUST be sorted in ascending alphabetical order.
 	// +optional
-	// +listType=map
-	// +listMapKey=name
+	// +listType=set
 	// <gateway:experimental>
 	// +kubebuilder:validation:MaxItems=64
 	SupportedFeatures []SupportedFeature `json:"supportedFeatures,omitempty"`
@@ -279,10 +269,6 @@ type GatewayClassList struct {
 	Items           []GatewayClass `json:"items"`
 }
 
-// FeatureName is used to describe distinct features that are covered by
+// SupportedFeature is used to describe distinct features that are covered by
 // conformance tests.
-type FeatureName string
-
-type SupportedFeature struct {
-	Name FeatureName `json:"name"`
-}
+type SupportedFeature string

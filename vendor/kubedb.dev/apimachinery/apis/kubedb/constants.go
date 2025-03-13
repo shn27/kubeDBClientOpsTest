@@ -358,23 +358,6 @@ const (
 	MariaDBMetricsExporterTLSVolumeName  = "metrics-exporter-config"
 	MariaDBMetricsExporterConfigPath     = "/etc/mysql/config/exporter"
 	MariaDBDataVolumeName                = "data"
-	DatabasePodPrimaryComponent          = "Primary"
-	DatabasePodMasterComponent           = "Master"
-	DatabasePodSlaveComponent            = "Slave"
-
-	// Maxscale
-	MaxscaleCommonName        = "mx"
-	MaxscaleContainerName     = "maxscale"
-	MaxscaleInitContainerName = "maxscale-init"
-	MaxscaleServerName        = "server"
-	MaxscaleConfigName        = "config"
-	MaxscaleConfigPath        = "/etc/maxscale.cnf.d"
-	MaxscaleDefaultConfigName = "default-config"
-	MaxscaleDefaultConfigPath = "/etc/maxscale"
-	MaxscaleDataVolumeName    = "data"
-	MaxscaleDataVolumePath    = "/var/lib/maxscale"
-	MaxscaleUIPort            = 8989
-	MaxscaleUIPortName        = "ui"
 
 	// =========================== SingleStore Constants ============================
 	SinglestoreDatabasePortName       = "db"
@@ -433,12 +416,9 @@ const (
 	MSSQLDatabasePortName              = "db"
 	MSSQLPrimaryServicePortName        = "primary"
 	MSSQLSecondaryServicePortName      = "secondary"
-	MSSQLCoordinatorPortName           = "coordinator"
-	MSSQLCoordinatorClientPortName     = "coordinatclient"
 	MSSQLDatabasePort                  = 1433
 	MSSQLDatabaseMirroringEndpointPort = 5022
-	MSSQLCoordinatorPort               = 2380
-	MSSQLCoordinatorClientPort         = 2379
+	MSSQLCoordinatorPort               = 2381
 	MSSQLMonitoringDefaultServicePort  = 9399
 
 	// environment variables
@@ -1715,7 +1695,7 @@ var (
 			core.ResourceMemory: resource.MustParse("1.5Gi"),
 		},
 		Limits: core.ResourceList{
-			core.ResourceMemory: resource.MustParse("2Gi"),
+			core.ResourceMemory: resource.MustParse("4Gi"),
 		},
 	}
 

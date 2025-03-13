@@ -6488,9 +6488,6 @@ spec:
                             required:
                             - name
                             type: object
-                          initScript:
-                            default: false
-                            type: boolean
                         type: object
                       manifestRepository:
                         properties:
@@ -26229,24 +26226,6 @@ spec:
                             type: string
                         required:
                         - name
-                        type: object
-                      manifestOptions:
-                        properties:
-                          archiver:
-                            default: false
-                            type: boolean
-                          archiverRef:
-                            properties:
-                              name:
-                                type: string
-                              namespace:
-                                type: string
-                            required:
-                            - name
-                            type: object
-                          initScript:
-                            default: false
-                            type: boolean
                         type: object
                       manifestRepository:
                         properties:

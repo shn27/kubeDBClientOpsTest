@@ -9,6 +9,7 @@ import (
 	kmapi "kmodules.xyz/client-go/api/v1"
 	api "kubedb.dev/apimachinery/apis/kubedb/v1"
 	"kubedb.dev/db-client-go/redis"
+	"strings"
 )
 
 func getRedisClient() (*redis.Client, error) {
@@ -46,5 +47,34 @@ func getRedisClient() (*redis.Client, error) {
 		fmt.Println("failed to get kube db client: %w", err)
 		return nil, err
 	}
+
+	ans, _ := redisClient.ClusterNodes(context.Background()).Result()
+	fmt.Println(ans)
+
 	return redisClient, nil
+}
+
+// Function to check for split-brain scenario
+func checkSplitBrain(client *redis.ClusterClient) error {
+	ctx := context.Background()
+	clusterNodes, err := client.ClusterNodes(ctx).Result()
+	if err != nil {
+		return fmt.Errorf("error fetching cluster nodes: %v", err)
+	}
+
+	// Count master nodes
+	masterCount := 0
+	for _, line := range strings.Split(clusterNodes, "\n") {
+		fields := strings.Fields(line)
+		if len(fields) > 2 && strings.Contains(fields[2], "master") {
+			masterCount++
+		}
+	}
+
+	if masterCount > 1 {
+		return fmt.Errorf("detected multiple masters (%d), possible split-brain scenario", masterCount)
+	}
+
+	fmt.Println("Cluster is healthy, only one master found.")
+	return nil
 }
