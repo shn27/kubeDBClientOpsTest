@@ -64,7 +64,22 @@ func checkClusterInfo(client *redis.Client) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("clusterInfo:", clusterInfo)
+	lines := strings.Split(clusterInfo, "\n")
+	for _, line := range lines {
+		if strings.HasPrefix(line, "cluster_state:") {
+			state := strings.TrimPrefix(line, "cluster_state:")
+			fmt.Println("📊 Cluster State:", strings.TrimSpace(state))
+			if strings.TrimSpace(state) != "ok" {
+				fmt.Println("⚠️  Warning: Cluster is not in a healthy state!")
+			}
+		}
+		if strings.HasPrefix(line, "cluster_slots_fail:") {
+			failures := strings.TrimPrefix(line, "cluster_slots_fail:")
+			if strings.TrimSpace(failures) != "0" {
+				fmt.Println("⚠️  Warning: Some slots have failures!")
+			}
+		}
+	}
 	return nil
 }
 
@@ -109,13 +124,12 @@ func getRedisNodes(client *redis.Client) ([]string, error) {
 
 // Check if a Redis node is reachable
 func checkRedisConnectivity(client *redis.Client, node string) bool {
-
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 
 	pong, err := client.Ping(ctx).Result()
 	if err != nil {
-		log.Printf("❌ Redis node %s is unreachable: %v\n", node, err)
+		log.Printf("Redis node %s is unreachable: %v\n", node, err)
 		return false
 	}
 	return pong == "PONG"
@@ -126,7 +140,7 @@ func checkClusterNodeInfo(client *redis.Client) error {
 	ctx := context.Background()
 	clusterNodes, err := client.ClusterNodes(ctx).Result()
 	if err != nil {
-		return fmt.Errorf("error fetching cluster nclusterNodes = {string} \"cbba139773c3602d042ffa72ce9203b66062e27d 10.42.0.90:6379@16379 master - 0 1741931362000 2 connected 5461-10922\\n67fc5c4e342db9bb48d5d293092173de6e36b9a2 10.42.0.98:6379@16379 master - 0 1741931363000 3 connected 10923-16383\\n9649dee04d62a6743648347b2bc3214776c48e22 10.42.0.100:6379@16379 slave 3f1ddf3fa187cc1cc99962dd1acfac74648950ad 0 1741931364085 1 connected\\n14217248cf9ab80312267de67abc99bc2e9920f6 10.42.0.102:6379@16379 slave cbba139773c3602d042ffa72ce9203b66062e27d 0 1741931363583 2 connected\\n3f1ddf3fa187cc1cc99962dd1acfac74648950ad 10.42.0.86:6379@16379 myself,master - 0 0 1 connected 0-5460\\n1bf7ab8412f8f9a664414ecaff23458ad8dc0b54 10.42.0.103:6379@16379 slave 67fc5c4e342db9bb48d5d293092173de6e36b9a2 0 1741931363583 3 connected\\n\"odes: %v", err)
+		return fmt.Errorf(err.Error())
 	}
 
 	// Count master nodes
@@ -186,7 +200,7 @@ func checkReplicaSync(client *redis.Client) {
 
 			slaveInfo := strings.Split(parts[1], ",")
 			slaveAddr := slaveInfo[0]
-			slaveState := strings.TrimSpace(strings.Split(slaveInfo[1], "=")[1])
+			slaveState := strings.TrimSpace(strings.Split(slaveInfo[2], "=")[1])
 
 			if slaveState != "online" {
 				fmt.Printf("❌ Disconnected Replica: %s (State: %s)\n", slaveAddr, slaveState)
@@ -226,7 +240,7 @@ func checkReplicationLag(client *redis.Client) {
 			parts := strings.Split(line, ":")
 			slaveInfo := strings.Split(parts[1], ",")
 			slaveAddr := slaveInfo[0]
-			offsetStr := strings.Split(slaveInfo[2], "=")[1]
+			offsetStr := strings.Split(slaveInfo[3], "=")[1]
 			slaveOffset, _ := strconv.ParseInt(offsetStr, 10, 64)
 
 			slaveOffsets[slaveAddr] = slaveOffset
@@ -239,6 +253,48 @@ func checkReplicationLag(client *redis.Client) {
 		fmt.Printf("🔍 Slave: %s | Offset Lag: %d\n", slave, lag)
 		if lag > 100 { // Threshold can be adjusted
 			fmt.Printf("⚠️ Warning: Slave %s has high replication lag!\n", slave)
+		}
+	}
+}
+
+// Fetch and analyze Redis connections
+func analyzeConnections(client *redis.Client) {
+
+	// Run CLIENT LIST command
+	result, err := client.ClientList(context.Background()).Result()
+	if err != nil {
+		log.Fatalf("❌ Failed to fetch client connections: %v\n", err)
+	}
+
+	// Parse CLIENT LIST output
+	connections := strings.Split(result, "\n")
+	connectionCount := len(connections) - 1 // Last entry is empty
+
+	fmt.Printf("🔍 Active Redis Connections: %d\n", connectionCount)
+
+	// Track connections by IP
+	connectionMap := make(map[string]int)
+
+	for _, conn := range connections {
+		fields := strings.Fields(conn)
+		if len(fields) > 1 {
+			for _, field := range fields {
+				if strings.HasPrefix(field, "addr=") {
+					ipPort := strings.TrimPrefix(field, "addr=")
+					ip := strings.Split(ipPort, ":")[0] // Extract IP (ignore port)
+					connectionMap[ip]++
+					break
+				}
+			}
+		}
+	}
+
+	// Print connection stats
+	fmt.Println("📊 Connection Breakdown by IP:")
+	for ip, count := range connectionMap {
+		fmt.Printf("   - %s: %d connections\n", ip, count)
+		if count > 50 { // Threshold (adjust as needed)
+			fmt.Printf("⚠️  Warning: High number of connections from %s!\n", ip)
 		}
 	}
 }
